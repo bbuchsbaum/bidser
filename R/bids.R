@@ -1,33 +1,4 @@
 
-
-read_example <- function(project) {
-  projurl <- paste0("https://raw.githubusercontent.com/bids-standard/bids-examples/master/", project)
-  part_df <- rio::import(paste0(projurl, "/participants.tsv"))
-
-}
-
-## match key-value
-str_match_all("sub-1001_task-hello_run-01", "([A-Za-z0-9]+-[A-Za-z0-9]+)_*")
-
-devtools::install_github("SWotherspoon/Combin8R")
-library(Combin8R)
-p=pSeq("bids_file",
-    pSeq("subject", pLiteral("sub"), pLiteral("-"), pRegex("id", "[A-Za-z0-9]+")),
-    pMany("has_session",
-          pSeq("session", pLiteral("_"), pLiteral("ses"), pLiteral("-"), pRegex("id", "[A-Za-z0-9]+"))
-    ))
-
-
-bids_project <- function(projname, path=".") {
-  part_df <- rio::import(paste0(path, "/participants.tsv"))
-  dsetinfo <- rio::import(paste0(path, "/dataset_description.json"))
-
-}
-
-scan_subject <- function(path, id) {
-
-}
-
 list_files_github <- function(user, repo, subdir="") {
   gurl <- paste0("https://api.github.com/repos/", user, "/", repo, "/git/trees/master?recursive=1")
   req <- httr::GET(gurl)
@@ -39,3 +10,155 @@ list_files_github <- function(user, repo, subdir="") {
     filelist
   }
 }
+
+read_example <- function(project) {
+  projurl <- paste0("https://raw.githubusercontent.com/bids-standard/bids-examples/master/", project)
+  part_df <- rio::import(paste0(projurl, "/participants.tsv"))
+}
+
+
+
+get_sessions <- function(path, sid) {
+  dnames <- basename(fs::dir_ls(paste0(path, "/", sid)))
+  ret <- str_detect(dnames, "ses-.*")
+  if (any(ret)) {
+    dnames[ret]
+  } else {
+    list()
+  }
+}
+
+descend_anat <- function(node, path) {
+  dnames <- basename(fs::dir_ls(paste0(path)))
+  ret <- str_detect(dnames, "anat")
+  n <- node$AddChild("anat")
+  if (any(ret)) {
+    fnames <- basename(fs::dir_ls(paste0(path, "/anat")))
+
+    for (fname in fnames) {
+      mat <- anat_matcher(fname)
+      if (!is.null(mat)) {
+        n$AddChild(fname)
+      }
+    }
+  }
+}
+
+descend_func <- function(node, path) {
+  dnames <- basename(fs::dir_ls(paste0(path)))
+  ret <- str_detect(dnames, "func")
+  node <- node$AddChild("func")
+  if (any(ret)) {
+    fnames <- basename(fs::dir_ls(paste0(path, "/func")))
+
+    for (fname in fnames) {
+      mat <- func_matcher(fname)
+      if (!is.null(mat)) {
+        n <- node$AddChild(fname)
+        n$type <- mat$result[[1]][[7]]
+        n$task <- mat$result[[1]][[3]]
+        if (length(mat$result[[1]][[6]]$value) > 0) {
+          n$run <- mat$result[[1]][[6]]$value
+        }
+      }
+    }
+  }
+}
+
+#' path <- "~/code/bidser/inst/extdata/ds114"
+#' @mportFrom data.tree Node
+bids_project <- function(path=".") {
+  path <- normalizePath(path)
+
+  if (!file.exists(paste0(path, "/participants.tsv"))) {
+    stop("participants.tsv is missing")
+  }
+
+  if (!file.exists(paste0(path, "/dataset_description.json"))) {
+    stop("dataset_description.json is missing")
+  }
+
+  part_df <- read.table(paste0(path, "/participants.tsv"), stringsAsFactors=FALSE)
+  desc <- jsonlite::read_json(paste0(path, "/dataset_description.json"))
+
+  project_name <- basename(path)
+  bids <- Node$new(project_name)
+
+  sdirs <- as.character(part_df$participant_id)
+
+  has_sessions <- FALSE
+
+  for (sdir in sdirs) {
+    if (file.exists(paste0(path, "/", sdir))) {
+      node <- bids$AddChild(sdir)
+      node$subid <- sdir
+    } else {
+      next
+    }
+
+    sessions <- get_sessions(path, sdir)
+
+    if (length(sessions) > 0) {
+      has_sessions <- TRUE
+      for (sess in sessions) {
+        snode <- node$AddChild(sess)
+        snode$session <- gsub("ses-", "", sess)
+        descend_anat(snode, paste0(path, "/", sdir, "/", sess))
+        descend_func(snode, paste0(path, "/", sdir, "/", sess))
+      }
+    } else {
+      descend_anat(node, paste0(path, "/", sdir))
+      descend_func(node, paste0(path, "/", sdir))
+    }
+  }
+
+
+
+  tbl <- ToDataFrameTypeCol(bids, 'subid', 'session', 'task', 'type')
+
+  ret <- list(bids_tree = bids,
+              tbl = tbl,
+              path=path,
+              has_sessions=has_sessions)
+
+  class(ret) <- "bids_project"
+  ret
+}
+
+
+#' @export
+sessions.bids_project <- function(x) {
+  if (x$has_session)
+   unique(p$bids_tree$Get("session", filterFun = function(x) !is.null(x$session)))
+}
+
+#' @export
+tasks.bids_project <- function(x) {
+  unique(x$bids_tree$Get("task", filterFun = function(x) !is.null(x$task)))
+}
+
+#' @export
+tasks.bids_project <- function(x) {
+  unique(x$bids_tree$Get("task", filterFun = function(x) !is.null(x$task)))
+}
+
+#' @export
+participants.bids_project <- function (x, ...) {
+  unique(x$bids_tree$Get("subid", filterFun = function(x) !is.null(x$subid)))
+}
+
+event_files.bids_project <- function (x, subid="^sub-.*", task=".*", ...) {
+  ret <- x$bids_tree$Get("type", filterFun = function(z) {
+    if (!is.null(z$type) && z$type == "events.tsv" && str_detect(z$name, subid)  && str_detect(z$name, task)) {
+      TRUE
+    } else {
+      FALSE
+    }
+  })
+  ret <- names(ret)
+  paths <- sapply(stringr::str_split(ret, "_"), function(sp) {
+    paste0(sp[[1]], "/", sp[[2]], "/func")
+  })
+  paste0(paths, "/", ret)
+}
+
