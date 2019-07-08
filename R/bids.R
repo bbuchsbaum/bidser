@@ -28,7 +28,33 @@ get_sessions <- function(path, sid) {
   }
 }
 
+descend <- function(node, path, ftype, parser) {
+  dnames <- basename(fs::dir_ls(paste0(path)))
+  ret <- str_detect(dnames, ftype)
+  node <- node$AddChild(ftype)
+  if (any(ret)) {
+    fnames <- basename(fs::dir_ls(paste0(path, "/", ftype)))
+
+    for (fname in fnames) {
+      mat <- parse(parser, fname)
+      if (!is.null(mat)) {
+        n <- node$AddChild(fname)
+        for (key in names(mat$result)) {
+          print(key)
+          #if (length(mat$task[[key]]) > 1) {
+          #  browser()
+          #}
+          if (length(mat$result[[key]]) > 0) {
+            n[[key]] <- mat$result[[key]]
+          }
+        }
+      }
+    }
+  }
+}
+
 descend_anat <- function(node, path) {
+  p <- anat_parser()
   dnames <- basename(fs::dir_ls(paste0(path)))
   ret <- str_detect(dnames, "anat")
   n <- node$AddChild("anat")
@@ -36,7 +62,7 @@ descend_anat <- function(node, path) {
     fnames <- basename(fs::dir_ls(paste0(path, "/anat")))
 
     for (fname in fnames) {
-      mat <- anat_matcher(fname)
+      mat <- parse(p, fname)
       if (!is.null(mat)) {
         n$AddChild(fname)
       }
@@ -45,6 +71,7 @@ descend_anat <- function(node, path) {
 }
 
 descend_func <- function(node, path) {
+  p <- func_parser()
   dnames <- basename(fs::dir_ls(paste0(path)))
   ret <- str_detect(dnames, "func")
   node <- node$AddChild("func")
@@ -52,22 +79,26 @@ descend_func <- function(node, path) {
     fnames <- basename(fs::dir_ls(paste0(path, "/func")))
 
     for (fname in fnames) {
-      mat <- func_matcher(fname)
+      mat <- parse(p, fname)
       if (!is.null(mat)) {
         n <- node$AddChild(fname)
-        n$type <- mat$result[[1]][[7]]
-        n$task <- mat$result[[1]][[3]]
-        if (length(mat$result[[1]][[6]]$value) > 0) {
-          n$run <- mat$result[[1]][[6]]$value
+        for (key in names(mat$result)) {
+          if (length(mat$result[[key]]) > 0) {
+
+            n[[key]] <- mat$result[[key]]
+          }
         }
       }
     }
   }
 }
 
-#' path <- "~/code/bidser/inst/extdata/ds114"
+#' path <- "~/code/bidser/inst/extdata/ds005"
 #' @mportFrom data.tree Node
 bids_project <- function(path=".") {
+  aparser <- anat_parser()
+  fparser <- func_parser()
+
   path <- normalizePath(path)
 
   if (!file.exists(paste0(path, "/participants.tsv"))) {
@@ -78,7 +109,7 @@ bids_project <- function(path=".") {
     stop("dataset_description.json is missing")
   }
 
-  part_df <- read.table(paste0(path, "/participants.tsv"), stringsAsFactors=FALSE)
+  part_df <- read.table(paste0(path, "/participants.tsv"), header=TRUE, stringsAsFactors=FALSE)
   desc <- jsonlite::read_json(paste0(path, "/dataset_description.json"))
 
   project_name <- basename(path)
@@ -103,12 +134,12 @@ bids_project <- function(path=".") {
       for (sess in sessions) {
         snode <- node$AddChild(sess)
         snode$session <- gsub("ses-", "", sess)
-        descend_anat(snode, paste0(path, "/", sdir, "/", sess))
-        descend_func(snode, paste0(path, "/", sdir, "/", sess))
+        descend(snode, paste0(path, "/", sdir, "/", sess), "anat", aparser)
+        descend(snode, paste0(path, "/", sdir, "/", sess), "func", fparser)
       }
     } else {
-      descend_anat(node, paste0(path, "/", sdir))
-      descend_func(node, paste0(path, "/", sdir))
+      descend(node, paste0(path, "/", sdir), "anat", aparser)
+      descend(node, paste0(path, "/", sdir), "func", fparser)
     }
   }
 
@@ -147,14 +178,17 @@ participants.bids_project <- function (x, ...) {
   unique(x$bids_tree$Get("subid", filterFun = function(x) !is.null(x$subid)))
 }
 
+
+#' @export
 event_files.bids_project <- function (x, subid="^sub-.*", task=".*", ...) {
   ret <- x$bids_tree$Get("type", filterFun = function(z) {
-    if (!is.null(z$type) && z$type == "events.tsv" && str_detect(z$name, subid)  && str_detect(z$name, task)) {
+    if (!is.null(z$type) && z$type == "events" && str_detect(z$name, subid)  && str_detect(z$name, task)) {
       TRUE
     } else {
       FALSE
     }
   })
+
   ret <- names(ret)
   paths <- sapply(stringr::str_split(ret, "_"), function(sp) {
     paste0(sp[[1]], "/", sp[[2]], "/func")

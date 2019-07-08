@@ -6,7 +6,8 @@ sub_matcher <- pSeq(function(value) {value[[3]]$value }, pLiteral("sub"), pLiter
 session_matcher <- pSeq(function(value) { value[[4]]$value }, pLiteral("_"), pLiteral("ses"), pLiteral("-"), pRegex("id", "[A-Za-z0-9]+"))
 
 func_mod_matcher <- pSeq(function(value) { value[[2]][[1]] },
-                         pLiteral("_"), pAlt("modality", pSeq(function(x) list(type=x[[1]][[1]], suffix=x[[2]][[1]]), pLiteral("bold"), pLiteral(".nii.gz")),
+                         pLiteral("_"), pAlt(function(x) { list(type=x[[1]][[1]], suffix=x[[2]][[1]]) },
+                                                         pSeq(function(x) { browser() }, pLiteral("bold"), pLiteral(".nii.gz")),
                                                          pSeq(pLiteral("bold"), pLiteral(".json")),
                                                          pSeq(pLiteral("events"), pLiteral(".tsv")),
                                                          pSeq(pLiteral("sbref"), pLiteral(".nii.gz")),
@@ -52,7 +53,7 @@ structural_matcher <- pSeq(function(value) { value[[2]][[1]][[1]] }, pLiteral("_
                                                                                          pLiteral("PDT2"),
                                                                                          pLiteral("inplaneT1"),
                                                                                          pLiteral("inpaneT2"),
-                                                                                         pLiteral("angio")), pAlt(pLiteral(".nii.gz"), pLiteral(".json")))
+                                                                                         pLiteral("angio")), pAlt(pLiteral(".nii"), pLiteral(".nii.gz"), pLiteral(".json")))
 
 
 
@@ -60,6 +61,7 @@ structural_matcher <- pSeq(function(value) { value[[2]][[1]][[1]] }, pLiteral("_
 #' @examples
 #' fp <- func_parser()
 #' parse(fp, "sub-01_ses-1_task-rest_acq-fullbrain_run-1_bold.nii.gz")
+#' parse(fp, "sub-01_ses-1_task-nback_acq-fullbrain_run-1_events.tsv")
 func_parser <- function() {
   builder <- function(x) {
       list(type="func",
@@ -101,6 +103,7 @@ func_parser <- function() {
 #' parse(ap, "sub-01_ses-1_T1map.nii.gz")
 #' parse(ap, "sub-01_ses-1_T1w.nii.gz")
 #' parse(ap, "sub-01_ses-retest_T1w.nii.gz")
+#'
 anat_parser <- function() {
   builder <- function(x) {
     list(type="anat",
@@ -165,10 +168,11 @@ fmap_parser <- function() {
                  structural_matcher)
 
   ret <- list(parser=parser)
-  class(ret) <- c("anat_parser", "parser")
+  class(ret) <- c("fmap_parser", "parser")
   ret
 
 }
+
 
 parse.parser <- function(x, fname) {
   x$parser(fname)
