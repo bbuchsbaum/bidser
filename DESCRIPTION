@@ -11,5 +11,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
 Imports:
   stringr,
-  data.tree
+  data.tree,
+  Combin8R
 
