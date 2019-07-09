@@ -5,13 +5,15 @@ sub_matcher <- pSeq(function(value) {value[[3]]$value }, pLiteral("sub"), pLiter
 
 session_matcher <- pSeq(function(value) { value[[4]]$value }, pLiteral("_"), pLiteral("ses"), pLiteral("-"), pRegex("id", "[A-Za-z0-9]+"))
 
-func_mod_matcher <- pSeq(function(value) { value[[2]][[1]] },
-                         pLiteral("_"), pAlt(function(x) { list(type=x[[1]][[1]], suffix=x[[2]][[1]]) },
-                                                         pSeq(function(x) { browser() }, pLiteral("bold"), pLiteral(".nii.gz")),
-                                                         pSeq(pLiteral("bold"), pLiteral(".json")),
-                                                         pSeq(pLiteral("events"), pLiteral(".tsv")),
-                                                         pSeq(pLiteral("sbref"), pLiteral(".nii.gz")),
-                                                         pSeq(pLiteral("physio"), pLiteral(".tsv"))))
+
+extractor <- function(x) { list(type=x[[1]][[1]], suffix=x[[2]][[1]]) }
+func_mod_matcher <- pSeq(function(x) { x[[2]] },
+                         pLiteral("_"), pAlt(function(x) x,
+                                                         pSeq(extractor, pLiteral("bold"), pLiteral(".nii.gz")),
+                                                         pSeq(extractor, pLiteral("bold"), pLiteral(".json")),
+                                                         pSeq(extractor, pLiteral("events"), pLiteral(".tsv")),
+                                                         pSeq(extractor, pLiteral("sbref"), pLiteral(".nii.gz")),
+                                                         pSeq(extractor, pLiteral("physio"), pLiteral(".tsv"))))
 
 fmap_matcher <- pSeq(function(value) { value[[2]][[1]][[1]] },
                          pLiteral("_"), pAlt("fmap", pRegex("magnitude[12]*.nii.gz"), pRegex("phasediff.nii.gz"),
