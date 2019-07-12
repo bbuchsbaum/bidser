@@ -40,11 +40,13 @@ descend <- function(node, path, ftype, parser) {
       if (!is.null(mat)) {
         n <- node$AddChild(fname)
         for (key in names(mat$result)) {
-          print(key)
+          
           #if (length(mat$task[[key]]) > 1) {
           #  browser()
           #}
           if (length(mat$result[[key]]) > 0) {
+            message("key = ", key)
+            message("val = ", mat$result[[key]])
             n[[key]] <- mat$result[[key]]
           }
         }
@@ -53,45 +55,6 @@ descend <- function(node, path, ftype, parser) {
   }
 }
 
-descend_anat <- function(node, path) {
-  p <- anat_parser()
-  dnames <- basename(fs::dir_ls(paste0(path)))
-  ret <- str_detect(dnames, "anat")
-  n <- node$AddChild("anat")
-  if (any(ret)) {
-    fnames <- basename(fs::dir_ls(paste0(path, "/anat")))
-
-    for (fname in fnames) {
-      mat <- parse(p, fname)
-      if (!is.null(mat)) {
-        n$AddChild(fname)
-      }
-    }
-  }
-}
-
-descend_func <- function(node, path) {
-  p <- func_parser()
-  dnames <- basename(fs::dir_ls(paste0(path)))
-  ret <- str_detect(dnames, "func")
-  node <- node$AddChild("func")
-  if (any(ret)) {
-    fnames <- basename(fs::dir_ls(paste0(path, "/func")))
-
-    for (fname in fnames) {
-      mat <- parse(p, fname)
-      if (!is.null(mat)) {
-        n <- node$AddChild(fname)
-        for (key in names(mat$result)) {
-          if (length(mat$result[[key]]) > 0) {
-
-            n[[key]] <- mat$result[[key]]
-          }
-        }
-      }
-    }
-  }
-}
 
 #' path <- "~/code/bidser/inst/extdata/ds005"
 #' @mportFrom data.tree Node
@@ -178,11 +141,28 @@ participants.bids_project <- function (x, ...) {
   unique(x$bids_tree$Get("subid", filterFun = function(x) !is.null(x$subid)))
 }
 
+scans.bids_project <- function (x, subid="^sub-.*", task=".*", run = ".*", modality="bold", ...) {
+  ret <- x$bids_tree$Get("type", filterFun = function(z) {
+    if (!is.null(z$type) && z$modality == modality && str_detect(z$name, subid)  && str_detect(z$name, task) && str_detect(z$run, run)) {
+      TRUE
+    } else {
+      FALSE
+    }
+  })
+  
+  ret <- names(ret)
+  paths <- sapply(stringr::str_split(ret, "_"), function(sp) {
+    paste0(sp[[1]], "/", sp[[2]], "/func")
+  })
+  paste0(paths, "/", ret)
+}
+
+
 
 #' @export
 event_files.bids_project <- function (x, subid="^sub-.*", task=".*", ...) {
   ret <- x$bids_tree$Get("type", filterFun = function(z) {
-    if (!is.null(z$type) && z$type == "events" && str_detect(z$name, subid)  && str_detect(z$name, task)) {
+    if (!is.null(z$type) && z$modality == "events" && str_detect(z$name, subid)  && str_detect(z$name, task)) {
       TRUE
     } else {
       FALSE
