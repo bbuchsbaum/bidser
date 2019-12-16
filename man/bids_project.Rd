@@ -2,10 +2,18 @@
 % Please edit documentation in R/bids.R
 \name{bids_project}
 \alias{bids_project}
-\title{path <- "~/code/bidser/inst/extdata/ds114"}
+\title{load a BIDS project}
 \usage{
 bids_project(path = ".")
 }
+\arguments{
+\item{path}{the file path of the project}
+}
 \description{
-path <- "~/code/bidser/inst/extdata/ds114"
+load a BIDS project
+}
+\examples{
+
+p <- system.file("inst/extdata/ds001", package="bidser")
+#path <- "~/code/bidser/inst/extdata/ds005"
 }
