@@ -1,4 +1,4 @@
-read_func_data <- function(x, mask, mode=mode = c("bigvec", 
+read_func_data <- function(x, mask, mode = c("bigvec", 
                                                   "mmap", 
                                                   "filebacked",
                                                   "normal"), subid="^sub-.*", task=".*", run = ".*", modality="bold", ...) {
