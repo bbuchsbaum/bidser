@@ -86,7 +86,13 @@ bids_project <- function(path=".") {
   bids <- Node$new(project_name)
 
   sdirs <- as.character(part_df$participant_id)
-
+  
+  if (!all(str_detect("^sub-", sdirs))) {
+    ind <- which(!str_detect("^sub-", sdirs))
+    sdirs[ind] <- paste0("sub-", sdirs[ind])
+  }
+  
+ 
   has_sessions <- FALSE
 
   for (sdir in sdirs) {
