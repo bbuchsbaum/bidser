@@ -14,7 +14,7 @@ extractor <- function(x) { list(type=x[[1]][[1]], suffix=x[[2]][[1]]) }
 func_mod_matcher <- pSeq(function(x) { x[[2]] },
                          pLiteral("_"), pAlt(function(x) x,
                                                          pSeq(extractor, pLiteral("bold"), pLiteral(".nii.gz")),
-                                                        vpSeq(extractor, pLiteral("bold"), pLiteral(".json")),
+                                                         pSeq(extractor, pLiteral("bold"), pLiteral(".json")),
                                                          pSeq(extractor, pLiteral("events"), pLiteral(".tsv")),
                                                          pSeq(extractor, pLiteral("sbref"), pLiteral(".nii.gz")),
                                                          pSeq(extractor, pLiteral("physio"), pLiteral(".tsv"))))
