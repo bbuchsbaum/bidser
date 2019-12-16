@@ -1,4 +1,4 @@
-#' @importFrom Combin8R pSeq pLiteral pRegex pAlt
+#' @importFrom Combin8R pSeq pLiteral pRegex pAlt pMany
 NULL
 
 sub_matcher <- pSeq(function(value) {value[[3]]$value }, pLiteral("sub"), pLiteral("-"), pRegex("id", "[A-Za-z0-9]+"))

@@ -60,7 +60,8 @@ descend <- function(node, path, ftype, parser) {
 #' 
 #' @param path the file path of the project
 #' @importFrom data.tree Node
-#' 
+#' @import stringr
+#' @export
 #' @examples 
 #' 
 #' p <- system.file("inst/extdata/ds001", package="bidser")
@@ -121,7 +122,7 @@ bids_project <- function(path=".") {
 
 
 
-  tbl <- ToDataFrameTypeCol(bids, 'subid', 'session', 'task', 'type')
+  tbl <- data.tree::ToDataFrameTypeCol(bids, 'subid', 'session', 'task', 'type')
 
   ret <- list(bids_tree = bids,
               tbl = tbl,
