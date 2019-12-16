@@ -45,8 +45,8 @@ descend <- function(node, path, ftype, parser) {
           #  browser()
           #}
           if (length(mat$result[[key]]) > 0) {
-            message("key = ", key)
-            message("val = ", mat$result[[key]])
+            #message("key = ", key)
+            #message("val = ", mat$result[[key]])
             n[[key]] <- mat$result[[key]]
           }
         }
@@ -56,8 +56,15 @@ descend <- function(node, path, ftype, parser) {
 }
 
 
-#' path <- "~/code/bidser/inst/extdata/ds005"
-#' @mportFrom data.tree Node
+#' load a BIDS project
+#' 
+#' @param path the file path of the project
+#' @importFrom data.tree Node
+#' 
+#' @examples 
+#' 
+#' p <- system.file("inst/extdata/ds001", package="bidser")
+#' #path <- "~/code/bidser/inst/extdata/ds005"
 bids_project <- function(path=".") {
   aparser <- anat_parser()
   fparser <- func_parser()
@@ -122,8 +129,11 @@ bids_project <- function(path=".") {
 
 #' @export
 sessions.bids_project <- function(x) {
-  if (x$has_session)
-   unique(p$bids_tree$Get("session", filterFun = function(x) !is.null(x$session)))
+  if (x$has_session) {
+    unique(p$bids_tree$Get("session", filterFun = function(x) !is.null(x$session)))
+  } else {
+    NULL
+  }
 }
 
 #' @export
@@ -131,17 +141,20 @@ tasks.bids_project <- function(x) {
   unique(x$bids_tree$Get("task", filterFun = function(x) !is.null(x$task)))
 }
 
-#' @export
-tasks.bids_project <- function(x) {
-  unique(x$bids_tree$Get("task", filterFun = function(x) !is.null(x$task)))
-}
 
 #' @export
 participants.bids_project <- function (x, ...) {
-  unique(x$bids_tree$Get("subid", filterFun = function(x) !is.null(x$subid)))
+  #ret <- x$bids_tree$Get("subid", filterFun = function(x) !is.null(x$subid))
+  unique(x$tbl$subid)
 }
 
-scans.bids_project <- function (x, subid="^sub-.*", task=".*", run = ".*", modality="bold", ...) {
+
+#' @export
+#' @examples 
+#' 
+#' p <- system.file("inst/extdata/ds001", package="bidser")
+#' fs <- func_scans(bids_project(p), subid="sub-0[123]", run="0[123]")
+func_scans.bids_project <- function (x, subid="^sub-.*", task=".*", run = ".*", modality="bold", ...) {
   ret <- x$bids_tree$Get("type", filterFun = function(z) {
     if (!is.null(z$type) && z$modality == modality && str_detect(z$name, subid)  && str_detect(z$name, task) && str_detect(z$run, run)) {
       TRUE
@@ -160,7 +173,7 @@ scans.bids_project <- function (x, subid="^sub-.*", task=".*", run = ".*", modal
 
 
 #' @export
-event_files.bids_project <- function (x, subid="^sub-.*", task=".*", ...) {
+event_files.bids_project <- function (x, subid="^sub-.*", task=".*", run="0[123]", ...) {
   ret <- x$bids_tree$Get("type", filterFun = function(z) {
     if (!is.null(z$type) && z$modality == "events" && str_detect(z$name, subid)  && str_detect(z$name, task)) {
       TRUE
@@ -175,4 +188,6 @@ event_files.bids_project <- function (x, subid="^sub-.*", task=".*", ...) {
   })
   paste0(paths, "/", ret)
 }
+
+
 

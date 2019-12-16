@@ -32,12 +32,9 @@ mandatory_key <- function(label, regex="[A-Za-z0-9]+") {
 
 
 
-
-
 #space_matcher <- pSeq(function(value) { value[[4]]$value }, pLiteral("_"), pLiteral("space"), pLiteral("-"), pRegex("id", "[A-Za-z0-9]+"))
 #label_matcher <- pSeq(function(value) { value[[4]]$value }, pLiteral("_"), pLiteral("label"), pLiteral("-"), pRegex("id", "[A-Za-z0-9]+"))
 #variant_matcher <- pSeq(function(value) { value[[4]]$value }, pLiteral("_"), pLiteral("variant"), pLiteral("-"), pRegex("id", "[A-Za-z0-9]+"))
-
 
 
 structural_matcher <- pSeq(function(value) { value[[2]][[1]][[1]] }, pLiteral("_"), pAlt("modality",

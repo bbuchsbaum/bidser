@@ -28,4 +28,10 @@ event_files <- function (x, ...) {
 
 #' @export
 func_scans <- function(x, ...) {
+  UseMethod("func_scans", x)
+}
+
+#' @export
+scans <- function(x, ...) {
+  UseMethod("scans", x)
 }
