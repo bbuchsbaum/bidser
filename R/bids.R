@@ -163,7 +163,6 @@ participants.bids_project <- function (x, ...) {
 func_scans.bids_project <- function (x, subid="^sub-.*", task=".*", run = ".*", modality="bold", ...) {
   ret <- x$bids_tree$Get("type", filterFun = function(z) {
     if (!is.null(z$type) && z$modality == modality && str_detect(z$name, subid)  && str_detect(z$name, task) && str_detect(z$run, run) && str_detect(z$suffix, ".nii(.gz)?$")) {
-      browser()
       TRUE
     } else {
       FALSE
