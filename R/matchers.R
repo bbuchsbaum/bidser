@@ -8,9 +8,6 @@ session_matcher <- pSeq(function(value) { value[[4]]$value }, pLiteral("_"), pLi
 
 extractor <- function(x) { list(type=x[[1]][[1]], suffix=x[[2]][[1]]) }
 
-#func_mod_matcher <- pSeq(
-#                         pLiteral("_"), pAlt(pSeq(extractor, pLiteral("bold"), pLiteral(".nii.gz")),
-#=======
 func_mod_matcher <- pSeq(function(x) { x[[2]] },
                          pLiteral("_"), pAlt(function(x) x,
                                                          pSeq(extractor, pLiteral("bold"), pLiteral(".nii.gz")),
@@ -32,7 +29,6 @@ optional_key <- function(label, regex="[A-Za-z0-9]+") {
 mandatory_key <- function(label, regex="[A-Za-z0-9]+") {
   pSeq(function(value) { value[[4]]$value}, pLiteral("_"), pLiteral(label), pLiteral("-"), pRegex("id", regex))
 }
-
 
 
 
@@ -182,8 +178,11 @@ parse.parser <- function(x, fname) {
 }
 
 funcpreptypes_matcher <- pSeq(function(value) { value[[2]][[1]][[1]] },
-                              pLiteral("_"), pAlt("preptype", pLiteral("roi.nii.gz"), pLiteral("preproc.nii.gz"), pLiteral("brainmask.nii.gz"),
-                                                  pLiteral("confounds.tsv"), pLiteral("AROMAnoiseICs.csv")))
+                              pLiteral("_"), pAlt("preptype", pLiteral("roi.nii.gz"), 
+                                                  pLiteral("preproc.nii.gz"), 
+                                                  pLiteral("brainmask.nii.gz"),
+                                                  pLiteral("confounds.tsv"), 
+                                                  pLiteral("AROMAnoiseICs.csv")))
 
 
 func_prep_builder <- function(x) {

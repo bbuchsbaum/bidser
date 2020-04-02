@@ -66,7 +66,7 @@ descend <- function(node, path, ftype, parser) {
 #' 
 #' p <- system.file("inst/extdata/ds001", package="bidser")
 #' #path <- "~/code/bidser/inst/extdata/ds005"
-bids_project <- function(path=".") {
+bids_project <- function(path=".", derivs=c("derivatives/fmriprep")) {
   aparser <- anat_parser()
   fparser <- func_parser()
 
