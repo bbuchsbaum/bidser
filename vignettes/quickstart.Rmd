@@ -25,6 +25,7 @@ There is a more elaborate Python package called [pybids](https://github.com/bids
 
 ```{r setup}
 ##library(bidser)
+library(tibble)
 devtools::load_all()
 library(gluedown)
 proj_path <- system.file("inst/extdata/ds001", package="bidser")
@@ -89,7 +90,7 @@ gluedown::md_bullet(t1w)
 
 Now we search for any scans containing the string "bold".
 
-```{r, echo=FALSE, results='asis'} 
+```{r, results='asis'} 
 
 bold <- search_files(proj, "bold")
 
@@ -137,7 +138,7 @@ gluedown::md_bullet(basename(fscans_16))
 
 BIDS event files describe the event-structure of *f*mri experiments. They can be easy read in to R as a set of `data.frame`s using the `read_events` function. As can be seen in the output below, `read_events` returns a `data.frame` with four columns: `.subid`, `.run`, `.task`, `data`. The `data` is nested in the table because there is no guantee that all events files have the same columns (for example, event files associated with different tasks). 
 
-```{r, results="asis"}
+```{r}
 
 evs <- read_events(proj)
 head(evs)
@@ -146,7 +147,7 @@ head(evs)
 
 Now we can filter the table as we like, for example, to extract the data only from the first participant. We can then "unnest" the `data` variable to access the actual event structure.
 
-```{r}
+```{r, result="asis"}
 library(tidyr)
 ev1 <- evs %>% filter(.subid == "01") %>% unnest(cols=c(data))
 head(ev1)
