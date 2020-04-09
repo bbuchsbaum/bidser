@@ -23,13 +23,8 @@ This is a work in progress...
 
 ## Installation
 
-You can install the released version of bidser from [CRAN](https://CRAN.R-project.org) with:
 
-``` r
-install.packages("bidser")
-```
-
-And the development version from [GitHub](https://github.com/) with:
+Install the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -40,7 +35,7 @@ devtools::install_github("bbuchsbaum/bidser")
 to come...
 
 ```{r example}
-library(bidser)
+## library(bidser)
 ## basic example code
 ```
 
