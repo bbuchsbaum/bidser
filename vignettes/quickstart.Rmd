@@ -1,0 +1,155 @@
+---
+title: "Getting Started with bidser"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{quickstart}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+## Brief Introduction to `bidser`
+
+
+`bidser` is an R package for working with the [BIDS](https://bids.neuroimaging.io/) neuroimaging projects. The goal of the package is to allow one to query files that are stored in a hierarchical BIDS structure. Below we load in a BIDS example project, which is stored and accessed through a `bids_project` object.
+
+There is a more elaborate Python package called [pybids](https://github.com/bids-standard/pybids) that can be used to work with BIDS in Python.
+
+
+```{r setup}
+##library(bidser)
+devtools::load_all()
+library(gluedown)
+proj_path <- system.file("inst/extdata/ds001", package="bidser")
+proj <- bids_project(proj_path)
+
+print(proj)
+
+```
+
+We can see that this is a project with 16 participants with anatomical and functional scans and a task called **balloonanalogrisktask**.
+
+We can also make some basic queries of the project to gather information. For example, does the project have any "sessions"?
+
+```{r}
+
+sessions(proj)
+```
+
+No sessions. And what are the participant ids?
+
+```{r}
+sids <- participants(proj)
+```
+
+```{r, results="asis", echo=FALSE}
+
+gluedown::md_bullet(sids)
+
+```
+
+Does it have task event files?
+
+```{r}
+
+
+fnames <- head(basename(event_files(proj)), n=3)
+## print the first three event files
+
+```
+
+```{r, echo=FALSE, results='asis'} 
+
+gluedown::md_order(fnames, seq = FALSE)
+```
+
+
+## Searching the BIDS structure
+
+Lets now search for some arbitrary files. For example, we wish to retrieve all the "T1w" anatomical images.
+
+
+```{r, echo=FALSE, results='asis'} 
+
+t1w <- search_files(proj, "T1w")
+
+```
+
+```{r, echo=FALSE, results='asis'} 
+
+gluedown::md_bullet(t1w)
+```
+
+Now we search for any scans containing the string "bold".
+
+```{r, echo=FALSE, results='asis'} 
+
+bold <- search_files(proj, "bold")
+
+## take the first 5 files, since there are alot.
+bold <- head(bold, 5)
+```
+
+```{r, echo=FALSE, results='asis'} 
+
+gluedown::md_bullet(bold)
+```
+
+
+## Specialized querying functions
+
+If we are only interested in functional bolds scans (rather than any file with "bold" in it), there is a special function called `func_scans` to return such files
+
+```{r, results='asis'} 
+
+fscans <- func_scans(proj)
+
+## take the first 5 files, since there are alot.
+fscans <- head(bold, 5)
+```
+
+```{r, echo=FALSE, results='asis'} 
+
+gluedown::md_bullet(fscans)
+```
+
+Suppose though that we only want the scans from subject "16"?
+
+```{r, results='asis'} 
+
+fscans_16 <- func_scans(proj, subid="16")
+
+```
+
+```{r, echo=FALSE, results='asis'} 
+
+gluedown::md_bullet(basename(fscans_16))
+```
+
+## Reading in Task Event files
+
+BIDS event files describe the event-structure of *f*mri experiments. They can be easy read in to R as a set of `data.frame`s using the `read_events` function. As can be seen in the output below, `read_events` returns a `data.frame` with four columns: `.subid`, `.run`, `.task`, `data`. The `data` is nested in the table because there is no guantee that all events files have the same columns (for example, event files associated with different tasks). 
+
+```{r, results="asis"}
+
+evs <- read_events(proj)
+head(evs)
+
+```
+
+Now we can filter the table as we like, for example, to extract the data only from the first participant. We can then "unnest" the `data` variable to access the actual event structure.
+
+```{r}
+library(tidyr)
+ev1 <- evs %>% filter(.subid == "01") %>% unnest(cols=c(data))
+head(ev1)
+```
+
+

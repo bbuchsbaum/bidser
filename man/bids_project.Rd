@@ -4,7 +4,7 @@
 \alias{bids_project}
 \title{load a BIDS project}
 \usage{
-bids_project(path = ".")
+bids_project(path = ".", fmriprep = FALSE)
 }
 \arguments{
 \item{path}{the file path of the project}
@@ -16,4 +16,7 @@ load a BIDS project
 
 p <- system.file("inst/extdata/ds001", package="bidser")
 #path <- "~/code/bidser/inst/extdata/ds005"
+pp <- bids_project(p)
+
+pp2 <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
 }

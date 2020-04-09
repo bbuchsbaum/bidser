@@ -1,4 +1,6 @@
 
+
+#' @keywords internal
 list_files_github <- function(user, repo, subdir="") {
   gurl <- paste0("https://api.github.com/repos/", user, "/", repo, "/git/trees/master?recursive=1")
   req <- httr::GET(gurl)
@@ -11,6 +13,7 @@ list_files_github <- function(user, repo, subdir="") {
   }
 }
 
+#' @keywords internal
 read_example <- function(project) {
   projurl <- paste0("https://raw.githubusercontent.com/bids-standard/bids-examples/master/", project)
   part_df <- rio::import(paste0(projurl, "/participants.tsv"))
@@ -18,6 +21,7 @@ read_example <- function(project) {
 
 
 
+#' @keywords internal
 get_sessions <- function(path, sid) {
   dnames <- basename(fs::dir_ls(paste0(path, "/", sid)))
   ret <- str_detect(dnames, "ses-.*")
@@ -28,10 +32,14 @@ get_sessions <- function(path, sid) {
   }
 }
 
+
+#' @keywords internal
 descend <- function(node, path, ftype, parser) {
   dnames <- basename(fs::dir_ls(paste0(path)))
   ret <- str_detect(dnames, ftype)
   node <- node$AddChild(ftype)
+  node$folder=ftype
+  
   if (any(ret)) {
     fnames <- basename(fs::dir_ls(paste0(path, "/", ftype)))
 
@@ -56,6 +64,9 @@ descend <- function(node, path, ftype, parser) {
 }
 
 
+
+
+
 #' load a BIDS project
 #' 
 #' @param path the file path of the project
@@ -66,9 +77,14 @@ descend <- function(node, path, ftype, parser) {
 #' 
 #' p <- system.file("inst/extdata/ds001", package="bidser")
 #' #path <- "~/code/bidser/inst/extdata/ds005"
-bids_project <- function(path=".", derivs=c("derivatives/fmriprep")) {
+#' pp <- bids_project(p)
+#' 
+#' pp2 <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
+bids_project <- function(path=".", fmriprep=FALSE) {
   aparser <- anat_parser()
   fparser <- func_parser()
+  
+ 
 
   path <- normalizePath(path)
 
@@ -77,29 +93,40 @@ bids_project <- function(path=".", derivs=c("derivatives/fmriprep")) {
   }
 
   if (!file.exists(paste0(path, "/dataset_description.json"))) {
-    stop("dataset_description.json is missing")
+    warning("dataset_description.json is missing")
+    desc <- list()
+  } else {
+    desc <- jsonlite::read_json(paste0(path, "/dataset_description.json"))
   }
 
   part_df <- read.table(paste0(path, "/participants.tsv"), header=TRUE, stringsAsFactors=FALSE)
-  desc <- jsonlite::read_json(paste0(path, "/dataset_description.json"))
+ 
 
   project_name <- basename(path)
   bids <- Node$new(project_name)
-
+  bids_raw <- bids$AddChild("raw")
+  
+  if (fmriprep) {
+    bids_prep <- bids$AddChild("derivatives/fmriprep")
+    prep_func_parser <- fmriprep_func_parser()
+    prep_anat_parser <- fmriprep_anat_parser() 
+  } 
+    
   sdirs <- as.character(part_df$participant_id)
   
-  if (!all(str_detect("^sub-", sdirs))) {
-    ind <- which(!str_detect("^sub-", sdirs))
+  if (!all(stringr::str_detect(sdirs, "^sub"))) {
+    ind <- which(!str_detect(sdirs, "^sub"))
     sdirs[ind] <- paste0("sub-", sdirs[ind])
   }
   
- 
   has_sessions <- FALSE
 
   for (sdir in sdirs) {
     if (file.exists(paste0(path, "/", sdir))) {
-      node <- bids$AddChild(sdir)
-      node$subid <- sdir
+      node <- bids_raw$AddChild(sdir)
+      if (fmriprep && file.exists(paste0(path, "/", "/derivatives/fmriprep/", sdir))) {
+        prepnode <- bids_prep$AddChild(sdir)
+      }
     } else {
       next
     }
@@ -111,26 +138,53 @@ bids_project <- function(path=".", derivs=c("derivatives/fmriprep")) {
       for (sess in sessions) {
         snode <- node$AddChild(sess)
         snode$session <- gsub("ses-", "", sess)
+        
+ 
         descend(snode, paste0(path, "/", sdir, "/", sess), "anat", aparser)
         descend(snode, paste0(path, "/", sdir, "/", sess), "func", fparser)
+        
+        if (fmriprep) {
+          snode_prepped <- prepnode$AddChild(sess)
+          descend(snode_prepped, paste0(path, "/derivatives/fmriprep/", sdir, "/", sess), "func", prep_func_parser)
+          descend(snode_prepped, paste0(path, "/derivatives/fmriprep/", sdir, "/", sess), "func", prep_anat_parser)
+        }
       }
     } else {
       descend(node, paste0(path, "/", sdir), "anat", aparser)
       descend(node, paste0(path, "/", sdir), "func", fparser)
+      
+      if (fmriprep) {
+        descend(prepnode, paste0(path, "/derivatives/fmriprep/", sdir), "func", prep_func_parser)
+      }
     }
   }
-
-
-
-  tbl <- data.tree::ToDataFrameTypeCol(bids, 'subid', 'session', 'task', 'type')
-
-  ret <- list(bids_tree = bids,
+  
+  tbl <- tibble::as_tibble(data.tree::ToDataFrameTypeCol(bids, 'subid', 'session', 'task', 'type', 'modality', 'suffix'))
+  
+  ret <- list(name=project_name, 
+              part_df=part_df,
+              bids_tree = bids,
               tbl = tbl,
               path=path,
+              has_fmriprep=fmriprep,
               has_sessions=has_sessions)
 
   class(ret) <- "bids_project"
   ret
+}
+
+
+#' @export
+print.bids_project <- function(x) {
+  cat("project: ", x$name, "\n")
+  cat("participants (n):", nrow(x$part_df), "\n")
+  cat("tasks: ", tasks(x), "\n")
+  if (x$has_sessions) {
+    cat("sessions: ", sessions(x), "\n")
+  }
+  cat("image types: ", unique(x$tbl$type), "\n")
+  cat("modalities: ", paste(unique(x$tbl$modality), collapse=", "), "\n")
+  
 }
 
 
@@ -156,44 +210,132 @@ participants.bids_project <- function (x, ...) {
 }
 
 
-#' @export
+
+#' @describeIn func_scans 
 #' @examples 
 #' 
 #' p <- system.file("inst/extdata/ds001", package="bidser")
 #' fs <- func_scans(bids_project(p), subid="sub-0[123]", run="0[123]")
-func_scans.bids_project <- function (x, subid="^sub-.*", task=".*", run = ".*", modality="bold", ...) {
-  ret <- x$bids_tree$Get("type", filterFun = function(z) {
-    if (!is.null(z$type) && z$modality == modality && str_detect(z$name, subid)  && str_detect(z$name, task) && str_detect(z$run, run) && str_detect(z$suffix, ".nii(.gz)?$")) {
+func_scans.bids_project <- function (x, subid="^sub-.*", task=".*", run = ".*", modality="bold", full_path=TRUE, ...) {
+  
+  f <- function(node) {
+    paste0(node$path[3:length(node$path)], collapse="/")
+  }
+  ret <- x$bids_tree$children$raw$Get(f, filterFun = function(z) {
+    if (z$isLeaf && !is.null(z$task) &&  !is.null(z$type) && z$modality == modality && str_detect(z$name, subid)  && str_detect(z$task, task) 
+        && str_detect(z$run, run) && str_detect(z$suffix, "nii(.gz)?$")) {
       TRUE
     } else {
       FALSE
     }
   })
   
-  ret <- names(ret)
-  paths <- sapply(stringr::str_split(ret, "_"), function(sp) {
-    paste0(sp[[1]], "/", sp[[2]], "/func")
-  })
-  paste0(paths, "/", ret)
+  #ret <- names(ret)
+  #paths <- sapply(stringr::str_split(ret, "_"), function(sp) {
+  #  paste0(sp[[1]], "/", sp[[2]], "/func")
+  #})
+  #paste0(paths, "/", ret)
+  if (full_path) {
+    ret <- paste0(x$path, "/", ret)
+  }
+  
+  ret
 }
 
 
 
-#' @export
-event_files.bids_project <- function (x, subid="^sub-.*", task=".*", run="0[123]", ...) {
-  ret <- x$bids_tree$Get("type", filterFun = function(z) {
-    if (!is.null(z$type) && z$modality == "events" && str_detect(z$name, subid)  && str_detect(z$name, task)) {
+str_detect_null <- function(x, pat, default=FALSE) {
+  if (is.null(x)) default else str_detect(x,pat)
+}
+
+#' @describeIn preproc_scans 
+#' @examples 
+#' proj <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
+#' preproc_scans(proj)
+preproc_scans.bids_project <- function (x, subid="^sub-.*", task=".*", run = ".*", variant="a^", space=".*", modality="bold", full_path=FALSE, ...) {
+  f <- function(node) {
+    paste0(node$path[2:length(node$path)], collapse="/")
+  }
+  
+  ret <- x$bids_tree$children$`derivatives/fmriprep`$Get(f, filterFun = function(z) {
+    if (is.null(variant) && !is.null(z$variant)) {
+      return(FALSE)
+    }
+    if (is.null(variant)) {
+      variant <- ".*"
+    }
+    
+  
+    if (z$isLeaf && z$deriv == "preproc" && !is.null(z$type) && z$modality == modality && 
+        str_detect(z$name, subid)  && str_detect(z$name, task) && 
+        str_detect_null(z$variant, variant, TRUE) && str_detect_null(z$space, space, TRUE) && str_detect(z$run, run) && 
+        str_detect(z$suffix, "nii(.gz)?$")) {
       TRUE
     } else {
       FALSE
     }
   })
+  
+  if (full_path) {
+    paste0(x$path, "/", ret)
+  } else {
+    ret
+  }
+}
 
-  ret <- names(ret)
-  paths <- sapply(stringr::str_split(ret, "_"), function(sp) {
-    paste0(sp[[1]], "/", sp[[2]], "/func")
-  })
-  paste0(paths, "/", ret)
+key_match <- function(...) {
+  keyvals <- list(...)
+  if (length(keyvals) == 0) {
+    return(function(x) TRUE)
+  }
+  keys <- names(keyvals)
+  function(x) {
+    all(sapply(keys, function(k) {
+      if (is.null(keyvals[[k]]) && !is.null(x[[k]])) {
+        FALSE
+      } else if (is.null(keyvals[[k]]) && is.null(x[[k]])) {
+        TRUE
+      } else {
+        str_detect_null(x[[k]], keyvals[[k]])
+      }
+    }))
+  }
+}
+
+
+#' @export
+#' @importFrom stringr str_detect
+search_files.bids_project <- function(x, regex=".*", full_path=FALSE, ...) {
+  f <- function(node) {
+    if (node$path[2] == "derivatives/fmriprep") {
+      paste0(node$path[2:length(node$path)], collapse="/")
+    } else {
+      paste0(node$path[3:length(node$path)], collapse="/")
+    }
+  }
+  
+  matcher <- key_match(...)
+  
+  ret <- x$bids_tree$Get(f, filterFun = function(z) {
+    z$isLeaf && str_detect(z$name, regex) && matcher(z)
+  }, simplify=FALSE)
+  
+  if (length(ret) == 0) {
+    return(list())
+  }
+  
+  if (full_path) {
+    paste0(x$path, "/", ret)
+  } else {
+    ret
+  }
+}
+
+
+
+#' @export
+event_files.bids_project <- function (x, subid=".*", task=".*", run=".*", full_path=TRUE, ...) {
+  search_files(x, modality = "events", subid=subid, task=task, run=run, full_path=full_path)
 }
 
 

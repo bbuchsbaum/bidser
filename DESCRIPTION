@@ -8,7 +8,7 @@ Encoding: UTF-8
 LazyData: true
 ByteCompile: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Imports:
   stringr,
   data.tree,
@@ -17,4 +17,7 @@ Imports:
 Remotes: 
   SWotherspoon/Combin8R,
   bbuchsbaum/neuroim2
-
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

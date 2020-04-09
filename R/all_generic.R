@@ -27,11 +27,30 @@ event_files <- function (x, ...) {
 }
 
 #' @export
+read_events <- function (x, ...) {
+  UseMethod("read_events", x)
+}
+
+#' extract functional scans from bids project
+#' 
+#' @export
 func_scans <- function(x, ...) {
   UseMethod("func_scans", x)
 }
 
+#' extract fmriprep "preproc" scans from bids project
 #' @export
-scans <- function(x, ...) {
-  UseMethod("scans", x)
+preproc_scans <- function(x, ...) {
+  UseMethod("preproc_scans", x)
+}
+
+#' @export
+create_preproc_mask <- function(x, ...) {
+  UseMethod("create_preproc_mask", x)
+}
+
+
+#' @export
+search_files <- function(x, ...) {
+  UseMethod("search_files", x)
 }
