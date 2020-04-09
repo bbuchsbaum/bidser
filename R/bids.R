@@ -182,8 +182,8 @@ print.bids_project <- function(x) {
   if (x$has_sessions) {
     cat("sessions: ", sessions(x), "\n")
   }
-  cat("image types: ", unique(x$tbl$type), "\n")
-  cat("modalities: ", paste(unique(x$tbl$modality), collapse=", "), "\n")
+  cat("image types: ", unique(x$tbl$type[!is.na(x$tbl$type)]), "\n")
+  cat("modalities: ", paste(unique(x$tbl$modality[!is.na(x$tbl$modality)]), collapse=", "), "\n")
   
 }
 
@@ -199,7 +199,7 @@ sessions.bids_project <- function(x) {
 
 #' @export
 tasks.bids_project <- function(x) {
-  unique(x$bids_tree$Get("task", filterFun = function(x) !is.null(x$task)))
+  unique(x$bids_tree$Get("task", filterFun = function(x) !is.null(x$task) & !is.na(x$task)))
 }
 
 
