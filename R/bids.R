@@ -191,7 +191,7 @@ print.bids_project <- function(x) {
 #' @export
 sessions.bids_project <- function(x) {
   if (x$has_session) {
-    unique(x$bids_tree$Get("session", filterFun = function(x) !is.null(x$session)))
+    unique(unlist(x$bids_tree$Get("session", filterFun = function(x) !is.null(x$session))))
   } else {
     NULL
   }
