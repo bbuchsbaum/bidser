@@ -121,7 +121,12 @@ bids_project <- function(path=".", fmriprep=FALSE) {
   
   has_sessions <- FALSE
 
+ 
+  pb <- progress_bar$new(total = length(sdirs))
+
+  
   for (sdir in sdirs) {
+    pb$tick()
     if (file.exists(paste0(path, "/", sdir))) {
       node <- bids_raw$AddChild(sdir)
       if (fmriprep && file.exists(paste0(path, "/", "/derivatives/fmriprep/", sdir))) {
@@ -145,8 +150,10 @@ bids_project <- function(path=".", fmriprep=FALSE) {
         
         if (fmriprep) {
           snode_prepped <- prepnode$AddChild(sess)
+          snode$session <- gsub("ses-", "", sess)
+          descend(snode_prepped, paste0(path, "/derivatives/fmriprep/", sdir, "/", sess), "anat", prep_anat_parser)
           descend(snode_prepped, paste0(path, "/derivatives/fmriprep/", sdir, "/", sess), "func", prep_func_parser)
-          descend(snode_prepped, paste0(path, "/derivatives/fmriprep/", sdir, "/", sess), "func", prep_anat_parser)
+          
         }
       }
     } else {

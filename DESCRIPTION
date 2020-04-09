@@ -13,7 +13,8 @@ Imports:
   stringr,
   data.tree,
   Combin8R,
-  neuroim2
+  neuroim2,
+  progress
 Remotes: 
   SWotherspoon/Combin8R,
   bbuchsbaum/neuroim2
