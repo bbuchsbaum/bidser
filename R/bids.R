@@ -126,7 +126,7 @@ bids_project <- function(path=".", fmriprep=FALSE) {
 
   
   for (sdir in sdirs) {
-    pb$tick()
+   
     if (file.exists(paste0(path, "/", sdir))) {
       node <- bids_raw$AddChild(sdir)
       if (fmriprep && file.exists(paste0(path, "/", "/derivatives/fmriprep/", sdir))) {
@@ -150,7 +150,7 @@ bids_project <- function(path=".", fmriprep=FALSE) {
         
         if (fmriprep) {
           snode_prepped <- prepnode$AddChild(sess)
-          snode$session <- gsub("ses-", "", sess)
+          snode_prepped$session <- gsub("ses-", "", sess)
           descend(snode_prepped, paste0(path, "/derivatives/fmriprep/", sdir, "/", sess), "anat", prep_anat_parser)
           descend(snode_prepped, paste0(path, "/derivatives/fmriprep/", sdir, "/", sess), "func", prep_func_parser)
           
@@ -161,9 +161,12 @@ bids_project <- function(path=".", fmriprep=FALSE) {
       descend(node, paste0(path, "/", sdir), "func", fparser)
       
       if (fmriprep) {
+        descend(prepnode, paste0(path, "/derivatives/fmriprep/", sdir), "func", prep_anat_parser)
         descend(prepnode, paste0(path, "/derivatives/fmriprep/", sdir), "func", prep_func_parser)
       }
     }
+    
+    pb$tick()
   }
   
   tbl <- tibble::as_tibble(data.tree::ToDataFrameTypeCol(bids, 'subid', 'session', 'task', 'type', 'modality', 'suffix'))
