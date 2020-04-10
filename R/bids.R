@@ -268,10 +268,16 @@ preproc_scans.bids_project <- function (x, subid="^sub-.*", task=".*", run = ".*
     paste0(node$path[2:length(node$path)], collapse="/")
   }
   
+  ## fixme...
   ret <- x$bids_tree$children$`derivatives/fmriprep`$Get(f, filterFun = function(z) {
     if (is.null(variant) && !is.null(z$variant)) {
       return(FALSE)
     }
+    
+    if (is.null(z$deriv)) {
+      return(FALSE)
+    }
+    
     if (is.null(variant)) {
       variant <- ".*"
     }
