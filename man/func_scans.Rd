@@ -9,7 +9,7 @@ func_scans(x, ...)
 
 \method{func_scans}{bids_project}(
   x,
-  subid = "^sub-.*",
+  subid = ".*",
   task = ".*",
   run = ".*",
   modality = "bold",

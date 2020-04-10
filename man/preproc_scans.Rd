@@ -9,7 +9,7 @@ preproc_scans(x, ...)
 
 \method{preproc_scans}{bids_project}(
   x,
-  subid = "^sub-.*",
+  subid = ".*",
   task = ".*",
   run = ".*",
   variant = "a^",
