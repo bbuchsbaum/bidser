@@ -227,7 +227,7 @@ participants.bids_project <- function (x, ...) {
 #' 
 #' p <- system.file("inst/extdata/ds001", package="bidser")
 #' fs <- func_scans(bids_project(p), subid="sub-0[123]", run="0[123]")
-func_scans.bids_project <- function (x, subid="^sub-.*", task=".*", run = ".*", modality="bold", full_path=TRUE, ...) {
+func_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", modality="bold", full_path=TRUE, ...) {
   
   f <- function(node) {
     paste0(node$path[3:length(node$path)], collapse="/")
@@ -263,7 +263,7 @@ str_detect_null <- function(x, pat, default=FALSE) {
 #' @examples 
 #' proj <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
 #' preproc_scans(proj)
-preproc_scans.bids_project <- function (x, subid="^sub-.*", task=".*", run = ".*", variant="a^", space=".*", modality="bold", full_path=FALSE, ...) {
+preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", variant="a^", space=".*", modality="bold", full_path=FALSE, ...) {
   f <- function(node) {
     paste0(node$path[2:length(node$path)], collapse="/")
   }
