@@ -209,7 +209,8 @@ sessions.bids_project <- function(x) {
 
 #' @export
 tasks.bids_project <- function(x) {
-  unique(x$bids_tree$Get("task", filterFun = function(x) !is.null(x$task) & !is.na(x$task)))
+  sort(unique(x$bids_tree$Get("task", filterFun = function(x) {!is.na(x$task) && !is.null(x$task) } )))
+  ##unique(x$bids_tree$Get("task", filterFun = function(x) !is.null(x$task) & !is.na(x$task)))
 }
 
 
