@@ -72,6 +72,7 @@ descend <- function(node, path, ftype, parser) {
 #' @param path the file path of the project
 #' @importFrom data.tree Node
 #' @import stringr
+#' @import progress
 #' @export
 #' @examples 
 #' 
@@ -122,7 +123,7 @@ bids_project <- function(path=".", fmriprep=FALSE) {
   has_sessions <- FALSE
 
  
-  pb <- progress_bar$new(total = length(sdirs))
+  pb <- progress::progress_bar$new(total = length(sdirs))
 
   
   for (sdir in sdirs) {
