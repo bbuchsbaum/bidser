@@ -228,14 +228,16 @@ participants.bids_project <- function (x, ...) {
 #' 
 #' p <- system.file("inst/extdata/ds001", package="bidser")
 #' fs <- func_scans(bids_project(p), subid="sub-0[123]", run="0[123]")
+#' @export
 func_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", modality="bold", full_path=TRUE, ...) {
   
   f <- function(node) {
     paste0(node$path[3:length(node$path)], collapse="/")
   }
   ret <- x$bids_tree$children$raw$Get(f, filterFun = function(z) {
-    if (z$isLeaf && !is.null(z$task) &&  !is.null(z$type) && z$modality == modality && str_detect(z$name, subid)  && str_detect(z$task, task) 
-        && str_detect(z$run, run) && str_detect(z$suffix, "nii(.gz)?$")) {
+    if (z$isLeaf && !is.null(z$task) &&  !is.null(z$type) && str_detect_null(z$modality,modality)
+        && str_detect_null(z$name, subid)  && str_detect_null(z$task, task) 
+        && str_detect_null(z$run, run) && str_detect_null(z$suffix, "nii(.gz)?$")) {
       TRUE
     } else {
       FALSE
@@ -257,13 +259,14 @@ func_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", modal
 
 
 str_detect_null <- function(x, pat, default=FALSE) {
-  if (is.null(x)) default else str_detect(x,pat)
+  if (is.null(x) || is.na(x)) default else str_detect(x,pat)
 }
 
 #' @describeIn preproc_scans 
 #' @examples 
 #' proj <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
 #' preproc_scans(proj)
+#' @export
 preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", variant="a^", space=".*", modality="bold", full_path=FALSE, ...) {
   f <- function(node) {
     paste0(node$path[2:length(node$path)], collapse="/")
@@ -284,10 +287,12 @@ preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", va
     }
     
   
-    if (z$isLeaf && z$deriv == "preproc" && !is.null(z$type) && z$modality == modality && 
-        str_detect(z$name, subid)  && str_detect(z$name, task) && 
-        str_detect_null(z$variant, variant, TRUE) && str_detect_null(z$space, space, TRUE) && str_detect(z$run, run) && 
-        str_detect(z$suffix, "nii(.gz)?$")) {
+    if (z$isLeaf && str_detect_null(z$deriv , "preproc") && !is.null(z$type) && 
+        str_detect_null(z$modality,modality) && 
+        str_detect_null(z$name, subid)  && str_detect_null(z$name, task) && 
+        str_detect_null(z$variant, variant, TRUE) && str_detect_null(z$space, space, TRUE) && 
+        str_detect_null(z$run, run) && 
+        str_detect_null(z$suffix, "nii(.gz)?$")) {
       TRUE
     } else {
       FALSE
