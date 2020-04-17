@@ -53,6 +53,24 @@ DEFAULT_CVARS <- c("CSF", "WhiteMatter", "GlobalSignal", "stdDVARS", "non.stdDVA
                     "aCompCor02" , "aCompCor03", "aCompCor04", "aCompCor05", "X", "Y", "Z",
                     "RotX", "RotY", "RotZ")
 
+
+#' @export
+confound_files.bids_project <- function(x, subid=".*", task=".*", nest=TRUE) {
+  sids <- participants(x)
+  gidx <- grep(subid, sids)
+  if (length(gidx) == 0) {
+    stop(paste("no matching participants found for regex: ", subid))
+  }
+  sids <- sids[gidx]
+  ret <- lapply(sids, function(s) {
+    fnames <- search_files(x, subid=as.character(s), task=task, deriv="confounds", full_path=TRUE)
+  })
+  
+  ret
+}
+  
+
+
 #' read in fmriprep confound tables for a set of subjects
 #' 
 #' @param subid (optional) subid regex selector
@@ -63,6 +81,7 @@ DEFAULT_CVARS <- c("CSF", "WhiteMatter", "GlobalSignal", "stdDVARS", "non.stdDVA
 #' @import dplyr
 #' @importFrom tidyr nest
 #' @importFrom tidyselect all_of
+#' @export
 read_confounds.bids_project <- function(x, subid=".*", task=".*", cvars=DEFAULT_CVARS, 
                                         npcs=-1, perc_var=-1, nest=TRUE) {
   sids <- participants(x)
@@ -80,7 +99,7 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", cvars=DEFAULT_
         dfx <- process_confounds(dfx, npcs=npcs, perc_var=perc_var)
       }
       
-      dfx %>% mutate(participant_id=s)
+      dfx %>% mutate(participant_id=s) 
     }) %>% bind_rows()
   }) %>% bind_rows()
   

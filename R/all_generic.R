@@ -27,8 +27,18 @@ event_files <- function (x, ...) {
 }
 
 #' @export
+confound_files <- function (x, ...) {
+  UseMethod("confound_files", x)
+}
+
+#' @export
 read_events <- function (x, ...) {
   UseMethod("read_events", x)
+}
+
+#' @export
+read_confounds <- function (x, ...) {
+  UseMethod("read_confounds", x)
 }
 
 #' extract functional scans from bids project
