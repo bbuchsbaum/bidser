@@ -72,7 +72,8 @@ descend <- function(node, path, ftype, parser) {
 #' @param path the file path of the project
 #' @importFrom data.tree Node
 #' @import stringr
-#' @import progress
+#' @importFrom progress progress_bar 
+#' @importFrom future availableCores
 #' @export
 #' @examples 
 #' 
@@ -220,6 +221,7 @@ participants.bids_project <- function (x, ...) {
   #ret <- x$bids_tree$Get("subid", filterFun = function(x) !is.null(x$subid))
   unique(x$tbl$subid)
 }
+
 
 
 

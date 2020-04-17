@@ -62,6 +62,7 @@ DEFAULT_CVARS <- c("CSF", "WhiteMatter", "GlobalSignal", "stdDVARS", "non.stdDVA
 #' @param perc_var perform pca reduction on confound matrix and retain \code{perc_var} percent of variance
 #' @import dplyr
 #' @importFrom tidyr nest
+#' @importFrom tidyselect all_of
 read_confounds.bids_project <- function(x, subid=".*", task=".*", cvars=DEFAULT_CVARS, 
                                         npcs=-1, perc_var=-1, nest=TRUE) {
   sids <- participants(x)
