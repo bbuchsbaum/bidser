@@ -14,7 +14,9 @@ Imports:
   data.tree,
   Combin8R,
   neuroim2,
-  progress
+  progress,
+  tidyselect,
+  dplyr
 Remotes: 
   SWotherspoon/Combin8R,
   bbuchsbaum/neuroim2
