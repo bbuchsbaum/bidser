@@ -149,7 +149,7 @@ process_confounds <- function(dfx, center=TRUE, scale=TRUE, npcs=-1, perc_var=-1
   as.data.frame(sm)
 }
 
-
+#' @export
 read_events.bids_project <- function(x, subid = ".*", task = ".*") {
   pt <- participants(x)
   idx <- grep(subid, pt)
