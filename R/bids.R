@@ -65,7 +65,8 @@ descend <- function(node, path, ftype, parser) {
 
 
 
-
+## TODO add ability to load one subject only
+## TODO create a "bids_object" to represent files and folders?
 
 #' load a BIDS project
 #' 
