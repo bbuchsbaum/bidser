@@ -25,6 +25,12 @@ optional_key <- function(label, regex="[A-Za-z0-9]+") {
         pSeq(function(value) { value[[4]]$value}, pLiteral("_"), pLiteral(label), pLiteral("-"), pRegex("id", regex)))
 }
 
+optional_literal <- function(lit, label) {
+  pMany(paste0("has_", label),
+        pSeq(function(value) { value[[2]][[1]][[1]] }, pLiteral("_"), pLiteral(lit))
+  )
+}
+
 mandatory_key <- function(label, regex="[A-Za-z0-9]+") {
   pSeq(function(value) { value[[4]]$value}, pLiteral("_"), pLiteral(label), pLiteral("-"), pRegex("id", regex))
 }
@@ -34,6 +40,12 @@ one_of <- function(labels) {
   pSeq(function(value) { value[[2]][[1]] }, pLiteral("_"), do.call(pAlt, c(lits, tag=function(x) { x})))
 }
 
+zero_or_one_of <- function(labels, label) {
+  lits <- lapply(labels, pLiteral)
+  pMany(paste0("has_", label),
+        pSeq(function(value) { value[[2]][[1]] }, pLiteral("_"), do.call(pAlt, c(lits, tag=function(x) { x})))
+  )
+}
 
 
 #space_matcher <- pSeq(function(value) { value[[4]]$value }, pLiteral("_"), pLiteral("space"), pLiteral("-"), pRegex("id", "[A-Za-z0-9]+"))
@@ -189,14 +201,17 @@ parse.parser <- function(x, fname) {
 
 
 
-func_prep_types <- c("roi", "preproc", "brainmask", "confounds", "AROMAnoiseICs")
+func_prep_types <- c("roi", "preproc", "brainmask", "confounds", "AROMAnoiseICs", "bold", "regressors")
 
 funcpreptypes_matcher <- pSeq(function(x) { x[[2]] },
                               pLiteral("_"), pAlt(function(x) x,
                                                   gen_lit("roi", ".nii.gz", extractor), 
+                                                  gen_lit("regressors", ".tsv", extractor),
                                                   gen_lit("preproc",".nii.gz", extractor), 
+                                                  gen_lit("bold",".nii.gz", extractor), 
                                                   gen_lit("brainmask", ".nii.gz", extractor),
                                                   gen_lit("confounds", ".tsv", extractor), 
+                                                  gen_lit("MELODICmix", ".tsv", extractor), 
                                                   gen_lit("AROMAnoiseICs", ".csv", extractor)))
 
 #' construct a parser for fmriprep func types
@@ -211,23 +226,34 @@ funcpreptypes_matcher <- pSeq(function(x) { x[[2]] },
 #  parse(p, "sub-2002_task-mega_run-09_bold_AROMAnoiseICs.csv")
 #  parse(p, "sub-2002_task-mega_run-09_bold_confounds.tsv")
 #  parse(p, "sub-2002_task-mega_run-09_bold_MELODICmix.tsv")
+#  parse(p, "sub-301_task-repetition_run-4_space-MNI152Lin_res-native_desc-preproc_bold.nii.gz")
+#  parse(p, "sub-301_task-localizer_run-3_desc-confounds_regressors.tsv")
 fmriprep_func_parser <- function() {
 
   builder <- function(x) {
-    list(type="func",
+    ret <- list(type="func",
          subid=x[[1]],
          session=unlist(x[[2]]$value),
          task=x[[3]],
          acquisition=unlist(x[[4]]$value),
          reconstruction=unlist(x[[5]]$value),
          run=unlist(x[[6]]$value),
-         modality=unlist(x[[7]]),
+         modality=unlist(x[[7]]$value),
          space=unlist(x[[8]]$value),
-         label=unlist(x[[9]]$value),
-         variant=unlist(x[[10]]$value),
+         res=unlist(x[[9]]$value),
+         desc=unlist(x[[10]]$value),
+         label=unlist(x[[11]]$value),
+         variant=unlist(x[[12]]$value),
          #desc=unlist(x[[11]]$value),
-         deriv=unlist(x[[11]]$type),
-         suffix=substr(x[[11]]$suffix, 2, nchar(x[[11]]$suffix)))
+         deriv=unlist(x[[13]]$type),
+         suffix=substr(x[[13]]$suffix, 2, nchar(x[[13]]$suffix)))
+    
+    if (is.null(ret$modality) && !is.null(ret$deriv)) {
+      ret$modality <- ret$deriv
+    }
+    
+    ret
+    
     
   }
   
@@ -240,8 +266,11 @@ fmriprep_func_parser <- function() {
                              optional_key("acq"),
                              optional_key("rec"),
                              optional_key("run", "[0-9]+"),
-                             pSeq(function(value) { value[[2]][[1]][[1]] }, pLiteral("_"), pLiteral("bold")),
+                             optional_literal("bold", "modality"),
+                             #pSeq(function(value) { value[[2]][[1]][[1]] }, pLiteral("_"), pLiteral("bold")),
                              optional_key("space"),
+                             optional_key("res"),
+                             optional_key("desc"),
                              optional_key("label"),
                              optional_key("variant"),
                              funcpreptypes_matcher)
@@ -252,7 +281,7 @@ fmriprep_func_parser <- function() {
 }
 
 
-anat_prep_types <- c("preproc", "brainmask", "probtissue", "dtissue", "warp",
+anat_prep_types <- c("preproc", "brainmask", "probtissue", "mask", "probseg", "T1w", "dtissue", "warp",
                      "inflated.L.surf","inflated.R.surf","pial.L.surf","pial.R.surf", "affine")
                      
                      
@@ -261,6 +290,9 @@ anatpreptypes_matcher <- pSeq(function(x) { x[[2]] },
                                                   gen_lit("preproc", ".nii.gz", extractor), 
                                                   gen_lit("brainmask",".nii.gz", extractor), 
                                                   gen_lit("probtissue", ".nii.gz", extractor),
+                                                  gen_lit("mask", ".nii.gz", extractor),
+                                                  gen_lit("T1w", ".nii.gz", extractor),
+                                                  gen_lit("probseg", ".nii.gz", extractor),
                                                   gen_lit("dtissue", ".nii.gz", extractor), 
                                                   gen_lit("warp", ".h5", extractor),
                                                   gen_lit("inflated.L.surf", ".gii", extractor),
@@ -276,6 +308,8 @@ anatpreptypes_matcher <- pSeq(function(x) { x[[2]] },
 #' ap <- fmriprep_anat_parser()
 #' parse(ap, "sub-2001_T1w_inflated.L.surf.gii")
 #' parse(ap, "sub-2001_T1w_space-MNI152NLin2009cAsym_class-GM_probtissue.nii.gz")
+#' parse(ap, "sub-301_space-MNI152Lin_desc-brain_mask.nii.gz")
+#' parse(ap, "sub-301_space-MNI152NLin2009cAsym_label-GM_probseg.nii.gz")
 fmriprep_anat_parser <- function() {
   builder <- function(x) {
     
@@ -290,11 +324,12 @@ fmriprep_anat_parser <- function() {
          modality=unlist(x[[8]]),
          label=unlist(x[[9]]$value),
          space=unlist(x[[10]]$value),
-         target=unlist(x[[11]]$value),
-         class=unlist(x[[12]]$value),
-         mod=unlist(x[[13]]$value),
-         deriv=x[[14]]$type,
-         suffix=substr(x[[14]]$suffix, 2, nchar(x[[14]]$suffix)))
+         desc=unlist(x[[11]]$value),
+         target=unlist(x[[12]]$value),
+         class=unlist(x[[13]]$value),
+         mod=unlist(x[[14]]$value),
+         deriv=x[[15]]$type,
+         suffix=substr(x[[15]]$suffix, 2, nchar(x[[15]]$suffix)))
   }
   
   parser <- pSeq(builder,
@@ -305,9 +340,10 @@ fmriprep_anat_parser <- function() {
                  optional_key("dir"),
                  optional_key("rec"),
                  optional_key("run", "[0-9]+"),
-                 one_of(anat_types),
-                 optional_key("label"),
+                 zero_or_one_of(anat_types, "anat_type"),
                  optional_key("space"),
+                 optional_key("label"),
+                 optional_key("desc"),
                  optional_key("target"),
                  optional_key("class"),
                  optional_key("mod"),
