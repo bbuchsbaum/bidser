@@ -65,11 +65,15 @@ gen_lits <- function(types, suffix, extractor) {
 
 anat_types <- c("defacemask","T1w", "T2w","T1map", "T2map", "T2star","FLAIR", "FLASH", "PDmap","PD","PDT2",
                 "inplaneT1", "inplaneT2", "angio")
-anat_nii <- gen_lits(anat_types, ".nii.gz", extractor)
+
+
+
+anat_nii_gz <- gen_lits(anat_types, ".nii.gz", extractor)
+anat_nii <- gen_lits(anat_types, ".nii", extractor)
 anat_json <- gen_lits(anat_types, ".json", extractor)
 
 anat_mod_matcher <- pSeq(function(x) { x[[2]] }, 
-                           pLiteral("_"), do.call(pAlt, c(anat_nii, anat_json, tag=function(x) x)))
+                           pLiteral("_"), do.call(pAlt, c(anat_nii_gz, anat_nii, anat_json, tag=function(x) x)))
                                               
                                               
                                                                                   
@@ -121,7 +125,7 @@ func_parser <- function() {
 #' parse(ap, "sub-01_ses-1_T1map.nii.gz")
 #' parse(ap, "sub-01_ses-1_T1w.nii.gz")
 #' parse(ap, "sub-01_ses-retest_T1w.nii.gz")
-#'
+#' parse(ap, "sub-303_T1w.nii")
 anat_parser <- function() {
   builder <- function(x) {
     #browser()
