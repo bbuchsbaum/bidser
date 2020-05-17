@@ -53,6 +53,12 @@ DEFAULT_CVARS <- c("CSF", "WhiteMatter", "GlobalSignal", "stdDVARS", "non.stdDVA
                     "aCompCor02" , "aCompCor03", "aCompCor04", "aCompCor05", "X", "Y", "Z",
                     "RotX", "RotY", "RotZ")
 
+DEFAULT_CVARS2 <- c("csf", "white_matter", "global_signal", "std_dvars", 
+                    "framewise_displacement", "t_comp_cor_00", "t_comp_cor_01", "t_comp_cor_02",           
+                   "t_comp_cor_03", "t_comp_cor_04", "t_comp_cor_00", "a_comp_cor_00", "a_comp_cor_01",           
+                   "a_comp_cor_02" , "a_comp_cor_03", "a_comp_cor_04", "a_comp_cor_03", "trans_x", "trans_y", "trans_z",
+                   "rot_x", "rot_y", "rot_z")
+
 
 #' @export
 confound_files.bids_project <- function(x, subid=".*", task=".*", nest=TRUE) {
@@ -92,7 +98,7 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", cvars=DEFAULT_
   sids <- sids[gidx]
   
   ret <- lapply(sids, function(s) {
-    fnames <- search_files(x, subid=as.character(s), deriv="confounds", full_path=TRUE)
+    fnames <- search_files(x, subid=as.character(s), deriv="(confounds|regressors)", full_path=TRUE)
     ret <- lapply(fnames, function(fn) {
       dfx <- read.table(fn, header=TRUE, na.strings=c("NA", "n/a")) %>% select(all_of(cvars)) 
       if (npcs >= 0 || perc_var > 0) {
