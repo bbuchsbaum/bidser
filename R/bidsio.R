@@ -86,7 +86,7 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", nest=TRUE) {
 #' @param perc_var perform pca reduction on confound matrix and retain \code{perc_var} percent of variance
 #' @import dplyr
 #' @importFrom tidyr nest
-#' @importFrom tidyselect all_of
+#' @importFrom tidyselect all_of any_of
 #' @export
 read_confounds.bids_project <- function(x, subid=".*", task=".*", cvars=DEFAULT_CVARS, 
                                         npcs=-1, perc_var=-1, nest=TRUE) {
@@ -100,7 +100,7 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", cvars=DEFAULT_
   ret <- lapply(sids, function(s) {
     fnames <- search_files(x, subid=as.character(s), deriv="(confounds|regressors)", full_path=TRUE)
     ret <- lapply(fnames, function(fn) {
-      dfx <- read.table(fn, header=TRUE, na.strings=c("NA", "n/a")) %>% select(all_of(cvars)) 
+      dfx <- read.table(fn, header=TRUE, na.strings=c("NA", "n/a")) %>% select(any_of(cvars)) 
       if (npcs >= 0 || perc_var > 0) {
         dfx <- process_confounds(dfx, npcs=npcs, perc_var=perc_var)
       }
