@@ -282,9 +282,9 @@ preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", va
       return(FALSE)
     }
     
-    if (is.null(z$deriv)) {
-      return(FALSE)
-    }
+    ##if (is.null(z$deriv)) {
+    ##  return(FALSE)
+    ##}
     
     if (is.null(variant)) {
       variant <- ".*"
