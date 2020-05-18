@@ -291,7 +291,7 @@ preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", va
     }
     
   
-    if (z$isLeaf && str_detect_null(z$deriv , "preproc") && !is.null(z$type) && 
+    if (z$isLeaf && (str_detect_null(z$deriv , "preproc") || str_detect_null(z$desc , "preproc")) && !is.null(z$type) && 
         str_detect_null(z$modality,modality) && 
         str_detect_null(z$name, subid)  && str_detect_null(z$name, task) && 
         str_detect_null(z$variant, variant, TRUE) && str_detect_null(z$space, space, TRUE) && 
