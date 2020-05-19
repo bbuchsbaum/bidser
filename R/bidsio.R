@@ -69,7 +69,11 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", nest=TRUE) {
   }
   sids <- sids[gidx]
   ret <- lapply(sids, function(s) {
-    fnames <- search_files(x, subid=as.character(s), task=task, deriv="confounds", full_path=TRUE)
+    ## new fmriprep
+    fnames1 <- search_files(x, subid=as.character(s), task=task, deriv="confounds", full_path=TRUE)
+    ## old fmriprep
+    fnames2 <- search_files(x, subid=as.character(s), task=task, desc="confounds", full_path=TRUE)
+    c(fnames1, fnames2)
   })
   
   ret
