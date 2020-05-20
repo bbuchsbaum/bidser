@@ -102,14 +102,18 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", cvars=DEFAULT_
   sids <- sids[gidx]
   
   ret <- lapply(sids, function(s) {
-    fnames <- search_files(x, subid=as.character(s), deriv="(confounds|regressors)", full_path=TRUE)
+    fnames <- search_files(x, subid=as.character(s), task=task, deriv="(confounds|regressors)", full_path=TRUE)
     ret <- lapply(fnames, function(fn) {
+      ## temporary hack
+      run <- stringr::str_match(fn, "_run-(\\d+)")[1,2]
+      ## 
       dfx <- read.table(fn, header=TRUE, na.strings=c("NA", "n/a")) %>% select(any_of(cvars)) 
+      
       if (npcs >= 0 || perc_var > 0) {
         dfx <- process_confounds(dfx, npcs=npcs, perc_var=perc_var)
       }
       
-      dfx %>% mutate(participant_id=s) 
+      dfx %>% mutate(participant_id=s, run=run) 
     }) %>% bind_rows()
   }) %>% bind_rows()
   
