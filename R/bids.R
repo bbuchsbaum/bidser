@@ -1,4 +1,8 @@
 
+bids_node <- function(name, ..., class=NULL) {
+  structure(name, ..., class=c(class, "bids_node"))  
+}
+
 
 #' @keywords internal
 list_files_github <- function(user, repo, subdir="") {
@@ -87,8 +91,6 @@ bids_project <- function(path=".", fmriprep=FALSE) {
   aparser <- anat_parser()
   fparser <- func_parser()
   
- 
-
   path <- normalizePath(path)
 
   if (!file.exists(paste0(path, "/participants.tsv"))) {
@@ -124,16 +126,16 @@ bids_project <- function(path=".", fmriprep=FALSE) {
   
   has_sessions <- FALSE
 
- 
   pb <- progress::progress_bar$new(total = length(sdirs))
 
-  
   for (sdir in sdirs) {
    
     if (file.exists(paste0(path, "/", sdir))) {
-      node <- bids_raw$AddChild(sdir)
+      browser()
+      node <- bids_raw$AddChild(bids_node(sdir, class="bids_folder"))
+      
       if (fmriprep && file.exists(paste0(path, "/", "/derivatives/fmriprep/", sdir))) {
-        prepnode <- bids_prep$AddChild(sdir)
+        prepnode <- bids_prep$AddChild(bids_node(sdir, class="bids_folder"))
       }
     } else {
       next
