@@ -1,7 +1,5 @@
 
-bids_node <- function(name, ..., class=NULL) {
-  structure(name, ..., class=c(class, "bids_node"))  
-}
+
 
 
 #' @keywords internal
@@ -131,11 +129,10 @@ bids_project <- function(path=".", fmriprep=FALSE) {
   for (sdir in sdirs) {
    
     if (file.exists(paste0(path, "/", sdir))) {
-      browser()
-      node <- bids_raw$AddChild(bids_node(sdir, class="bids_folder"))
+      node <- bids_raw$AddChild(sdir)
       
       if (fmriprep && file.exists(paste0(path, "/", "/derivatives/fmriprep/", sdir))) {
-        prepnode <- bids_prep$AddChild(bids_node(sdir, class="bids_folder"))
+        prepnode <- bids_prep$AddChild(sdir)
       }
     } else {
       next

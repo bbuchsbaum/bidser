@@ -37,6 +37,12 @@ read_events <- function (x, ...) {
 }
 
 #' @export
+match_attr <- function (x, ...) {
+  UseMethod("match_attr", x)
+}
+
+
+#' @export
 read_confounds <- function (x, ...) {
   UseMethod("read_confounds", x)
 }

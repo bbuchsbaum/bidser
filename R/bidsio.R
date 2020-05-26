@@ -118,7 +118,7 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", cvars=DEFAULT_
   }) %>% bind_rows()
   
   if (nest) {
-    ret %>% group_by(participant_id) %>% tidyr::nest()
+    ret %>% group_by(participant_id,run) %>% tidyr::nest()
   } else {
     ret
   }
