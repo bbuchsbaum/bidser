@@ -83,6 +83,7 @@ anat_mod_matcher <- pSeq(function(x) { x[[2]] },
 #' fp <- func_parser()
 #' parse(fp, "sub-01_ses-1_task-rest_acq-fullbrain_run-1_bold.nii.gz")
 #' parse(fp, "sub-01_ses-1_task-nback_acq-fullbrain_run-1_events.tsv")
+#' parse(fp, "sub-01_ses-1_task-nback_acq-fullbrain_events.tsv")
 func_parser <- function() {
   builder <- function(x) {
 
@@ -232,6 +233,7 @@ funcpreptypes_matcher <- pSeq(function(x) { x[[2]] },
 #  parse(p, "sub-2002_task-mega_run-09_bold_MELODICmix.tsv")
 #  parse(p, "sub-301_task-repetition_run-4_space-MNI152Lin_res-native_desc-preproc_bold.nii.gz")
 #  parse(p, "sub-301_task-localizer_run-3_desc-confounds_regressors.tsv")
+#  parse(p, "sub-301_task-localizer_desc-confounds_regressors.tsv")
 fmriprep_func_parser <- function() {
 
   builder <- function(x) {
