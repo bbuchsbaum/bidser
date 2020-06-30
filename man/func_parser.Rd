@@ -13,4 +13,5 @@ construct a parser for functional data
 fp <- func_parser()
 parse(fp, "sub-01_ses-1_task-rest_acq-fullbrain_run-1_bold.nii.gz")
 parse(fp, "sub-01_ses-1_task-nback_acq-fullbrain_run-1_events.tsv")
+parse(fp, "sub-01_ses-1_task-nback_acq-fullbrain_events.tsv")
 }

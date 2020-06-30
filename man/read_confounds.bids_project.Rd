@@ -4,7 +4,7 @@
 \alias{read_confounds.bids_project}
 \title{read in fmriprep confound tables for a set of subjects}
 \usage{
-read_confounds.bids_project(
+\method{read_confounds}{bids_project}(
   x,
   subid = ".*",
   task = ".*",

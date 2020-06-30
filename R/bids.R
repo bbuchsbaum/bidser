@@ -1,7 +1,4 @@
 
-
-
-
 #' @keywords internal
 list_files_github <- function(user, repo, subdir="") {
   gurl <- paste0("https://api.github.com/repos/", user, "/", repo, "/git/trees/master?recursive=1")
@@ -39,8 +36,10 @@ get_sessions <- function(path, sid) {
 descend <- function(node, path, ftype, parser) {
   dnames <- basename(fs::dir_ls(paste0(path)))
   ret <- str_detect(dnames, ftype)
-  node <- node$AddChild(ftype)
-  node$folder=ftype
+  
+  node <- add_node(node, ftype, folder=ftype)
+  #node <- node$AddChild(ftype)
+  #node$folder=ftype
   
   if (any(ret)) {
     fnames <- basename(fs::dir_ls(paste0(path, "/", ftype)))
@@ -48,24 +47,28 @@ descend <- function(node, path, ftype, parser) {
     for (fname in fnames) {
       mat <- parse(parser, fname)
       if (!is.null(mat)) {
-        n <- node$AddChild(fname)
-        for (key in names(mat$result)) {
-          
-          #if (length(mat$task[[key]]) > 1) {
-          #  browser()
-          #}
-          if (length(mat$result[[key]]) > 0) {
-            #message("key = ", key)
-            #message("val = ", mat$result[[key]])
-            n[[key]] <- mat$result[[key]]
-          }
-        }
+        keep <- sapply(mat$result, function(x) !is.null(x) && length(x) > 0)
+        res <- mat$result[keep]
+    
+        pf <- purrr::partial(Node$new, fname)
+        n <- Node$new(fname)
+        n <- do.call(pf, res)
+        
+        node$AddChildNode(n)
       }
     }
   }
 }
 
 
+
+add_node <- function(bids, name, ...) {
+  bids$AddChild(name, ...)
+}
+
+add_file <- function(bids, name,...) {
+  bids$AddChild(name, ...)
+}
 
 ## TODO add ability to load one subject only
 ## TODO create a "bids_object" to represent files and folders?
@@ -106,11 +109,13 @@ bids_project <- function(path=".", fmriprep=FALSE) {
  
 
   project_name <- basename(path)
+
   bids <- Node$new(project_name)
-  bids_raw <- bids$AddChild("raw")
+  bids_raw <- add_node(bids, "raw")
   
   if (fmriprep) {
-    bids_prep <- bids$AddChild("derivatives/fmriprep")
+    #bids_prep <- bids$AddChild("derivatives/fmriprep")
+    bids_prep <- add_node(bids, "derivatives/fmriprep")
     prep_func_parser <- fmriprep_func_parser()
     prep_anat_parser <- fmriprep_anat_parser() 
   } 
@@ -129,10 +134,11 @@ bids_project <- function(path=".", fmriprep=FALSE) {
   for (sdir in sdirs) {
    
     if (file.exists(paste0(path, "/", sdir))) {
-      node <- bids_raw$AddChild(sdir)
-      
+      #node <- bids_raw$AddChild(sdir)
+      node <- add_node(bids_raw, sdir)
       if (fmriprep && file.exists(paste0(path, "/", "/derivatives/fmriprep/", sdir))) {
-        prepnode <- bids_prep$AddChild(sdir)
+        #prepnode <- bids_prep$AddChild(sdir)
+        prepnode <- add_node(bids_prep, sdir)
       }
     } else {
       next
@@ -143,16 +149,18 @@ bids_project <- function(path=".", fmriprep=FALSE) {
     if (length(sessions) > 0) {
       has_sessions <- TRUE
       for (sess in sessions) {
-        snode <- node$AddChild(sess)
-        snode$session <- gsub("ses-", "", sess)
-        
- 
+        #snode <- node$AddChild(sess)
+        snode <- add_node(node, sess, session=gsub("ses-", "", sess))
+        #snode$session <- gsub("ses-", "", sess)
+      
         descend(snode, paste0(path, "/", sdir, "/", sess), "anat", aparser)
         descend(snode, paste0(path, "/", sdir, "/", sess), "func", fparser)
         
         if (fmriprep) {
-          snode_prepped <- prepnode$AddChild(sess)
-          snode_prepped$session <- gsub("ses-", "", sess)
+          #snode_prepped <- prepnode$AddChild(sess)
+          #snode_prepped$session <- gsub("ses-", "", sess)
+          snode_prepped <- add_node(prepnode, sess, session=gsub("ses-", "", sess))
+          
           descend(snode_prepped, paste0(path, "/derivatives/fmriprep/", sdir, "/", sess), "anat", prep_anat_parser)
           descend(snode_prepped, paste0(path, "/derivatives/fmriprep/", sdir, "/", sess), "func", prep_func_parser)
           
@@ -267,8 +275,8 @@ str_detect_null <- function(x, pat, default=FALSE) {
 
 #' @describeIn preproc_scans 
 #' @examples 
-#' proj <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
-#' preproc_scans(proj)
+#' #proj <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
+#' #preproc_scans(proj)
 #' @export
 preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", variant="a^", space=".*", session=".*", modality="bold", full_path=FALSE, ...) {
   f <- function(node) {
@@ -359,11 +367,16 @@ search_files.bids_project <- function(x, regex=".*", full_path=FALSE, ...) {
 }
 
 
-
-#' @export
-event_files.bids_project <- function (x, subid=".*", task=".*", run=".*", session=".*", full_path=TRUE, ...) {
-  search_files(x, modality = "events", subid=subid, task=task, session=session, run=run, full_path=full_path, ...)
+match_attribute <- function(x, ...) {
+  ll <- list(...)
+  
+  all(sapply(names(ll), function(key) {
+    stringr::str_detect(attr(x, key), as.character(ll[[key]]))
+  }))
 }
+
+
+
 
 
 

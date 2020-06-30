@@ -14,5 +14,5 @@ ap <- anat_parser()
 parse(ap, "sub-01_ses-1_T1map.nii.gz")
 parse(ap, "sub-01_ses-1_T1w.nii.gz")
 parse(ap, "sub-01_ses-retest_T1w.nii.gz")
-
+parse(ap, "sub-303_T1w.nii")
 }

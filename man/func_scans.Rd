@@ -12,6 +12,7 @@ func_scans(x, ...)
   subid = ".*",
   task = ".*",
   run = ".*",
+  session = ".*",
   modality = "bold",
   full_path = TRUE,
   ...

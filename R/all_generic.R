@@ -36,10 +36,10 @@ read_events <- function (x, ...) {
   UseMethod("read_events", x)
 }
 
-#' @export
-match_attr <- function (x, ...) {
-  UseMethod("match_attr", x)
-}
+# @export
+#match_attr <- function (x, ...) {
+#  UseMethod("match_attr", x)
+#}
 
 
 #' @export

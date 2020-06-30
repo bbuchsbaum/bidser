@@ -14,6 +14,7 @@ preproc_scans(x, ...)
   run = ".*",
   variant = "a^",
   space = ".*",
+  session = ".*",
   modality = "bold",
   full_path = FALSE,
   ...

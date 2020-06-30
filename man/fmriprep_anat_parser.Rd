@@ -13,4 +13,6 @@ construct a parser for anatomical data
 ap <- fmriprep_anat_parser()
 parse(ap, "sub-2001_T1w_inflated.L.surf.gii")
 parse(ap, "sub-2001_T1w_space-MNI152NLin2009cAsym_class-GM_probtissue.nii.gz")
+parse(ap, "sub-301_space-MNI152Lin_desc-brain_mask.nii.gz")
+parse(ap, "sub-301_space-MNI152NLin2009cAsym_label-GM_probseg.nii.gz")
 }
