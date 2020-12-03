@@ -61,7 +61,7 @@ DEFAULT_CVARS2 <- c("csf", "white_matter", "global_signal", "std_dvars",
 
 
 #' @export
-confound_files.bids_project <- function(x, subid=".*", task=".*", nest=TRUE) {
+confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", nest=TRUE) {
   sids <- participants(x)
   gidx <- grep(subid, sids)
   if (length(gidx) == 0) {
@@ -70,9 +70,9 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", nest=TRUE) {
   sids <- sids[gidx]
   ret <- lapply(sids, function(s) {
     ## new fmriprep
-    fnames1 <- search_files(x, subid=as.character(s), task=task, deriv="confounds", full_path=TRUE)
+    fnames1 <- search_files(x, subid=as.character(s), task=task, session=session, deriv="confounds", full_path=TRUE)
     ## old fmriprep
-    fnames2 <- search_files(x, subid=as.character(s), task=task, desc="confounds", full_path=TRUE)
+    fnames2 <- search_files(x, subid=as.character(s), task=task, session=session, desc="confounds", full_path=TRUE)
     c(fnames1, fnames2)
   })
   
@@ -92,7 +92,7 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", nest=TRUE) {
 #' @importFrom tidyr nest
 #' @importFrom tidyselect all_of any_of
 #' @export
-read_confounds.bids_project <- function(x, subid=".*", task=".*", cvars=DEFAULT_CVARS, 
+read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", cvars=DEFAULT_CVARS, 
                                         npcs=-1, perc_var=-1, nest=TRUE) {
   sids <- participants(x)
   gidx <- grep(subid, sids)
@@ -102,23 +102,28 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", cvars=DEFAULT_
   sids <- sids[gidx]
   
   ret <- lapply(sids, function(s) {
-    fnames <- search_files(x, subid=as.character(s), task=task, deriv="(confounds|regressors)", full_path=TRUE)
+    fnames <- search_files(x, subid=as.character(s), task=task, session=session, deriv="(confounds|regressors)", full_path=TRUE)
     ret <- lapply(fnames, function(fn) {
       ## temporary hack
       run <- stringr::str_match(fn, "_run-(\\d+)")[1,2]
+      session <- stringr::str_match(fn, "_ses-(\\d+)")[1,2]
+      if (is.na(session)) {
+        session <- "1"
+      }
       ## 
+      
       dfx <- read.table(fn, header=TRUE, na.strings=c("NA", "n/a")) %>% select(any_of(cvars)) 
       
       if (npcs >= 0 || perc_var > 0) {
         dfx <- process_confounds(dfx, npcs=npcs, perc_var=perc_var)
       }
       
-      dfx %>% mutate(participant_id=s, run=run) 
+      dfx %>% mutate(participant_id=s, run=run, session=session) 
     }) %>% bind_rows()
   }) %>% bind_rows()
   
   if (nest) {
-    ret %>% group_by(participant_id,run) %>% tidyr::nest()
+    ret %>% group_by(participant_id,run,session) %>% tidyr::nest()
   } else {
     ret
   }
