@@ -130,6 +130,8 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
   
 }
 
+
+#' @keywords internal
 process_confounds <- function(dfx, center=TRUE, scale=TRUE, npcs=-1, perc_var=-1) {
   m <- as.matrix(dfx)
   if (any(is.na(m))) {

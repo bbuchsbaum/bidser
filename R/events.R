@@ -29,9 +29,13 @@ read_events.bids_project <- function(x, subid = ".*", task = ".*") {
   lapply(tasks, function(t) {
     lapply(sids, function(sid) {
       evs <- event_files(x,subid=as.character(sid),task=t)
-      runs <- sapply(evs, function(ev) parse(p, basename(ev))$result$run)
-      res <- lapply(evs, read.table, header=TRUE,stringsAsFactors=FALSE, na.strings=c("n/a", "NA"))
-      lapply(1:length(res), function(i) dplyr::mutate(res[[i]], .subid=sid, .run=runs[i])) %>% bind_rows()       
+      if (length(evs) > 0) {
+        runs <- sapply(evs, function(ev) parse(p, basename(ev))$result$run)
+        res <- lapply(evs, read.table, header=TRUE,stringsAsFactors=FALSE, na.strings=c("n/a", "NA"))
+        lapply(1:length(res), function(i) dplyr::mutate(res[[i]], .subid=sid, .run=runs[i])) %>% bind_rows()    
+      } else {
+        NULL
+      }
     }) %>% bind_rows() %>% mutate(.task=t) %>% group_by(.task, .run, .subid) %>% nest()
   }) %>% bind_rows() 
   

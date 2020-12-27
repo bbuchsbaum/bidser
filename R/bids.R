@@ -318,7 +318,7 @@ preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", va
   }
 }
 
-key_match <- function(...) {
+key_match <- function(default=FALSE, ...) {
   keyvals <- list(...)
   if (length(keyvals) == 0) {
     return(function(x) TRUE)
@@ -331,7 +331,7 @@ key_match <- function(...) {
       } else if (is.null(keyvals[[k]]) && is.null(x[[k]])) {
         TRUE
       } else {
-        str_detect_null(x[[k]], keyvals[[k]])
+        str_detect_null(x[[k]], keyvals[[k]], default)
       }
     }))
   }
@@ -340,8 +340,11 @@ key_match <- function(...) {
 
 #' @export
 #' @importFrom stringr str_detect
+# proj <- bids_project(system.file("inst/extdata/ds001", package="bidser"), fmriprep=FALSE)
+# x = search_files(proj, regex="events")
 search_files.bids_project <- function(x, regex=".*", full_path=FALSE, ...) {
   f <- function(node) {
+    ## TODO deal with this
     if (node$path[2] == "derivatives/fmriprep") {
       paste0(node$path[2:length(node$path)], collapse="/")
     } else {
@@ -349,7 +352,7 @@ search_files.bids_project <- function(x, regex=".*", full_path=FALSE, ...) {
     }
   }
   
-  matcher <- key_match(...)
+  matcher <- key_match(default=TRUE, ...)
   
   ret <- x$bids_tree$Get(f, filterFun = function(z) {
     z$isLeaf && str_detect(z$name, regex) && matcher(z)
