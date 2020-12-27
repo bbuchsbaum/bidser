@@ -17,7 +17,6 @@ knitr::opts_chunk$set(
 
 ## Brief Introduction to `bidser`
 
-
 `bidser` is an R package for working with the [BIDS](https://bids.neuroimaging.io/) neuroimaging projects. The goal of the package is to allow one to query files that are stored in a hierarchical BIDS structure. Below we load in a BIDS example project, which is stored and accessed through a `bids_project` object.
 
 There is a more elaborate Python package called [pybids](https://github.com/bids-standard/pybids) that can be used to work with BIDS in Python.

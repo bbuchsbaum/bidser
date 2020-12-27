@@ -88,7 +88,7 @@ add_file <- function(bids, name,...) {
 #' pp <- bids_project(p)
 #' 
 #' pp2 <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
-bids_project <- function(path=".", fmriprep=FALSE) {
+bids_project <- function(path=".", fmriprep=FALSE, prep_dir = "fmriprep/derivatives") {
   aparser <- anat_parser()
   fparser <- func_parser()
   
@@ -115,7 +115,7 @@ bids_project <- function(path=".", fmriprep=FALSE) {
   
   if (fmriprep) {
     #bids_prep <- bids$AddChild("derivatives/fmriprep")
-    bids_prep <- add_node(bids, "derivatives/fmriprep")
+    bids_prep <- add_node(bids, prep_dir)
     prep_func_parser <- fmriprep_func_parser()
     prep_anat_parser <- fmriprep_anat_parser() 
   } 
@@ -136,7 +136,7 @@ bids_project <- function(path=".", fmriprep=FALSE) {
     if (file.exists(paste0(path, "/", sdir))) {
       #node <- bids_raw$AddChild(sdir)
       node <- add_node(bids_raw, sdir)
-      if (fmriprep && file.exists(paste0(path, "/", "/derivatives/fmriprep/", sdir))) {
+      if (fmriprep && file.exists(paste0(path, "/", prep_dir, sdir))) {
         #prepnode <- bids_prep$AddChild(sdir)
         prepnode <- add_node(bids_prep, sdir)
       }
@@ -161,8 +161,8 @@ bids_project <- function(path=".", fmriprep=FALSE) {
           #snode_prepped$session <- gsub("ses-", "", sess)
           snode_prepped <- add_node(prepnode, sess, session=gsub("ses-", "", sess))
           
-          descend(snode_prepped, paste0(path, "/derivatives/fmriprep/", sdir, "/", sess), "anat", prep_anat_parser)
-          descend(snode_prepped, paste0(path, "/derivatives/fmriprep/", sdir, "/", sess), "func", prep_func_parser)
+          descend(snode_prepped, paste0(path, prep_dir, sdir, "/", sess), "anat", prep_anat_parser)
+          descend(snode_prepped, paste0(path, prep_dir, sdir, "/", sess), "func", prep_func_parser)
           
         }
       }
@@ -171,8 +171,8 @@ bids_project <- function(path=".", fmriprep=FALSE) {
       descend(node, paste0(path, "/", sdir), "func", fparser)
       
       if (fmriprep) {
-        descend(prepnode, paste0(path, "/derivatives/fmriprep/", sdir), "func", prep_anat_parser)
-        descend(prepnode, paste0(path, "/derivatives/fmriprep/", sdir), "func", prep_func_parser)
+        descend(prepnode, paste0(path, prep_dir, sdir), "func", prep_anat_parser)
+        descend(prepnode, paste0(path, prep_dir, sdir), "func", prep_func_parser)
       }
     }
     
@@ -187,6 +187,7 @@ bids_project <- function(path=".", fmriprep=FALSE) {
               tbl = tbl,
               path=path,
               has_fmriprep=fmriprep,
+              prep_dir=if (fmriprep) prep_dir else "",
               has_sessions=has_sessions)
 
   class(ret) <- "bids_project"
@@ -201,6 +202,9 @@ print.bids_project <- function(x) {
   cat("tasks: ", tasks(x), "\n")
   if (x$has_sessions) {
     cat("sessions: ", sessions(x), "\n")
+  }
+  if (x$has_fmriprep) {
+    cat("fmriprep: ", x$prep_dir, "\n")
   }
   cat("image types: ", unique(x$tbl$type[!is.na(x$tbl$type)]), "\n")
   cat("modalities: ", paste(unique(x$tbl$modality[!is.na(x$tbl$modality)]), collapse=", "), "\n")
@@ -284,7 +288,8 @@ preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", va
   }
   
   ## fixme...
-  ret <- x$bids_tree$children$`derivatives/fmriprep`$Get(f, filterFun = function(z) {
+  pdir <- x$prep_dir
+  ret <- x$bids_tree$children[[pdir]]$Get(f, filterFun = function(z) {
     if (is.null(variant) && !is.null(z$variant)) {
       return(FALSE)
     }
