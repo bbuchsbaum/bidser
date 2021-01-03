@@ -88,7 +88,7 @@ add_file <- function(bids, name,...) {
 #' pp <- bids_project(p)
 #' 
 #' pp2 <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
-bids_project <- function(path=".", fmriprep=FALSE, prep_dir = "fmriprep/derivatives") {
+bids_project <- function(path=".", fmriprep=FALSE, prep_dir = "derivatives/fmriprep") {
   aparser <- anat_parser()
   fparser <- func_parser()
   
@@ -136,7 +136,7 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir = "fmriprep/derivati
     if (file.exists(paste0(path, "/", sdir))) {
       #node <- bids_raw$AddChild(sdir)
       node <- add_node(bids_raw, sdir)
-      if (fmriprep && file.exists(paste0(path, "/", prep_dir, sdir))) {
+      if (fmriprep && file.exists(paste0(path, "/", prep_dir, "/", sdir))) {
         #prepnode <- bids_prep$AddChild(sdir)
         prepnode <- add_node(bids_prep, sdir)
       }
@@ -161,8 +161,8 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir = "fmriprep/derivati
           #snode_prepped$session <- gsub("ses-", "", sess)
           snode_prepped <- add_node(prepnode, sess, session=gsub("ses-", "", sess))
           
-          descend(snode_prepped, paste0(path, prep_dir, sdir, "/", sess), "anat", prep_anat_parser)
-          descend(snode_prepped, paste0(path, prep_dir, sdir, "/", sess), "func", prep_func_parser)
+          descend(snode_prepped, paste0(path, "/", prep_dir, "/", sdir, "/", sess), "anat", prep_anat_parser)
+          descend(snode_prepped, paste0(path, "/", prep_dir, "/", sdir, "/", sess), "func", prep_func_parser)
           
         }
       }
@@ -171,8 +171,8 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir = "fmriprep/derivati
       descend(node, paste0(path, "/", sdir), "func", fparser)
       
       if (fmriprep) {
-        descend(prepnode, paste0(path, prep_dir, sdir), "func", prep_anat_parser)
-        descend(prepnode, paste0(path, prep_dir, sdir), "func", prep_func_parser)
+        descend(prepnode, paste0(path, "/", prep_dir, "/", sdir), "func", prep_anat_parser)
+        descend(prepnode, paste0(path, "/", prep_dir, "/", sdir), "func", prep_func_parser)
       }
     }
     
