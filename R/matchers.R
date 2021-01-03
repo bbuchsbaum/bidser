@@ -199,7 +199,7 @@ fmap_parser <- function() {
 
 }
 
-
+#' @export
 parse.parser <- function(x, fname) {
   x$parser(fname)
 }
@@ -362,7 +362,17 @@ fmriprep_anat_parser <- function() {
 }
 
 
-
+bids_parser <- function() {
+  parser <- pAlt("bids_generic",
+    anat_parser()$parser,
+    func_parser()$parser,
+    fmriprep_anat_parser()$parser,
+    fmriprep_func_parser()$parser)
+  
+  ret <- list(parser=parser)
+  class(ret) <- c("bids_parser", "parser")
+  ret
+}
 
 # sub-2001_T1w_brainmask.nii.gz						sub-2001_T1w_smoothwm.R.surf.gii
 # sub-2001_T1w_class-CSF_probtissue.nii.gz				sub-2001_T1w_space-MNI152NLin2009cAsym_brainmask.nii.gz

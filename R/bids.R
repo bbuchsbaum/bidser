@@ -1,4 +1,16 @@
 
+#' @export
+encode.character <- function(fname) {
+  p <- bids_parser()
+  ret <- parse(p, fname)
+  if (!is.null(ret)) {
+    v <- ret$result$value
+    v[!sapply(v, is.null)]
+  } else {
+    NULL
+  }
+}
+
 #' @keywords internal
 list_files_github <- function(user, repo, subdir="") {
   gurl <- paste0("https://api.github.com/repos/", user, "/", repo, "/git/trees/master?recursive=1")
@@ -194,6 +206,10 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir = "derivatives/fmrip
   ret
 }
 
+#' @export
+flat_list.bids_project <- function(x) {
+  data.tree::ToDataFrameTable(x$bids_tree, "pathString")
+}
 
 #' @export
 print.bids_project <- function(x) {
@@ -234,24 +250,24 @@ participants.bids_project <- function (x, ...) {
   unique(x$tbl$subid)
 }
 
-
-
-
 #' @describeIn func_scans 
 #' @examples 
 #' 
 #' p <- system.file("inst/extdata/ds001", package="bidser")
 #' fs <- func_scans(bids_project(p), subid="sub-0[123]", run="0[123]")
 #' @export
-func_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", session=".*", modality="bold", full_path=TRUE, ...) {
+func_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", session=".*", 
+                                     modality="bold", full_path=TRUE, ...) {
   
   f <- function(node) {
     paste0(node$path[3:length(node$path)], collapse="/")
   }
+  
   ret <- x$bids_tree$children$raw$Get(f, filterFun = function(z) {
+  
     if (z$isLeaf && !is.null(z$task) &&  !is.null(z$type) && str_detect_null(z$modality,modality)
         && str_detect_null(z$name, subid)  && str_detect_null(z$task, task) 
-        && str_detect_null(z$session, session) 
+        && str_detect_null(z$session, session, default=TRUE) 
         && str_detect_null(z$run, run, TRUE) && str_detect_null(z$suffix, "nii(.gz)?$")) {
       TRUE
     } else {

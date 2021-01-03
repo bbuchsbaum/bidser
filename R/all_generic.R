@@ -4,6 +4,11 @@ parse <- function (x, fname,...) {
   UseMethod("parse", x)
 }
 
+#' @encode
+encode <- function(x,...) {
+  UseMethod("encode")
+}
+
 #' @export
 sessions <- function (x, ...) {
   UseMethod("sessions", x)
@@ -12,6 +17,12 @@ sessions <- function (x, ...) {
 #' @export
 tasks <- function (x, ...) {
   UseMethod("tasks", x)
+}
+
+
+#' @export
+flat_list <- function(x, ...) {
+  UseMethod("flatlist", x)
 }
 
 

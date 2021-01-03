@@ -29,6 +29,6 @@ extract fmriprep "preproc" scans from bids project
 }}
 
 \examples{
-proj <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
-preproc_scans(proj)
+#proj <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
+#preproc_scans(proj)
 }

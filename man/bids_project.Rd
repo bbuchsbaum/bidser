@@ -4,7 +4,7 @@
 \alias{bids_project}
 \title{load a BIDS project}
 \usage{
-bids_project(path = ".", fmriprep = FALSE)
+bids_project(path = ".", fmriprep = FALSE, prep_dir = "derivatives/fmriprep")
 }
 \arguments{
 \item{path}{the file path of the project}

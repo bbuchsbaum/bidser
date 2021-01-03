@@ -8,6 +8,7 @@
   x,
   subid = ".*",
   task = ".*",
+  session = ".*",
   cvars = DEFAULT_CVARS,
   npcs = -1,
   perc_var = -1,
