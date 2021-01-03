@@ -22,7 +22,7 @@ tasks <- function (x, ...) {
 
 #' @export
 flat_list <- function(x, ...) {
-  UseMethod("flatlist", x)
+  UseMethod("flat_list", x)
 }
 
 
