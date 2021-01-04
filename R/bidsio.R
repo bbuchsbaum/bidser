@@ -38,7 +38,7 @@ read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bi
   neuroim2::read_vec(fnames, mask=mask, mode=mode, ...)
 }
 
-
+#' @export
 create_preproc_mask.bids_project <- function(x, subid, thresh=.99, ...) {
   maskfiles <- search_files(x, subid=subid, deriv="brainmask", full_path=TRUE, ...)
   vols <- lapply(maskfiles, neuroim2::read_vol)
@@ -69,9 +69,9 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
   }
   sids <- sids[gidx]
   ret <- lapply(sids, function(s) {
-    ## new fmriprep
+    ## new fmriprep (e.g. (> 1.5)), where confounds are denotedd by 'deriv-confounds``
     fnames1 <- search_files(x, subid=as.character(s), task=task, session=session, deriv="confounds", full_path=TRUE)
-    ## old fmriprep
+    ## old fmriprep (e.g. 1.1.8)
     fnames2 <- search_files(x, subid=as.character(s), task=task, session=session, desc="confounds", full_path=TRUE)
     c(fnames1, fnames2)
   })
@@ -80,14 +80,16 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 }
   
 
-
-#' read in fmriprep confound tables for a set of subjects
+#' read confound files
+#' 
+#' read in fmriprep confound tables for one or more subjects
 #' 
 #' @param subid (optional) subid regex selector
 #' @param task (optional) task regex selector
-#' @param cvars a vector of confound variables to select. If missing, defaults to a set defined by constant \code{DEFAULT_CVARS}.
+#' @param cvars the names of the confound variables to select. If missing, defaults to a set defined by constant \code{DEFAULT_CVARS}.
 #' @param npcs perform pca reduction on confound matrix and reduce to \code{npcs} dimensions
-#' @param perc_var perform pca reduction on confound matrix and retain \code{perc_var} percent of variance
+#' @param perc_var perform pca reduction on confound matrix and retain \code{perc_var} percent of total (selected) confound variance
+#' @param nest nest confound tables by subject/sesssion/run
 #' @import dplyr
 #' @importFrom tidyr nest
 #' @importFrom tidyselect all_of any_of
