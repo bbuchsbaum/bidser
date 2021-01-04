@@ -352,7 +352,11 @@ key_match <- function(default=FALSE, ...) {
       } else if (is.null(keyvals[[k]]) && is.null(x[[k]])) {
         TRUE
       } else {
-        str_detect_null(x[[k]], keyvals[[k]], default)
+        if (keyvals[[k]] == ".*") {
+          TRUE
+        } else {
+          str_detect_null(x[[k]], keyvals[[k]], default)
+        }
       }
     }))
   }
@@ -363,7 +367,7 @@ key_match <- function(default=FALSE, ...) {
 #' @importFrom stringr str_detect
 # proj <- bids_project(system.file("inst/extdata/ds001", package="bidser"), fmriprep=FALSE)
 # x = search_files(proj, regex="events")
-search_files.bids_project <- function(x, regex=".*", full_path=FALSE, ...) {
+search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRUE, ...) {
   f <- function(node) {
     ## TODO deal with this
     if (node$path[2] == "derivatives/fmriprep") {
@@ -373,7 +377,7 @@ search_files.bids_project <- function(x, regex=".*", full_path=FALSE, ...) {
     }
   }
   
-  matcher <- key_match(default=TRUE, ...)
+  matcher <- key_match(default=!strict, ...)
   
   ret <- x$bids_tree$Get(f, filterFun = function(z) {
     z$isLeaf && str_detect(z$name, regex) && matcher(z)
