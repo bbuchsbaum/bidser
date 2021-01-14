@@ -22,5 +22,7 @@ Remotes:
   bbuchsbaum/neuroim2
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat,
+    covr
 VignetteBuilder: knitr

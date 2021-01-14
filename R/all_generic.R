@@ -4,7 +4,7 @@ parse <- function (x, fname,...) {
   UseMethod("parse", x)
 }
 
-#' @encode
+#' @export
 encode <- function(x,...) {
   UseMethod("encode")
 }
@@ -65,19 +65,32 @@ func_scans <- function(x, ...) {
   UseMethod("func_scans", x)
 }
 
-#' extract fmriprep "preproc" scans from bids project
+#' get pre-processed fmri scans
+#' 
+#' extract fmriprep-created `preproc` scans from bids project
+#' 
 #' @export
 preproc_scans <- function(x, ...) {
   UseMethod("preproc_scans", x)
 }
 
+#' create a binary mask from pre-processed functional scans
+#' 
 #' @export
 create_preproc_mask <- function(x, ...) {
   UseMethod("create_preproc_mask", x)
 }
 
-
+#' search files in BIDS structure
+#' 
+#' find files in BIDS tree by matching file names
+#' 
 #' @export
 search_files <- function(x, ...) {
   UseMethod("search_files", x)
+}
+
+#' @export
+anomalies <- function(x, ...) {
+  UseMethod("anomalies", x)
 }

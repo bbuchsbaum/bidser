@@ -288,7 +288,7 @@ fmriprep_func_parser <- function() {
 
 
 anat_prep_types <- c("preproc", "brainmask", "probtissue", "mask", "probseg", "T1w", "dtissue", "warp",
-                     "inflated.L.surf","inflated.R.surf","pial.L.surf","pial.R.surf", "affine")
+                     "inflated.L.surf","inflated.R.surf","pial.L.surf","pial.R.surf", "affine", "roi")
                      
                      
 anatpreptypes_matcher <- pSeq(function(x) { x[[2]] },
@@ -303,8 +303,13 @@ anatpreptypes_matcher <- pSeq(function(x) { x[[2]] },
                                                   gen_lit("warp", ".h5", extractor),
                                                   gen_lit("inflated.L.surf", ".gii", extractor),
                                                   gen_lit("inflated.R.surf", ".gii", extractor),
+                                                  gen_lit("midthickness.L.surf", ".gii", extractor),
+                                                  gen_lit("midthickness.R.surf", ".gii", extractor),
                                                   gen_lit("pial.L.surf", ".gii", extractor),
                                                   gen_lit("pial.R.surf", ".gii", extractor),
+                                                  gen_lit("smoothwm.L.surf", ".gii", extractor),
+                                                  gen_lit("smoothwm.R.surf", ".gii", extractor),
+                                                  gen_lit("roi", ".nii.gz", extractor),
                                                   gen_lit("affine", ".txt", extractor)))
 
 

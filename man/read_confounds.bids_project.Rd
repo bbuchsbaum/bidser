@@ -2,7 +2,7 @@
 % Please edit documentation in R/bidsio.R
 \name{read_confounds.bids_project}
 \alias{read_confounds.bids_project}
-\title{read in fmriprep confound tables for a set of subjects}
+\title{read confound files}
 \usage{
 \method{read_confounds}{bids_project}(
   x,
@@ -20,12 +20,14 @@
 
 \item{task}{(optional) task regex selector}
 
-\item{cvars}{a vector of confound variables to select. If missing, defaults to a set defined by constant \code{DEFAULT_CVARS}.}
+\item{cvars}{the names of the confound variables to select. If missing, defaults to a set defined by constant \code{DEFAULT_CVARS}.}
 
 \item{npcs}{perform pca reduction on confound matrix and reduce to \code{npcs} dimensions}
 
-\item{perc_var}{perform pca reduction on confound matrix and retain \code{perc_var} percent of variance}
+\item{perc_var}{perform pca reduction on confound matrix and retain \code{perc_var} percent of total (selected) confound variance}
+
+\item{nest}{nest confound tables by subject/sesssion/run}
 }
 \description{
-read in fmriprep confound tables for a set of subjects
+read in fmriprep confound tables for one or more subjects
 }

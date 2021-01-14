@@ -21,10 +21,10 @@ read_func_scans.bids_project <- function(x, mask, mode = c("normal", "bigvec"), 
 
 
 #' @inheritParams read_func_scans
-#' @example 
 #' 
-#' proj <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
-#' sc <- read_preproc_scans(proj)
+#' 
+# proj <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
+# sc <- read_preproc_scans(proj)
 read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bigvec"), subid="^sub-.*", task=".*", 
                                             run = ".*", modality="bold", ...) {
   
@@ -76,7 +76,7 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
     c(fnames1, fnames2)
   })
   
-  ret
+  unlist(ret)
 }
   
 

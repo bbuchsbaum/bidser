@@ -264,9 +264,8 @@ func_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", sessi
   }
   
   ret <- x$bids_tree$children$raw$Get(f, filterFun = function(z) {
-  
     if (z$isLeaf && !is.null(z$task) &&  !is.null(z$type) && str_detect_null(z$modality,modality)
-        && str_detect_null(z$name, subid)  && str_detect_null(z$task, task) 
+        && str_detect_null(z$subid, subid)  && str_detect_null(z$task, task) 
         && str_detect_null(z$session, session, default=TRUE) 
         && str_detect_null(z$run, run, TRUE) && str_detect_null(z$suffix, "nii(.gz)?$")) {
       TRUE
@@ -280,7 +279,7 @@ func_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", sessi
   #  paste0(sp[[1]], "/", sp[[2]], "/func")
   #})
   #paste0(paths, "/", ret)
-  if (full_path) {
+  if (full_path && !is.null(ret)) {
     ret <- paste0(x$path, "/", ret)
   }
   
@@ -298,7 +297,9 @@ str_detect_null <- function(x, pat, default=FALSE) {
 #' #proj <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
 #' #preproc_scans(proj)
 #' @export
-preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", variant="a^", space=".*", session=".*", modality="bold", full_path=FALSE, ...) {
+preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", 
+                                        variant="a^", space=".*", session=".*", 
+                                        modality="bold", full_path=FALSE, ...) {
   f <- function(node) {
     paste0(node$path[2:length(node$path)], collapse="/")
   }
@@ -332,7 +333,7 @@ preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", va
     }
   })
   
-  if (full_path) {
+  if (full_path && !is.null(ret)) {
     paste0(x$path, "/", ret)
   } else {
     ret
@@ -363,10 +364,17 @@ key_match <- function(default=FALSE, ...) {
 }
 
 
+#' @param regex a regular expression to match files
+#' @param full_path return full_path of files
+#' @param strict if `TRUE` require that a queried key must exist in match files. 
+#'     Otherwise, allow matches for files missing queried key.
+#' @param ... additional keys to match on (e.g. subid = "01", task="wm")
 #' @export
+#' @rdname search_files 
 #' @importFrom stringr str_detect
-# proj <- bids_project(system.file("inst/extdata/ds001", package="bidser"), fmriprep=FALSE)
-# x = search_files(proj, regex="events")
+#' @examples
+#'  proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
+#'  x = search_files(proj, regex="events")
 search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRUE, ...) {
   f <- function(node) {
     ## TODO deal with this
@@ -387,7 +395,7 @@ search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRU
     return(list())
   }
   
-  if (full_path) {
+  if (full_path && !is.null(ret)) {
     paste0(x$path, "/", ret)
   } else {
     ret

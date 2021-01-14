@@ -3,7 +3,7 @@
 \name{preproc_scans}
 \alias{preproc_scans}
 \alias{preproc_scans.bids_project}
-\title{extract fmriprep "preproc" scans from bids project}
+\title{get pre-processed fmri scans}
 \usage{
 preproc_scans(x, ...)
 
@@ -21,7 +21,7 @@ preproc_scans(x, ...)
 )
 }
 \description{
-extract fmriprep "preproc" scans from bids project
+extract fmriprep-created \code{preproc} scans from bids project
 }
 \section{Methods (by class)}{
 \itemize{
