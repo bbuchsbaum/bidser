@@ -1,89 +1,50 @@
 #' @importFrom Combin8R pSeq pLiteral pRegex pAlt pMany
 NULL
 
-sub_matcher <- pSeq(function(value) {value[[3]]$value }, pLiteral("sub"), pLiteral("-"), pRegex("id", "[A-Za-z0-9]+"))
 
-session_matcher <- pSeq(function(value) { value[[4]]$value }, pLiteral("_"), pLiteral("ses"), pLiteral("-"), pRegex("id", "[A-Za-z0-9]+"))
+#' parse any BIDS file types
+#' @keywords internal
+bids_parser <- function() {
+  parser <- pAlt("bids_generic",
+                 anat_parser()$parser,
+                 func_parser()$parser,
+                 fmriprep_anat_parser()$parser,
+                 fmriprep_func_parser()$parser)
+  
+  ret <- list(parser=parser)
+  class(ret) <- c("bids_parser", "parser")
+  ret
+}
 
-extractor <- function(x) { list(type=x[[1]][[1]], suffix=x[[2]][[1]]) }
 
+#' @export
+parse.parser <- function(x, fname) {
+  x$parser(fname)
+}
+
+
+## helper matcher for functional files
 func_mod_matcher <- pSeq(function(x) { x[[2]] },
                          pLiteral("_"), pAlt(function(x) x,
-                                                         pSeq(extractor, pLiteral("bold"), pLiteral(".nii.gz")),
-                                                         pSeq(extractor, pLiteral("bold"), pLiteral(".json")),
-                                                         pSeq(extractor, pLiteral("events"), pLiteral(".tsv")),
-                                                         pSeq(extractor, pLiteral("sbref"), pLiteral(".nii.gz")),
-                                                         pSeq(extractor, pLiteral("physio"), pLiteral(".tsv"))))
+                                             pSeq(extractor, pLiteral("bold"), pLiteral(".nii.gz")),
+                                             pSeq(extractor, pLiteral("bold"), pLiteral(".json")),
+                                             pSeq(extractor, pLiteral("events"), pLiteral(".tsv")),
+                                             pSeq(extractor, pLiteral("sbref"), pLiteral(".nii.gz")),
+                                             pSeq(extractor, pLiteral("physio"), pLiteral(".tsv"))))
 
-fmap_matcher <- pSeq(function(value) { value[[2]][[1]][[1]] },
-                         pLiteral("_"), pAlt("fmap", pRegex("magnitude[12]*.nii.gz"), pRegex("phasediff.nii.gz"),
-                                             pRegex("magnitude[12]*.nii.gz"), pLiteral("phase[12]*.nii.gz")))
-
-
-optional_key <- function(label, regex="[A-Za-z0-9]+") {
-  pMany(paste0("has_", label),
-        pSeq(function(value) { value[[4]]$value}, pLiteral("_"), pLiteral(label), pLiteral("-"), pRegex("id", regex)))
-}
-
-optional_literal <- function(lit, label) {
-  pMany(paste0("has_", label),
-        pSeq(function(value) { value[[2]][[1]][[1]] }, pLiteral("_"), pLiteral(lit))
-  )
-}
-
-mandatory_key <- function(label, regex="[A-Za-z0-9]+") {
-  pSeq(function(value) { value[[4]]$value}, pLiteral("_"), pLiteral(label), pLiteral("-"), pRegex("id", regex))
-}
-
-one_of <- function(labels) {
-  lits <- lapply(labels, pLiteral)
-  pSeq(function(value) { value[[2]][[1]] }, pLiteral("_"), do.call(pAlt, c(lits, tag=function(x) { x})))
-}
-
-zero_or_one_of <- function(labels, label) {
-  lits <- lapply(labels, pLiteral)
-  pMany(paste0("has_", label),
-        pSeq(function(value) { value[[2]][[1]] }, pLiteral("_"), do.call(pAlt, c(lits, tag=function(x) { x})))
-  )
-}
-
-
-#space_matcher <- pSeq(function(value) { value[[4]]$value }, pLiteral("_"), pLiteral("space"), pLiteral("-"), pRegex("id", "[A-Za-z0-9]+"))
-#label_matcher <- pSeq(function(value) { value[[4]]$value }, pLiteral("_"), pLiteral("label"), pLiteral("-"), pRegex("id", "[A-Za-z0-9]+"))
-#variant_matcher <- pSeq(function(value) { value[[4]]$value }, pLiteral("_"), pLiteral("variant"), pLiteral("-"), pRegex("id", "[A-Za-z0-9]+"))
-
-
-
-gen_lit <- function(type, suffix, extractor) {
-  pSeq(extractor, pLiteral(type), pLiteral(suffix))
-}
-
-gen_lits <- function(types, suffix, extractor) {
-  lapply(types, function(t) gen_lit(t,suffix,extractor))
-  
-}
-
-anat_types <- c("defacemask","T1w", "T2w","T1map", "T2map", "T2star","FLAIR", "FLASH", "PDmap","PD","PDT2",
-                "inplaneT1", "inplaneT2", "angio")
-
-
-
-anat_nii_gz <- gen_lits(anat_types, ".nii.gz", extractor)
-anat_nii <- gen_lits(anat_types, ".nii", extractor)
-anat_json <- gen_lits(anat_types, ".json", extractor)
-
-anat_mod_matcher <- pSeq(function(x) { x[[2]] }, 
-                           pLiteral("_"), do.call(pAlt, c(anat_nii_gz, anat_nii, anat_json, tag=function(x) x)))
-                                              
-                                              
-                                                                                  
-
-#' construct a parser for functional data
+                                                                               
+#' parser for "func" files
+#' 
+#' construct a parser for functional files
+#' 
 #' @examples
+#' 
 #' fp <- func_parser()
+#' 
 #' parse(fp, "sub-01_ses-1_task-rest_acq-fullbrain_run-1_bold.nii.gz")
 #' parse(fp, "sub-01_ses-1_task-nback_acq-fullbrain_run-1_events.tsv")
 #' parse(fp, "sub-01_ses-1_task-nback_acq-fullbrain_events.tsv")
+#' @keywords internal
 func_parser <- function() {
   builder <- function(x) {
 
@@ -102,7 +63,7 @@ func_parser <- function() {
   }
 
   parser <- pSeq(builder,
-                        sub_matcher,
+                        start_key("sub"),
                         optional_key("ses"),
                         mandatory_key("task"),
                         optional_key("acq"),
@@ -120,13 +81,28 @@ func_parser <- function() {
 
 }
 
-#' construct a parser for anatomical data
+
+anat_types <- c("defacemask","T1w", "T2w","T1map", "T2map", "T2star","FLAIR", "FLASH", "PDmap","PD","PDT2",
+                "inplaneT1", "inplaneT2", "angio")
+
+anat_nii_gz <- gen_lits(anat_types, ".nii.gz", extractor)
+anat_nii <- gen_lits(anat_types, ".nii", extractor)
+anat_json <- gen_lits(anat_types, ".json", extractor)
+
+anat_mod_matcher <- pSeq(function(x) { x[[2]] }, 
+                         pLiteral("_"), do.call(pAlt, c(anat_nii_gz, anat_nii, anat_json, tag=function(x) x)))
+
+
+
+#' construct a parser for anatomical files
+#' 
 #' @examples
 #' ap <- anat_parser()
 #' parse(ap, "sub-01_ses-1_T1map.nii.gz")
 #' parse(ap, "sub-01_ses-1_T1w.nii.gz")
 #' parse(ap, "sub-01_ses-retest_T1w.nii.gz")
 #' parse(ap, "sub-303_T1w.nii")
+#' @keywords internal
 anat_parser <- function() {
   builder <- function(x) {
     #browser()
@@ -144,7 +120,7 @@ anat_parser <- function() {
   }
 
   parser <- pSeq(builder,
-                     sub_matcher,
+                     start_key("sub"),
                      optional_key("ses"),
                      optional_key("acq"),
                      optional_key("ce"),
@@ -159,6 +135,12 @@ anat_parser <- function() {
   ret
 
 }
+
+
+## helper for fmap files
+fmap_matcher <- pSeq(function(value) { value[[2]][[1]][[1]] },
+                     pLiteral("_"), pAlt("fmap", pRegex("magnitude[12]*.nii.gz"), pRegex("phasediff.nii.gz"),
+                                         pRegex("magnitude[12]*.nii.gz"), pLiteral("phase[12]*.nii.gz")))
 
 
 #' construct a parser for field map types
@@ -183,7 +165,7 @@ fmap_parser <- function() {
   }
 
   parser <- pSeq(builder,
-                 sub_matcher,
+                 start_key("sub"),
                  optional_key("ses"),
                  optional_key("acq"),
                  optional_key("ce"),
@@ -199,15 +181,10 @@ fmap_parser <- function() {
 
 }
 
-#' @export
-parse.parser <- function(x, fname) {
-  x$parser(fname)
-}
 
 
 
-func_prep_types <- c("roi", "preproc", "brainmask", "confounds", "AROMAnoiseICs", "bold", "regressors")
-
+## helper for fmriprep func types
 funcpreptypes_matcher <- pSeq(function(x) { x[[2]] },
                               pLiteral("_"), pAlt(function(x) x,
                                                   gen_lit("roi", ".nii.gz", extractor), 
@@ -265,8 +242,7 @@ fmriprep_func_parser <- function() {
   
 
   parser  <- pSeq(function(x) builder(x),
-                             sub_matcher,
-                  
+                             start_key("sub"),
                              optional_key("ses"),
                              mandatory_key("task"),
                              optional_key("acq"),
@@ -287,10 +263,8 @@ fmriprep_func_parser <- function() {
 }
 
 
-anat_prep_types <- c("preproc", "brainmask", "probtissue", "mask", "probseg", "T1w", "dtissue", "warp",
-                     "inflated.L.surf","inflated.R.surf","pial.L.surf","pial.R.surf", "affine", "roi")
-                     
-                     
+
+## helper for anatomical fmriprep types
 anatpreptypes_matcher <- pSeq(function(x) { x[[2]] },
                               pLiteral("_"), pAlt(function(x) x,
                                                   gen_lit("preproc", ".nii.gz", extractor), 
@@ -344,7 +318,7 @@ fmriprep_anat_parser <- function() {
   }
   
   parser <- pSeq(builder,
-                 sub_matcher,
+                 mandatory_key("sub"),
                  optional_key("ses"),
                  optional_key("acq"),
                  optional_key("ce"),
@@ -366,31 +340,4 @@ fmriprep_anat_parser <- function() {
   
 }
 
-
-bids_parser <- function() {
-  parser <- pAlt("bids_generic",
-    anat_parser()$parser,
-    func_parser()$parser,
-    fmriprep_anat_parser()$parser,
-    fmriprep_func_parser()$parser)
-  
-  ret <- list(parser=parser)
-  class(ret) <- c("bids_parser", "parser")
-  ret
-}
-
-# sub-2001_T1w_brainmask.nii.gz						sub-2001_T1w_smoothwm.R.surf.gii
-# sub-2001_T1w_class-CSF_probtissue.nii.gz				sub-2001_T1w_space-MNI152NLin2009cAsym_brainmask.nii.gz
-# sub-2001_T1w_class-GM_probtissue.nii.gz					sub-2001_T1w_space-MNI152NLin2009cAsym_class-CSF_probtissue.nii.gz
-# sub-2001_T1w_class-WM_probtissue.nii.gz					sub-2001_T1w_space-MNI152NLin2009cAsym_class-GM_probtissue.nii.gz
-# sub-2001_T1w_dtissue.nii.gz						sub-2001_T1w_space-MNI152NLin2009cAsym_class-GM_probtissue_small.nii.gz
-# sub-2001_T1w_inflated.L.surf.gii					sub-2001_T1w_space-MNI152NLin2009cAsym_class-WM_probtissue.nii.gz
-# sub-2001_T1w_inflated.R.surf.gii					sub-2001_T1w_space-MNI152NLin2009cAsym_dtissue.nii.gz
-# sub-2001_T1w_label-aparcaseg_roi.nii.gz					sub-2001_T1w_space-MNI152NLin2009cAsym_label-aparcaseg_roi.nii.gz
-# sub-2001_T1w_label-aseg_roi.nii.gz					sub-2001_T1w_space-MNI152NLin2009cAsym_preproc.nii.gz
-# sub-2001_T1w_midthickness.L.surf.gii					sub-2001_T1w_space-MNI152NLin2009cAsym_target-T1w_warp.h5
-# sub-2001_T1w_midthickness.R.surf.gii					sub-2001_T1w_space-orig_target-T1w_affine.txt
-# sub-2001_T1w_pial.L.surf.gii						sub-2001_T1w_target-MNI152NLin2009cAsym_warp.h5
-# sub-2001_T1w_pial.R.surf.gii						sub-2001_T1w_target-fsnative_affine.txt
-# sub-2001_T1w_preproc.nii.gz
 

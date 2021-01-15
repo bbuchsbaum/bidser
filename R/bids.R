@@ -95,8 +95,8 @@ add_file <- function(bids, name,...) {
 #' @export
 #' @examples 
 #' 
-#' p <- system.file("inst/extdata/ds001", package="bidser")
-#' #path <- "~/code/bidser/inst/extdata/ds005"
+#' p <- system.file("inst/extdata/7t_trt", package="bidser")
+#' #path <- "~/code/bidser/inst/extdata/7t_trt"
 #' pp <- bids_project(p)
 #' 
 #' pp2 <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
@@ -207,8 +207,14 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir = "derivatives/fmrip
 }
 
 #' @export
-flat_list.bids_project <- function(x) {
-  data.tree::ToDataFrameTable(x$bids_tree, "pathString")
+flat_list.bids_project <- function(x, full_path=TRUE) {
+  if (full_path) {
+    data.tree::ToDataFrameTable(x$bids_tree, "pathString", "name") %>% filter(stringr::str_detect(name, "^sub-")) %>%
+    rename(path=pathString) %>% select(path)
+  } else {
+    data.tree::ToDataFrameTable(x$bids_tree, "pathString", "name") %>% filter(stringr::str_detect(name, "^sub-")) %>%
+      rename(path=pathString) %>% select(name)
+  }
 }
 
 #' @export
