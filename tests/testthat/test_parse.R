@@ -1,3 +1,4 @@
+context("parser")
 test_that("can parse various file types", {
   expect_type(encode("sub-2001_T1w_brainmask.nii.gz"), "list")
   expect_type(encode("sub-2001_T1w_class-CSF_probtissue.nii.gz"), "list")

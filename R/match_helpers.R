@@ -1,8 +1,13 @@
+## convenience methods for matching different patterns
+
 #' pull out the `type` and `suffix`
 #' 
 #' @keywords internal
-extractor <- function(x) { list(type=x[[1]][[1]], suffix=x[[2]][[1]]) }
+extractor <- function(x) {list(type=x[[1]][[1]], suffix=x[[2]][[1]]) }
 
+
+#' @keywords internal
+alt_extractor <- function(x) { list(type=x[[1]][[1]], suffix=x[[2]]$value) }
 
 
 #' create parser for optional BIDS key

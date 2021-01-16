@@ -31,7 +31,6 @@ read_example <- function(project) {
 }
 
 
-
 #' @keywords internal
 get_sessions <- function(path, sid) {
   dnames <- basename(fs::dir_ls(paste0(path, "/", sid)))
@@ -253,7 +252,7 @@ tasks.bids_project <- function(x) {
 #' @export
 participants.bids_project <- function (x, ...) {
   #ret <- x$bids_tree$Get("subid", filterFun = function(x) !is.null(x$subid))
-  unique(x$tbl$subid)
+  unique(x$tbl$subid[!is.na(x$tbl$subid)])
 }
 
 #' @describeIn func_scans 
@@ -289,11 +288,11 @@ func_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", sessi
     ret <- paste0(x$path, "/", ret)
   }
   
-  ret
+  unname(ret)
 }
 
 
-
+#' @keywords internal
 str_detect_null <- function(x, pat, default=FALSE) {
   if (is.null(x) || is.na(x)) default else str_detect(x,pat)
 }
@@ -398,14 +397,16 @@ search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRU
   }, simplify=FALSE)
   
   if (length(ret) == 0) {
-    return(list())
+    return(NULL)
   }
   
-  if (full_path && !is.null(ret)) {
+  ret <- if (full_path && !is.null(ret)) {
     paste0(x$path, "/", ret)
   } else {
     ret
   }
+  
+  as.vector(unlist(ret))
 }
 
 
