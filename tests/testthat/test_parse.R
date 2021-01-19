@@ -30,6 +30,8 @@ test_that("can parse various file types", {
   expect_type(encode("sub-2001_T1w_space-MNI152NLin2009cAsym_preproc.nii.gz"), "list")
   expect_type(encode("sub-2001_T1w_space-MNI152NLin2009cAsym_dtissue.nii.gz"), "list")
   
+  expect_type(encode("sub-2001_task-test_confounds.tsv"), "list")
+  
 })
 
 
