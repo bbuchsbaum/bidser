@@ -1,4 +1,11 @@
 
+## TODO
+## heatmap plot
+## x axis is subject
+## y axis is task by run
+## squares colored by file-size
+## files could be confounds, scans, preproc, etc.
+
 #' @export
 encode.character <- function(fname) {
   p <- bids_parser()
@@ -117,8 +124,6 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir = "derivatives/fmrip
   }
 
   part_df <- read.table(paste0(path, "/participants.tsv"), header=TRUE, stringsAsFactors=FALSE)
- 
-
   project_name <- basename(path)
 
   bids <- Node$new(project_name)
@@ -190,7 +195,8 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir = "derivatives/fmrip
     pb$tick()
   }
   
-  tbl <- tibble::as_tibble(data.tree::ToDataFrameTypeCol(bids, 'subid', 'session', 'task', 'type', 'modality', 'suffix'))
+  tbl <- tibble::as_tibble(data.tree::ToDataFrameTypeCol(bids, 'name', 'type', 'subid', 'session', 'task', 'run', 'modality', 'suffix'))
+  tbl <- tbl %>% select(-starts_with("level_"))
   
   ret <- list(name=project_name, 
               part_df=part_df,
@@ -229,6 +235,7 @@ print.bids_project <- function(x) {
   }
   cat("image types: ", unique(x$tbl$type[!is.na(x$tbl$type)]), "\n")
   cat("modalities: ", paste(unique(x$tbl$modality[!is.na(x$tbl$modality)]), collapse=", "), "\n")
+  cat("keys: ", paste(unique(x$bids_tree$fieldsAll), collapse=", "), "\n")
   
 }
 
@@ -324,7 +331,6 @@ preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*",
       variant <- ".*"
     }
     
-  
     if (z$isLeaf && (str_detect_null(z$deriv , "preproc") || str_detect_null(z$desc , "preproc")) && !is.null(z$type) && 
         str_detect_null(z$modality,modality) && 
         str_detect_null(z$name, subid)  && str_detect_null(z$name, task) && 
@@ -380,7 +386,7 @@ key_match <- function(default=FALSE, ...) {
 #' @examples
 #'  proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
 #'  x = search_files(proj, regex="events")
-search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRUE, ...) {
+search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRUE, new=FALSE, ...) {
   f <- function(node) {
     ## TODO deal with this
     if (node$path[2] == "derivatives/fmriprep") {
@@ -390,11 +396,47 @@ search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRU
     }
   }
   
-  matcher <- key_match(default=!strict, ...)
-  
-  ret <- x$bids_tree$Get(f, filterFun = function(z) {
-    z$isLeaf && str_detect(z$name, regex) && matcher(z)
-  }, simplify=FALSE)
+  new=FALSE
+  if (new) {
+    
+    nodes <- data.tree::Traverse(x$bids_tree, filterFun = function(x) x$isLeaf && str_detect(x$name, regex))
+    fnames <- sapply(nodes, "[[", "name")
+    keys <- list(...)
+    if (length(keys) > 0) {
+      reg2 <- sapply(names(keys), function(k) paste0(".*(", k, "-", keys[[k]], ")"))
+      reg2 <- paste0(unlist(reg2), collapse="")
+      keep <- str_detect(fnames, reg2)
+      ret <- fnames[keep]
+    } else {
+      ret <- fnames
+    }
+    # keys <- list(...)
+    # nodes <- data.tree::Traverse(x$bids_tree, filterFun =function(x) x$isLeaf && str_detect(x$name, regex))
+    # fnames <- sapply(nodes, "[[", "name")
+    # keep <- stringr::str_detect(fnames, regex)
+    # nodes <- nodes[keep]
+    # fnames <- fnames[keep]
+    # 
+    # gdf <- lapply(names(keys), function(k) {
+    #   Get(nodes, k)
+    # }) %>% setNames(names(keys)) %>% bind_cols()
+    # 
+    # mval <- Reduce("+", lapply(seq_along(keys), function(i) {
+    #   k <- names(keys)[[i]]
+    #   v <- keys[[i]]
+    #   str_detect(gdf[[k]], v)
+    # }))
+    # 
+    # keep2 <- which(mval == length(keys))
+    # ret <- fnames[keep2]
+    # ret
+  } else {
+
+    matcher <- key_match(default=!strict, ...)
+    ret <- x$bids_tree$Get(f, filterFun = function(z) {
+      z$isLeaf && str_detect(z$name, regex) && matcher(z)
+    }, simplify=FALSE)
+  }
   
   if (length(ret) == 0) {
     return(NULL)
