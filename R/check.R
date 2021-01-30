@@ -85,8 +85,8 @@ file_pairs <- function(x, pair=c("bold-events", "preproc-events"), task=".*", ma
       #enc1 <- lapply(s1, function(fn) encode(basename(fn)))
       #enc2 <- lapply(s2, function(fn) encode(basename(fn)))
       
-      enc1 <- lapply(s1$name, function(fn) encode(basename(fn)))
-      enc2 <- lapply(s2$name, function(fn) encode(basename(fn)))
+      #enc1 <- lapply(s1$name, function(fn) encode(basename(fn)))
+      #enc2 <- lapply(s2$name, function(fn) encode(basename(fn)))
       
       mat1 <- cbind(s1[, matchon])
       mat2 <- cbind(s2[, matchon])
