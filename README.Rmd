@@ -19,8 +19,9 @@ knitr::opts_chunk$set(
 [![Codecov test coverage](https://codecov.io/gh/bbuchsbaum/bidser/branch/master/graph/badge.svg)](https://codecov.io/gh/bbuchsbaum/bidser?branch=master)
 <!-- badges: end -->
 
-The goal of bidser is to make working with the BIDS neuroimaging format concenient in R. 
-This is a work in progress...
+The goal of bidser is to make working with the BIDS neuroimaging format convenient in R. 
+Currently there is support for MRI data and some support for some [fmriprep](https://fmriprep.org/en/stable/) derivatives.
+
 
 ## Installation
 
@@ -33,12 +34,9 @@ devtools::install_github("bbuchsbaum/bidser")
 ```
 ## Example
 
-to come...
+See https://bbuchsbaum.github.io/bidser/articles/quickstart.html
 
-```{r example}
-## library(bidser)
-## basic example code
-```
+
 
 
 

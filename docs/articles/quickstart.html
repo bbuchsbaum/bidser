@@ -111,7 +111,7 @@
 <p>We can also make some basic queries of the project to gather information. For example, does the project have any “sessions”?</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
-<span class="fu">sessions</span><span class="op">(</span><span class="va">proj</span><span class="op">)</span>
+<span class="fu"><a href="../reference/sessions.html">sessions</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span>
 <span class="co">#&gt; NULL</span></code></pre></div>
 <p>No sessions. And what are the participant ids?</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -216,7 +216,7 @@
 <p>BIDS event files describe the event-structure of <em>f</em>mri experiments. They can be easy read in to R as a set of <code>data.frame</code>s using the <code>read_events</code> function. As can be seen in the output below, <code>read_events</code> returns a <code>data.frame</code> with four columns: <code>.subid</code>, <code>.run</code>, <code>.task</code>, <code>data</code>. The <code>data</code> is nested in the table because there is no guantee that all events files have the same columns (for example, event files associated with different tasks).</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
-<span class="va">evs</span> <span class="op">&lt;-</span> <span class="fu">read_events</span><span class="op">(</span><span class="va">proj</span><span class="op">)</span>
+<span class="va">evs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_events.html">read_events</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">evs</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 4</span>
 <span class="co">#&gt; # Groups:   .subid, .run, .task [6]</span>
