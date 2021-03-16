@@ -17,6 +17,8 @@ search_files(x, ...)
 )
 }
 \arguments{
+\item{x}{the \code{bids_project} object}
+
 \item{...}{additional keys to match on (e.g. subid = "01", task="wm")}
 
 \item{regex}{a regular expression to match files}

@@ -18,6 +18,11 @@ func_scans(x, ...)
   ...
 )
 }
+\arguments{
+\item{x}{the \code{bids_project} object}
+
+\item{...}{extra args}
+}
 \description{
 extract functional scans from bids project
 }

@@ -6,6 +6,11 @@
 \usage{
 read_confounds(x, ...)
 }
+\arguments{
+\item{x}{the \code{bids_project} object}
+
+\item{...}{extra args}
+}
 \description{
 read in confound files
 }

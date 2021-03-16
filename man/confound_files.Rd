@@ -7,5 +7,5 @@
 confound_files(x, ...)
 }
 \description{
-Get list of confound files
+get a vector of confound files in a bids project.
 }

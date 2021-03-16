@@ -6,6 +6,11 @@
 \usage{
 create_preproc_mask(x, ...)
 }
+\arguments{
+\item{x}{the \code{bids_project} object}
+
+\item{...}{extra args}
+}
 \description{
 create a binary mask from pre-processed functional scans
 }

@@ -9,6 +9,13 @@ encode <- function(x,...) {
   UseMethod("encode")
 }
 
+
+#' Get sessions
+#' 
+#' get a vector of sessions in the project
+#' 
+#' @param x the `bids_project` object
+#' @param ... extra args
 #' @export
 sessions <- function (x, ...) {
   UseMethod("sessions", x)
@@ -39,12 +46,19 @@ event_files <- function (x, ...) {
 
 #' Get list of confound files
 #' 
+#' get a vector of confound files in a bids project.
+#' 
 #' @export
 confound_files <- function (x, ...) {
   UseMethod("confound_files", x)
 }
 
 #' read in event files
+#' 
+#' read tab-separated event files as a `data.frame`
+#' 
+#' @param x the `bids_project` object
+#' @param ... extra args
 #' 
 #' @export
 read_events <- function (x, ...) {
@@ -61,6 +75,8 @@ read_events <- function (x, ...) {
 #' 
 #' 
 #' @export
+#' @param x the `bids_project` object
+#' @param ... extra args
 read_confounds <- function (x, ...) {
   UseMethod("read_confounds", x)
 }
@@ -69,6 +85,8 @@ read_confounds <- function (x, ...) {
 #' 
 #' extract functional scans from bids project
 #' 
+#' @param x the `bids_project` object
+#' @param ... extra args
 #' @export
 func_scans <- function(x, ...) {
   UseMethod("func_scans", x)
@@ -78,6 +96,8 @@ func_scans <- function(x, ...) {
 #' 
 #' extract fmriprep-created `preproc` scans from bids project
 #' 
+#' @param x the `bids_project` object
+#' @param ... extra args
 #' @export
 preproc_scans <- function(x, ...) {
   UseMethod("preproc_scans", x)
@@ -87,7 +107,8 @@ preproc_scans <- function(x, ...) {
 #' 
 #' create a binary mask from pre-processed functional scans
 #' 
-#' 
+#' @param x the `bids_project` object
+#' @param ... extra args
 #' @export
 create_preproc_mask <- function(x, ...) {
   UseMethod("create_preproc_mask", x)
@@ -97,6 +118,8 @@ create_preproc_mask <- function(x, ...) {
 #' 
 #' find files in BIDS tree by matching file names
 #' 
+#' @param x the `bids_project` object
+#' @param ... extra args
 #' @export
 search_files <- function(x, ...) {
   UseMethod("search_files", x)
