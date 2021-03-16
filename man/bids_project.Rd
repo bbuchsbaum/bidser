@@ -2,7 +2,7 @@
 % Please edit documentation in R/bids.R
 \name{bids_project}
 \alias{bids_project}
-\title{load a BIDS project}
+\title{Load a BIDS project at a file path}
 \usage{
 bids_project(path = ".", fmriprep = FALSE, prep_dir = "derivatives/fmriprep")
 }
@@ -10,13 +10,13 @@ bids_project(path = ".", fmriprep = FALSE, prep_dir = "derivatives/fmriprep")
 \item{path}{the file path of the project}
 }
 \description{
-load a BIDS project
+bids project
 }
 \examples{
 
-p <- system.file("inst/extdata/7t_trt", package="bidser")
-#path <- "~/code/bidser/inst/extdata/7t_trt"
-pp <- bids_project(p)
+# p <- system.file("inst/extdata/7t_trt", package="bidser")
+# path <- "~/code/bidser/inst/extdata/7t_trt"
+# pp <- bids_project(p)
 
-pp2 <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
+# pp2 <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
 }

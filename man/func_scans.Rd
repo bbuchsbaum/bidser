@@ -3,7 +3,7 @@
 \name{func_scans}
 \alias{func_scans}
 \alias{func_scans.bids_project}
-\title{extract functional scans from bids project}
+\title{Get functional scans}
 \usage{
 func_scans(x, ...)
 

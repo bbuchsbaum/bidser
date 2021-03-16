@@ -2,7 +2,7 @@
 % Please edit documentation in R/all_generic.R
 \name{create_preproc_mask}
 \alias{create_preproc_mask}
-\title{create a binary mask from pre-processed functional scans}
+\title{create pre-processing mask}
 \usage{
 create_preproc_mask(x, ...)
 }

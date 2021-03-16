@@ -37,11 +37,15 @@ event_files <- function (x, ...) {
   UseMethod("event_files", x)
 }
 
+#' Get list of confound files
+#' 
 #' @export
 confound_files <- function (x, ...) {
   UseMethod("confound_files", x)
 }
 
+#' read in event files
+#' 
 #' @export
 read_events <- function (x, ...) {
   UseMethod("read_events", x)
@@ -53,11 +57,16 @@ read_events <- function (x, ...) {
 #}
 
 
+#' read in confound files
+#' 
+#' 
 #' @export
 read_confounds <- function (x, ...) {
   UseMethod("read_confounds", x)
 }
 
+#' Get functional scans
+#' 
 #' extract functional scans from bids project
 #' 
 #' @export
@@ -65,7 +74,7 @@ func_scans <- function(x, ...) {
   UseMethod("func_scans", x)
 }
 
-#' get pre-processed fmri scans
+#' Get pre-processed fmri scans 
 #' 
 #' extract fmriprep-created `preproc` scans from bids project
 #' 
@@ -74,14 +83,17 @@ preproc_scans <- function(x, ...) {
   UseMethod("preproc_scans", x)
 }
 
+#' create pre-processing mask
+#' 
 #' create a binary mask from pre-processed functional scans
+#' 
 #' 
 #' @export
 create_preproc_mask <- function(x, ...) {
   UseMethod("create_preproc_mask", x)
 }
 
-#' search files in BIDS structure
+#' Search files in BIDS structure
 #' 
 #' find files in BIDS tree by matching file names
 #' 

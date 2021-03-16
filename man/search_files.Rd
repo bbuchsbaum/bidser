@@ -3,7 +3,7 @@
 \name{search_files}
 \alias{search_files}
 \alias{search_files.bids_project}
-\title{search files in BIDS structure}
+\title{Search files in BIDS structure}
 \usage{
 search_files(x, ...)
 

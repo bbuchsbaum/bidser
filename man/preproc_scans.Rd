@@ -3,7 +3,7 @@
 \name{preproc_scans}
 \alias{preproc_scans}
 \alias{preproc_scans.bids_project}
-\title{get pre-processed fmri scans}
+\title{Get pre-processed fmri scans}
 \usage{
 preproc_scans(x, ...)
 

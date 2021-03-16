@@ -91,7 +91,9 @@ add_file <- function(bids, name,...) {
 ## TODO add ability to load one subject only
 ## TODO create a "bids_object" to represent files and folders?
 
-#' load a BIDS project
+#' Load a BIDS project at a file path
+#' 
+#' bids project
 #' 
 #' @param path the file path of the project
 #' @importFrom data.tree Node
@@ -101,11 +103,11 @@ add_file <- function(bids, name,...) {
 #' @export
 #' @examples 
 #' 
-#' p <- system.file("inst/extdata/7t_trt", package="bidser")
-#' #path <- "~/code/bidser/inst/extdata/7t_trt"
-#' pp <- bids_project(p)
+#' # p <- system.file("inst/extdata/7t_trt", package="bidser")
+#' # path <- "~/code/bidser/inst/extdata/7t_trt"
+#' # pp <- bids_project(p)
 #' 
-#' pp2 <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
+#' # pp2 <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
 bids_project <- function(path=".", fmriprep=FALSE, prep_dir = "derivatives/fmriprep") {
   aparser <- anat_parser()
   fparser <- func_parser()
