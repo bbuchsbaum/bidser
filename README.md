@@ -9,6 +9,8 @@
 coverage](https://codecov.io/gh/bbuchsbaum/bidser/branch/master/graph/badge.svg)](https://codecov.io/gh/bbuchsbaum/bidser?branch=master)
 <!-- badges: end -->
 
+[BIDS](https://bids.neuroimaging.io/) in R – (it’s a start!)
+
 The goal of bidser is to make working with the BIDS neuroimaging format
 convenient in R. Currently there is support for MRI data and some
 support for some [fmriprep](https://fmriprep.org/en/stable/)
