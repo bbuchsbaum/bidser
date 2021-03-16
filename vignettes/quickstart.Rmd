@@ -2,7 +2,7 @@
 title: "Getting Started with bidser"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{quickstart}
+  %\VignetteIndexEntry{Getting Started with bidser}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,14 +19,18 @@ knitr::opts_chunk$set(
 
 `bidser` is an R package for working with the [BIDS](https://bids.neuroimaging.io/) neuroimaging projects. The goal of the package is to allow one to query files that are stored in a hierarchical BIDS structure. Below we load in a BIDS example project, which is stored and accessed through a `bids_project` object.
 
-There is a more elaborate Python package called [pybids](https://github.com/bids-standard/pybids) that can be used to work with BIDS in Python.
-
+There is a Python package called [pybids](https://github.com/bids-standard/pybids) that can be used to work with BIDS in Python and is more developed.
+```{r echo=FALSE}
+devtools::load_all()
+```
 
 ```{r setup}
-##library(bidser)
+
+
+library(bidser)
 library(tibble)
-devtools::load_all()
 library(gluedown)
+
 proj_path <- system.file("inst/extdata/ds001", package="bidser")
 proj <- bids_project(proj_path)
 

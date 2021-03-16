@@ -14,8 +14,8 @@ load a BIDS project
 }
 \examples{
 
-p <- system.file("inst/extdata/ds001", package="bidser")
-#path <- "~/code/bidser/inst/extdata/ds005"
+p <- system.file("inst/extdata/7t_trt", package="bidser")
+#path <- "~/code/bidser/inst/extdata/7t_trt"
 pp <- bids_project(p)
 
 pp2 <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)

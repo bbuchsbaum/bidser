@@ -7,7 +7,14 @@
 \usage{
 search_files(x, ...)
 
-\method{search_files}{bids_project}(x, regex = ".*", full_path = FALSE, strict = TRUE, ...)
+\method{search_files}{bids_project}(
+  x,
+  regex = ".*",
+  full_path = FALSE,
+  strict = TRUE,
+  new = FALSE,
+  ...
+)
 }
 \arguments{
 \item{...}{additional keys to match on (e.g. subid = "01", task="wm")}
