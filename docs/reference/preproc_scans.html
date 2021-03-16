@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>extract fmriprep "preproc" scans from bids project — preproc_scans • bidser</title>
+<title>get pre-processed fmri scans — preproc_scans • bidser</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="extract fmriprep "preproc" scans from bids project — preproc_scans" />
-<meta property="og:description" content="extract fmriprep &quot;preproc&quot; scans from bids project" />
+<meta property="og:title" content="get pre-processed fmri scans — preproc_scans" />
+<meta property="og:description" content="extract fmriprep-created preproc scans from bids project" />
 
 
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -115,29 +115,30 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>extract fmriprep "preproc" scans from bids project</h1>
+    <h1>get pre-processed fmri scans</h1>
     
     <div class="hidden name"><code>preproc_scans.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>extract fmriprep "preproc" scans from bids project</p>
+    <p>extract fmriprep-created <code>preproc</code> scans from bids project</p>
     </div>
 
-    <pre class="usage"><span class='fu'>preproc_scans</span>(<span class='no'>x</span>, <span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>preproc_scans</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for bids_project</span>
-<span class='fu'>preproc_scans</span>(
-  <span class='no'>x</span>,
-  <span class='kw'>subid</span> <span class='kw'>=</span> <span class='st'>"^sub-.*"</span>,
-  <span class='kw'>task</span> <span class='kw'>=</span> <span class='st'>".*"</span>,
-  <span class='kw'>run</span> <span class='kw'>=</span> <span class='st'>".*"</span>,
-  <span class='kw'>variant</span> <span class='kw'>=</span> <span class='st'>"a^"</span>,
-  <span class='kw'>space</span> <span class='kw'>=</span> <span class='st'>".*"</span>,
-  <span class='kw'>modality</span> <span class='kw'>=</span> <span class='st'>"bold"</span>,
-  <span class='kw'>full_path</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='no'>...</span>
-)</pre>
+<span class='fu'>preproc_scans</span><span class='op'>(</span>
+  <span class='va'>x</span>,
+  subid <span class='op'>=</span> <span class='st'>".*"</span>,
+  task <span class='op'>=</span> <span class='st'>".*"</span>,
+  run <span class='op'>=</span> <span class='st'>".*"</span>,
+  variant <span class='op'>=</span> <span class='st'>"a^"</span>,
+  space <span class='op'>=</span> <span class='st'>".*"</span>,
+  session <span class='op'>=</span> <span class='st'>".*"</span>,
+  modality <span class='op'>=</span> <span class='st'>"bold"</span>,
+  full_path <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
 
     <h2 class="hasAnchor" id="methods-by-class-"><a class="anchor" href="#methods-by-class-"></a>Methods (by class)</h2>
@@ -148,7 +149,9 @@
 </ul>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>proj</span> <span class='kw'>&lt;-</span> <span class='fu'>bids_project</span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"inst/extdata/megalocalizer"</span>, <span class='kw'>package</span><span class='kw'>=</span><span class='st'>"bidser"</span>), <span class='kw'>fmriprep</span><span class='kw'>=</span><span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: path[1]="": No such file or directory</span></div><div class='output co'>#&gt; <span class='error'>Error in bids_project(system.file("inst/extdata/megalocalizer", package = "bidser"),     fmriprep = TRUE): participants.tsv is missing</span></div><div class='input'><span class='fu'>preproc_scans</span>(<span class='no'>proj</span>)</div><div class='output co'>#&gt; <span class='error'>Error in UseMethod("preproc_scans", x): no applicable method for 'preproc_scans' applied to an object of class "function"</span></div></pre>
+    <pre class="examples"><div class='input'><span class='co'>#proj &lt;- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)</span>
+<span class='co'>#preproc_scans(proj)</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -164,7 +167,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

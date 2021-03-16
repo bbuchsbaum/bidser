@@ -79,7 +79,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -140,39 +140,21 @@
       <tr>
         
         <td>
-          <p><code><a href="anat_parser.html">anat_parser()</a></code> </p>
-        </td>
-        <td><p>construct a parser for anatomical data</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="bids_project.html">bids_project()</a></code> </p>
         </td>
         <td><p>load a BIDS project</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="fmap_parser.html">fmap_parser()</a></code> </p>
+          <p><code><a href="check_func_scans.html">check_func_scans()</a></code> </p>
         </td>
-        <td><p>construct a parser for field map types</p></td>
+        <td><p>x &lt;- bids_project(system.file("inst/extdata/phoneme_stripped", package="bidser"), fmriprep=TRUE)</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="fmriprep_anat_parser.html">fmriprep_anat_parser()</a></code> </p>
+          <p><code><a href="create_preproc_mask.html">create_preproc_mask()</a></code> </p>
         </td>
-        <td><p>construct a parser for anatomical data</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="fmriprep_func_parser.html">fmriprep_func_parser()</a></code> </p>
-        </td>
-        <td><p>construct a parser for fmriprep func types</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="func_parser.html">func_parser()</a></code> </p>
-        </td>
-        <td><p>construct a parser for functional data</p></td>
+        <td><p>create a binary mask from pre-processed functional scans</p></td>
       </tr><tr>
         
         <td>
@@ -182,21 +164,45 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="preproc_scans.html">preproc_scans()</a></code> </p>
+          <p><code><a href="gen_lit.html">gen_lit()</a></code> </p>
         </td>
-        <td><p>extract fmriprep "preproc" scans from bids project</p></td>
+        <td><p>a literal matcher</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="read_confounds.bids_project.html">read_confounds.bids_project()</a></code> </p>
+          <p><code><a href="optional_key.html">optional_key()</a></code> </p>
         </td>
-        <td><p>read in fmriprep confound tables for a set of subjects</p></td>
+        <td><p>create parser for optional BIDS key</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="optional_literal.html">optional_literal()</a></code> </p>
+        </td>
+        <td><p>create parser for an optional BIDS literal</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="preproc_scans.html">preproc_scans()</a></code> </p>
+        </td>
+        <td><p>get pre-processed fmri scans</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="read_confounds.bids_project.html">read_confounds(<i>&lt;bids_project&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>read confound files</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="read_func_scans.bids_project.html">read_func_scans.bids_project()</a></code> </p>
         </td>
         <td><p>read in a set of four-dimensioanl functional scans</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="search_files.html">search_files()</a></code> </p>
+        </td>
+        <td><p>search files in BIDS structure</p></td>
       </tr>
     </tbody>
     </table>
@@ -216,7 +222,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

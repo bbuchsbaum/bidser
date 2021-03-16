@@ -39,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -69,7 +69,7 @@
 
       
 
-      </header><div class="row">
+      </header><script src="quickstart_files/header-attrs-2.7.4/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Getting Started with bidser</h1>
@@ -87,28 +87,35 @@
 <a href="#brief-introduction-to-bidser" class="anchor"></a>Brief Introduction to <code>bidser</code>
 </h2>
 <p><code>bidser</code> is an R package for working with the <a href="https://bids.neuroimaging.io/">BIDS</a> neuroimaging projects. The goal of the package is to allow one to query files that are stored in a hierarchical BIDS structure. Below we load in a BIDS example project, which is stored and accessed through a <code>bids_project</code> object.</p>
-<p>There is a more elaborate Python package called <a href="https://github.com/bids-standard/pybids">pybids</a> that can be used to work with BIDS in Python.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="co">##library(bidser)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">tibble</span>)
-<span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/load_all.html">load_all</a></span>()
-<span class="co">#&gt; Loading bidser</span>
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">gluedown</span>)
-<span class="no">proj_path</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"inst/extdata/ds001"</span>, <span class="kw">package</span><span class="kw">=</span><span class="st">"bidser"</span>)
-<span class="no">proj</span> <span class="kw">&lt;-</span> <span class="fu">bids_project</span>(<span class="no">proj_path</span>)
+<p>There is a Python package called <a href="https://github.com/bids-standard/pybids">pybids</a> that can be used to work with BIDS in Python and is more developed.</p>
+<pre><code>#&gt; Loading bidser</code></pre>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">proj</span>)
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">bidser</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/">tibble</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://kiernann.com/gluedown/">gluedown</a></span><span class="op">)</span>
+
+<span class="va">proj_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"inst/extdata/ds001"</span>, package<span class="op">=</span><span class="st">"bidser"</span><span class="op">)</span>
+<span class="va">proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">proj_path</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span>
 <span class="co">#&gt; project:  ds001 </span>
 <span class="co">#&gt; participants (n): 16 </span>
 <span class="co">#&gt; tasks:  balloonanalogrisktask </span>
-<span class="co">#&gt; image types:  anat func </span>
-<span class="co">#&gt; modalities:  T1w, inplaneT2, bold, events</span></pre></body></html></div>
+<span class="co">#&gt; image types:  func </span>
+<span class="co">#&gt; modalities:  T1w, inplaneT2, bold, events </span>
+<span class="co">#&gt; [1] "Node$fieldsAll will be deprecated in the next release. Please use Node$attributesAll instead."</span>
+<span class="co">#&gt; keys:  folder, modality, subid, suffix, type, run, task</span></code></pre></div>
 <p>We can see that this is a project with 16 participants with anatomical and functional scans and a task called <strong>balloonanalogrisktask</strong>.</p>
 <p>We can also make some basic queries of the project to gather information. For example, does the project have any “sessions”?</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r">
-<span class="fu">sessions</span>(<span class="no">proj</span>)
-<span class="co">#&gt; NULL</span></pre></body></html></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="fu">sessions</span><span class="op">(</span><span class="va">proj</span><span class="op">)</span>
+<span class="co">#&gt; NULL</span></code></pre></div>
 <p>No sessions. And what are the participant ids?</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">sids</span> <span class="kw">&lt;-</span> <span class="fu">participants</span>(<span class="no">proj</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">sids</span> <span class="op">&lt;-</span> <span class="fu">participants</span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></code></pre></div>
 <ul>
 <li>01</li>
 <li>02</li>
@@ -128,10 +135,11 @@
 <li>16</li>
 </ul>
 <p>Does it have task event files?</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
 
-<span class="no">fnames</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/basename.html">basename</a></span>(<span class="fu">event_files</span>(<span class="no">proj</span>)), <span class="kw">n</span><span class="kw">=</span><span class="fl">3</span>)
-<span class="co">## print the first three event files</span></pre></body></html></div>
+<span class="va">fnames</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html">basename</a></span><span class="op">(</span><span class="fu">event_files</span><span class="op">(</span><span class="va">proj</span><span class="op">)</span><span class="op">)</span>, n<span class="op">=</span><span class="fl">3</span><span class="op">)</span>
+<span class="co">## print the first three event files</span></code></pre></div>
 <ol style="list-style-type: decimal">
 <li>sub-01_task-balloonanalogrisktask_run-01_events.tsv</li>
 <li>sub-01_task-balloonanalogrisktask_run-02_events.tsv</li>
@@ -161,11 +169,12 @@
 <li>sub-16/anat/sub-16_T1w.nii.gz</li>
 </ul>
 <p>Now we search for any scans containing the string “bold”.</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r">
-<span class="no">bold</span> <span class="kw">&lt;-</span> <span class="fu">search_files</span>(<span class="no">proj</span>, <span class="st">"bold"</span>)
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="va">bold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/search_files.html">search_files</a></span><span class="op">(</span><span class="va">proj</span>, <span class="st">"bold"</span><span class="op">)</span>
 
 <span class="co">## take the first 5 files, since there are alot.</span>
-<span class="no">bold</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">bold</span>, <span class="fl">5</span>)</pre></body></html></div>
+<span class="va">bold</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">bold</span>, <span class="fl">5</span><span class="op">)</span></code></pre></div>
 <ul>
 <li>sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz</li>
 <li>sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz</li>
@@ -178,11 +187,12 @@
 <h2 class="hasAnchor">
 <a href="#specialized-querying-functions" class="anchor"></a>Specialized querying functions</h2>
 <p>If we are only interested in functional bolds scans (rather than any file with “bold” in it), there is a special function called <code>func_scans</code> to return such files</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r">
-<span class="no">fscans</span> <span class="kw">&lt;-</span> <span class="fu">func_scans</span>(<span class="no">proj</span>)
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="va">fscans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span>
 
 <span class="co">## take the first 5 files, since there are alot.</span>
-<span class="no">fscans</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">bold</span>, <span class="fl">5</span>)</pre></body></html></div>
+<span class="va">fscans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">bold</span>, <span class="fl">5</span><span class="op">)</span></code></pre></div>
 <ul>
 <li>sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz</li>
 <li>sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz</li>
@@ -191,8 +201,9 @@
 <li>sub-02/func/sub-02_task-balloonanalogrisktask_run-02_bold.nii.gz</li>
 </ul>
 <p>Suppose though that we only want the scans from subject “16”?</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r">
-<span class="no">fscans_16</span> <span class="kw">&lt;-</span> <span class="fu">func_scans</span>(<span class="no">proj</span>, <span class="kw">subid</span><span class="kw">=</span><span class="st">"16"</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="va">fscans_16</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid<span class="op">=</span><span class="st">"16"</span><span class="op">)</span></code></pre></div>
 <ul>
 <li>sub-16_task-balloonanalogrisktask_run-01_bold.nii.gz</li>
 <li>sub-16_task-balloonanalogrisktask_run-02_bold.nii.gz</li>
@@ -203,9 +214,10 @@
 <h2 class="hasAnchor">
 <a href="#reading-in-task-event-files" class="anchor"></a>Reading in Task Event files</h2>
 <p>BIDS event files describe the event-structure of <em>f</em>mri experiments. They can be easy read in to R as a set of <code>data.frame</code>s using the <code>read_events</code> function. As can be seen in the output below, <code>read_events</code> returns a <code>data.frame</code> with four columns: <code>.subid</code>, <code>.run</code>, <code>.task</code>, <code>data</code>. The <code>data</code> is nested in the table because there is no guantee that all events files have the same columns (for example, event files associated with different tasks).</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r">
-<span class="no">evs</span> <span class="kw">&lt;-</span> <span class="fu">read_events</span>(<span class="no">proj</span>)
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">evs</span>)
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="va">evs</span> <span class="op">&lt;-</span> <span class="fu">read_events</span><span class="op">(</span><span class="va">proj</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">evs</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 4</span>
 <span class="co">#&gt; # Groups:   .subid, .run, .task [6]</span>
 <span class="co">#&gt;   .subid .run  .task                 data              </span>
@@ -215,28 +227,32 @@
 <span class="co">#&gt; 3 01     03    balloonanalogrisktask &lt;tibble [149 × 8]&gt;</span>
 <span class="co">#&gt; 4 02     01    balloonanalogrisktask &lt;tibble [185 × 8]&gt;</span>
 <span class="co">#&gt; 5 02     02    balloonanalogrisktask &lt;tibble [184 × 8]&gt;</span>
-<span class="co">#&gt; 6 02     03    balloonanalogrisktask &lt;tibble [186 × 8]&gt;</span></pre></body></html></div>
+<span class="co">#&gt; 6 02     03    balloonanalogrisktask &lt;tibble [186 × 8]&gt;</span></code></pre></div>
 <p>Now we can filter the table as we like, for example, to extract the data only from the first participant. We can then “unnest” the <code>data</code> variable to access the actual event structure.</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">tidyr</span>)
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org">tidyr</a></span><span class="op">)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Attaching package: 'tidyr'</span>
 <span class="co">#&gt; The following object is masked from 'package:bidser':</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     one_of</span>
-<span class="no">ev1</span> <span class="kw">&lt;-</span> <span class="no">evs</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span>(<span class="no">.subid</span> <span class="kw">==</span> <span class="st">"01"</span>) <span class="kw">%&gt;%</span> <span class="fu"><a href="https://tidyr.tidyverse.org/reference/nest.html">unnest</a></span>(<span class="kw">cols</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">data</span>))
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">ev1</span>)
+<span class="co">#&gt; The following object is masked from 'package:testthat':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     matches</span>
+<span class="va">ev1</span> <span class="op">&lt;-</span> <span class="va">evs</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">.subid</span> <span class="op">==</span> <span class="st">"01"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://tidyr.tidyverse.org/reference/nest.html">unnest</a></span><span class="op">(</span>cols<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">ev1</span><span class="op">)</span>
 <span class="co">#&gt; # A tibble: 6 x 11</span>
 <span class="co">#&gt; # Groups:   .subid, .run, .task [1]</span>
-<span class="co">#&gt;   .subid .run  .task  onset duration trial_type cash_demean control_pumps_d…</span>
-<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt;            &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 01     01    ball…  0.061    0.772 pumps_dem…          NA               NA</span>
-<span class="co">#&gt; 2 01     01    ball…  4.96     0.772 pumps_dem…          NA               NA</span>
-<span class="co">#&gt; 3 01     01    ball…  7.18     0.772 pumps_dem…          NA               NA</span>
-<span class="co">#&gt; 4 01     01    ball… 10.4      0.772 pumps_dem…          NA               NA</span>
-<span class="co">#&gt; 5 01     01    ball… 13.4      0.772 pumps_dem…          NA               NA</span>
-<span class="co">#&gt; 6 01     01    ball… 16.8      0.772 explode_d…          NA               NA</span>
+<span class="co">#&gt;   .subid .run  .task     onset duration trial_type  cash_demean control_pumps_d…</span>
+<span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;             &lt;dbl&gt;            &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 01     01    balloon…  0.061    0.772 pumps_deme…          NA               NA</span>
+<span class="co">#&gt; 2 01     01    balloon…  4.96     0.772 pumps_deme…          NA               NA</span>
+<span class="co">#&gt; 3 01     01    balloon…  7.18     0.772 pumps_deme…          NA               NA</span>
+<span class="co">#&gt; 4 01     01    balloon… 10.4      0.772 pumps_deme…          NA               NA</span>
+<span class="co">#&gt; 5 01     01    balloon… 13.4      0.772 pumps_deme…          NA               NA</span>
+<span class="co">#&gt; 6 01     01    balloon… 16.8      0.772 explode_de…          NA               NA</span>
 <span class="co">#&gt; # … with 3 more variables: explode_demean &lt;dbl&gt;, pumps_demean &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   response_time &lt;dbl&gt;</span></pre></body></html></div>
+<span class="co">#&gt; #   response_time &lt;dbl&gt;</span></code></pre></div>
 </div>
   </div>
 
@@ -255,7 +271,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
