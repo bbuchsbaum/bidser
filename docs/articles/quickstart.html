@@ -105,7 +105,6 @@
 <span class="co">#&gt; tasks:  balloonanalogrisktask </span>
 <span class="co">#&gt; image types:  func </span>
 <span class="co">#&gt; modalities:  T1w, inplaneT2, bold, events </span>
-<span class="co">#&gt; [1] "Node$fieldsAll will be deprecated in the next release. Please use Node$attributesAll instead."</span>
 <span class="co">#&gt; keys:  folder, modality, subid, suffix, type, run, task</span></code></pre></div>
 <p>We can see that this is a project with 16 participants with anatomical and functional scans and a task called <strong>balloonanalogrisktask</strong>.</p>
 <p>We can also make some basic queries of the project to gather information. For example, does the project have any “sessions”?</p>
@@ -115,7 +114,7 @@
 <span class="co">#&gt; NULL</span></code></pre></div>
 <p>No sessions. And what are the participant ids?</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sids</span> <span class="op">&lt;-</span> <span class="fu">participants</span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">sids</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/participants.html">participants</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></code></pre></div>
 <ul>
 <li>01</li>
 <li>02</li>
@@ -138,7 +137,7 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 
-<span class="va">fnames</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html">basename</a></span><span class="op">(</span><span class="fu">event_files</span><span class="op">(</span><span class="va">proj</span><span class="op">)</span><span class="op">)</span>, n<span class="op">=</span><span class="fl">3</span><span class="op">)</span>
+<span class="va">fnames</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html">basename</a></span><span class="op">(</span><span class="fu"><a href="../reference/event_files.html">event_files</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span><span class="op">)</span>, n<span class="op">=</span><span class="fl">3</span><span class="op">)</span>
 <span class="co">## print the first three event files</span></code></pre></div>
 <ol style="list-style-type: decimal">
 <li>sub-01_task-balloonanalogrisktask_run-01_events.tsv</li>
