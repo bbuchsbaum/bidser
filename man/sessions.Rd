@@ -11,6 +11,9 @@ sessions(x, ...)
 
 \item{...}{extra args}
 }
+\value{
+a vector of session ids
+}
 \description{
 get a vector of sessions in the project
 }

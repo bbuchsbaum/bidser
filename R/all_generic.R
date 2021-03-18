@@ -1,9 +1,17 @@
 
+#' Parse a file-name
+#'
+#' @param x the string to parse
+#' @param ... extra args
 #' @export
 parse <- function (x, fname,...) {
   UseMethod("parse", x)
 }
 
+#' Encode a string
+#' 
+#' @param x the string to encode
+#' @param ... extra args
 #' @export
 encode <- function(x,...) {
   UseMethod("encode")
@@ -16,29 +24,55 @@ encode <- function(x,...) {
 #' 
 #' @param x the `bids_project` object
 #' @param ... extra args
+#' @return a vector of session ids
 #' @export
 sessions <- function (x, ...) {
   UseMethod("sessions", x)
 }
 
+
+#' Get Tasks
+#' 
+#' get the tasks in the project
+#' 
+#' @param x the `bids_project` object
+#' @param ... extra args
+#' @return a vector of task names
+#' 
 #' @export
 tasks <- function (x, ...) {
   UseMethod("tasks", x)
 }
 
-
+#' Get "flat" representation
+#' 
+#' get a flattened representation of project
+#' 
+#' @param x the `bids_project` object
+#' @param ... extra args
+#' 
 #' @export
 flat_list <- function(x, ...) {
   UseMethod("flat_list", x)
 }
 
-
+#' Get participants
+#' 
+#' get vector of participant ids
+#' 
+#' @param x the `bids_project` object
+#' @param ... extra args
 #' @export
 participants <- function (x, ...) {
   UseMethod("participants", x)
 }
 
-
+#' Get event files
+#' 
+#' get vector of event files in project
+#' 
+#' @param x the `bids_project` object
+#' @param ... extra args
 #' @export
 event_files <- function (x, ...) {
   UseMethod("event_files", x)
@@ -48,6 +82,8 @@ event_files <- function (x, ...) {
 #' 
 #' get a vector of confound files in a bids project.
 #' 
+#' @param x the `bids_project` object
+#' @param ... extra args
 #' @export
 confound_files <- function (x, ...) {
   UseMethod("confound_files", x)

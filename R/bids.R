@@ -237,7 +237,7 @@ print.bids_project <- function(x) {
   }
   cat("image types: ", unique(x$tbl$type[!is.na(x$tbl$type)]), "\n")
   cat("modalities: ", paste(unique(x$tbl$modality[!is.na(x$tbl$modality)]), collapse=", "), "\n")
-  cat("keys: ", paste(unique(x$bids_tree$fieldsAll), collapse=", "), "\n")
+  cat("keys: ", paste(unique(x$bids_tree$attributesAll), collapse=", "), "\n")
   
 }
 
