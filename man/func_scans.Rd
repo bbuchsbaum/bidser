@@ -22,6 +22,18 @@ func_scans(x, ...)
 \item{x}{the \code{bids_project} object}
 
 \item{...}{extra args}
+
+\item{subid}{regular expression matching 'task'}
+
+\item{task}{regular expression matching 'task'}
+
+\item{run}{regular expression matching 'run'}
+
+\item{session}{regular expression matching 'session'}
+
+\item{modality}{regular expression matching 'modality'}
+
+\item{full_path}{return full file path?}
 }
 \description{
 extract functional scans from bids project

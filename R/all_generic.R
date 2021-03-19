@@ -26,6 +26,9 @@ encode <- function(x,...) {
 #' @param ... extra args
 #' @return a vector of session ids
 #' @export
+#' @examples 
+#' p <- system.file("inst/extdata/ds001", package="bidser")
+#' sessions(bids_project(p))
 sessions <- function (x, ...) {
   UseMethod("sessions", x)
 }
@@ -40,18 +43,24 @@ sessions <- function (x, ...) {
 #' @return a vector of task names
 #' 
 #' @export
+#' @examples 
+#' p <- system.file("inst/extdata/ds001", package="bidser")
+#' tasks(bids_project(p))
 tasks <- function (x, ...) {
   UseMethod("tasks", x)
 }
 
-#' Get "flat" representation
+#' Get "flat" representation of BIDS Project
 #' 
-#' get a flattened representation of project
+#' get a flattened (non-hiearchical) representation of project formatted as a `data.frame`
 #' 
 #' @param x the `bids_project` object
 #' @param ... extra args
 #' 
 #' @export
+#' @examples 
+#' p <- system.file("inst/extdata/ds001", package="bidser")
+#' flat_list(bids_project(p))
 flat_list <- function(x, ...) {
   UseMethod("flat_list", x)
 }
@@ -63,6 +72,9 @@ flat_list <- function(x, ...) {
 #' @param x the `bids_project` object
 #' @param ... extra args
 #' @export
+#' @examples 
+#' p <- system.file("inst/extdata/ds001", package="bidser")
+#' participants(bids_project(p))
 participants <- function (x, ...) {
   UseMethod("participants", x)
 }
@@ -74,6 +86,10 @@ participants <- function (x, ...) {
 #' @param x the `bids_project` object
 #' @param ... extra args
 #' @export
+#' 
+#' @examples 
+#' p <- system.file("inst/extdata/ds001", package="bidser")
+#' event_files(bids_project(p))
 event_files <- function (x, ...) {
   UseMethod("event_files", x)
 }

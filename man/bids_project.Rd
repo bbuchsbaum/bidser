@@ -2,21 +2,24 @@
 % Please edit documentation in R/bids.R
 \name{bids_project}
 \alias{bids_project}
-\title{Load a BIDS project at a file path}
+\title{Bids Project}
 \usage{
 bids_project(path = ".", fmriprep = FALSE, prep_dir = "derivatives/fmriprep")
 }
 \arguments{
 \item{path}{the file path of the project}
+
+\item{fmriprep}{whether to load fmriprep folder hierarchy}
+
+\item{prep_dir}{location of fmriprep subfolder}
 }
 \description{
-bids project
+Load a BIDS project at a file root
 }
 \examples{
 
-# p <- system.file("inst/extdata/7t_trt", package="bidser")
-# path <- "~/code/bidser/inst/extdata/7t_trt"
-# pp <- bids_project(p)
+p <- system.file("inst/extdata/7t_trt", package="bidser")
+pp <- bids_project(p)
 
-# pp2 <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
+pp2 <- bids_project(system.file("inst/extdata/phoneme_stripped", package="bidser"), fmriprep=TRUE)
 }

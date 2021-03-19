@@ -17,3 +17,7 @@ a vector of task names
 \description{
 get the tasks in the project
 }
+\examples{
+p <- system.file("inst/extdata/ds001", package="bidser")
+tasks(bids_project(p))
+}

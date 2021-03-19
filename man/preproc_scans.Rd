@@ -24,6 +24,18 @@ preproc_scans(x, ...)
 \item{x}{the \code{bids_project} object}
 
 \item{...}{extra args}
+
+\item{subid}{regular expression matching 'task'}
+
+\item{task}{regular expression matching 'task'}
+
+\item{run}{regular expression matching 'run'}
+
+\item{session}{regular expression matching 'session'}
+
+\item{modality}{regular expression matching 'modality'}
+
+\item{full_path}{return full file path?}
 }
 \description{
 extract fmriprep-created \code{preproc} scans from bids project
@@ -34,6 +46,6 @@ extract fmriprep-created \code{preproc} scans from bids project
 }}
 
 \examples{
-#proj <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
-#preproc_scans(proj)
+proj <- bids_project(system.file("inst/extdata/phoneme_stripped", package="bidser"), fmriprep=TRUE)
+preproc_scans(proj)
 }

@@ -14,3 +14,7 @@ participants(x, ...)
 \description{
 get vector of participant ids
 }
+\examples{
+p <- system.file("inst/extdata/ds001", package="bidser")
+participants(bids_project(p))
+}

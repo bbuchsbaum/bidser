@@ -14,3 +14,7 @@ event_files(x, ...)
 \description{
 get vector of event files in project
 }
+\examples{
+p <- system.file("inst/extdata/ds001", package="bidser")
+event_files(bids_project(p))
+}

@@ -17,3 +17,7 @@ a vector of session ids
 \description{
 get a vector of sessions in the project
 }
+\examples{
+p <- system.file("inst/extdata/ds001", package="bidser")
+sessions(bids_project(p))
+}

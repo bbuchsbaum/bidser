@@ -79,11 +79,12 @@ descend <- function(node, path, ftype, parser) {
 }
 
 
-
+#' @keywords internal
 add_node <- function(bids, name, ...) {
   bids$AddChild(name, ...)
 }
 
+#' @keywords internal
 add_file <- function(bids, name,...) {
   bids$AddChild(name, ...)
 }
@@ -91,11 +92,14 @@ add_file <- function(bids, name,...) {
 ## TODO add ability to load one subject only
 ## TODO create a "bids_object" to represent files and folders?
 
-#' Load a BIDS project at a file path
+#' Bids Project
 #' 
-#' bids project
+#' Load a BIDS project at a file root
+#' 
 #' 
 #' @param path the file path of the project
+#' @param fmriprep whether to load fmriprep folder hierarchy
+#' @param prep_dir location of fmriprep subfolder
 #' @importFrom data.tree Node
 #' @import stringr
 #' @importFrom progress progress_bar 
@@ -103,11 +107,10 @@ add_file <- function(bids, name,...) {
 #' @export
 #' @examples 
 #' 
-#' # p <- system.file("inst/extdata/7t_trt", package="bidser")
-#' # path <- "~/code/bidser/inst/extdata/7t_trt"
-#' # pp <- bids_project(p)
+#' p <- system.file("inst/extdata/7t_trt", package="bidser")
+#' pp <- bids_project(p)
 #' 
-#' # pp2 <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
+#' pp2 <- bids_project(system.file("inst/extdata/phoneme_stripped", package="bidser"), fmriprep=TRUE)
 bids_project <- function(path=".", fmriprep=FALSE, prep_dir = "derivatives/fmriprep") {
   aparser <- anat_parser()
   fparser <- func_parser()
@@ -264,7 +267,16 @@ participants.bids_project <- function (x, ...) {
   unique(x$tbl$subid[!is.na(x$tbl$subid)])
 }
 
+
+
 #' @describeIn func_scans 
+#' 
+#' @param subid regular expression matching 'task' 
+#' @param task regular expression matching 'task' 
+#' @param run regular expression matching 'run' 
+#' @param session regular expression matching 'session' 
+#' @param modality regular expression matching 'modality' 
+#' @param full_path return full file path?
 #' @examples 
 #' 
 #' p <- system.file("inst/extdata/ds001", package="bidser")
@@ -308,8 +320,9 @@ str_detect_null <- function(x, pat, default=FALSE) {
 
 #' @describeIn preproc_scans 
 #' @examples 
-#' #proj <- bids_project(system.file("inst/extdata/megalocalizer", package="bidser"), fmriprep=TRUE)
-#' #preproc_scans(proj)
+#' proj <- bids_project(system.file("inst/extdata/phoneme_stripped", package="bidser"), fmriprep=TRUE)
+#' preproc_scans(proj)
+#' @inheritParams func_scans.bids_project
 #' @export
 preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", 
                                         variant="a^", space=".*", session=".*", 
