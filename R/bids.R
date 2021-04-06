@@ -293,7 +293,7 @@ func_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", sessi
     if (z$isLeaf && !is.null(z$task) &&  !is.null(z$type) && str_detect_null(z$modality,modality)
         && str_detect_null(z$subid, subid)  && str_detect_null(z$task, task) 
         && str_detect_null(z$session, session, default=TRUE) 
-        && str_detect_null(z$run, run, TRUE) && str_detect_null(z$suffix, "nii(.gz)?$")) {
+        && str_detect_null(z$run, run, default=TRUE) && str_detect_null(z$suffix, "nii(.gz)?$")) {
       TRUE
     } else {
       FALSE
@@ -325,7 +325,7 @@ str_detect_null <- function(x, pat, default=FALSE) {
 #' @inheritParams func_scans.bids_project
 #' @export
 preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", 
-                                        variant="a^", space=".*", session=".*", 
+                                        variant=NULL, space=".*", session=".*", 
                                         modality="bold", full_path=FALSE, ...) {
   f <- function(node) {
     paste0(node$path[2:length(node$path)], collapse="/")
@@ -347,8 +347,8 @@ preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*",
     }
     
     if (z$isLeaf && (str_detect_null(z$deriv , "preproc") || str_detect_null(z$desc , "preproc")) && !is.null(z$type) && 
-        str_detect_null(z$modality,modality) && 
-        str_detect_null(z$name, subid)  && str_detect_null(z$name, task) && 
+        str_detect_null(z$modality,modality, TRUE) && 
+        str_detect_null(z$name, subid)  && str_detect_null(z$name, task, TRUE) && 
         str_detect_null(z$variant, variant, TRUE) && str_detect_null(z$space, space, TRUE) && 
         str_detect_null(z$run, run, TRUE) && 
         str_detect_null(z$session, session, TRUE) && 
