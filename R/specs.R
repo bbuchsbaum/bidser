@@ -71,6 +71,9 @@ gen_parser <- function(spec, typename="modality") {
 
 }
 
+## "preproc" is modality instead of "bold"
+## "sub-1001_task-phoneme_run-01_bold_space-MNI152NLin2009cAsym_preproc.nii.gz"
+
 #' func spec
 #' 
 #' create a spec table for "func" files

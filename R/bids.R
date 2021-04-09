@@ -331,13 +331,15 @@ preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*",
     paste0(node$path[2:length(node$path)], collapse="/")
   }
   
+  
+  
   ## fixme...
   pdir <- x$prep_dir
   ret <- x$bids_tree$children[[pdir]]$Get(f, filterFun = function(z) {
     if (is.null(variant) && !is.null(z$variant)) {
       return(FALSE)
     }
-    
+    print("here")
     ##if (is.null(z$deriv)) {
     ##  return(FALSE)
     ##}
@@ -346,7 +348,13 @@ preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*",
       variant <- ".*"
     }
     
-    if (z$isLeaf && (str_detect_null(z$deriv , "preproc") || str_detect_null(z$desc , "preproc")) && !is.null(z$type) && 
+    
+    #if (str_detect_null(z$name , "preproc"))  {
+    #  browser()
+    #}
+    
+    ## attributes no longer contains 'deriv' or 'desc'
+    if (z$isLeaf && (str_detect_null(z$modality , "preproc") || str_detect_null(z$deriv , "preproc") || str_detect_null(z$desc , "preproc")) && !is.null(z$type) && 
         str_detect_null(z$modality,modality, TRUE) && 
         str_detect_null(z$name, subid)  && str_detect_null(z$name, task, TRUE) && 
         str_detect_null(z$variant, variant, TRUE) && str_detect_null(z$space, space, TRUE) && 
