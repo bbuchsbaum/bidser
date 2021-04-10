@@ -104,8 +104,8 @@
 <span class="co">#&gt; participants (n): 16 </span>
 <span class="co">#&gt; tasks:  balloonanalogrisktask </span>
 <span class="co">#&gt; image types:  func </span>
-<span class="co">#&gt; modalities:  T1w, inplaneT2, bold, events </span>
-<span class="co">#&gt; keys:  folder, modality, subid, suffix, type, run, task</span></code></pre></div>
+<span class="co">#&gt; modalities:   </span>
+<span class="co">#&gt; keys:  folder, kind, subid, suffix, type, run, task</span></code></pre></div>
 <p>We can see that this is a project with 16 participants with anatomical and functional scans and a task called <strong>balloonanalogrisktask</strong>.</p>
 <p>We can also make some basic queries of the project to gather information. For example, does the project have any “sessions”?</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -252,6 +252,41 @@
 <span class="co">#&gt; 6 01     01    balloon… 16.8      0.772 explode_de…          NA               NA</span>
 <span class="co">#&gt; # … with 3 more variables: explode_demean &lt;dbl&gt;, pumps_demean &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   response_time &lt;dbl&gt;</span></code></pre></div>
+</div>
+<div id="reading-files-produced-by-fmriprep" class="section level2">
+<h2 class="hasAnchor">
+<a href="#reading-files-produced-by-fmriprep" class="anchor"></a>Reading files produced by FMRIPrep</h2>
+<p>If you have processed a dataset with FMRIPrep, <code>bidser</code> can be used to read in the many of the resultant derivative files. If a project has an FMRIPrep derivatives folder, then we can read in the BIDS hierarchy plus derivatives as follows:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">proj_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"inst/extdata/phoneme_stripped"</span>, package<span class="op">=</span><span class="st">"bidser"</span><span class="op">)</span>
+<span class="va">proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">proj_path</span>, fmriprep<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
+<span class="co">#&gt; Warning in bids_project(proj_path, fmriprep = TRUE): dataset_description.json is</span>
+<span class="co">#&gt; missing</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span>
+<span class="co">#&gt; project:  phoneme_stripped </span>
+<span class="co">#&gt; participants (n): 24 </span>
+<span class="co">#&gt; tasks:  phoneme rest </span>
+<span class="co">#&gt; fmriprep:  derivatives/fmriprep </span>
+<span class="co">#&gt; image types:  func funcprep </span>
+<span class="co">#&gt; modalities:  bold </span>
+<span class="co">#&gt; keys:  folder, kind, subid, suffix, type, run, task, modality, space, label</span></code></pre></div>
+<p>By default it is assumed that the FMRIPrep files are in ‘derivatives/fmriprep’.</p>
+<p>Now we can access various derivative files with convenience functions. For example, to read in “preproc” scans we can use the <code>preproc_scans</code> function.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="va">pscans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preproc_scans.html">preproc_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid<span class="op">=</span><span class="st">"1001"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span><span class="op">(</span><span class="va">pscans</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt;  [1] "derivatives/fmriprep/sub-1001/func/sub-1001_task-phoneme_run-01_bold_space-MNI152NLin2009cAsym_preproc.nii.gz"</span>
+<span class="co">#&gt;  [2] "derivatives/fmriprep/sub-1001/func/sub-1001_task-phoneme_run-02_bold_space-MNI152NLin2009cAsym_preproc.nii.gz"</span>
+<span class="co">#&gt;  [3] "derivatives/fmriprep/sub-1001/func/sub-1001_task-phoneme_run-03_bold_space-MNI152NLin2009cAsym_preproc.nii.gz"</span>
+<span class="co">#&gt;  [4] "derivatives/fmriprep/sub-1001/func/sub-1001_task-phoneme_run-04_bold_space-MNI152NLin2009cAsym_preproc.nii.gz"</span>
+<span class="co">#&gt;  [5] "derivatives/fmriprep/sub-1001/func/sub-1001_task-phoneme_run-05_bold_space-MNI152NLin2009cAsym_preproc.nii.gz"</span>
+<span class="co">#&gt;  [6] "derivatives/fmriprep/sub-1001/func/sub-1001_task-phoneme_run-06_bold_space-MNI152NLin2009cAsym_preproc.nii.gz"</span>
+<span class="co">#&gt;  [7] "derivatives/fmriprep/sub-1001/func/sub-1001_task-phoneme_run-07_bold_space-MNI152NLin2009cAsym_preproc.nii.gz"</span>
+<span class="co">#&gt;  [8] "derivatives/fmriprep/sub-1001/func/sub-1001_task-phoneme_run-08_bold_space-MNI152NLin2009cAsym_preproc.nii.gz"</span>
+<span class="co">#&gt;  [9] "derivatives/fmriprep/sub-1001/func/sub-1001_task-phoneme_run-09_bold_space-MNI152NLin2009cAsym_preproc.nii.gz"</span>
+<span class="co">#&gt; [10] "derivatives/fmriprep/sub-1001/func/sub-1001_task-phoneme_run-10_bold_space-MNI152NLin2009cAsym_preproc.nii.gz"</span></code></pre></div>
 </div>
   </div>
 

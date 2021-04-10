@@ -283,14 +283,14 @@ participants.bids_project <- function (x, ...) {
 #' fs <- func_scans(bids_project(p), subid="sub-0[123]", run="0[123]")
 #' @export
 func_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", session=".*", 
-                                     modality="bold", full_path=TRUE, ...) {
+                                     kind="bold", full_path=TRUE, ...) {
   
   f <- function(node) {
     paste0(node$path[3:length(node$path)], collapse="/")
   }
   
   ret <- x$bids_tree$children$raw$Get(f, filterFun = function(z) {
-    if (z$isLeaf && !is.null(z$task) &&  !is.null(z$type) && str_detect_null(z$modality,modality)
+    if (z$isLeaf && !is.null(z$task) &&  !is.null(z$type) && str_detect_null(z$kind,kind)
         && str_detect_null(z$subid, subid)  && str_detect_null(z$task, task) 
         && str_detect_null(z$session, session, default=TRUE) 
         && str_detect_null(z$run, run, default=TRUE) && str_detect_null(z$suffix, "nii(.gz)?$")) {
@@ -339,11 +339,7 @@ preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*",
     if (is.null(variant) && !is.null(z$variant)) {
       return(FALSE)
     }
-    print("here")
-    ##if (is.null(z$deriv)) {
-    ##  return(FALSE)
-    ##}
-    
+   
     if (is.null(variant)) {
       variant <- ".*"
     }
@@ -354,7 +350,7 @@ preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*",
     #}
     
     ## attributes no longer contains 'deriv' or 'desc'
-    if (z$isLeaf && (str_detect_null(z$modality , "preproc") || str_detect_null(z$deriv , "preproc") || str_detect_null(z$desc , "preproc")) && !is.null(z$type) && 
+    if (z$isLeaf && (str_detect_null(z$kind , "preproc") || str_detect_null(z$deriv , "preproc") || str_detect_null(z$desc , "preproc")) && !is.null(z$type) && 
         str_detect_null(z$modality,modality, TRUE) && 
         str_detect_null(z$name, subid)  && str_detect_null(z$name, task, TRUE) && 
         str_detect_null(z$variant, variant, TRUE) && str_detect_null(z$space, space, TRUE) && 

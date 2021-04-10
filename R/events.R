@@ -2,7 +2,7 @@
 
 #' @export
 event_files.bids_project <- function (x, subid=".*", task=".*", run=".*", session=".*", full_path=TRUE, ...) {
-  search_files(x, modality = "events", subid=subid, task=task, session=session, run=run, full_path=full_path, ...)
+  search_files(x, kind = "events", subid=subid, task=task, session=session, run=run, full_path=full_path, ...)
 }
 
 #' @export

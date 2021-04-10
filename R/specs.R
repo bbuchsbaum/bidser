@@ -5,7 +5,7 @@
 #' @keywords internal
 #' @param spec the specification as a table with `keystruc` and `modality` tables
 #' @param typename the name given to the final type element
-gen_parser <- function(spec, typename="modality") {
+gen_parser <- function(spec, typename="kind") {
   keystruc <- spec$keystruc
   
   keymatchers <- lapply(1:nrow(keystruc), function(i) {
@@ -27,14 +27,14 @@ gen_parser <- function(spec, typename="modality") {
   })
   
  
-  typematchers <- lapply(1:nrow(spec$modalities), function(i) {
-    pat <- spec$modalities$suffix[i]
+  typematchers <- lapply(1:nrow(spec$kinds), function(i) {
+    pat <- spec$kinds$suffix[i]
     if (is.list(pat)) {
       fun <- purrr::partial(pAlt, tag=function(x) {  x })
       lits <- lapply(unlist(pat), pLiteral)
-      pSeq(alt_extractor, pLiteral(spec$modalities$modality[i]), do.call(fun, lits))
+      pSeq(alt_extractor, pLiteral(spec$kinds$kind[i]), do.call(fun, lits))
     } else {
-      pSeq(extractor, pLiteral(spec$modalities$modality[i]), pLiteral(pat))
+      pSeq(extractor, pLiteral(spec$kinds$kind[i]), pLiteral(pat))
     }
   })
   
@@ -86,7 +86,7 @@ gen_parser <- function(spec, typename="modality") {
 #' indicating constraints on the pattern of the value associated with the key. The `name` field indicates how each key 
 #' can be referred to in the resultant parsed list structure, e.g. (`sub` will be named `subid`).
 #' 
-#' The `modalities` table describes the types of files and their suffixes that are allowed. the `modality` variable
+#' The `kinds` table describes the types of files and their suffixes that are allowed. the `modality` variable
 #' indicates the name of the file category (e.g. "bold") and suffix is used match different file formats. 
 #' 
 #' @keywords internal
@@ -103,15 +103,15 @@ func_spec <- function() {
     "echo", "echo", TRUE, "[0-9]+"
   )
   
-  modalities <- tribble(
-    ~modality, ~suffix,
+  kinds <- tribble(
+    ~kind, ~suffix,
     "bold", list(".nii.gz",".nii", ".json"),
     "events", ".tsv",
     "sbref", list(".nii.gz",".nii", ".json"),
     "physio", ".tsv"
   )
   
-  ret <- list(keystruc=keystruc, modalities=modalities, type="func")
+  ret <- list(keystruc=keystruc, kinds=kinds, type="func")
   class(ret) <- "parser_spec"
   ret
 }
@@ -132,8 +132,8 @@ anat_spec <- function() {
     "run", "run", TRUE, "[0-9]+"
   )
   
-  modalities <- tribble(
-    ~modality, ~ suffix,
+  kinds <- tribble(
+    ~kind, ~ suffix,
     "defacemask", list(".nii.gz", ".nii", ".json"),
     "T1w", list(".nii.gz", ".nii", ".json"),
     "T2w", list(".nii.gz", ".nii", ".json"),
@@ -150,7 +150,7 @@ anat_spec <- function() {
     
   )
   
-  ret <- list(keystruc=keystruc, modalities=modalities, type="func")
+  ret <- list(keystruc=keystruc, kinds=kinds, type="func")
   class(ret) <- "parser_spec"
   ret
 }
@@ -174,8 +174,8 @@ funcprepspec <- function() {
     "label", "label", TRUE,"[A-Za-z0-9]+",
     "variant", "variant", TRUE,"[A-Za-z0-9]+")
 
-  modalities <- tribble(
-    ~modality, ~ suffix,
+  kinds <- tribble(
+    ~kind, ~ suffix,
     "roi", list(".nii.gz", ".nii", ".json"),
     "regressors", ".tsv",
     "preproc", list(".nii.gz", ".nii", ".json"),
@@ -186,7 +186,7 @@ funcprepspec <- function() {
     "AROMAnoiseICs", ".tsv"
   )
   
-  ret <- list(keystruc=keystruc, modalities=modalities, type="funcprep")
+  ret <- list(keystruc=keystruc, kinds=kinds, type="funcprep")
   class(ret) <- "parser_spec"
   ret
 }
@@ -216,8 +216,8 @@ anatprepspec <- function() {
     "mod", "mod",TRUE,"[A-Za-z0-9]+"
     )
   
-  modalities <- tribble(
-    ~modality, ~ suffix,
+  kinds <- tribble(
+    ~kind, ~ suffix,
     "preproc",  list(".nii.gz", ".nii", ".json"),
     "brainmask", list(".nii.gz", ".nii", ".json"),
     "probtissue",list(".nii.gz", ".nii", ".json"),
@@ -238,7 +238,7 @@ anatprepspec <- function() {
     "affine", ".txt"
   )
   
-  ret <- list(keystruc=keystruc, modalities=modalities, type="anatprep")
+  ret <- list(keystruc=keystruc, kinds=kinds, type="anatprep")
   class(ret) <- "parser_spec"
   ret
   
@@ -259,8 +259,8 @@ fmapspec <- function() {
     "mod", "mod", TRUE, "[A-Za-z0-9]+"
   )
   
-  modalities <- tribble(
-    ~modality, ~ suffix,
+  kinds <- tribble(
+    ~kind, ~ suffix,
     "magnitude", list(".nii.gz", ".nii", ".json"),
     "magnitude1", list(".nii.gz", ".nii", ".json"),
     "magnitude2", list(".nii.gz", ".nii", ".json"),
@@ -270,7 +270,7 @@ fmapspec <- function() {
     "phasediff", list(".nii.gz", ".nii", ".json")
   )
   
-  ret <- list(keystruc=keystruc, modalities=modalities, type="fmap")
+  ret <- list(keystruc=keystruc, kinds=kinds, type="fmap")
   class(ret) <- "parser_spec"
   ret
   

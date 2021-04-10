@@ -157,3 +157,24 @@ head(ev1)
 ```
 
 
+## Reading files produced by FMRIPrep
+
+If you have processed a dataset with FMRIPrep, `bidser` can be used to read in the many of the resultant derivative files. If a project has an FMRIPrep derivatives folder, then we can read in the BIDS hierarchy plus derivatives as follows:
+
+```{r}
+proj_path <- system.file("inst/extdata/phoneme_stripped", package="bidser")
+proj <- bids_project(proj_path, fmriprep=TRUE)
+
+print(proj)
+```
+
+By default it is assumed that the FMRIPrep files are in 'derivatives/fmriprep'.
+
+Now we can access various derivative files with convenience functions. For example, to read in "preproc" scans we can use the `preproc_scans` function.
+
+```{r}
+
+pscans <- preproc_scans(proj, subid="1001")
+print(as.character(pscans))
+
+```
