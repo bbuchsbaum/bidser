@@ -29,6 +29,7 @@ test_that("can parse various file types", {
   expect_type(encode("sub-2001_T1w_space-orig_target-T1w_affine.txt"), "list")
   expect_type(encode("sub-2001_T1w_space-MNI152NLin2009cAsym_preproc.nii.gz"), "list")
   expect_type(encode("sub-2001_T1w_space-MNI152NLin2009cAsym_dtissue.nii.gz"), "list")
+  expect_type(encode("sub-1006_task-phoneme_run-all_bold_space-MNI152NLin2009cAsym_latent.lv.h5"))
   
   expect_type(encode("sub-2001_task-test_confounds.tsv"), "list")
   
