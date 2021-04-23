@@ -105,7 +105,7 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
   
   ret <- lapply(sids, function(s) {
     fnames <- search_files(x, subid=as.character(s), task=task, 
-                           session=session, deriv="(confounds|regressors)", strict=TRUE, full_path=TRUE)
+                           session=session, kind="(confounds|regressors)", suffix="tsv", strict=TRUE, full_path=TRUE)
     ret <- lapply(fnames, function(fn) {
       ## temporary hack
       run <- stringr::str_match(fn, "_run-(\\d+)")[1,2]
