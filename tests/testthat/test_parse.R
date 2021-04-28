@@ -29,10 +29,24 @@ test_that("can parse various file types", {
   expect_type(encode("sub-2001_T1w_space-orig_target-T1w_affine.txt"), "list")
   expect_type(encode("sub-2001_T1w_space-MNI152NLin2009cAsym_preproc.nii.gz"), "list")
   expect_type(encode("sub-2001_T1w_space-MNI152NLin2009cAsym_dtissue.nii.gz"), "list")
-  expect_type(encode("sub-1006_task-phoneme_run-all_bold_space-MNI152NLin2009cAsym_latent.lv.h5"))
+  expect_type(encode("sub-1006_task-phoneme_run-all_bold_space-MNI152NLin2009cAsym_latent.lv.h5"), "list")
   
   expect_type(encode("sub-2001_task-test_confounds.tsv"), "list")
+  expect_type(encode("sub-2001_ses-01_task-test_run-01_bold_space-MNI152NLin2009cAsym_preproc.nii.gz"), "list")
+  expect_type(encode("sub-2001_ses-01_task-test_run-01_bold_space-MNI152NLin2009cAsym_variant-smoothAROMAnonaggr_preproc.nii.gz"), "list")
+  expect_type(encode("sub-2001_task-test_run-01_bold_MELODICmix.tsv"), "list")
+  expect_type(encode("sub-2001_task-test_run-01_bold_AROMAnoiseICs.tsv"), "list")
+  #expect_type(encode("sub-2001_task-test_run-01_bold_AROMAnoiseICs.csv"), "list")
   
+  #BIDS 1.6.0 conventions
+  #expect_type(encode("sub-01_task-test_desc-confounds_timeseries.tsv"), "list")
+  #expect_type(encode("sub-2001_task-test_run-01_desc-MELODIC_mixing.tsv"), "list")
+  
+  expect_type(encode("sub-01_ses-01_task-test_run-01_echo-01_bold.nii.gz"), "list")
+  expect_type(encode("sub-01_task-test_desc-preproc_bold.nii.gz"), "list")
+  expect_type(encode("sub-01_task-test_run-01_desc-preproc_bold.nii.gz"), "list")
+  expect_type(encode("sub-01_ses-01_task-test_run-01_desc-preproc_bold.nii.gz"), "list")
+  expect_type(encode("sub-01_ses-01_task-test_run-01_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz"), "list")
 })
 
 
