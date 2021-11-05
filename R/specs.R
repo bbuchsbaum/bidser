@@ -184,7 +184,9 @@ funcprepspec <- function() {
     "brainmask", list(".nii.gz", ".nii", ".json"),
     "mask", list(".nii.gz", ".nii", ".json"),
     "confounds", ".tsv",
+    "timeseries", ".tsv",
     "MELODICmix", ".tsv",
+    "mixing", ".tsv",
     "AROMAnoiseICs", ".tsv"
   )
   
