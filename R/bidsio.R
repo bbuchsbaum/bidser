@@ -69,7 +69,7 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
   }
   sids <- sids[gidx]
   ret <- lapply(sids, function(s) {
-    ## new fmriprep (e.g. (> 1.5)), where confounds are denotedd by 'deriv-confounds``
+    ## new fmriprep (e.g. (> 1.5)), where confounds are denoted by 'deriv-confounds``
     fnames1 <- search_files(x, subid=as.character(s), task=task, session=session, deriv="confounds", full_path=TRUE)
     ## old fmriprep (e.g. 1.1.8)
     fnames2 <- search_files(x, subid=as.character(s), task=task, session=session, desc="confounds", full_path=TRUE)

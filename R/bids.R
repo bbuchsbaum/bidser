@@ -6,6 +6,18 @@
 ## squares colored by file-size
 ## files could be confounds, scans, preproc, etc.
 
+
+set_key <- function(fname, key, value) {
+  p <- encode(fname)
+  p[[key]] <- value
+  p
+}
+
+decode.list <- function(x) {
+  
+}
+
+
 #' @export
 encode.character <- function(fname) {
   p <- bids_parser()

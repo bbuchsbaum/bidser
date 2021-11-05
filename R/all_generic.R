@@ -8,13 +8,23 @@ parse <- function (x, fname,...) {
   UseMethod("parse", x)
 }
 
-#' Encode a string
+#' Encode a string into a BIDS key-value list
 #' 
 #' @param x the string to encode
 #' @param ... extra args
 #' @export
 encode <- function(x,...) {
   UseMethod("encode")
+}
+
+
+#' Decode a key-value list into a string
+#' 
+#' @param x the list to decode
+#' @param ... extra args
+#' @export
+decode <- function(x,...) {
+  UseMethod("decode")
 }
 
 

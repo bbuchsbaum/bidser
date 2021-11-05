@@ -92,15 +92,15 @@ gen_parser <- function(spec, typename="kind") {
 #' @keywords internal
 func_spec <- function() {
   keystruc <- tribble(
-    ~name, ~key, ~optional, ~pattern,
-    "subid", "sub", FALSE, "[A-Za-z0-9]+",
-    "session", "ses", TRUE, "[A-Za-z0-9]+",
-    "task", "task", FALSE, "[A-Za-z0-9]+",
-    "acquisition", "acq", TRUE, "[A-Za-z0-9]+",
-    "contrast", "ce", TRUE, "[A-Za-z0-9]+",
-    "reconstruction", "rec", TRUE, "[A-Za-z0-9]+",
-    "run", "run", TRUE, "[0-9]+",
-    "echo", "echo", TRUE, "[0-9]+"
+    ~name, ~key, ~optional, ~pattern,~order,
+    "subid", "sub", FALSE, "[A-Za-z0-9]+",1,
+    "session", "ses", TRUE, "[A-Za-z0-9]+",2,
+    "task", "task", FALSE, "[A-Za-z0-9]+",3,
+    "acquisition", "acq", TRUE, "[A-Za-z0-9]+",5,
+    "contrast", "ce", TRUE, "[A-Za-z0-9]+",6,
+    "reconstruction", "rec", TRUE, "[A-Za-z0-9]+",7,
+    "run", "run", TRUE, "[0-9]+",4,
+    "echo", "echo", TRUE, "[0-9]+",8
   )
   
   kinds <- tribble(
@@ -112,7 +112,7 @@ func_spec <- function() {
   )
   
   ret <- list(keystruc=keystruc, kinds=kinds, type="func")
-  class(ret) <- "parser_spec"
+  class(ret) <- c("func_spec", "parser_spec")
   ret
 }
 
@@ -122,14 +122,14 @@ func_spec <- function() {
 #' @keywords internal
 anat_spec <- function() {
   keystruc <- tribble(
-    ~name, ~key, ~optional, ~pattern,
-    "subid", "sub", FALSE, "[A-Za-z0-9]+",
-    "session", "ses", TRUE, "[A-Za-z0-9]+",
-    "acquisition", "acq", TRUE, "[A-Za-z0-9]+",
-    "contrast", "ce", TRUE, "[A-Za-z0-9]+",
-    "dir", "dir", TRUE, "[A-Za-z0-9]+",
-    "reconstruction", "rec", TRUE, "[A-Za-z0-9]+",
-    "run", "run", TRUE, "[0-9]+"
+    ~name, ~key, ~optional, ~pattern, ~order,
+    "subid", "sub", FALSE, "[A-Za-z0-9]+", 1,
+    "session", "ses", TRUE, "[A-Za-z0-9]+",2,
+    "acquisition", "acq", TRUE, "[A-Za-z0-9]+", 4,
+    "contrast", "ce", TRUE, "[A-Za-z0-9]+",5,
+    "dir", "dir", TRUE, "[A-Za-z0-9]+", 6,
+    "reconstruction", "rec", TRUE, "[A-Za-z0-9]+",7,
+    "run", "run", TRUE, "[0-9]+",3
   )
   
   kinds <- tribble(
@@ -151,7 +151,7 @@ anat_spec <- function() {
   )
   
   ret <- list(keystruc=keystruc, kinds=kinds, type="func")
-  class(ret) <- "parser_spec"
+  class(ret) <- c("anat_spec", "parser_spec")
   ret
 }
 
@@ -159,20 +159,20 @@ anat_spec <- function() {
 #' @keywords internal
 funcprepspec <- function() {
   keystruc <- tribble(
-    ~name, ~key, ~optional, ~pattern,
-    "subid", "sub", FALSE, "[A-Za-z0-9]+",
-    "session", "ses", TRUE, "[A-Za-z0-9]+",
-    "task", "task", FALSE, "[A-Za-z0-9]+",
-    "acquisition", "acq", TRUE, "[A-Za-z0-9]+",
-    "contrast", "ce", TRUE, "[A-Za-z0-9]+",
-    "reconstruction", "rec", TRUE, "[A-Za-z0-9]+",
-    "run", "run", TRUE, "[a-z0-9]+",
-    "modality", "bold", TRUE, NULL,
-    "space", "space", TRUE,"[A-Za-z0-9]+",
-    "res", "res", TRUE,"[A-Za-z0-9]+",
-    "desc", "desc", TRUE,"[A-Za-z0-9]+",
-    "label", "label", TRUE,"[A-Za-z0-9]+",
-    "variant", "variant", TRUE,"[A-Za-z0-9]+")
+    ~name, ~key, ~optional, ~pattern,~order,
+    "subid", "sub", FALSE, "[A-Za-z0-9]+",1,
+    "session", "ses", TRUE, "[A-Za-z0-9]+",2,
+    "task", "task", FALSE, "[A-Za-z0-9]+",3,
+    "acquisition", "acq", TRUE, "[A-Za-z0-9]+",5,
+    "contrast", "ce", TRUE, "[A-Za-z0-9]+",6,
+    "reconstruction", "rec", TRUE, "[A-Za-z0-9]+",6,
+    "run", "run", TRUE, "[a-z0-9]+",4,
+    "modality", "bold", TRUE, NULL, 8,
+    "space", "space", TRUE,"[A-Za-z0-9]+", 9,
+    "res", "res", TRUE,"[A-Za-z0-9]+",10,
+    "desc", "desc", TRUE,"[A-Za-z0-9]+",11,
+    "label", "label", TRUE,"[A-Za-z0-9]+",12,
+    "variant", "variant", TRUE,"[A-Za-z0-9]+", 13)
 
   kinds <- tribble(
     ~kind, ~ suffix,
@@ -182,13 +182,14 @@ funcprepspec <- function() {
     "preproc", list(".nii.gz", ".nii", ".json"),
     "bold", list(".nii.gz", ".nii", ".json"),
     "brainmask", list(".nii.gz", ".nii", ".json"),
+    "mask", list(".nii.gz", ".nii", ".json"),
     "confounds", ".tsv",
     "MELODICmix", ".tsv",
     "AROMAnoiseICs", ".tsv"
   )
   
   ret <- list(keystruc=keystruc, kinds=kinds, type="funcprep")
-  class(ret) <- "parser_spec"
+  class(ret) <- c("funcprep_spec", "parser_spec")
   ret
 }
 
@@ -200,21 +201,21 @@ anatprepspec <- function() {
                   "inplaneT1", "inplaneT2", "angio")
   
   keystruc <- tribble(
-    ~name, ~key, ~optional, ~pattern,
-    "subid", "sub", FALSE, "[A-Za-z0-9]+",
-    "session", "ses", TRUE,"[A-Za-z0-9]+",
-    "acquisition", "acq",TRUE,"[A-Za-z0-9]+",
-    "contrast", "ce", TRUE,"[A-Za-z0-9]+",
-    "dir", "dir", TRUE,"[A-Za-z0-9]+",
-    "reconstruction", "rec",TRUE,"[A-Za-z0-9]+",
-    "run", "run",TRUE,"[0-9]+",
-    "modality", list(anat_types),TRUE, NULL,
-    "label", "label",TRUE,"[A-Za-z0-9]+",
-    "space", "space",TRUE,"[A-Za-z0-9]+",
-    "desc", "desc",TRUE,"[A-Za-z0-9]+",
-    "target", "target",TRUE,"[A-Za-z0-9]+",
-    "class", "class",TRUE,"[A-Za-z0-9]+",
-    "mod", "mod",TRUE,"[A-Za-z0-9]+"
+    ~name, ~key, ~optional, ~pattern,~order,
+    "subid", "sub", FALSE, "[A-Za-z0-9]+",1,
+    "session", "ses", TRUE,"[A-Za-z0-9]+",2,
+    "acquisition", "acq",TRUE,"[A-Za-z0-9]+",4,
+    "contrast", "ce", TRUE,"[A-Za-z0-9]+",5,
+    "dir", "dir", TRUE,"[A-Za-z0-9]+",6,
+    "reconstruction", "rec",TRUE,"[A-Za-z0-9]+",7,
+    "run", "run",TRUE,"[0-9]+",3,
+    "modality", list(anat_types),TRUE, NULL,8,
+    "label", "label",TRUE,"[A-Za-z0-9]+",9,
+    "space", "space",TRUE,"[A-Za-z0-9]+",10,
+    "desc", "desc",TRUE,"[A-Za-z0-9]+",11,
+    "target", "target",TRUE,"[A-Za-z0-9]+",12,
+    "class", "class",TRUE,"[A-Za-z0-9]+",13,
+    "mod", "mod",TRUE,"[A-Za-z0-9]+",14
     )
   
   kinds <- tribble(
@@ -240,7 +241,7 @@ anatprepspec <- function() {
   )
   
   ret <- list(keystruc=keystruc, kinds=kinds, type="anatprep")
-  class(ret) <- "parser_spec"
+  class(ret) <- c("anatprep_spec", "parser_spec")
   ret
   
 }
@@ -249,15 +250,15 @@ anatprepspec <- function() {
 #' @keywords internal
 fmapspec <- function() {
   keystruc <- tribble(
-    ~name, ~key, ~optional, ~pattern,
-    "subid", "sub", FALSE, "[A-Za-z0-9]+",
-    "session", "ses", TRUE, "[A-Za-z0-9]+",
-    "acquisition", "acq", TRUE, "[A-Za-z0-9]+",
-    "contrast", "ce", TRUE, "[A-Za-z0-9]+",
-    "dir", "dir", TRUE, "[A-Za-z0-9]+",
-    "reconstruction", "rec", TRUE, "[A-Za-z0-9]+",
-    "run", "run", TRUE, "[0-9]+",
-    "mod", "mod", TRUE, "[A-Za-z0-9]+"
+    ~name, ~key, ~optional, ~pattern,~order,
+    "subid", "sub", FALSE, "[A-Za-z0-9]+",1,
+    "session", "ses", TRUE, "[A-Za-z0-9]+",2,
+    "acquisition", "acq", TRUE, "[A-Za-z0-9]+",4,
+    "contrast", "ce", TRUE, "[A-Za-z0-9]+",5,
+    "dir", "dir", TRUE, "[A-Za-z0-9]+",6,
+    "reconstruction", "rec", TRUE, "[A-Za-z0-9]+",7,
+    "run", "run", TRUE, "[0-9]+",8,
+    "mod", "mod", TRUE, "[A-Za-z0-9]+",9
   )
   
   kinds <- tribble(
@@ -272,7 +273,7 @@ fmapspec <- function() {
   )
   
   ret <- list(keystruc=keystruc, kinds=kinds, type="fmap")
-  class(ret) <- "parser_spec"
+  class(ret) <- c("fmap_spec", "parser_spec")
   ret
   
   
