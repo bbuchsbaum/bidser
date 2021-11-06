@@ -364,7 +364,7 @@ preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*",
     ## attributes no longer contains 'deriv' or 'desc'
     if (z$isLeaf && (str_detect_null(z$kind , "preproc") || str_detect_null(z$deriv , "preproc") || str_detect_null(z$desc , "preproc")) && !is.null(z$type) && 
         str_detect_null(z$modality,modality, TRUE) && 
-        str_detect_null(z$name, subid)  && str_detect_null(z$name, task, TRUE) && 
+        str_detect_null(z$subid, subid)  && str_detect_null(z$task, task, TRUE) && 
         str_detect_null(z$variant, variant, TRUE) && str_detect_null(z$space, space, TRUE) && 
         str_detect_null(z$run, run, TRUE) && 
         str_detect_null(z$session, session, TRUE) && 
