@@ -104,7 +104,7 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
   sids <- sids[gidx]
   
   ret <- lapply(sids, function(s) {
-    fnames <- search_files(x, subid=as.character(s), task=task, 
+    fnames <- search_files(x, subid=paste0("^", as.character(s), "$"), task=task, 
                            session=session, kind="(confounds|regressors)", suffix="tsv", strict=TRUE, full_path=TRUE)
     ret <- lapply(fnames, function(fn) {
       ## temporary hack
