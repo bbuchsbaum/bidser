@@ -62,21 +62,21 @@ DEFAULT_CVARS2 <- c("csf", "white_matter", "global_signal", "std_dvars",
 
 #' @export
 confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", nest=TRUE) {
-  sids <- participants(x)
-  gidx <- grep(subid, sids)
-  if (length(gidx) == 0) {
-    stop(paste("no matching participants found for regex: ", subid))
-  }
-  sids <- sids[gidx]
-  ret <- lapply(sids, function(s) {
-    ## new fmriprep (e.g. (> 1.5)), where confounds are denoted by 'deriv-confounds``
-    fnames1 <- search_files(x, subid=as.character(s), task=task, session=session, deriv="confounds", full_path=TRUE)
-    ## old fmriprep (e.g. 1.1.8)
-    fnames2 <- search_files(x, subid=as.character(s), task=task, session=session, desc="confounds", full_path=TRUE)
-    c(fnames1, fnames2)
-  })
+  #sids <- participants(x)
+  #gidx <- grep(subid, sids)
+  #if (length(gidx) == 0) {
+  #  stop(paste("no matching participants found for regex: ", subid))
+  #}
+  #sids <- sids[gidx]
+  #ret <- lapply(sids, function(s) {
+  ## new fmriprep (e.g. (> 1.5)), where confounds are denoted by 'deriv-confounds``
+  fnames1 <- search_files(x, subid=subid, task=task, session=session, deriv="confounds", full_path=TRUE)
+  ## old fmriprep (e.g. 1.1.8)
+  fnames2 <- search_files(x, subid=subid, task=task, session=session, desc="confounds", full_path=TRUE)
+  c(fnames1, fnames2)
+  #})
   
-  unlist(ret)
+  #unlist(ret)
 }
   
 
