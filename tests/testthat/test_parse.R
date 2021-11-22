@@ -48,6 +48,7 @@ test_that("can parse various file types", {
   expect_type(encode("sub-01_task-test_run-01_desc-preproc_bold.nii.gz"), "list")
   expect_type(encode("sub-01_ses-01_task-test_run-01_desc-preproc_bold.nii.gz"), "list")
   expect_type(encode("sub-01_ses-01_task-test_run-01_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz"), "list")
+  expect_type(encode("sub-sid000009_task-movie_run-03_space-MNI152Lin_res-native_desc-preproc_bold.nii.gz"), "list")
 })
 
 
