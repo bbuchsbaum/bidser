@@ -13,9 +13,9 @@ set_key <- function(fname, key, value) {
   p
 }
 
-decode.list <- function(x) {
-  
-}
+#decode.list <- function(x) {
+#  
+#}
 
 
 #' @export
@@ -140,7 +140,8 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir = "derivatives/fmrip
     desc <- jsonlite::read_json(paste0(path, "/dataset_description.json"))
   }
 
-  part_df <- read.table(paste0(path, "/participants.tsv"), header=TRUE, stringsAsFactors=FALSE)
+  part_df <- read.table(paste0(path, "/participants.tsv"), header=TRUE, stringsAsFactors=FALSE, 
+                        colClasses=c(participant_id="character"))
   project_name <- basename(path)
 
   bids <- Node$new(project_name)
@@ -429,7 +430,6 @@ search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRU
   
   new=FALSE
   if (new) {
-    
     nodes <- data.tree::Traverse(x$bids_tree, filterFun = function(x) x$isLeaf && str_detect(x$name, regex))
     fnames <- sapply(nodes, "[[", "name")
     keys <- list(...)
