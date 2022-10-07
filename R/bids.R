@@ -383,6 +383,7 @@ preproc_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*",
   }
 }
 
+#' @keywords internal
 key_match <- function(default=FALSE, ...) {
   keyvals <- list(...)
   if (length(keyvals) == 0) {
@@ -482,7 +483,7 @@ search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRU
   as.vector(unlist(ret))
 }
 
-
+#' @keywords internal
 match_attribute <- function(x, ...) {
   ll <- list(...)
   
