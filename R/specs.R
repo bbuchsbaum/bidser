@@ -167,12 +167,13 @@ funcprepspec <- function() {
     "contrast", "ce", TRUE, "[A-Za-z0-9]+",6,
     "reconstruction", "rec", TRUE, "[A-Za-z0-9]+",6,
     "run", "run", TRUE, "[a-z0-9]+",4,
+    "echo", "echo", TRUE, "[0-9]+", 6,
     "modality", "bold", TRUE, NULL, 8,
     "space", "space", TRUE,"[A-Za-z0-9]+", 9,
     "res", "res", TRUE,"[A-Za-z0-9]+",10,
     "desc", "desc", TRUE,"[A-Za-z0-9]+",11,
     "label", "label", TRUE,"[A-Za-z0-9]+",12,
-    "echo", "echo", TRUE, "[0-9]+", 13,
+    
     "variant", "variant", TRUE,"[A-Za-z0-9]+", 14)
 
   kinds <- tribble(

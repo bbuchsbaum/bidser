@@ -38,6 +38,7 @@ test_that("can parse various file types", {
   expect_type(encode("sub-2001_task-test_run-01_bold_MELODICmix.tsv"), "list")
   expect_type(encode("sub-2001_task-test_run-01_bold_AROMAnoiseICs.tsv"), "list")
   expect_type(encode("sub-2001_task-alice_echo-2_bold.nii.gz"), "list")
+  expect_type(encode("sub-2001_task-alice_echo-2_space-hello_res-2_desc-preproc__bold.nii.gz"), "list")
   
   #expect_type(encode("sub-2001_task-test_run-01_bold_AROMAnoiseICs.csv"), "list")
   
