@@ -172,7 +172,8 @@ funcprepspec <- function() {
     "res", "res", TRUE,"[A-Za-z0-9]+",10,
     "desc", "desc", TRUE,"[A-Za-z0-9]+",11,
     "label", "label", TRUE,"[A-Za-z0-9]+",12,
-    "variant", "variant", TRUE,"[A-Za-z0-9]+", 13)
+    "echo", "echo", TRUE, "[0-9]+", 13,
+    "variant", "variant", TRUE,"[A-Za-z0-9]+", 14)
 
   kinds <- tribble(
     ~kind, ~ suffix,

@@ -37,6 +37,8 @@ test_that("can parse various file types", {
   expect_type(encode("sub-2001_ses-01_task-test_run-01_bold_space-MNI152NLin2009cAsym_variant-smoothAROMAnonaggr_preproc.nii.gz"), "list")
   expect_type(encode("sub-2001_task-test_run-01_bold_MELODICmix.tsv"), "list")
   expect_type(encode("sub-2001_task-test_run-01_bold_AROMAnoiseICs.tsv"), "list")
+  expect_type(encode("sub-2001_task-alice_echo-2_bold.nii.gz"), "list")
+  
   #expect_type(encode("sub-2001_task-test_run-01_bold_AROMAnoiseICs.csv"), "list")
   
   #BIDS 1.6.0 conventions
