@@ -94,7 +94,7 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #' @importFrom tidyr nest
 #' @importFrom tidyselect all_of any_of
 #' @export
-read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", cvars=DEFAULT_CVARS, 
+read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", run=".*", cvars=DEFAULT_CVARS, 
                                         npcs=-1, perc_var=-1, nest=TRUE) {
   sids <- participants(x)
   gidx <- grep(subid, sids)
@@ -105,7 +105,8 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
   
   ret <- lapply(sids, function(s) {
     fnames <- search_files(x, subid=paste0("^", as.character(s), "$"), task=task, 
-                           session=session, kind="(confounds|regressors)", suffix="tsv", strict=TRUE, full_path=TRUE)
+                           run=run, session=session, kind="(confounds|regressors|timeseries)", suffix="tsv", 
+                           strict=TRUE, full_path=TRUE)
     ret <- lapply(fnames, function(fn) {
       ## temporary hack
       run <- stringr::str_match(fn, "_run-(\\d+)")[1,2]
