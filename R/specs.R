@@ -182,7 +182,7 @@ funcprepspec <- function() {
     "regressors", ".tsv",
     "latent", ".lv.h5",
     "preproc", list(".nii.gz", ".nii", ".json"),
-    "bold", list(".nii.gz", ".nii", ".json"),
+    "bold", list(".nii.gz", ".nii", ".json", ".lv.h5"),
     "brainmask", list(".nii.gz", ".nii", ".json"),
     "mask", list(".nii.gz", ".nii", ".json"),
     "confounds", ".tsv",

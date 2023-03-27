@@ -37,8 +37,9 @@ test_that("can parse various file types", {
   expect_type(encode("sub-2001_ses-01_task-test_run-01_bold_space-MNI152NLin2009cAsym_variant-smoothAROMAnonaggr_preproc.nii.gz"), "list")
   expect_type(encode("sub-2001_task-test_run-01_bold_MELODICmix.tsv"), "list")
   expect_type(encode("sub-2001_task-test_run-01_bold_AROMAnoiseICs.tsv"), "list")
+  expect_type(encode("sub-1001_task-dae_run-all_space-MNI152Lin_res-native_desc-latent_bold.lv.h5"), "list")
   expect_type(encode("sub-2001_task-alice_echo-2_bold.nii.gz"), "list")
-  expect_type(encode("sub-2001_task-alice_echo-2_space-hello_res-2_desc-preproc__bold.nii.gz"), "list")
+  expect_type(encode("sub-2001_task-alice_echo-2_space-hello_res-2_desc-preproc_bold.nii.gz"), "list")
   
   #expect_type(encode("sub-2001_task-test_run-01_bold_AROMAnoiseICs.csv"), "list")
   
