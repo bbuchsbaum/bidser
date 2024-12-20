@@ -2,11 +2,11 @@
 % Please edit documentation in R/specs.R
 \name{anatprepspec}
 \alias{anatprepspec}
-\title{create a spec table for fmriprep "anat" files}
+\title{Create a spec table for fMRIPrep "anat" files}
 \usage{
 anatprepspec()
 }
 \description{
-create a spec table for fmriprep "anat" files
+Create a spec table for fMRIPrep "anat" files
 }
 \keyword{internal}

@@ -2,11 +2,19 @@
 % Please edit documentation in R/match_helpers.R
 \name{mandatory_key}
 \alias{mandatory_key}
-\title{create parser for a mandatory BIDS key}
+\title{Create a parser for a mandatory BIDS key}
 \usage{
 mandatory_key(label, regex = "[A-Za-z0-9]+")
 }
+\arguments{
+\item{label}{The label of the key to parse.}
+
+\item{regex}{The regex for the key's value.}
+}
+\value{
+A parser that must match one occurrence of \verb{_<label>-<id>}
+}
 \description{
-create parser for a mandatory BIDS key
+Matches a pattern \verb{_<label>-<id>} where \code{id} matches a given regex.
 }
 \keyword{internal}

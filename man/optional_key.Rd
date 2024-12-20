@@ -2,10 +2,19 @@
 % Please edit documentation in R/match_helpers.R
 \name{optional_key}
 \alias{optional_key}
-\title{create parser for optional BIDS key}
+\title{Create a parser for an optional BIDS key}
 \usage{
 optional_key(label, regex = "[A-Za-z0-9]+")
 }
-\description{
-create parser for optional BIDS key
+\arguments{
+\item{label}{The label of the key to parse.}
+
+\item{regex}{A regex pattern that the key's value should match.}
 }
+\value{
+A parser that matches zero or more occurrences of \verb{_<label>-<id>}
+}
+\description{
+Create a parser for an optional BIDS key
+}
+\keyword{internal}

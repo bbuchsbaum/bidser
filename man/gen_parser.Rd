@@ -2,16 +2,18 @@
 % Please edit documentation in R/specs.R
 \name{gen_parser}
 \alias{gen_parser}
-\title{given a match specification specification, generate a parser}
+\title{Given a match specification, generate a parser}
 \usage{
-gen_parser(spec, typename = "modality")
+gen_parser(spec, typename = "kind")
 }
 \arguments{
-\item{spec}{the specification as a table with \code{keystruc} and \code{modality} tables}
+\item{spec}{A specification object containing \code{keystruc} and \code{kinds} tables.
+\code{keystruc} defines the keys and their regex patterns, and \code{kinds} defines
+the possible file types and suffixes.}
 
-\item{typename}{the name given to the final type element}
+\item{typename}{The name given to the final type element. Default is "kind".}
 }
 \description{
-given a match specification specification, generate a parser
+Given a match specification, generate a parser
 }
 \keyword{internal}

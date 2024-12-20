@@ -2,10 +2,20 @@
 % Please edit documentation in R/match_helpers.R
 \name{gen_lit}
 \alias{gen_lit}
-\title{a literal matcher}
+\title{A literal matcher}
 \usage{
 gen_lit(type, suffix, extractor)
 }
+\arguments{
+\item{type}{A literal for the type.}
+
+\item{suffix}{A literal for the suffix.}
+
+\item{extractor}{A function to extract matched fields.}
+}
+\value{
+A parser that matches \code{type} followed by \code{suffix}.
+}
 \description{
-a literal matcher
+Matches a fixed \verb{<type><suffix>} pattern, using a provided extractor.
 }

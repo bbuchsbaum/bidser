@@ -2,21 +2,14 @@
 % Please edit documentation in R/specs.R
 \name{func_spec}
 \alias{func_spec}
-\title{func spec}
+\title{Create a spec table for "func" files}
 \usage{
 func_spec()
 }
 \description{
-create a spec table for "func" files
-}
-\details{
-"spec" objects describe the pattern rules for matching bids files for a given domain, e.g. ("func", "anat", etc.)
-A specification consists of two tables, a \code{keystruc} table and a \code{modalities} table. The \code{keystruc} table describes
-the allowable keys (e.g. \code{sub}, \code{ses}, etc.), their order, whether they are "optional" or not, and a regular expression
-indicating constraints on the pattern of the value associated with the key. The \code{name} field indicates how each key
-can be referred to in the resultant parsed list structure, e.g. (\code{sub} will be named \code{subid}).
-
-The \code{modalities} table describes the types of files and their suffixes that are allowed. the \code{modality} variable
-indicates the name of the file category (e.g. "bold") and suffix is used match different file formats.
+The \code{spec} object describes pattern rules for matching BIDS filenames.
+It consists of a \code{keystruc} table and a \code{kinds} table. The \code{keystruc} table
+defines keys, their regex patterns, their optionality, etc. The \code{kinds} table
+defines allowed file kinds and their suffixes.
 }
 \keyword{internal}

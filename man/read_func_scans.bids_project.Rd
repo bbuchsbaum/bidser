@@ -2,7 +2,7 @@
 % Please edit documentation in R/bidsio.R
 \name{read_func_scans.bids_project}
 \alias{read_func_scans.bids_project}
-\title{read in a set of four-dimensioanl functional scans}
+\title{Read in a set of four-dimensional functional scans}
 \usage{
 read_func_scans.bids_project(
   x,
@@ -16,25 +16,25 @@ read_func_scans.bids_project(
 )
 }
 \arguments{
-\item{x}{the \code{bids_project} object}
+\item{x}{A \code{bids_project} object}
 
-\item{mask}{a brain mask of type \code{LogicalNeuroVol}}
+\item{mask}{A brain mask of type \code{LogicalNeuroVol}}
 
-\item{mode}{the file mode: 'normal' for in-memory files or 'bigvec' for on-disk files}
+\item{mode}{The file mode: 'normal' for in-memory files or 'bigvec' for on-disk files}
 
-\item{subid}{one or more subject ids}
+\item{subid}{One or more subject IDs (regex)}
 
-\item{task}{an optional task regex}
+\item{task}{An optional task regex}
 
-\item{run}{an optional run regex}
+\item{run}{An optional run regex}
 
-\item{modality}{the image modality (usually "bold")}
+\item{modality}{The image modality (usually "bold")}
 
-\item{...}{extra args send to \code{neuroim2::read_vec}}
+\item{...}{Extra arguments passed to \code{neuroim2::read_vec}}
 }
 \value{
-a instance of type \code{NeuroVec}
+An instance of type \code{NeuroVec}
 }
 \description{
-read in a set of four-dimensioanl functional scans
+Read in a set of four-dimensional functional scans
 }

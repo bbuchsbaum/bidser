@@ -2,11 +2,17 @@
 % Please edit documentation in R/match_helpers.R
 \name{one_of}
 \alias{one_of}
-\title{match one of several labels}
+\title{Match one of several possible labels}
 \usage{
 one_of(labels)
 }
+\arguments{
+\item{labels}{A character vector of possible labels.}
+}
+\value{
+A parser that matches \verb{_<one_of_labels>}
+}
 \description{
-match one of several labels
+Given a vector of labels, matches \verb{_<label>} where \if{html}{\out{<label>}} is one of them.
 }
 \keyword{internal}

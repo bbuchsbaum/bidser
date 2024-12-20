@@ -13,7 +13,7 @@ func_scans(x, ...)
   task = ".*",
   run = ".*",
   session = ".*",
-  modality = "bold",
+  kind = "bold",
   full_path = TRUE,
   ...
 )
@@ -31,18 +31,18 @@ func_scans(x, ...)
 
 \item{session}{regular expression matching 'session'}
 
-\item{modality}{regular expression matching 'modality'}
-
 \item{full_path}{return full file path?}
+
+\item{modality}{regular expression matching 'modality'}
 }
 \description{
 extract functional scans from bids project
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{bids_project}: 
-}}
+\item \code{func_scans(bids_project)}: 
 
+}}
 \examples{
 
 p <- system.file("inst/extdata/ds001", package="bidser")

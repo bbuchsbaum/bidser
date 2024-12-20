@@ -2,11 +2,11 @@
 % Please edit documentation in R/specs.R
 \name{funcprepspec}
 \alias{funcprepspec}
-\title{create a spec table for fmriprep "func" files}
+\title{Create a spec table for fMRIPrep "func" files}
 \usage{
 funcprepspec()
 }
 \description{
-create a spec table for fmriprep "func" files
+Create a spec table for fMRIPrep "func" files
 }
 \keyword{internal}

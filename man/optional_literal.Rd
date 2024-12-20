@@ -2,10 +2,19 @@
 % Please edit documentation in R/match_helpers.R
 \name{optional_literal}
 \alias{optional_literal}
-\title{create parser for an optional BIDS literal}
+\title{Create a parser for an optional BIDS literal}
 \usage{
 optional_literal(lit, label)
 }
-\description{
-create parser for an optional BIDS literal
+\arguments{
+\item{lit}{A literal to match (a fixed string).}
+
+\item{label}{A label for the parser.}
 }
+\value{
+A parser that matches zero or one occurrence of \verb{_<lit>}
+}
+\description{
+This matches zero or one occurrence of \verb{_<lit>}
+}
+\keyword{internal}

@@ -2,13 +2,14 @@
 % Please edit documentation in R/bidsio.R
 \name{read_confounds.bids_project}
 \alias{read_confounds.bids_project}
-\title{read confound files}
+\title{Read confound files}
 \usage{
 \method{read_confounds}{bids_project}(
   x,
   subid = ".*",
   task = ".*",
   session = ".*",
+  run = ".*",
   cvars = DEFAULT_CVARS,
   npcs = -1,
   perc_var = -1,
@@ -16,18 +17,27 @@
 )
 }
 \arguments{
-\item{subid}{(optional) subid regex selector}
+\item{x}{A \code{bids_project} object}
 
-\item{task}{(optional) task regex selector}
+\item{subid}{Subject ID regex}
 
-\item{cvars}{the names of the confound variables to select. If missing, defaults to a set defined by constant \code{DEFAULT_CVARS}.}
+\item{task}{Task regex}
 
-\item{npcs}{perform pca reduction on confound matrix and reduce to \code{npcs} dimensions}
+\item{session}{Session regex}
 
-\item{perc_var}{perform pca reduction on confound matrix and retain \code{perc_var} percent of total (selected) confound variance}
+\item{run}{Run regex}
 
-\item{nest}{nest confound tables by subject/sesssion/run}
+\item{cvars}{The names of the confound variables to select. Defaults to \code{DEFAULT_CVARS}.}
+
+\item{npcs}{Perform PCA reduction on confounds and return \code{npcs} PCs.}
+
+\item{perc_var}{Perform PCA reduction to retain \code{perc_var}\% variance.}
+
+\item{nest}{If TRUE, nests confound tables by subject/session/run.}
+}
+\value{
+A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds.
 }
 \description{
-read in fmriprep confound tables for one or more subjects
+Reads in fmriprep confound tables for one or more subjects.
 }

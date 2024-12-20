@@ -2,11 +2,21 @@
 % Please edit documentation in R/match_helpers.R
 \name{gen_lits}
 \alias{gen_lits}
-\title{multiple literal matchers}
+\title{Multiple literal matchers}
 \usage{
 gen_lits(types, suffix, extractor)
 }
+\arguments{
+\item{types}{A character vector of types.}
+
+\item{suffix}{A single suffix string.}
+
+\item{extractor}{A function to extract matched fields.}
+}
+\value{
+A list of parsers.
+}
 \description{
-multiple literal matchers
+Given multiple \code{types} and a single \code{suffix}, generates a list of parsers.
 }
 \keyword{internal}

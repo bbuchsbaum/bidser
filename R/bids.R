@@ -384,46 +384,73 @@ str_detect_null <- function(x, pat, default=FALSE) {
   if (is.null(x) || is.na(x)) default else str_detect(x,pat)
 }
 
-#' @describeIn preproc_scans 
+#' Retrieve preprocessed scans from a BIDS project
+#'
+#' This function searches for preprocessed (fMRIPrep-derived) scans matching the specified
+#' subject, task, run, session, and optionally variant and space. By default, it returns 
+#' only preprocessed BOLD scans, which excludes anatomical preprocessed files such as `T1w`.
+#'
+#' @param x A \code{bids_project} object.
+#' @param subid A regex pattern for matching subjects. Default is `".*"`.
+#' @param task A regex pattern for matching tasks. Default is `".*"`.
+#' @param run A regex pattern for matching runs. Default is `".*"`.
+#' @param variant A regex pattern for matching variant. Default is `NULL` (no variant filtering).
+#' @param space A regex pattern for matching space. Default is `".*"`.
+#' @param session A regex pattern for matching sessions. Default is `".*"`.
+#' @param modality A regex pattern for matching modality. Default is `"bold"`. 
+#'        Set this to something else if you need a different modality.
+#' @param kind The kind of preprocessed data to return (e.g. `"bold"`). Default is `"bold"`.
+#'        Setting this allows excluding other preprocessed files like `T1w`.
+#' @param full_path If `TRUE`, return full file paths. Otherwise return relative paths.
+#' @param ... Additional arguments (not used currently).
+#'
+#' @return A character vector of file paths to the matched preprocessed scans. If none are found, returns `NULL`.
+#'
 #' @examples 
 #' proj <- bids_project(system.file("inst/extdata/phoneme_stripped", package="bidser"), fmriprep=TRUE)
-#' preproc_scans(proj)
-#' @inheritParams func_scans.bids_project
+#' preproc_scans(proj) # returns all preprocessed BOLD scans by default
+#'
 #' @export
 preproc_scans.bids_project <- function (x, subid=".*", task=".*", run=".*", 
                                         variant=NULL, space=".*", session=".*", 
-                                        modality="bold", full_path=FALSE, ...) {
+                                        modality="bold", kind="bold", full_path=FALSE, ...) {
   f <- function(node) paste0(node$path[2:length(node$path)], collapse="/")
   
   pdir <- x$prep_dir
   
-  # Handle variant logic once before the filter:
+  # If variant is NULL, treat it as ".*"
   var_pattern <- if (is.null(variant)) ".*" else variant
   
   ret <- x$bids_tree$children[[pdir]]$Get(f, filterFun = function(z) {
-    # If variant was NULL but z$variant is not null, skip this node
+    # If variant not specified but z$variant is not null, skip this node
     if (is.null(variant) && !is.null(z$variant)) {
       return(FALSE)
     }
     
+    # Check that:
+    # - The file is a leaf (no children)
+    # - The file has desc=preproc (indicating preprocessed)
+    # - The file matches the requested modality and kind
+    # - The file matches subid, task, run, session, space, and variant patterns
+    # - The file suffix matches a NIfTI pattern (nii or nii.gz)
     z$isLeaf &&
-      (str_detect_null(z$kind, "preproc") || str_detect_null(z$deriv, "preproc") || str_detect_null(z$desc, "preproc")) &&
-      !is.null(z$type) &&
-      str_detect_null(z$modality, modality, TRUE) &&
+      str_detect_null(z$desc, "preproc") &&
+      str_detect_null(z$kind, kind, default=TRUE) &&
+      str_detect_null(z$modality, modality, default=TRUE) &&
       str_detect_null(z$subid, subid) &&
-      str_detect_null(z$task, task, TRUE) &&
-      str_detect_null(z$variant, var_pattern, TRUE) &&
-      str_detect_null(z$space, space, TRUE) &&
-      str_detect_null(z$run, run, TRUE) &&
-      str_detect_null(z$session, session, TRUE) &&
+      str_detect_null(z$task, task, default=TRUE) &&
+      str_detect_null(z$variant, var_pattern, default=TRUE) &&
+      str_detect_null(z$space, space, default=TRUE) &&
+      str_detect_null(z$run, run, default=TRUE) &&
+      str_detect_null(z$session, session, default=TRUE) &&
       str_detect_null(z$suffix, "nii(.gz)?$")
   })
   
-  if (full_path && !is.null(ret)) {
-    file.path(x$path, ret)
-  } else {
-    ret
+  if (!is.null(ret) && full_path) {
+    ret <- file.path(x$path, ret)
   }
+  
+  ret
 }
 
 #' @keywords internal

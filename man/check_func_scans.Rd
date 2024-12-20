@@ -2,10 +2,32 @@
 % Please edit documentation in R/check.R
 \name{check_func_scans}
 \alias{check_func_scans}
-\title{x <- bids_project(system.file("inst/extdata/phoneme_stripped", package="bidser"), fmriprep=TRUE)}
+\title{Check Functional Scans in a BIDS Project}
 \usage{
 check_func_scans(x)
 }
+\arguments{
+\item{x}{A \code{bids_project} object created by \code{bids_project()}.}
+}
+\value{
+A list containing:
+\itemize{
+\item \code{scans}: a tibble with details of all functional scans.
+\item \code{tasklist}: a vector of tasks found in the project.
+\item \code{scans_per_subject}: a summary of the number of scans per subject.
+\item If multiple tasks are present:
+\itemize{
+\item \code{scans_per_task}: summary of scans per task
+\item \code{scans_per_task_subject}: summary of scans per subject and task
+\item \code{size_per_task}: tibble with size deltas by task
+}
+\item If only one task is present:
+\itemize{
+\item \code{size_per_subject}: tibble with size deltas by subject
+}
+}
+}
 \description{
-x <- bids_project(system.file("inst/extdata/phoneme_stripped", package="bidser"), fmriprep=TRUE)
+This function inspects functional scans within a BIDS project and returns
+summaries of scan counts and file sizes per subject and (if multiple tasks) per task.
 }

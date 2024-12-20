@@ -2,7 +2,7 @@
 % Please edit documentation in R/all_generic.R
 \name{encode}
 \alias{encode}
-\title{Encode a string}
+\title{Encode a string into a BIDS key-value list}
 \usage{
 encode(x, ...)
 }
@@ -12,5 +12,5 @@ encode(x, ...)
 \item{...}{extra args}
 }
 \description{
-Encode a string
+Encode a string into a BIDS key-value list
 }

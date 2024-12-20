@@ -2,11 +2,19 @@
 % Please edit documentation in R/match_helpers.R
 \name{zero_or_one_of}
 \alias{zero_or_one_of}
-\title{match zero or one of several labels}
+\title{Match zero or one of several labels}
 \usage{
 zero_or_one_of(labels, label)
 }
+\arguments{
+\item{labels}{A character vector of possible labels.}
+
+\item{label}{A label for the parser.}
+}
+\value{
+A parser that matches zero or one of \verb{_<labels>}
+}
 \description{
-match zero or one of several labels
+Similar to \code{one_of} but matches zero or one occurrence.
 }
 \keyword{internal}

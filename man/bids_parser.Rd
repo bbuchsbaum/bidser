@@ -2,11 +2,11 @@
 % Please edit documentation in R/matchers.R
 \name{bids_parser}
 \alias{bids_parser}
-\title{parse any BIDS file types}
+\title{Create a parser for a generic BIDS file}
 \usage{
 bids_parser()
 }
 \description{
-parse any BIDS file types
+This parser tries to match against various known parsers (anat, func, fmriprep anat/func).
 }
 \keyword{internal}
