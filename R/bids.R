@@ -1,24 +1,18 @@
+#' @importFrom crayon green cyan magenta yellow bold
+NULL
 
-## TODO
-## heatmap plot
-## x axis is subject
-## y axis is task by run
-## squares colored by file-size
-## files could be confounds, scans, preproc, etc.
-
-
+#' @noRd
 set_key <- function(fname, key, value) {
   p <- encode(fname)
   p[[key]] <- value
   p
 }
 
-#decode.list <- function(x) {
-#  
-#}
 
 
 #' @export
+#' @rdname encode
+#' @param fname The filename string to encode
 encode.character <- function(fname) {
   p <- bids_parser()
   ret <- parse(p, fname)
@@ -30,7 +24,9 @@ encode.character <- function(fname) {
   }
 }
 
+
 #' @keywords internal
+#' @noRd
 list_files_github <- function(user, repo, subdir="") {
   gurl <- paste0("https://api.github.com/repos/", user, "/", repo, "/git/trees/master?recursive=1")
   req <- httr::GET(gurl)
@@ -51,6 +47,7 @@ read_example <- function(project) {
 
 
 #' @keywords internal
+#' @noRd
 get_sessions <- function(path, sid) {
   dnames <- basename(fs::dir_ls(paste0(path, "/", sid)))
   ret <- str_detect(dnames, "ses-.*")
@@ -63,67 +60,125 @@ get_sessions <- function(path, sid) {
 
 
 #' @keywords internal
+#' @noRd
 descend <- function(node, path, ftype, parser) {
+  # List all files in the directory
   dnames <- basename(fs::dir_ls(paste0(path)))
   ret <- str_detect(dnames, ftype)
   
+  # Add the folder node (e.g., 'anat', 'func')
   node <- add_node(node, ftype, folder=ftype)
-  #node <- node$AddChild(ftype)
-  #node$folder=ftype
   
   if (any(ret)) {
+    # Get all files in the folder
     fnames <- basename(fs::dir_ls(paste0(path, "/", ftype)))
-
+    
+    # Debug info to see which files we're attempting to parse
+    # message("Processing ", length(fnames), " files in ", ftype, " folder at ", path)
+    
     for (fname in fnames) {
+      # Try to parse the filename using the provided parser
       mat <- parse(parser, fname)
+      
       if (!is.null(mat)) {
+        # The parser matched the file - extract the results
         keep <- sapply(mat$result, function(x) !is.null(x) && length(x) > 0)
         res <- mat$result[keep]
-    
+        
+        # Ensure 'kind' attribute is always set when dealing with func files
+        if (ftype == "func" && !is.null(res$suffix)) {
+          # For func files with .nii or .nii.gz extension but no explicit kind
+          if (grepl("nii(\\.gz)?$", res$suffix) && 
+              (is.null(res$kind) || is.na(res$kind) || res$kind == "")) {
+            # Explicitly set kind to "bold" for functional MRI files
+            res$kind <- "bold"
+          }
+        }
+        
+        # Create a new node for this file
         pf <- purrr::partial(Node$new, fname)
         n <- Node$new(fname)
         n <- do.call(pf, res)
         
+        # Add file path for reference
+        n$relative_path <- file.path(ftype, fname)
+        
+        # Add the file node to the parent folder node
         node$AddChildNode(n)
+      } else {
+        # Parser didn't match - could add warning or debug info here
+        # message("Could not parse file: ", fname, " in ", ftype, " folder")
       }
     }
   }
+  
+  return(node)
 }
 
 
 #' @keywords internal
+#' @noRd
 add_node <- function(bids, name, ...) {
   bids$AddChild(name, ...)
 }
 
 #' @keywords internal
+#' @noRd
 add_file <- function(bids, name,...) {
   bids$AddChild(name, ...)
 }
 
-## TODO add ability to load one subject only
-## TODO create a "bids_object" to represent files and folders?
 
-#' Bids Project
-#' 
-#' Load a BIDS project at a file root
-#' 
-#' 
-#' @param path the file path of the project
-#' @param fmriprep whether to load fmriprep folder hierarchy
-#' @param prep_dir location of fmriprep subfolder
-#' @importFrom data.tree Node
-#' @import stringr
-#' @importFrom progress progress_bar 
-#' @importFrom future availableCores
+
+#' Create a BIDS Project Object
+#'
+#' This function creates a BIDS project object from a directory containing BIDS-formatted
+#' neuroimaging data. It can optionally load preprocessed derivatives from fMRIPrep.
+#' The function validates the basic BIDS structure and provides methods for accessing
+#' raw and preprocessed data, querying subjects, sessions, and tasks, reading event
+#' files, and checking BIDS compliance.
+#'
+#' @param path Character string. The file path to the root of the BIDS project.
+#'   Defaults to the current directory (".").
+#' @param fmriprep Logical. Whether to load the fMRIPrep derivatives folder hierarchy.
+#'   Defaults to FALSE.
+#' @param prep_dir Character string. The location of the fMRIPrep subfolder relative
+#'   to the derivatives directory. Defaults to "derivatives/fmriprep".
+#'
+#' @return A `bids_project` object representing the BIDS project structure. The object
+#'   provides methods for:
+#'   - Accessing raw and preprocessed data files
+#'   - Querying subjects, sessions, and tasks
+#'   - Reading event files and confound regressors
+#'   - Checking BIDS compliance
+#'   - Extracting metadata from file names
+#'   Returns NULL if the directory does not contain a valid BIDS dataset.
+#'
+#' @examples
+#' # Load a basic BIDS dataset
+#' ds001_path <- system.file("extdata/ds001", package="bidser")
+#' proj <- bids_project(ds001_path)
+#'
+#' # Check available tasks
+#' tasks(proj)
+#'
+#' # Get participant IDs
+#' participants(proj)
+#'
+#' # Load a dataset with fMRIPrep derivatives
+#' fmriprep_path <- system.file("extdata/phoneme_stripped", package="bidser")
+#' proj_prep <- bids_project(fmriprep_path, fmriprep=TRUE)
+#'
+#' # Access preprocessed data
+#' preproc_scans(proj_prep)
+#'
+#' # Load a dataset with a custom fMRIPrep directory
+#' proj_custom <- bids_project(fmriprep_path,
+#'                            fmriprep=TRUE,
+#'                            prep_dir="derivatives/custom_fmriprep")
+#'
 #' @export
-#' @examples 
-#' 
-#' p <- system.file("inst/extdata/7t_trt", package="bidser")
-#' pp <- bids_project(p)
-#' 
-#' pp2 <- bids_project(system.file("inst/extdata/phoneme_stripped", package="bidser"), fmriprep=TRUE)
-bids_project <- function(path=".", fmriprep=FALSE, prep_dir = "derivatives/fmriprep") {
+bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmriprep") {
   aparser <- anat_parser()
   fparser <- func_parser()
   
@@ -230,6 +285,8 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir = "derivatives/fmrip
 }
 
 #' @export
+#' @rdname flat_list-method
+#' @method flat_list bids_project
 flat_list.bids_project <- function(x, full_path=TRUE) {
   if (full_path) {
     data.tree::ToDataFrameTable(x$bids_tree, "pathString", "name") %>% filter(stringr::str_detect(name, "^sub-")) %>%
@@ -240,8 +297,7 @@ flat_list.bids_project <- function(x, full_path=TRUE) {
   }
 }
 
-#' @importFrom crayon green cyan magenta yellow bold
-NULL
+
 
 #' @export
 print.bids_project <- function(x, ...) {
@@ -309,6 +365,8 @@ print.bids_project <- function(x, ...) {
 
 
 #' @export
+#' @rdname sessions-method
+#' @method sessions bids_project
 sessions.bids_project <- function(x) {
   if (x$has_session) {
     unique(unlist(x$bids_tree$Get("session", filterFun = function(x) !is.null(x$session))))
@@ -318,6 +376,8 @@ sessions.bids_project <- function(x) {
 }
 
 #' @export
+#' @rdname tasks-method
+#' @method tasks bids_project
 tasks.bids_project <- function(x) {
   sort(unique(x$bids_tree$Get("task", filterFun = function(x) {!is.na(x$task) && !is.null(x$task) } )))
   ##unique(x$bids_tree$Get("task", filterFun = function(x) !is.null(x$task) & !is.na(x$task)))
@@ -325,6 +385,7 @@ tasks.bids_project <- function(x) {
 
 
 #' @export
+#' @rdname participants-method
 participants.bids_project <- function(x, ...) {
   if ("subid" %in% names(x$tbl)) {
     unique(x$tbl$subid[!is.na(x$tbl$subid)])
@@ -335,18 +396,54 @@ participants.bids_project <- function(x, ...) {
 
 
 
-#' @describeIn func_scans 
-#' 
-#' @param subid regular expression matching 'task' 
-#' @param task regular expression matching 'task' 
-#' @param run regular expression matching 'run' 
-#' @param session regular expression matching 'session' 
-#' @param modality regular expression matching 'modality' 
-#' @param full_path return full file path?
-#' @examples 
-#' 
-#' p <- system.file("inst/extdata/ds001", package="bidser")
-#' fs <- func_scans(bids_project(p), subid="sub-0[123]", run="0[123]")
+#' Get Functional Scans from a BIDS Project
+#'
+#' This method extracts functional scan files from a BIDS project based on specified
+#' criteria such as subject ID, task name, run number, and session. It can return
+#' either full or relative file paths to the functional scans.
+#'
+#' @param x A `bids_project` object.
+#' @param subid Regular expression for matching subject IDs. Default is ".*".
+#' @param task Regular expression for matching task names. Default is ".*".
+#' @param run Regular expression for matching run numbers. Default is ".*".
+#' @param session Regular expression for matching session IDs. Default is ".*".
+#' @param kind Regular expression for matching scan type. Default is "bold".
+#' @param full_path Logical. If TRUE, return full file paths. If FALSE, return
+#'   relative paths. Default is TRUE.
+#' @param ... Additional arguments (not currently used).
+#'
+#' @return A character vector of file paths to functional scans matching the criteria.
+#'   Returns NULL if:
+#'   - No matching files are found
+#'   - The project doesn't contain functional data
+#'   - The specified criteria don't match any files
+#'
+#' @examples
+#' # Create a BIDS project
+#' ds001_path <- system.file("extdata/ds001", package="bidser")
+#' proj <- bids_project(ds001_path)
+#'
+#' # Get all functional scans
+#' all_scans <- func_scans(proj)
+#'
+#' # Get scans for specific subjects
+#' sub_scans <- func_scans(proj, subid="0[123]")
+#'
+#' # Get scans for a specific task
+#' task_scans <- func_scans(proj, task="rest")
+#'
+#' # Get scans from specific runs
+#' run_scans <- func_scans(proj, run="0[123]")
+#'
+#' # Combine multiple filters
+#' filtered_scans <- func_scans(proj,
+#'                             subid="01",
+#'                             task="rest",
+#'                             run="01")
+#'
+#' # Get relative paths instead of full paths
+#' rel_scans <- func_scans(proj, full_path=FALSE)
+#'
 #' @export
 func_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", session=".*", 
                                      kind="bold", full_path=TRUE, ...) {
@@ -380,40 +477,74 @@ func_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", sessi
 
 
 #' @keywords internal
+#' @noRd
 str_detect_null <- function(x, pat, default=FALSE) {
   if (is.null(x) || is.na(x)) default else str_detect(x,pat)
 }
 
-#' Retrieve preprocessed scans from a BIDS project
+#' Get preprocessed scans from a BIDS project
 #'
-#' This function searches for preprocessed (fMRIPrep-derived) scans matching the specified
-#' subject, task, run, session, and optionally variant and space. By default, it returns 
-#' only preprocessed BOLD scans, which excludes anatomical preprocessed files such as `T1w`.
+#' This function retrieves paths to preprocessed functional MRI scans from a BIDS project's
+#' fMRIPrep derivatives. It allows filtering by various BIDS entities such as subject,
+#' task, run, session, and space. The function is particularly useful for accessing
+#' preprocessed data for analysis pipelines.
 #'
 #' @param x A \code{bids_project} object.
-#' @param subid A regex pattern for matching subjects. Default is `".*"`.
-#' @param task A regex pattern for matching tasks. Default is `".*"`.
-#' @param run A regex pattern for matching runs. Default is `".*"`.
-#' @param variant A regex pattern for matching variant. Default is `NULL` (no variant filtering).
-#' @param space A regex pattern for matching space. Default is `".*"`.
-#' @param session A regex pattern for matching sessions. Default is `".*"`.
-#' @param modality A regex pattern for matching modality. Default is `"bold"`. 
-#'        Set this to something else if you need a different modality.
-#' @param kind The kind of preprocessed data to return (e.g. `"bold"`). Default is `"bold"`.
-#'        Setting this allows excluding other preprocessed files like `T1w`.
-#' @param full_path If `TRUE`, return full file paths. Otherwise return relative paths.
-#' @param ... Additional arguments (not used currently).
+#' @param subid A regex pattern for matching subjects. Default is ".*".
+#' @param task A regex pattern for matching tasks. Default is ".*".
+#' @param run A regex pattern for matching runs. Default is ".*".
+#' @param variant A regex pattern for matching preprocessing variants. Default is NULL
+#'   (no variant filtering).
+#' @param space A regex pattern for matching spaces (e.g., "MNI152NLin2009cAsym").
+#'   Default is ".*".
+#' @param session A regex pattern for matching sessions. Default is ".*".
+#' @param modality A regex pattern for matching modality. Default is "bold".
+#'   Set this to something else if you need a different modality.
+#' @param kind The kind of preprocessed data to return. Default is ".*" to match any kind.
+#' @param full_path If TRUE, return full file paths. Otherwise return relative paths.
+#'   Default is FALSE.
+#' @param ... Additional arguments passed to internal functions.
 #'
-#' @return A character vector of file paths to the matched preprocessed scans. If none are found, returns `NULL`.
+#' @return A character vector of file paths to preprocessed scans matching the criteria.
+#'   Returns NULL if:
+#'   - No matching files are found
+#'   - The project doesn't have fMRIPrep derivatives
+#'   - The specified criteria don't match any files
 #'
-#' @examples 
-#' proj <- bids_project(system.file("inst/extdata/phoneme_stripped", package="bidser"), fmriprep=TRUE)
-#' preproc_scans(proj) # returns all preprocessed BOLD scans by default
+#' @examples
+#' # Create a BIDS project with fMRIPrep derivatives
+#' proj <- bids_project(system.file("extdata/phoneme_stripped", package="bidser"),
+#'                      fmriprep=TRUE)
+#'
+#' # Get all preprocessed BOLD scans
+#' all_scans <- preproc_scans(proj)
+#'
+#' # Get preprocessed scans for specific subjects
+#' sub_scans <- preproc_scans(proj, subid="0[12]")
+#'
+#' # Get scans in MNI space
+#' mni_scans <- preproc_scans(proj, space="MNI152NLin2009cAsym")
+#'
+#' # Get scans for a specific task with full paths
+#' task_scans <- preproc_scans(proj,
+#'                            task="phoneme",
+#'                            full_path=TRUE)
+#'
+#' # Get scans from a specific session
+#' session_scans <- preproc_scans(proj, session="test")
+#'
+#' # Combine multiple filters
+#' filtered_scans <- preproc_scans(proj,
+#'                                subid="01",
+#'                                task="phoneme",
+#'                                run="01",
+#'                                space="MNI152NLin2009cAsym")
 #'
 #' @export
-preproc_scans.bids_project <- function (x, subid=".*", task=".*", run=".*", 
-                                        variant=NULL, space=".*", session=".*", 
-                                        modality="bold", kind="bold", full_path=FALSE, ...) {
+preproc_scans.bids_project <- function(x, subid=".*", task=".*", run=".*", variant=NULL,
+                                      space=".*", session=".*", modality="bold", kind=".*",
+                                      full_path=FALSE, ...) {
+  # Function to extract path from node
   f <- function(node) paste0(node$path[2:length(node$path)], collapse="/")
   
   pdir <- x$prep_dir
@@ -421,31 +552,44 @@ preproc_scans.bids_project <- function (x, subid=".*", task=".*", run=".*",
   # If variant is NULL, treat it as ".*"
   var_pattern <- if (is.null(variant)) ".*" else variant
   
-  ret <- x$bids_tree$children[[pdir]]$Get(f, filterFun = function(z) {
-    # If variant not specified but z$variant is not null, skip this node
-    if (is.null(variant) && !is.null(z$variant)) {
-      return(FALSE)
-    }
+  # Create a list of criteria to check
+  criteria <- list(
+    # Basic file criteria
+    is_leaf = function(z) z$isLeaf,
+    is_nifti = function(z) str_detect_null(z$suffix, "nii(.gz)?$"),
     
-    # Check that:
-    # - The file is a leaf (no children)
-    # - The file has desc=preproc (indicating preprocessed)
-    # - The file matches the requested modality and kind
-    # - The file matches subid, task, run, session, space, and variant patterns
-    # - The file suffix matches a NIfTI pattern (nii or nii.gz)
-    z$isLeaf &&
-      str_detect_null(z$desc, "preproc") &&
-      str_detect_null(z$kind, kind, default=TRUE) &&
-      str_detect_null(z$modality, modality, default=TRUE) &&
-      str_detect_null(z$subid, subid) &&
-      str_detect_null(z$task, task, default=TRUE) &&
-      str_detect_null(z$variant, var_pattern, default=TRUE) &&
-      str_detect_null(z$space, space, default=TRUE) &&
-      str_detect_null(z$run, run, default=TRUE) &&
-      str_detect_null(z$session, session, default=TRUE) &&
-      str_detect_null(z$suffix, "nii(.gz)?$")
+    # Metadata criteria
+    matches_modality = function(z) str_detect_null(z$modality, modality, default=TRUE),
+    matches_kind = function(z) str_detect_null(z$kind, kind, default=TRUE),
+    matches_subid = function(z) str_detect_null(z$subid, subid),
+    matches_task = function(z) str_detect_null(z$task, task, default=TRUE),
+    matches_run = function(z) str_detect_null(z$run, run, default=TRUE),
+    matches_session = function(z) str_detect_null(z$session, session, default=TRUE),
+    matches_space = function(z) str_detect_null(z$space, space, default=TRUE),
+    
+    # Special handling for variant
+    matches_variant = function(z) {
+      # If variant not specified but z$variant is not null, skip this node
+      if (is.null(variant) && !is.null(z$variant)) {
+        return(FALSE)
+      }
+      return(str_detect_null(z$variant, var_pattern, default=TRUE))
+    },
+    
+    # Preprocessed file criteria - must have either desc=preproc OR kind=preproc
+    is_preprocessed = function(z) {
+      return(str_detect_null(z$desc, "preproc", default=FALSE) || 
+             str_detect_null(z$kind, "preproc", default=FALSE))
+    }
+  )
+  
+  # Get files matching all criteria
+  ret <- x$bids_tree$children[[pdir]]$Get(f, filterFun = function(z) {
+    # Apply all criteria and return TRUE only if all are met
+    all(sapply(criteria, function(criterion) criterion(z)))
   })
   
+  # Add full path if requested
   if (!is.null(ret) && full_path) {
     ret <- file.path(x$path, ret)
   }
@@ -454,30 +598,70 @@ preproc_scans.bids_project <- function (x, subid=".*", task=".*", run=".*",
 }
 
 #' @keywords internal
+#' @noRd
 key_match <- function(default=FALSE, ...) {
   keyvals <- list(...)
+  
+  # If no key-value pairs provided, always return TRUE
   if (length(keyvals) == 0) {
     return(function(x) TRUE)
   }
+  
   keys <- names(keyvals)
+  
+  # Return a function that checks if an object matches all patterns
   function(x) {
-    all(sapply(keys, function(k) {
+    all(vapply(keys, function(k) {
+      # Case 1: Key value is NULL in pattern but exists in object - no match
       if (is.null(keyvals[[k]]) && !is.null(x[[k]])) {
-        FALSE
-      } else if (is.null(keyvals[[k]]) && is.null(x[[k]])) {
-        TRUE
-      } else {
-        if (keyvals[[k]] == ".*") {
-          TRUE
-        } else {
-          str_detect_null(x[[k]], keyvals[[k]], default)
-        }
+        return(FALSE)
       }
-    }))
+      
+      # Case 2: Key value is NULL in pattern and NULL in object - match
+      if (is.null(keyvals[[k]]) && is.null(x[[k]])) {
+        return(TRUE)
+      }
+      
+      # Case 3: Wildcard pattern ".*" - always match
+      if (identical(keyvals[[k]], ".*")) {
+        return(TRUE)
+      }
+      
+      # Case 4: Use str_detect_null to match pattern
+      return(str_detect_null(x[[k]], keyvals[[k]], default))
+    }, logical(1)))
   }
 }
 
 
+#' Search for files in a BIDS project
+#' 
+#' This function searches for files in a BIDS project that match a specified pattern
+#' and optional key-value criteria. It can search in both raw data and preprocessed 
+#' derivatives (if available).
+#'
+#' @param x A \code{bids_project} object.
+#' @param regex A regular expression to match against filenames. Default is ".*" (all files).
+#' @param full_path If TRUE, return full file paths. If FALSE, return paths relative to the project root.
+#' @param strict If TRUE, require that all queried keys must exist in matched files.
+#'        If FALSE, allow matches for files missing queried keys.
+#' @param new Deprecated parameter. Should always be FALSE.
+#' @param ... Additional key-value pairs to filter files (e.g., subid = "01", task = "wm").
+#'        These are matched against the corresponding metadata in the BIDS files.
+#' @return A character vector of file paths matching the criteria, or NULL if no matches found.
+#' @export
+#' @rdname search_files 
+#' @importFrom stringr str_detect
+#' @examples
+#' # Search for event files in a BIDS dataset
+#' proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
+#' event_files <- search_files(proj, regex="events\\\\.tsv$")
+#' 
+#' # Search with additional criteria (note: ds001 only has one subject '01')
+#' sub01_files <- search_files(proj, regex="bold\\\\.nii\\\\.gz$", subid="01", task="balloonanalogrisktask")
+#' 
+#' # Get full paths
+#' full_paths <- search_files(proj, regex="events\\\\.tsv$", full_path=TRUE)
 #' @param regex a regular expression to match files
 #' @param full_path return full_path of files
 #' @param strict if `TRUE` require that a queried key must exist in match files. 
@@ -538,6 +722,7 @@ search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRU
   
   as.vector(unlist(ret))
 }
+
 
 #' @keywords internal
 match_attribute <- function(x, ...) {
@@ -781,9 +966,4 @@ bids_check_compliance <- function(x) {
   
   list(passed = passed, issues = issues)
 }
-
-
-
-
-
 

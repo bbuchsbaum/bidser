@@ -17,27 +17,51 @@ file_pairs(
 
 \item{pair}{A character string specifying which pair of files to match. Currently supported:
 \itemize{
-\item "bold-events" matches BOLD files with event files
-\item "preproc-events" matches preprocessed BOLD files with event files
+\item "bold-events": matches BOLD files with event files
+\item "preproc-events": matches preprocessed BOLD files with event files
 }}
 
 \item{task}{A regex pattern to filter tasks. Default is ".*" (no filter).}
 
 \item{matchon}{A character vector of keys to match on, usually c("run", "task").}
 
-\item{...}{Additional arguments (not currently used).}
+\item{...}{Additional arguments passed to internal functions.}
 }
 \value{
 A tibble with columns:
 \itemize{
 \item \code{subid}: The subject ID
 \item \code{task}: The task name
-\item \verb{[type1]}: The name of the first file type (e.g. "bold" or "preproc")
-\item \verb{[type2]}: The matched file of the second type (e.g. "events"), or \code{NA} if no match found.
+\item \verb{[type1]}: The name of the first file type (e.g., "bold" or "preproc")
+\item \verb{[type2]}: The matched file of the second type (e.g., "events"), or \code{NA} if no match found
+\item Additional columns for matched metadata (e.g., run, session)
 }
 }
 \description{
-Matches pairs of files (e.g., "bold-events" or "preproc-events") for each subject and task,
-returning a tibble with matched filenames. Useful for verifying that for every BOLD file
-an events file also exists, or vice-versa.
+This function matches pairs of related files (e.g., BOLD and event files) in a BIDS project,
+returning a tibble with matched filenames. It's useful for verifying that corresponding files
+exist for each subject and task, such as ensuring every BOLD file has an associated events file.
+}
+\examples{
+# Create a BIDS project object
+proj <- bids_project(system.file("extdata/ds001", package="bidser"))
+
+# Match BOLD files with their corresponding event files
+bold_pairs <- file_pairs(proj, pair="bold-events")
+
+# Check pairs for a specific task
+task_pairs <- file_pairs(proj, 
+                        pair="bold-events",
+                        task="balloonanalogrisktask")
+
+# Create a project with preprocessed data
+prep_proj <- bids_project(system.file("extdata/phoneme_stripped", package="bidser"),
+                         fmriprep=TRUE)
+
+# Match preprocessed files with event files
+preproc_pairs <- file_pairs(prep_proj, pair="preproc-events")
+
+# Check for missing pairs
+missing_pairs <- preproc_pairs[is.na(preproc_pairs$events), ]
+
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/bidsio.R
 \name{read_preproc_scans.bids_project}
 \alias{read_preproc_scans.bids_project}
-\title{Read in a set of preprocessed functional scans}
+\title{Read preprocessed functional MRI scans from a BIDS project}
 \usage{
 read_preproc_scans.bids_project(
   x,
@@ -16,25 +16,60 @@ read_preproc_scans.bids_project(
 )
 }
 \arguments{
-\item{x}{A \code{bids_project} object}
+\item{x}{A \code{bids_project} object with fMRIPrep derivatives}
 
-\item{mask}{A brain mask of type \code{LogicalNeuroVol}, or NULL (if NULL, a mask will be created)}
+\item{mask}{A brain mask of type \code{LogicalNeuroVol}, or NULL (if NULL, a mask will be created automatically)}
 
-\item{mode}{The file mode: 'normal' or 'bigvec'}
+\item{mode}{The file mode: 'normal' for in-memory files or 'bigvec' for on-disk files}
 
-\item{subid}{Subject IDs (regex)}
+\item{subid}{Regular expression to match subject IDs (default: "^sub-.*" to match all subjects)}
 
-\item{task}{Task regex}
+\item{task}{Regular expression to match tasks (default: ".*" to match all tasks)}
 
-\item{run}{Run regex}
+\item{run}{Regular expression to match runs (default: ".*" to match all runs)}
 
-\item{modality}{Image modality (usually "bold")}
+\item{modality}{Image modality to match (default: "bold" for functional MRI)}
 
 \item{...}{Extra arguments passed to \code{neuroim2::read_vec}}
 }
 \value{
-An instance of type \code{NeuroVec}
+An instance of type \code{NeuroVec} containing the preprocessed functional data.
 }
 \description{
-Read in a set of preprocessed functional scans
+This function reads preprocessed functional MRI scans from a BIDS project's fMRIPrep
+derivatives directory. It uses the \code{preproc_scans} function to locate the files
+and then reads them into a \code{NeuroVec} object using the neuroim2 package. If a
+mask is not provided, one will be automatically created from available brainmask files.
+}
+\details{
+This function requires the \code{neuroim2} package to be installed. It will throw an
+error if the package is not available or if fMRIPrep derivatives are not found in the
+BIDS project. If no mask is provided, it will create one using the \code{create_preproc_mask}
+function.
+}
+\examples{
+\donttest{
+# Load a BIDS project with fMRIPrep derivatives
+proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
+
+# Read preprocessed scans for all subjects
+# (mask will be created automatically)
+all_scans <- read_preproc_scans(proj)
+
+# Read preprocessed scans for a specific subject
+sub01_scans <- read_preproc_scans(proj, subid="01")
+
+# Read preprocessed scans for a specific task and run
+task_scans <- read_preproc_scans(proj, 
+                                task="rest",
+                                run="01")
+
+# Specify mode for large datasets
+bigvec_scans <- read_preproc_scans(proj, mode="bigvec")
+
+# Provide a custom mask
+mask <- create_preproc_mask(proj, thresh=0.95)
+masked_scans <- read_preproc_scans(proj, mask=mask)
+}
+
 }

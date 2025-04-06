@@ -2,3 +2,17 @@
 ^\.Rproj\.user$
 ^codecov\.yml$
 old
+^LICENSE\.md$
+^README\.Rmd$
+^Rplots\.pdf$
+^_pkgdown\.yml$
+^docs$
+^\.github$
+^\.gitignore$
+^cran-comments\.md$
+^CRAN-SUBMISSION$
+^\.Renviron$
+^\.travis\.yml$
+^appveyor\.yml$
+^inst/extdata/.*sub-.*_task-.*_run-.*_bold\.nii\.gz$
+^inst/extdata/.*derivatives/.*preproc_bold\.nii\.gz$

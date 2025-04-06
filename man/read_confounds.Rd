@@ -2,15 +2,70 @@
 % Please edit documentation in R/all_generic.R
 \name{read_confounds}
 \alias{read_confounds}
-\title{read in confound files}
+\title{Read Confound Files from a BIDS Project}
 \usage{
 read_confounds(x, ...)
 }
 \arguments{
-\item{x}{the \code{bids_project} object}
+\item{x}{The object to read confounds from (typically a \code{bids_project}).}
 
-\item{...}{extra args}
+\item{...}{Additional arguments passed to methods, including:
+\itemize{
+\item \code{subid}: Regex to match subject IDs (default: ".*")
+\item \code{task}: Regex to match tasks (default: ".*")
+\item \code{session}: Regex to match sessions (default: ".*")
+\item \code{run}: Regex to match runs (default: ".*")
+\item \code{cvars}: Character vector of confound variable names to select
+\item \code{npcs}: Integer. Perform PCA reduction and return this many PCs
+\item \code{perc_var}: Numeric. Perform PCA reduction to retain this percentage of variance
+\item \code{nest}: Logical. If TRUE, nests confound tables by subject/session/run (default: TRUE)
+}}
+}
+\value{
+A tibble containing confound data. If \code{nest=TRUE} (default), returns a
+nested tibble with columns for subject, session, run, and a nested \code{data} column
+containing the confound variables. If \code{nest=FALSE}, returns a flat tibble with
+all confound variables. Returns NULL if no matching files are found.
 }
 \description{
-read in confound files
+This function reads in fMRIPrep confound tables for one or more subjects from a
+BIDS project. Confound files contain nuisance variables that can be used for
+denoising fMRI data, such as motion parameters, physiological signals, and other
+noise components. The function can optionally perform PCA reduction on the confounds
+and return either nested or flat tibbles.
+}
+\examples{
+# Create a BIDS project with fMRIPrep derivatives
+fmriprep_path <- system.file("extdata/phoneme_stripped", package="bidser")
+proj <- bids_project(fmriprep_path, fmriprep=TRUE)
+
+# Read all confound files
+all_conf <- read_confounds(proj)
+
+# Read confounds for specific subjects and tasks
+sub_conf <- read_confounds(proj,
+                          subid="01",
+                          task="phoneme")
+
+# Select specific confound variables
+motion_conf <- read_confounds(proj,
+                             cvars=c("framewise_displacement",
+                                    "trans_x", "trans_y", "trans_z",
+                                    "rot_x", "rot_y", "rot_z"))
+
+# Perform PCA reduction
+pca_conf <- read_confounds(proj, npcs=5)
+
+# Get confounds as a flat tibble
+flat_conf <- read_confounds(proj, nest=FALSE)
+
+# Combine multiple options
+custom_conf <- read_confounds(proj,
+                             subid="01",
+                             task="phoneme",
+                             cvars=c("framewise_displacement",
+                                    "trans_x", "trans_y", "trans_z"),
+                             npcs=3,
+                             nest=FALSE)
+
 }

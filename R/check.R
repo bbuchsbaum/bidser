@@ -1,19 +1,62 @@
 #' Check Functional Scans in a BIDS Project
 #'
-#' This function inspects functional scans within a BIDS project and returns
-#' summaries of scan counts and file sizes per subject and (if multiple tasks) per task.
+#' This function performs a comprehensive inspection of functional scans within a BIDS project,
+#' providing detailed summaries of scan counts and file sizes per subject and task. It helps
+#' identify potential issues such as missing scans, inconsistent file sizes, or unexpected
+#' variations in the data.
 #'
 #' @param x A \code{bids_project} object created by \code{bids_project()}.
+#'
 #' @return A list containing:
-#'   - \code{scans}: a tibble with details of all functional scans.
-#'   - \code{tasklist}: a vector of tasks found in the project.
-#'   - \code{scans_per_subject}: a summary of the number of scans per subject.
-#'   - If multiple tasks are present:
-#'       - \code{scans_per_task}: summary of scans per task
-#'       - \code{scans_per_task_subject}: summary of scans per subject and task
-#'       - \code{size_per_task}: tibble with size deltas by task
-#'   - If only one task is present:
-#'       - \code{size_per_subject}: tibble with size deltas by subject
+#'   - `scans`: A tibble with details of all functional scans, including:
+#'     - Subject ID
+#'     - Task name
+#'     - Run number
+#'     - File size
+#'     - Full file path
+#'   - `tasklist`: A vector of unique tasks found in the project
+#'   - `scans_per_subject`: A summary tibble showing the number of scans per subject
+#'   
+#'   If multiple tasks are present, also includes:
+#'   - `scans_per_task`: Summary of scan counts by task
+#'   - `scans_per_task_subject`: Summary of scan counts by subject and task
+#'   - `size_per_task`: Tibble with file size statistics by task
+#'   
+#'   If only one task is present:
+#'   - `size_per_subject`: Tibble with file size statistics by subject
+#'
+#' @examples
+#' # Create a BIDS project object
+#' proj <- bids_project(system.file("extdata/ds001", package="bidser"))
+#'
+#' # Check functional scans
+#' scan_check <- check_func_scans(proj)
+#'
+#' # View available tasks
+#' print(scan_check$tasklist)
+#'
+#' # Check scan counts per subject
+#' print(scan_check$scans_per_subject)
+#'
+#' # Example with multiple tasks
+#' ds007 <- bids_project(system.file("extdata/ds007", package="bidser"))
+#' multi_check <- check_func_scans(ds007)
+#'
+#' # View scan distribution across tasks
+#' print(multi_check$scans_per_task)
+#'
+#' # Check for potential issues
+#' if (nrow(multi_check$scans) > 0) {
+#'   # Look for subjects with fewer scans than expected
+#'   expected_scans <- 4  # Example: expecting 4 scans per subject
+#'   missing <- multi_check$scans_per_subject[
+#'     multi_check$scans_per_subject$n < expected_scans,
+#'   ]
+#'   if (nrow(missing) > 0) {
+#'     print("Subjects with missing scans:")
+#'     print(missing)
+#'   }
+#' }
 #'
 #' @importFrom fs file_size
 #' @importFrom dplyr group_by summarize mutate select everything
@@ -102,23 +145,46 @@ check_func_scans <- function(x) {
 
 #' Find File Pairs in a BIDS Project
 #'
-#' Matches pairs of files (e.g., "bold-events" or "preproc-events") for each subject and task,
-#' returning a tibble with matched filenames. Useful for verifying that for every BOLD file
-#' an events file also exists, or vice-versa.
+#' This function matches pairs of related files (e.g., BOLD and event files) in a BIDS project,
+#' returning a tibble with matched filenames. It's useful for verifying that corresponding files
+#' exist for each subject and task, such as ensuring every BOLD file has an associated events file.
 #'
 #' @param x A \code{bids_project} object.
 #' @param pair A character string specifying which pair of files to match. Currently supported:
-#'   - "bold-events" matches BOLD files with event files
-#'   - "preproc-events" matches preprocessed BOLD files with event files
+#'   - "bold-events": matches BOLD files with event files
+#'   - "preproc-events": matches preprocessed BOLD files with event files
 #' @param task A regex pattern to filter tasks. Default is ".*" (no filter).
 #' @param matchon A character vector of keys to match on, usually c("run", "task").
-#' @param ... Additional arguments (not currently used).
+#' @param ... Additional arguments passed to internal functions.
 #'
 #' @return A tibble with columns:
 #'   - `subid`: The subject ID
 #'   - `task`: The task name
-#'   - `[type1]`: The name of the first file type (e.g. "bold" or "preproc")
-#'   - `[type2]`: The matched file of the second type (e.g. "events"), or `NA` if no match found.
+#'   - `[type1]`: The name of the first file type (e.g., "bold" or "preproc")
+#'   - `[type2]`: The matched file of the second type (e.g., "events"), or `NA` if no match found
+#'   - Additional columns for matched metadata (e.g., run, session)
+#'
+#' @examples
+#' # Create a BIDS project object
+#' proj <- bids_project(system.file("extdata/ds001", package="bidser"))
+#'
+#' # Match BOLD files with their corresponding event files
+#' bold_pairs <- file_pairs(proj, pair="bold-events")
+#'
+#' # Check pairs for a specific task
+#' task_pairs <- file_pairs(proj, 
+#'                         pair="bold-events",
+#'                         task="balloonanalogrisktask")
+#'
+#' # Create a project with preprocessed data
+#' prep_proj <- bids_project(system.file("extdata/phoneme_stripped", package="bidser"),
+#'                          fmriprep=TRUE)
+#'
+#' # Match preprocessed files with event files
+#' preproc_pairs <- file_pairs(prep_proj, pair="preproc-events")
+#'
+#' # Check for missing pairs
+#' missing_pairs <- preproc_pairs[is.na(preproc_pairs$events), ]
 #'
 #' @importFrom dplyr filter mutate tibble bind_rows group_by summarize
 #' @importFrom assertthat assert_that
@@ -126,7 +192,7 @@ check_func_scans <- function(x) {
 #' @importFrom stringdist stringdistmatrix
 #' @importFrom rlang sym
 #' @export
-file_pairs <- function(x, pair = c("bold-events", "preproc-events"), task = ".*", matchon = c("run", "task"), ...) {
+file_pairs <- function(x, pair=c("bold-events", "preproc-events"), task=".*", matchon=c("run", "task"), ...) {
   assertthat::assert_that(inherits(x, "bids_project"))
   
   pair <- match.arg(pair)

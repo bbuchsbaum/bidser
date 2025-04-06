@@ -1,0 +1,14 @@
+Every R object should be documented and have a @return and @examples flag.
+S3 generics should be documented first, and given @rdname, e.g. function-method
+S3 method implemention should have the same rdname as the generics
+S3 method implementations to not need to include tags for parameters, unless the parameter is not docuemented in the generic
+never use /dontrun in roxygen docs, use /donttest instead if necessary
+Try and create a testable example if at all possible even if it means constructing objects that are nomrally read in from the file system
+
+
+
+
+
+
+
+

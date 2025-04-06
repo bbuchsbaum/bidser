@@ -142,14 +142,35 @@ zero_or_one_of <- function(labels, label) {
   )
 }
 
-#' A literal matcher
+#' Create a parser that matches a fixed pattern of type followed by suffix
 #'
-#' Matches a fixed `<type><suffix>` pattern, using a provided extractor.
+#' This function creates a parser that matches a fixed pattern of type followed by suffix,
+#' used internally to match specific BIDS file patterns. The parser uses a provided extractor
+#' function to extract matched fields from the filename.
 #'
-#' @param type A literal for the type.
-#' @param suffix A literal for the suffix.
-#' @param extractor A function to extract matched fields.
-#' @return A parser that matches `type` followed by `suffix`.
+#' @param type A literal for the type (e.g., "bold", "T1w").
+#' @param suffix A literal for the suffix (e.g., ".nii.gz", ".tsv").
+#' @param extractor A function to extract matched fields from the filename.
+#'
+#' @return A parser function that matches `type` followed by `suffix`. The parser returns:
+#'   - A list with the matched components if successful
+#'   - NULL if the pattern doesn't match
+#'
+#' @examples
+#' # Create a parser for BOLD files
+#' bold_parser <- gen_lit("bold", ".nii.gz", function(x) list(type="bold"))
+#' bold_parser("sub-01_task-rest_bold.nii.gz")  # Returns list(type="bold")
+#' bold_parser("sub-01_T1w.nii.gz")  # Returns NULL (no match)
+#'
+#' # Create a parser for T1w files
+#' t1w_parser <- gen_lit("T1w", ".nii.gz", function(x) list(type="T1w"))
+#' t1w_parser("sub-01_T1w.nii.gz")  # Returns list(type="T1w")
+#'
+#' # Create a parser for event files
+#' event_parser <- gen_lit("events", ".tsv", function(x) list(type="events"))
+#' event_parser("sub-01_task-rest_events.tsv")  # Returns list(type="events")
+#'
+#' @keywords internal
 gen_lit <- function(type, suffix, extractor) {
   if (!is.character(type) || length(type) != 1) {
     stop("`type` must be a single character string.")

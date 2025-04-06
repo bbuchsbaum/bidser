@@ -35,18 +35,55 @@ read_func_scans.bids_project <- function(x, mask, mode = c("normal", "bigvec"),
 }
 
 
-#' Read in a set of preprocessed functional scans
+#' Read preprocessed functional MRI scans from a BIDS project
 #'
-#' @inheritParams read_func_scans
-#' @param x A \code{bids_project} object
-#' @param mask A brain mask of type \code{LogicalNeuroVol}, or NULL (if NULL, a mask will be created)
-#' @param mode The file mode: 'normal' or 'bigvec'
-#' @param subid Subject IDs (regex)
-#' @param task Task regex
-#' @param run Run regex
-#' @param modality Image modality (usually "bold")
+#' This function reads preprocessed functional MRI scans from a BIDS project's fMRIPrep
+#' derivatives directory. It uses the \code{preproc_scans} function to locate the files
+#' and then reads them into a \code{NeuroVec} object using the neuroim2 package. If a
+#' mask is not provided, one will be automatically created from available brainmask files.
+#'
+#' @param x A \code{bids_project} object with fMRIPrep derivatives
+#' @param mask A brain mask of type \code{LogicalNeuroVol}, or NULL (if NULL, a mask will be created automatically)
+#' @param mode The file mode: 'normal' for in-memory files or 'bigvec' for on-disk files
+#' @param subid Regular expression to match subject IDs (default: "^sub-.*" to match all subjects)
+#' @param task Regular expression to match tasks (default: ".*" to match all tasks)
+#' @param run Regular expression to match runs (default: ".*" to match all runs)
+#' @param modality Image modality to match (default: "bold" for functional MRI)
 #' @param ... Extra arguments passed to \code{neuroim2::read_vec}
-#' @return An instance of type \code{NeuroVec}
+#' 
+#' @return An instance of type \code{NeuroVec} containing the preprocessed functional data.
+#' 
+#' @details
+#' This function requires the \code{neuroim2} package to be installed. It will throw an
+#' error if the package is not available or if fMRIPrep derivatives are not found in the
+#' BIDS project. If no mask is provided, it will create one using the \code{create_preproc_mask}
+#' function.
+#'
+#' @examples
+#' \donttest{
+#' # Load a BIDS project with fMRIPrep derivatives
+#' proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
+#'
+#' # Read preprocessed scans for all subjects
+#' # (mask will be created automatically)
+#' all_scans <- read_preproc_scans(proj)
+#'
+#' # Read preprocessed scans for a specific subject
+#' sub01_scans <- read_preproc_scans(proj, subid="01")
+#'
+#' # Read preprocessed scans for a specific task and run
+#' task_scans <- read_preproc_scans(proj, 
+#'                                 task="rest",
+#'                                 run="01")
+#'
+#' # Specify mode for large datasets
+#' bigvec_scans <- read_preproc_scans(proj, mode="bigvec")
+#'
+#' # Provide a custom mask
+#' mask <- create_preproc_mask(proj, thresh=0.95)
+#' masked_scans <- read_preproc_scans(proj, mask=mask)
+#' }
+#'
 #' @export
 read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bigvec"),
                                             subid="^sub-.*", task=".*", run = ".*", modality="bold", ...) {
@@ -81,13 +118,48 @@ read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bi
 }
 
 
-#' Create a preprocessing mask
+#' Create a binary brain mask from preprocessed scans
 #'
-#' @param x A \code{bids_project} object
-#' @param subid Subject ID regex
-#' @param thresh Threshold value (default 0.99)
-#' @param ... Additional arguments passed to `search_files`
-#' @return A logical mask volume
+#' This function creates a binary brain mask from preprocessed functional scans in a BIDS project.
+#' It searches for brainmask files in the fMRIPrep derivatives directory, reads them using the 
+#' neuroim2 package, and averages them to create a single mask. The resulting mask can be used
+#' for subsequent analyses with preprocessed functional data.
+#'
+#' @param x A \code{bids_project} object with fMRIPrep derivatives
+#' @param subid Regular expression to match subject IDs (e.g., "01" for subject 01, ".*" for all subjects)
+#' @param thresh Threshold value between 0 and 1 (default 0.99) - voxels with values below this threshold are excluded from the mask
+#' @param ... Additional arguments passed to \code{search_files} for finding mask files
+#'
+#' @return A logical mask volume (\code{LogicalNeuroVol}) that can be used for subsequent analyses with preprocessed functional data.
+#'
+#' @details
+#' The function works by finding all brainmask files that match the subject ID pattern,
+#' reading them into memory, averaging them, and then thresholding the result to create
+#' a binary mask. This is useful when you want to analyze multiple runs or subjects together
+#' and need a common mask that covers the brain areas present in all scans.
+#' 
+#' The threshold parameter controls how conservative the mask is. Higher values (closer to 1)
+#' result in a more conservative mask that includes only voxels that are consistently marked
+#' as brain across all subjects/runs. Lower values create a more inclusive mask.
+#'
+#' @examples
+#' \donttest{
+#' # Load a BIDS project with fMRIPrep derivatives
+#' proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
+#'
+#' # Create a mask for all subjects (conservative threshold)
+#' all_subj_mask <- create_preproc_mask(proj, subid=".*")
+#'
+#' # Create a mask for a specific subject
+#' sub01_mask <- create_preproc_mask(proj, subid="01")
+#'
+#' # Create a more inclusive mask with a lower threshold
+#' inclusive_mask <- create_preproc_mask(proj, subid=".*", thresh=0.8)
+#'
+#' # Use additional search criteria
+#' task_mask <- create_preproc_mask(proj, subid=".*", task="rest")
+#' }
+#'
 #' @export
 create_preproc_mask.bids_project <- function(x, subid, thresh=.99, ...) {
   if (!inherits(x, "bids_project")) {
@@ -145,9 +217,28 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
     stop("`x` must be a `bids_project` object.")
   }
   
+  # Check if project has fmriprep derivatives
+  if (!x$has_fmriprep) {
+    rlang::inform("Project does not have fmriprep derivatives enabled. Cannot search for confound files.")
+    return(NULL)
+  }
+  
+  # Search for confound files with different possible formats *within derivatives*
   fnames1 <- search_files(x, subid=subid, task=task, session=session, deriv="confounds", full_path=TRUE)
   fnames2 <- search_files(x, subid=subid, task=task, session=session, desc="confounds", full_path=TRUE)
-  c(fnames1, fnames2)
+  fnames3 <- search_files(x, subid=subid, task=task, session=session, kind="confounds", full_path=TRUE)
+  
+  # Also search for files with _confounds.tsv suffix pattern *within derivatives*
+  fnames4 <- search_files(x, regex="_confounds\\.tsv$", subid=subid, task=task, session=session, full_path=TRUE)
+  
+  # Combine all results and remove duplicates
+  found_files <- unique(c(fnames1, fnames2, fnames3, fnames4))
+  
+  if (length(found_files) == 0) {
+    return(NULL)
+  }
+  
+  return(found_files)
 }
 
 
@@ -184,9 +275,13 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
   sids <- sids[gidx]
   
   ret <- lapply(sids, function(s) {
-    fnames <- search_files(x, subid=paste0("^", as.character(s), "$"), task=task,
-                           run=run, session=session, kind="(confounds|regressors|timeseries)", suffix="tsv",
-                           strict=TRUE, full_path=TRUE)
+    # Use confound_files to get all possible confound files
+    fnames <- confound_files(x, subid=paste0("^", as.character(s), "$"), task=task, session=session, nest=FALSE)
+    
+    # Filter by run if specified
+    if (run != ".*") {
+      fnames <- fnames[grepl(paste0("_run-", run), fnames)]
+    }
     
     if (length(fnames) == 0) {
       # No confound files for this participant; return empty frame
@@ -195,8 +290,9 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
     
     # Process each confound file
     dflist <- lapply(fnames, function(fn) {
-      run_val <- stringr::str_match(fn, "_run-(\\d+)")[1,2]
-      sess_val <- stringr::str_match(fn, "_ses-(\\d+)")[1,2]
+      # Extract run and session from filename
+      run_val <- stringr::str_match(fn, "_run-([0-9]+)")[1,2]
+      sess_val <- stringr::str_match(fn, "_ses-([A-Za-z0-9]+)")[1,2]
       
       if (is.na(sess_val)) {
         sess_val <- "1"

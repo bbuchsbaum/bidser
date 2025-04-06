@@ -2,24 +2,60 @@
 % Please edit documentation in R/bids.R
 \name{bids_project}
 \alias{bids_project}
-\title{Bids Project}
+\title{Create a BIDS Project Object}
 \usage{
 bids_project(path = ".", fmriprep = FALSE, prep_dir = "derivatives/fmriprep")
 }
 \arguments{
-\item{path}{the file path of the project}
+\item{path}{Character string. The file path to the root of the BIDS project.
+Defaults to the current directory (".").}
 
-\item{fmriprep}{whether to load fmriprep folder hierarchy}
+\item{fmriprep}{Logical. Whether to load the fMRIPrep derivatives folder hierarchy.
+Defaults to FALSE.}
 
-\item{prep_dir}{location of fmriprep subfolder}
+\item{prep_dir}{Character string. The location of the fMRIPrep subfolder relative
+to the derivatives directory. Defaults to "derivatives/fmriprep".}
+}
+\value{
+A \code{bids_project} object representing the BIDS project structure. The object
+provides methods for:
+\itemize{
+\item Accessing raw and preprocessed data files
+\item Querying subjects, sessions, and tasks
+\item Reading event files and confound regressors
+\item Checking BIDS compliance
+\item Extracting metadata from file names
+Returns NULL if the directory does not contain a valid BIDS dataset.
+}
 }
 \description{
-Load a BIDS project at a file root
+This function creates a BIDS project object from a directory containing BIDS-formatted
+neuroimaging data. It can optionally load preprocessed derivatives from fMRIPrep.
+The function validates the basic BIDS structure and provides methods for accessing
+raw and preprocessed data, querying subjects, sessions, and tasks, reading event
+files, and checking BIDS compliance.
 }
 \examples{
+# Load a basic BIDS dataset
+ds001_path <- system.file("extdata/ds001", package="bidser")
+proj <- bids_project(ds001_path)
 
-p <- system.file("inst/extdata/7t_trt", package="bidser")
-pp <- bids_project(p)
+# Check available tasks
+tasks(proj)
 
-pp2 <- bids_project(system.file("inst/extdata/phoneme_stripped", package="bidser"), fmriprep=TRUE)
+# Get participant IDs
+participants(proj)
+
+# Load a dataset with fMRIPrep derivatives
+fmriprep_path <- system.file("extdata/phoneme_stripped", package="bidser")
+proj_prep <- bids_project(fmriprep_path, fmriprep=TRUE)
+
+# Access preprocessed data
+preproc_scans(proj_prep)
+
+# Load a dataset with a custom fMRIPrep directory
+proj_custom <- bids_project(fmriprep_path,
+                           fmriprep=TRUE,
+                           prep_dir="derivatives/custom_fmriprep")
+
 }

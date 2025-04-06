@@ -2,22 +2,54 @@
 % Please edit documentation in R/bidsio.R
 \name{create_preproc_mask.bids_project}
 \alias{create_preproc_mask.bids_project}
-\title{Create a preprocessing mask}
+\title{Create a binary brain mask from preprocessed scans}
 \usage{
 \method{create_preproc_mask}{bids_project}(x, subid, thresh = 0.99, ...)
 }
 \arguments{
-\item{x}{A \code{bids_project} object}
+\item{x}{A \code{bids_project} object with fMRIPrep derivatives}
 
-\item{subid}{Subject ID regex}
+\item{subid}{Regular expression to match subject IDs (e.g., "01" for subject 01, ".*" for all subjects)}
 
-\item{thresh}{Threshold value (default 0.99)}
+\item{thresh}{Threshold value between 0 and 1 (default 0.99) - voxels with values below this threshold are excluded from the mask}
 
-\item{...}{Additional arguments passed to \code{search_files}}
+\item{...}{Additional arguments passed to \code{search_files} for finding mask files}
 }
 \value{
-A logical mask volume
+A logical mask volume (\code{LogicalNeuroVol}) that can be used for subsequent analyses with preprocessed functional data.
 }
 \description{
-Create a preprocessing mask
+This function creates a binary brain mask from preprocessed functional scans in a BIDS project.
+It searches for brainmask files in the fMRIPrep derivatives directory, reads them using the
+neuroim2 package, and averages them to create a single mask. The resulting mask can be used
+for subsequent analyses with preprocessed functional data.
+}
+\details{
+The function works by finding all brainmask files that match the subject ID pattern,
+reading them into memory, averaging them, and then thresholding the result to create
+a binary mask. This is useful when you want to analyze multiple runs or subjects together
+and need a common mask that covers the brain areas present in all scans.
+
+The threshold parameter controls how conservative the mask is. Higher values (closer to 1)
+result in a more conservative mask that includes only voxels that are consistently marked
+as brain across all subjects/runs. Lower values create a more inclusive mask.
+}
+\examples{
+\donttest{
+# Load a BIDS project with fMRIPrep derivatives
+proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
+
+# Create a mask for all subjects (conservative threshold)
+all_subj_mask <- create_preproc_mask(proj, subid=".*")
+
+# Create a mask for a specific subject
+sub01_mask <- create_preproc_mask(proj, subid="01")
+
+# Create a more inclusive mask with a lower threshold
+inclusive_mask <- create_preproc_mask(proj, subid=".*", thresh=0.8)
+
+# Use additional search criteria
+task_mask <- create_preproc_mask(proj, subid=".*", task="rest")
+}
+
 }

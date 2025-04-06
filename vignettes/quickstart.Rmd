@@ -21,17 +21,17 @@ knitr::opts_chunk$set(
 
 There is a Python package called [pybids](https://github.com/bids-standard/pybids) that can be used to work with BIDS in Python and is more developed.
 ```{r echo=FALSE}
-devtools::load_all()
+library(bidser)
 ```
 
 ```{r setup}
 
-
 library(bidser)
 library(tibble)
+library(dplyr)
 library(gluedown)
 
-proj_path <- system.file("inst/extdata/ds001", package="bidser")
+proj_path <- system.file("extdata/ds001", package="bidser")
 proj <- bids_project(proj_path)
 
 print(proj)
@@ -152,7 +152,8 @@ Now we can filter the table as we like, for example, to extract the data only fr
 
 ```{r, result="asis"}
 library(tidyr)
-ev1 <- evs %>% filter(.subid == "01") %>% unnest(cols=c(data))
+library(dplyr)
+ev1 <- evs %>% dplyr::filter(.subid == "01") %>% unnest(cols=c(data))
 head(ev1)
 ```
 
@@ -162,7 +163,7 @@ head(ev1)
 If you have processed a dataset with FMRIPrep, `bidser` can be used to read in the many of the resultant derivative files. If a project has an FMRIPrep derivatives folder, then we can read in the BIDS hierarchy plus derivatives as follows:
 
 ```{r}
-proj_path <- system.file("inst/extdata/phoneme_stripped", package="bidser")
+proj_path <- system.file("extdata/phoneme_stripped", package="bidser")
 proj <- bids_project(proj_path, fmriprep=TRUE)
 
 print(proj)

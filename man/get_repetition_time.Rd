@@ -17,7 +17,7 @@ get_repetition_time(x, subid, task, run = ".*", session = ".*", ...)
 
 \item{session}{Session ID (exact or regex). Default is ".*".}
 
-\item{...}{Additional arguments passed to \code{read_sidecar_jsons()}.}
+\item{...}{Additional arguments passed to \code{read_sidecar()}.}
 }
 \value{
 A numeric value representing the RepetitionTime in seconds, or NA if not found.

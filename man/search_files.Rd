@@ -17,7 +17,7 @@ search_files(x, ...)
 )
 }
 \arguments{
-\item{x}{the \code{bids_project} object}
+\item{x}{A \code{bids_project} object.}
 
 \item{...}{additional keys to match on (e.g. subid = "01", task="wm")}
 
@@ -27,11 +27,45 @@ search_files(x, ...)
 
 \item{strict}{if \code{TRUE} require that a queried key must exist in match files.
 Otherwise, allow matches for files missing queried key.}
+
+\item{new}{Deprecated parameter. Should always be FALSE.}
+}
+\value{
+A character vector of file paths matching the criteria, or NULL if no matches found.
+
+A character vector of file paths matching the criteria, or NULL if no matches found.
 }
 \description{
-find files in BIDS tree by matching file names
+This function searches for files in a BIDS project that match a specified pattern and
+optional key-value criteria. It can be used to find files in both raw data and preprocessed
+derivatives based on filename patterns and BIDS metadata.
+
+This function searches for files in a BIDS project that match a specified pattern
+and optional key-value criteria. It can search in both raw data and preprocessed
+derivatives (if available).
 }
 \examples{
+# Search for event files in a BIDS dataset
+proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
+event_files <- search_files(proj, regex="events\\\\.tsv$")
+
+# Search with additional criteria
+sub01_files <- search_files(proj, regex="bold\\\\.nii\\\\.gz$", subid="01", task="balloonanalogrisktask")
+
+# Get full paths
+full_paths <- search_files(proj, regex="events\\\\.tsv$", full_path=TRUE)
+
+# Search with strict matching
+strict_matches <- search_files(proj, regex="\\\\.tsv$", strict=TRUE, task="balloonanalogrisktask")
+# Search for event files in a BIDS dataset
+proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
+event_files <- search_files(proj, regex="events\\\\\\\\.tsv$")
+
+# Search with additional criteria (note: ds001 only has one subject '01')
+sub01_files <- search_files(proj, regex="bold\\\\\\\\.nii\\\\\\\\.gz$", subid="01", task="balloonanalogrisktask")
+
+# Get full paths
+full_paths <- search_files(proj, regex="events\\\\\\\\.tsv$", full_path=TRUE)
  proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
  x = search_files(proj, regex="events")
 }

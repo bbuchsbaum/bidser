@@ -2,15 +2,54 @@
 % Please edit documentation in R/all_generic.R
 \name{read_events}
 \alias{read_events}
-\title{read in event files}
+\title{Read Event Files from a BIDS Project}
 \usage{
 read_events(x, ...)
 }
 \arguments{
-\item{x}{the \code{bids_project} object}
+\item{x}{The object to read events from (typically a \code{bids_project}).}
 
-\item{...}{extra args}
+\item{...}{Additional arguments passed to methods.}
+}
+\value{
+A nested tibble with columns:
+\itemize{
+\item \code{.task}: Task name
+\item \code{.run}: Run number
+\item \code{.subid}: Subject ID
+\item \code{data}: Nested column containing the event data
+If no matching data is found, returns an empty tibble with appropriate columns.
+}
 }
 \description{
-read tab-separated event files as a \code{data.frame}
+This generic function reads and nests event files from a BIDS project. Event files
+contain timing information about task events, conditions, and responses during
+functional MRI scans. The function can filter events by subject and task, and
+returns a nested tibble for easy data manipulation.
+}
+\examples{
+# Create a BIDS project
+ds001_path <- system.file("extdata/ds001", package="bidser")
+proj <- bids_project(ds001_path)
+
+# Read all event files
+all_events <- read_events(proj)
+
+# Read events for specific subjects
+sub_events <- read_events(proj, subid="0[123]")
+
+# Read events for a specific task
+task_events <- read_events(proj, task="balloonanalogrisktask")
+
+# Combine multiple filters
+filtered_events <- read_events(proj,
+                              subid="01",
+                              task="balloonanalogrisktask")
+
+# Access nested data
+if (nrow(filtered_events) > 0) {
+  first_run <- filtered_events$data[[1]]
+  print(head(first_run))
+}
+
 }

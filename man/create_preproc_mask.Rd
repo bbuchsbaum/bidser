@@ -2,15 +2,34 @@
 % Please edit documentation in R/all_generic.R
 \name{create_preproc_mask}
 \alias{create_preproc_mask}
-\title{create pre-processing mask}
+\title{Create a preprocessing mask from BIDS data}
 \usage{
-create_preproc_mask(x, ...)
+create_preproc_mask(x, subid, thresh = 0.99, ...)
 }
 \arguments{
-\item{x}{the \code{bids_project} object}
+\item{x}{A bids_project object}
 
-\item{...}{extra args}
+\item{subid}{A regular expression pattern to match subject IDs}
+
+\item{thresh}{Threshold value for mask creation (default: 0.99)}
+
+\item{...}{Additional arguments passed to methods}
+}
+\value{
+A logical mask volume
 }
 \description{
-create a binary mask from pre-processed functional scans
+Create a preprocessing mask from BIDS data
+}
+\examples{
+\donttest{
+proj <- bids_project(system.file("extdata/phoneme_stripped", package="bidser"))
+mask <- create_preproc_mask(proj, subid=".*")
+
+# Create mask for single subject
+sub01_mask <- create_preproc_mask(proj, subid="01")
+
+# Create mask with different threshold
+mask_thresh <- create_preproc_mask(proj, subid=".*", thresh=0.95)
+}
 }

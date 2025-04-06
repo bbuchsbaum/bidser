@@ -2,7 +2,7 @@
 % Please edit documentation in R/bids.R
 \name{preproc_scans.bids_project}
 \alias{preproc_scans.bids_project}
-\title{Retrieve preprocessed scans from a BIDS project}
+\title{Get preprocessed scans from a BIDS project}
 \usage{
 \method{preproc_scans}{bids_project}(
   x,
@@ -13,7 +13,7 @@
   space = ".*",
   session = ".*",
   modality = "bold",
-  kind = "bold",
+  kind = ".*",
   full_path = FALSE,
   ...
 )
@@ -21,38 +21,72 @@
 \arguments{
 \item{x}{A \code{bids_project} object.}
 
-\item{subid}{A regex pattern for matching subjects. Default is \code{".*"}.}
+\item{subid}{A regex pattern for matching subjects. Default is ".*".}
 
-\item{task}{A regex pattern for matching tasks. Default is \code{".*"}.}
+\item{task}{A regex pattern for matching tasks. Default is ".*".}
 
-\item{run}{A regex pattern for matching runs. Default is \code{".*"}.}
+\item{run}{A regex pattern for matching runs. Default is ".*".}
 
-\item{variant}{A regex pattern for matching variant. Default is \code{NULL} (no variant filtering).}
+\item{variant}{A regex pattern for matching preprocessing variants. Default is NULL
+(no variant filtering).}
 
-\item{space}{A regex pattern for matching space. Default is \code{".*"}.}
+\item{space}{A regex pattern for matching spaces (e.g., "MNI152NLin2009cAsym").
+Default is ".*".}
 
-\item{session}{A regex pattern for matching sessions. Default is \code{".*"}.}
+\item{session}{A regex pattern for matching sessions. Default is ".*".}
 
-\item{modality}{A regex pattern for matching modality. Default is \code{"bold"}.
+\item{modality}{A regex pattern for matching modality. Default is "bold".
 Set this to something else if you need a different modality.}
 
-\item{kind}{The kind of preprocessed data to return (e.g. \code{"bold"}). Default is \code{"bold"}.
-Setting this allows excluding other preprocessed files like \code{T1w}.}
+\item{kind}{The kind of preprocessed data to return. Default is ".*" to match any kind.}
 
-\item{full_path}{If \code{TRUE}, return full file paths. Otherwise return relative paths.}
+\item{full_path}{If TRUE, return full file paths. Otherwise return relative paths.
+Default is FALSE.}
 
-\item{...}{Additional arguments (not used currently).}
+\item{...}{Additional arguments passed to internal functions.}
 }
 \value{
-A character vector of file paths to the matched preprocessed scans. If none are found, returns \code{NULL}.
+A character vector of file paths to preprocessed scans matching the criteria.
+Returns NULL if:
+\itemize{
+\item No matching files are found
+\item The project doesn't have fMRIPrep derivatives
+\item The specified criteria don't match any files
+}
 }
 \description{
-This function searches for preprocessed (fMRIPrep-derived) scans matching the specified
-subject, task, run, session, and optionally variant and space. By default, it returns
-only preprocessed BOLD scans, which excludes anatomical preprocessed files such as \code{T1w}.
+This function retrieves paths to preprocessed functional MRI scans from a BIDS project's
+fMRIPrep derivatives. It allows filtering by various BIDS entities such as subject,
+task, run, session, and space. The function is particularly useful for accessing
+preprocessed data for analysis pipelines.
 }
 \examples{
-proj <- bids_project(system.file("inst/extdata/phoneme_stripped", package="bidser"), fmriprep=TRUE)
-preproc_scans(proj) # returns all preprocessed BOLD scans by default
+# Create a BIDS project with fMRIPrep derivatives
+proj <- bids_project(system.file("extdata/phoneme_stripped", package="bidser"),
+                     fmriprep=TRUE)
+
+# Get all preprocessed BOLD scans
+all_scans <- preproc_scans(proj)
+
+# Get preprocessed scans for specific subjects
+sub_scans <- preproc_scans(proj, subid="0[12]")
+
+# Get scans in MNI space
+mni_scans <- preproc_scans(proj, space="MNI152NLin2009cAsym")
+
+# Get scans for a specific task with full paths
+task_scans <- preproc_scans(proj,
+                           task="phoneme",
+                           full_path=TRUE)
+
+# Get scans from a specific session
+session_scans <- preproc_scans(proj, session="test")
+
+# Combine multiple filters
+filtered_scans <- preproc_scans(proj,
+                               subid="01",
+                               task="phoneme",
+                               run="01",
+                               space="MNI152NLin2009cAsym")
 
 }

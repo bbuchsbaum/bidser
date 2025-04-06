@@ -4,23 +4,66 @@
 \alias{read_events.bids_project}
 \title{Read event files from a BIDS project}
 \usage{
-\method{read_events}{bids_project}(x, subid = ".*", task = ".*")
+\method{read_events}{bids_project}(x, subid = ".*", task = ".*", run = ".*", session = ".*", ...)
 }
 \arguments{
 \item{x}{A \code{bids_project} object.}
 
-\item{subid}{Regex to match subject IDs. Default is ".*" (no filtering).}
+\item{subid}{Regex pattern to match subject IDs. Default is ".*" (all subjects).}
 
-\item{task}{Regex to match tasks. Default is ".*".}
+\item{task}{Regex pattern to match tasks. Default is ".*" (all tasks).}
+
+\item{run}{Regex pattern to match runs. Default is ".*" (all runs).}
+
+\item{session}{Regex pattern to match sessions. Default is ".*" (all sessions).}
+
+\item{...}{Additional arguments passed to \code{event_files}.}
 }
 \value{
-A nested tibble with columns: \code{.task}, \code{.run}, \code{.subid} and a nested column \code{data} containing the event data.
+A nested tibble with columns:
+\itemize{
+\item \code{.subid}: Subject ID
+\item \code{.task}: Task name
+\item \code{.run}: Run number
+\item \code{.session}: Session ID (if present)
+\item \code{data}: A nested tibble containing the event data with columns:
+\itemize{
+\item \code{onset}: Event onset time in seconds
+\item \code{duration}: Event duration in seconds
+\item Additional task-specific columns (e.g., trial type, response, accuracy)
+If no matching data is found, returns an empty tibble with appropriate columns.
+}
+}
 }
 \description{
 Reads and nests event files for given subjects and tasks from a \code{bids_project} object.
-Returns a nested tibble with event data grouped by task, run, and subject.
+Returns a nested tibble with event data grouped by task, run, and subject. Event files
+typically contain trial-by-trial information for task-based fMRI data, including onset times,
+durations, trial types, and other task-specific variables.
 }
 \examples{
-# x <- bids_project(system.file("inst/extdata/phoneme_stripped", package="bidser"), fmriprep=TRUE)
-# events <- read_events(x, subid="sub-01", task="task-phoneme")
+# Create a BIDS project object
+proj <- bids_project(system.file("extdata/ds001", package="bidser"))
+
+# Read all event files
+all_events <- read_events(proj)
+
+# Read events for a specific subject and task
+sub01_events <- read_events(proj, 
+                          subid="01", 
+                          task="balloonanalogrisktask")
+
+# Read events for multiple subjects and a specific run
+multi_sub_events <- read_events(proj, 
+                              subid="0[1-3]", 
+                              run="01")
+
+# Access nested data for analysis
+if (nrow(sub01_events) > 0) {
+  # Get first subject's data
+  first_sub_data <- sub01_events$data[[1]]
+  
+  # Calculate mean trial duration
+  mean_duration <- mean(first_sub_data$duration)
+}
 }

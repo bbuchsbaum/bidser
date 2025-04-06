@@ -2,7 +2,8 @@
 #'
 #' This function searches for JSON sidecar files matching the given criteria (subject, task, run, session),
 #' reads the JSON content, and converts all top-level fields into columns of a tibble. Each file's metadata
-#' becomes one row in the returned tibble.
+#' becomes one row in the returned tibble. This is particularly useful for extracting metadata about BIDS
+#' imaging files, such as acquisition parameters, task descriptions, and other relevant information.
 #'
 #' @param x A \code{bids_project} object.
 #' @param subid A regex for matching subject IDs. Default is `".*"`.
@@ -13,16 +14,40 @@
 #' @param full_path If TRUE, return full file paths in the `file` column. Default is TRUE.
 #' @param ... Additional arguments passed to `search_files()`.
 #'
-#' @return A tibble with one row per JSON file. Columns include `file` (the JSON file path),
-#'         `.subid`, `.session`, `.task`, `.run` (extracted from filename), and all top-level keys from the JSON.
-#'         If no files are found, returns an empty tibble.
+#' @return A tibble with one row per JSON file. Columns include:
+#'   - `file`: the JSON file path
+#'   - `.subid`: subject ID extracted from filename
+#'   - `.session`: session ID extracted from filename (if present)
+#'   - `.task`: task name extracted from filename (if present)
+#'   - `.run`: run number extracted from filename (if present)
+#'   - Additional columns for each top-level key in the JSON files
+#'   If no files are found, returns an empty tibble.
+#'
+#' @examples
+#' # Read all BOLD sidecar files from a BIDS dataset
+#' proj <- bids_project(system.file("extdata/ds001", package="bidser"))
+#' metadata <- read_sidecar(proj)
+#'
+#' # Read sidecar files for a specific subject and task
+#' sub01_meta <- read_sidecar(proj, 
+#'                           subid="01", 
+#'                           task="balloonanalogrisktask")
+#'
+#' # Read sidecar files for anatomical data
+#' anat_meta <- read_sidecar(proj, 
+#'                          modality="T1w",
+#'                          full_path=FALSE)
+#'
+#' # Read sidecar files for a specific session
+#' ds007 <- bids_project(system.file("extdata/ds007", package="bidser"))
+#' session_meta <- read_sidecar(ds007, session="test")
 #'
 #' @importFrom tibble tibble
 #' @importFrom dplyr bind_rows mutate
 #' @importFrom jsonlite read_json
 #' @importFrom stringr str_match
 #' @export
-read_sidecar_jsons <- function(x, subid=".*", task=".*", run=".*", session=".*", modality="bold", full_path=TRUE, ...) {
+read_sidecar <- function(x, subid=".*", task=".*", run=".*", session=".*", modality="bold", full_path=TRUE, ...) {
   # Find all JSON sidecar files (assumed to end with .json)
   # and match given criteria:
   json_files <- search_files(x, regex="\\.json$", full_path=full_path, strict=TRUE,
@@ -92,14 +117,14 @@ read_sidecar_jsons <- function(x, subid=".*", task=".*", run=".*", session=".*",
 #' @param task Task name (exact or regex).
 #' @param run Run number (exact or regex). Default is ".*" to allow flexible matching.
 #' @param session Session ID (exact or regex). Default is ".*".
-#' @param ... Additional arguments passed to `read_sidecar_jsons()`.
+#' @param ... Additional arguments passed to `read_sidecar()`.
 #'
 #' @return A numeric value representing the RepetitionTime in seconds, or NA if not found.
 #'
 #' @export
 get_repetition_time <- function(x, subid, task, run=".*", session=".*", ...) {
   # Load sidecar JSONs for matching subid, task, run, session with a 'bold' modality by default
-  sidecars <- read_sidecar_jsons(x, subid=subid, task=task, run=run, session=session, modality="bold", ...)
+  sidecars <- read_sidecar(x, subid=subid, task=task, run=run, session=session, modality="bold", ...)
   
   if (nrow(sidecars) == 0) {
     message("No matching sidecar JSON file found for the specified criteria.")

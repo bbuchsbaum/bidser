@@ -1,9 +1,13 @@
 Package: bidser
 Version: 0.0.0.9000
 Title: Work with BIDS projects
-Description: What the package does (one paragraph).
+Description: Tools for working with Brain Imaging Data Structure (BIDS) formatted neuroimaging datasets.
+    The package provides functionality for reading, validating, and querying BIDS-compliant 
+    projects, creating mock BIDS datasets for testing, and extracting preprocessed data from 
+    BIDS derivatives. It supports searching and filtering BIDS files by various entities
+    such as subject, session, task, and run to streamline neuroimaging data workflow.
 Authors@R: person("Bradley", "Buchsbaum", , "brad.buchsbaum@gmail.com", c("aut", "cre"))
-License: What license it uses
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 ByteCompile: true
@@ -16,7 +20,22 @@ Imports:
   neuroim2,
   progress,
   tidyselect,
-  dplyr
+  dplyr,
+  ggplot2,
+  scales,
+  plotly,
+  patchwork,
+  viridis,
+  assertthat,
+  crayon,
+  fs,
+  jsonlite,
+  magrittr, 
+  readr,
+  rlang,
+  stringdist,
+  tibble,
+  tidyr
 Remotes: 
   SWotherspoon/Combin8R,
   bbuchsbaum/neuroim2
@@ -24,5 +43,6 @@ Suggests:
     knitr,
     rmarkdown,
     testthat,
-    covr
+    covr,
+    gluedown
 VignetteBuilder: knitr
