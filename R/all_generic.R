@@ -567,6 +567,25 @@ bids_check_compliance <- function(x) {
   UseMethod("bids_check_compliance")
 }
 
+#' Access a single subject from a BIDS project
+#'
+#' `bids_subject` returns a lightweight interface with helper functions
+#' for retrieving data associated with one subject.
+#'
+#' @param x A `bids_project` object.
+#' @param subid Subject identifier (with or without the `sub-` prefix).
+#' @param ... Additional arguments passed to methods.
+#' @return A list of helper functions for the subject.
+#' @export
+#' @rdname bids_subject
+#' @examples
+#' proj <- bids_project(system.file("extdata/ds001", package="bidser"))
+#' subj <- bids_subject(proj, "01")
+#' subj$events()
+#' subj$scans()
+bids_subject <- function(x, subid, ...) {
+  UseMethod("bids_subject")
+}
 #' @noRd
 anomalies <- function(x, ...) {
   UseMethod("anomalies", x)
