@@ -95,10 +95,9 @@ descend <- function(node, path, ftype, parser) {
           }
         }
         
-        # Create a new node for this file
-        pf <- purrr::partial(Node$new, fname)
-        n <- Node$new(fname)
-        n <- do.call(pf, res)
+        # Create a new node for this file using parsed attributes
+        args <- c(list(fname), res)
+        n <- do.call(Node$new, args)
         
         # Add file path for reference
         n$relative_path <- file.path(ftype, fname)
