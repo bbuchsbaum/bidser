@@ -9,7 +9,7 @@ mandatory_key(label, regex = "[A-Za-z0-9]+")
 \arguments{
 \item{label}{The label of the key to parse.}
 
-\item{regex}{The regex for the key's value.}
+\item{regex}{The regex for the key's value. Must be a single character string.}
 }
 \value{
 A parser that must match one occurrence of \verb{_<label>-<id>}

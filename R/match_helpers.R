@@ -20,12 +20,16 @@ alt_extractor <- function(x) {
 #' Create a parser for an optional BIDS key
 #'
 #' @param label The label of the key to parse.
-#' @param regex A regex pattern that the key's value should match.
+#' @param regex A regex pattern that the key's value should match. Must be a
+#'   single character string.
 #' @return A parser that matches zero or more occurrences of `_<label>-<id>`
 #' @keywords internal
 optional_key <- function(label, regex = "[A-Za-z0-9]+") {
   if (!is.character(label) || length(label) != 1) {
     stop("`label` must be a single character string.")
+  }
+  if (!is.character(regex) || length(regex) != 1) {
+    stop("`regex` must be a single character string.")
   }
   pMany(
     paste0("has_", label),
@@ -65,12 +69,15 @@ optional_literal <- function(lit, label) {
 #' Matches a pattern `_<label>-<id>` where `id` matches a given regex.
 #'
 #' @param label The label of the key to parse.
-#' @param regex The regex for the key's value.
+#' @param regex The regex for the key's value. Must be a single character string.
 #' @return A parser that must match one occurrence of `_<label>-<id>`
 #' @keywords internal
 mandatory_key <- function(label, regex = "[A-Za-z0-9]+") {
   if (!is.character(label) || length(label) != 1) {
     stop("`label` must be a single character string.")
+  }
+  if (!is.character(regex) || length(regex) != 1) {
+    stop("`regex` must be a single character string.")
   }
   pSeq(
     function(value) { value[[4]]$value },
@@ -83,11 +90,14 @@ mandatory_key <- function(label, regex = "[A-Za-z0-9]+") {
 #' Matches `<label>-<id>` at the start of a filename.
 #'
 #' @param label The label of the key to parse.
-#' @param regex The regex for the key's value.
+#' @param regex The regex for the key's value. Must be a single character string.
 #' @return A parser that matches `<label>-<id>` at the start
 start_key <- function(label, regex = "[A-Za-z0-9]+") {
   if (!is.character(label) || length(label) != 1) {
     stop("`label` must be a single character string.")
+  }
+  if (!is.character(regex) || length(regex) != 1) {
+    stop("`regex` must be a single character string.")
   }
   pSeq(
     function(value) { value[[3]]$value },
