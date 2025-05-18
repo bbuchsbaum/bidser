@@ -149,8 +149,8 @@ zero_or_one_of <- function(labels, label) {
 #' function to extract matched fields from the filename.
 #'
 #' @param type A literal for the type (e.g., "bold", "T1w").
-#' @param suffix A literal for the suffix (e.g., ".nii.gz", ".tsv").
-#' @param extractor A function to extract matched fields from the filename.
+#' @param suffix A single-character string for the suffix (e.g., ".nii.gz", ".tsv").
+#' @param extractor A function used to extract matched fields from the filename.
 #'
 #' @return A parser function that matches `type` followed by `suffix`. The parser returns:
 #'   - A list with the matched components if successful
@@ -178,7 +178,10 @@ gen_lit <- function(type, suffix, extractor) {
   if (!is.character(suffix) || length(suffix) != 1) {
     stop("`suffix` must be a single character string.")
   }
-  
+  if (!is.function(extractor)) {
+    stop("`extractor` must be a function.")
+  }
+
   pSeq(extractor, pLiteral(type), pLiteral(suffix))
 }
 
@@ -187,13 +190,19 @@ gen_lit <- function(type, suffix, extractor) {
 #' Given multiple `types` and a single `suffix`, generates a list of parsers.
 #'
 #' @param types A character vector of types.
-#' @param suffix A single suffix string.
-#' @param extractor A function to extract matched fields.
+#' @param suffix A single-character string shared by all types.
+#' @param extractor A function used to extract matched fields from each filename.
 #' @return A list of parsers.
 #' @keywords internal
 gen_lits <- function(types, suffix, extractor) {
   if (!is.character(types) || length(types) == 0) {
     stop("`types` must be a non-empty character vector.")
+  }
+  if (!is.character(suffix) || length(suffix) != 1) {
+    stop("`suffix` must be a single character string.")
+  }
+  if (!is.function(extractor)) {
+    stop("`extractor` must be a function.")
   }
   lapply(types, function(t) gen_lit(t, suffix, extractor))
 }
