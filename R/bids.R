@@ -368,8 +368,11 @@ print.bids_project <- function(x, ...) {
 #' @rdname sessions-method
 #' @method sessions bids_project
 sessions.bids_project <- function(x) {
-  if (x$has_session) {
-    unique(unlist(x$bids_tree$Get("session", filterFun = function(x) !is.null(x$session))))
+  if (x$has_sessions) {
+    sort(unique(unlist(x$bids_tree$Get(
+      "session",
+      filterFun = function(node) !is.null(node$session)
+    ))))
   } else {
     NULL
   }
