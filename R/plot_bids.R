@@ -489,14 +489,25 @@ prepare_bids_data_for_plot <- function(x, include_derivatives = TRUE) {
 plot_bids_completeness <- function(data, color_scheme = "viridis") {
   # Extract data
   raw_data <- data$raw_data
-  
+
+  if (!"type" %in% names(raw_data)) {
+    stop("missing 'type' column")
+  }
+
   # Determine if we need to include sessions
   has_sessions <- !is.null(data$project_info$sessions) && length(data$project_info$sessions) > 0
+
+  if (has_sessions && !"session" %in% names(raw_data)) {
+    stop("missing 'session' column")
+  }
   
   # Prepare data for completeness heatmap
   if (has_sessions) {
     # With sessions: subject x session x task
     if (length(data$project_info$tasks) > 0) {
+      if (!"task" %in% names(raw_data)) {
+        stop("missing 'task' column")
+      }
       completeness_data <- raw_data %>%
         filter(!is.na(subid), !is.na(session), !is.na(task)) %>%
         group_by(subid, session, task) %>%
@@ -559,6 +570,9 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
   } else {
     # No sessions: subject x task/type
     if (length(data$project_info$tasks) > 0) {
+      if (!"task" %in% names(raw_data)) {
+        stop("missing 'task' column")
+      }
       completeness_data <- raw_data %>%
         filter(!is.na(subid), !is.na(task)) %>%
         group_by(subid, task) %>%
@@ -633,6 +647,10 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
 plot_bids_file_sizes <- function(data, color_scheme = "viridis", scale = "log") {
   # Extract data
   raw_data <- data$raw_data
+
+  if (!"type" %in% names(raw_data)) {
+    stop("missing 'type' column")
+  }
   
   # Create a boxplot of file sizes by type
   p <- ggplot(raw_data, aes(x = type, y = file_size, fill = type)) +
@@ -670,6 +688,13 @@ plot_bids_file_sizes <- function(data, color_scheme = "viridis", scale = "log") 
 plot_bids_tasks <- function(data, color_scheme = "viridis") {
   # Extract data
   raw_data <- data$raw_data
+
+  if (!"type" %in% names(raw_data)) {
+    stop("missing 'type' column")
+  }
+  if (!"task" %in% names(raw_data)) {
+    stop("missing 'task' column")
+  }
   
   # Check if we have tasks
   if (length(data$project_info$tasks) == 0 || 
@@ -771,6 +796,10 @@ plot_bids_tasks <- function(data, color_scheme = "viridis") {
 plot_bids_structure <- function(data, color_scheme = "viridis") {
   # Extract data
   raw_data <- data$raw_data
+
+  if (!"type" %in% names(raw_data)) {
+    stop("missing 'type' column")
+  }
   
   # Create a tree-like structure representation
   # This is a simplified version that shows the proportion of different data types
@@ -863,6 +892,10 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
   # Prepare data
   project_data <- prepare_bids_data_for_plot(x, include_derivatives = TRUE)
   raw_data <- project_data$raw_data
+
+  if (!"type" %in% names(raw_data)) {
+    stop("missing 'type' column")
+  }
   
   # Filter by file type
   if (!file_type %in% unique(raw_data$type)) {
@@ -870,20 +903,25 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
                 paste(unique(raw_data$type), collapse = ", ")))
   }
   
-  filtered_data <- raw_data %>% 
+  filtered_data <- raw_data %>%
     dplyr::filter(type == file_type)
-  
+
   # Determine if we have sessions
-  has_sessions <- !is.null(project_data$project_info$sessions) && 
+  has_sessions <- !is.null(project_data$project_info$sessions) &&
                  length(project_data$project_info$sessions) > 0
+
+  if (has_sessions && !"session" %in% names(raw_data)) {
+    stop("missing 'session' column")
+  }
   
   # Create different visualizations based on file type
   if (file_type == "func") {
     # For functional data, use task and run
-    if (!all(c("task", "run") %in% names(filtered_data))) {
-      warning("Task or run information missing for functional data. Creating simplified heatmap.")
-      # Fall back to a simpler visualization
-      return(plot_bids_heatmap(project_data, color_scheme, highlight_missing))
+    if (!"task" %in% names(raw_data)) {
+      stop("missing 'task' column")
+    }
+    if (!"run" %in% names(raw_data)) {
+      stop("missing 'run' column")
     }
     
     # Create a task-run combination for y-axis
