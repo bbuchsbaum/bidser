@@ -453,18 +453,10 @@ prepare_bids_data_for_plot <- function(x, include_derivatives = TRUE) {
       raw_data$file_size <- NA_real_
       
       if ("path" %in% names(raw_data)) {
-        # Try to get file sizes for files that exist
-        file_sizes <- vapply(
-          raw_data$path, 
-          function(p) {
-            if (!is.na(p) && file.exists(p)) {
-              return(file.info(p)$size)
-            } else {
-              return(NA_real_)
-            }
-          },
-          FUN.VALUE = numeric(1)
-        )
+        # Use vectorized file.size for performance
+        existing <- !is.na(raw_data$path) & file.exists(raw_data$path)
+        file_sizes <- rep(NA_real_, length(raw_data$path))
+        file_sizes[existing] <- file.size(raw_data$path[existing])
         raw_data$file_size <- file_sizes
       }
     }
