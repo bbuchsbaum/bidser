@@ -22,22 +22,23 @@
 \value{
 A nested tibble with columns:
 \itemize{
-\item \code{.subid}: Subject ID
 \item \code{.task}: Task name
-\item \code{.run}: Run number
 \item \code{.session}: Session ID (if present)
+\item \code{.run}: Run number
+\item \code{.subid}: Subject ID
 \item \code{data}: A nested tibble containing the event data with columns:
 \itemize{
 \item \code{onset}: Event onset time in seconds
 \item \code{duration}: Event duration in seconds
 \item Additional task-specific columns (e.g., trial type, response, accuracy)
 If no matching data is found, returns an empty tibble with appropriate columns.
+Run and session identifiers are parsed from filenames using \code{func_parser()}.
 }
 }
 }
 \description{
 Reads and nests event files for given subjects and tasks from a \code{bids_project} object.
-Returns a nested tibble with event data grouped by task, run, and subject. Event files
+Returns a nested tibble with event data grouped by task, session, run, and subject. Event files
 typically contain trial-by-trial information for task-based fMRI data, including onset times,
 durations, trial types, and other task-specific variables.
 }

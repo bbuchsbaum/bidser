@@ -28,3 +28,17 @@ test_that("can read in event files from a  single subject", {
   ev <- read_events(proj, subid="01")
   testthat::expect_equal(nrow(ev), 3)
 })
+
+test_that("run filtering works", {
+  proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
+  ev <- read_events(proj, run="02")
+  testthat::expect_equal(nrow(ev), 16)
+  testthat::expect_true(all(ev$.run == "02"))
+})
+
+test_that("session filtering works", {
+  proj <- bids_project(system.file("extdata/ds114", package="bidser"), fmriprep=FALSE)
+  ev <- read_events(proj, session="test")
+  testthat::expect_equal(nrow(ev), 10)
+  testthat::expect_true(all(ev$.session == "test"))
+})
