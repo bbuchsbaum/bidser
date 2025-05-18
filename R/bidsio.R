@@ -127,7 +127,9 @@ read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bi
 #'
 #' @param x A \code{bids_project} object with fMRIPrep derivatives
 #' @param subid Regular expression to match subject IDs (e.g., "01" for subject 01, ".*" for all subjects)
-#' @param thresh Threshold value between 0 and 1 (default 0.99) - voxels with values below this threshold are excluded from the mask
+#' @param thresh Threshold value between 0 and 1 (default 0.99). Values outside
+#'   this range will trigger an error. Voxels with values below the threshold are
+#'   excluded from the mask.
 #' @param ... Additional arguments passed to \code{search_files} for finding mask files
 #'
 #' @return A logical mask volume (\code{LogicalNeuroVol}) that can be used for subsequent analyses with preprocessed functional data.
@@ -164,6 +166,10 @@ read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bi
 create_preproc_mask.bids_project <- function(x, subid, thresh=.99, ...) {
   if (!inherits(x, "bids_project")) {
     stop("`x` must be a `bids_project` object.")
+  }
+
+  if (!is.numeric(thresh) || length(thresh) != 1 || thresh < 0 || thresh > 1) {
+    stop("`thresh` must be between 0 and 1.")
   }
   
   if (!x$has_fmriprep) {
