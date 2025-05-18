@@ -250,7 +250,8 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #' @param subid Subject ID regex
 #' @param task Task regex
 #' @param session Session regex
-#' @param run Run regex
+#' @param run Run regex. If the run identifier cannot be extracted from
+#'   the filename, the run value defaults to "1".
 #' @param cvars The names of the confound variables to select. Defaults to \code{DEFAULT_CVARS}.
 #' @param npcs Perform PCA reduction on confounds and return \code{npcs} PCs.
 #' @param perc_var Perform PCA reduction to retain \code{perc_var}% variance.
@@ -293,7 +294,11 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
       # Extract run and session from filename
       run_val <- stringr::str_match(fn, "_run-([0-9]+)")[1,2]
       sess_val <- stringr::str_match(fn, "_ses-([A-Za-z0-9]+)")[1,2]
-      
+
+      if (is.na(run_val)) {
+        run_val <- "1"
+      }
+
       if (is.na(sess_val)) {
         sess_val <- "1"
       }
