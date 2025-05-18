@@ -86,9 +86,15 @@ test_that("combining multiple filters works correctly", {
 
 test_that("attempt to find preproc scans with non-existent id returns NULL", {
   skip_if_not(has_phoneme_data(), "Phoneme dataset with fmriprep derivatives not available")
-  
+
   proj <- bids_project(system.file("extdata/phoneme_stripped", package="bidser"), fmriprep=TRUE)
   pscans <- preproc_scans(proj, subid="nonexistent")
+  expect_null(pscans)
+})
+
+test_that("returns NULL when project lacks fmriprep data", {
+  proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
+  pscans <- preproc_scans(proj)
   expect_null(pscans)
 })
 

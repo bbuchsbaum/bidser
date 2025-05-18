@@ -551,6 +551,12 @@ preproc_scans.bids_project <- function(x, subid=".*", task=".*", run=".*", varia
   f <- function(node) paste0(node$path[2:length(node$path)], collapse="/")
   
   pdir <- x$prep_dir
+
+  # check that fMRIPrep derivatives are available
+  if (!x$has_fmriprep || !(pdir %in% names(x$bids_tree$children))) {
+    message("fMRIPrep derivatives not found; returning NULL.")
+    return(NULL)
+  }
   
   # If variant is NULL, treat it as ".*"
   var_pattern <- if (is.null(variant)) ".*" else variant
