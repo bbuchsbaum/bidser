@@ -9,4 +9,10 @@ anatprepspec()
 \description{
 Create a spec table for fMRIPrep "anat" files
 }
+\value{
+A list containing \code{keystruc}, \code{kinds}, and \code{type} for fMRIPrep anatomical files.
+}
+\examples{
+anatprepspec()
+}
 \keyword{internal}

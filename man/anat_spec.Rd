@@ -9,4 +9,10 @@ anat_spec()
 \description{
 Create a spec table for "anat" files
 }
+\value{
+A list containing \code{keystruc}, \code{kinds}, and \code{type} for anatomical files.
+}
+\examples{
+anat_spec()
+}
 \keyword{internal}

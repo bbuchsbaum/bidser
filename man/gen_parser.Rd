@@ -13,7 +13,14 @@ the possible file types and suffixes.}
 
 \item{typename}{The name given to the final type element. Default is "kind".}
 }
+\value{
+A parser function generated from the specification.
+}
 \description{
 Given a match specification, generate a parser
+}
+\examples{
+spec <- func_spec()
+gen_parser(spec)
 }
 \keyword{internal}

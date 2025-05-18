@@ -9,4 +9,10 @@ fmapspec()
 \description{
 Create a spec table for fieldmap files
 }
+\value{
+A list containing \code{keystruc}, \code{kinds}, and \code{type} for fieldmap files.
+}
+\examples{
+fmapspec()
+}
 \keyword{internal}

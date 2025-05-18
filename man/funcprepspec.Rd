@@ -9,4 +9,10 @@ funcprepspec()
 \description{
 Create a spec table for fMRIPrep "func" files
 }
+\value{
+A list containing \code{keystruc}, \code{kinds}, and \code{type} for fMRIPrep functional files.
+}
+\examples{
+funcprepspec()
+}
 \keyword{internal}
