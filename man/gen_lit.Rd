@@ -9,9 +9,9 @@ gen_lit(type, suffix, extractor)
 \arguments{
 \item{type}{A literal for the type (e.g., "bold", "T1w").}
 
-\item{suffix}{A literal for the suffix (e.g., ".nii.gz", ".tsv").}
+\item{suffix}{A single-character string for the suffix (e.g., ".nii.gz", ".tsv").}
 
-\item{extractor}{A function to extract matched fields from the filename.}
+\item{extractor}{A function used to extract matched fields from the filename.}
 }
 \value{
 A parser function that matches \code{type} followed by \code{suffix}. The parser returns:

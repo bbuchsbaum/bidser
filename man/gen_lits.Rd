@@ -9,9 +9,9 @@ gen_lits(types, suffix, extractor)
 \arguments{
 \item{types}{A character vector of types.}
 
-\item{suffix}{A single suffix string.}
+\item{suffix}{A single-character string shared by all types.}
 
-\item{extractor}{A function to extract matched fields.}
+\item{extractor}{A function used to extract matched fields from each filename.}
 }
 \value{
 A list of parsers.
