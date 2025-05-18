@@ -12,7 +12,6 @@ search_files(x, ...)
   regex = ".*",
   full_path = FALSE,
   strict = TRUE,
-  new = FALSE,
   ...
 )
 }
@@ -27,8 +26,6 @@ search_files(x, ...)
 
 \item{strict}{if \code{TRUE} require that a queried key must exist in match files.
 Otherwise, allow matches for files missing queried key.}
-
-\item{new}{Deprecated parameter. Should always be FALSE.}
 }
 \value{
 A character vector of file paths matching the criteria, or NULL if no matches found.
