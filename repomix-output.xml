@@ -5073,7 +5073,7 @@ fmriprep_func_parser <- function() {
 #'
 #' @keywords internal
 fmap_parser <- function() {
-  spec <- fmap_spec()
+  spec <- fmapspec()
   parser <- gen_parser(spec)
   ret <- list(parser = parser)
   class(ret) <- c("fmap_parser", "parser")
