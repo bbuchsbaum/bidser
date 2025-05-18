@@ -47,7 +47,7 @@ event_files.bids_project <- function(x, subid=".*", task=".*", run=".*", session
 #' Read event files from a BIDS project
 #'
 #' Reads and nests event files for given subjects and tasks from a \code{bids_project} object.
-#' Returns a nested tibble with event data grouped by task, run, and subject. Event files
+#' Returns a nested tibble with event data grouped by task, session, run, and subject. Event files
 #' typically contain trial-by-trial information for task-based fMRI data, including onset times,
 #' durations, trial types, and other task-specific variables.
 #'
@@ -59,15 +59,16 @@ event_files.bids_project <- function(x, subid=".*", task=".*", run=".*", session
 #' @param ... Additional arguments passed to \code{event_files}.
 #'
 #' @return A nested tibble with columns:
-#'   - `.subid`: Subject ID
 #'   - `.task`: Task name
-#'   - `.run`: Run number
 #'   - `.session`: Session ID (if present)
+#'   - `.run`: Run number
+#'   - `.subid`: Subject ID
 #'   - `data`: A nested tibble containing the event data with columns:
 #'     - `onset`: Event onset time in seconds
 #'     - `duration`: Event duration in seconds
 #'     - Additional task-specific columns (e.g., trial type, response, accuracy)
 #'   If no matching data is found, returns an empty tibble with appropriate columns.
+#'   Run and session identifiers are parsed from filenames using \code{func_parser()}.
 #'
 #' @importFrom dplyr mutate group_by bind_rows %>% filter
 #' @importFrom tidyr nest
@@ -109,6 +110,7 @@ read_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session
   # Create empty result tibble with correct structure
   empty_result <- tibble::tibble(
     .task = character(0),
+    .session = character(0),
     .run = character(0),
     .subid = character(0),
     data = list()
@@ -157,7 +159,8 @@ read_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session
       
       # Get event files for this subject and task
       evs <- tryCatch({
-        event_files(x, subid = as.character(sid), task = tk)
+        event_files(x, subid = as.character(sid), task = tk, run = run,
+                    session = session)
       }, error = function(e) {
         warning("Error retrieving event files for subject ", sid, " and task ", tk, ": ", e$message)
         character(0)
@@ -169,8 +172,9 @@ read_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session
         next
       }
       
-      # Extract run information from filenames
+      # Extract run and session information from filenames
       runs <- character(length(evs))
+      sessions <- character(length(evs))
       for (k in seq_along(evs)) {
         parsed <- tryCatch({
           parse(p, basename(evs[k]))
@@ -178,9 +182,14 @@ read_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session
           warning("Failed to parse filename: ", basename(evs[k]), " - ", e$message)
           NULL
         })
-        
+
         runs[k] <- if (!is.null(parsed) && !is.null(parsed$result$run)) {
           parsed$result$run
+        } else {
+          NA_character_
+        }
+        sessions[k] <- if (!is.null(parsed) && !is.null(parsed$result$session)) {
+          parsed$result$session
         } else {
           NA_character_
         }
@@ -199,8 +208,9 @@ read_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session
         
         if (!is.null(df)) {
           # Add metadata columns
-          event_data[[k]] <- dplyr::mutate(df, 
-                                          .subid = sid, 
+          event_data[[k]] <- dplyr::mutate(df,
+                                          .subid = sid,
+                                          .session = sessions[k],
                                           .run = runs[k],
                                           .file = evs[k])
         }
@@ -218,7 +228,7 @@ read_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session
     if (nrow(task_combined) > 0) {
       results[[i]] <- task_combined %>% 
         dplyr::mutate(.task = tk) %>%
-        dplyr::group_by(.data$.task, .data$.run, .data$.subid) %>%
+        dplyr::group_by(.data$.task, .data$.session, .data$.run, .data$.subid) %>%
         tidyr::nest()
     }
   }
