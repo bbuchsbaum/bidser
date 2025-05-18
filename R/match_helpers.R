@@ -21,7 +21,7 @@ alt_extractor <- function(x) {
 #'
 #' @param label The label of the key to parse.
 #' @param regex A regex pattern that the key's value should match.
-#' @return A parser that matches zero or more occurrences of `_<label>-<id>`
+#' @return A parser that matches zero or one occurrence of `_<label>-<id>`
 #' @keywords internal
 optional_key <- function(label, regex = "[A-Za-z0-9]+") {
   if (!is.character(label) || length(label) != 1) {
@@ -32,7 +32,8 @@ optional_key <- function(label, regex = "[A-Za-z0-9]+") {
     pSeq(
       function(value) { value[[4]]$value },
       pLiteral("_"), pLiteral(label), pLiteral("-"), pRegex("id", regex)
-    )
+    ),
+    max = 1
   )
 }
 
@@ -56,7 +57,8 @@ optional_literal <- function(lit, label) {
     pSeq(
       function(value) { value[[2]][[1]][[1]] },
       pLiteral("_"), pLiteral(lit)
-    )
+    ),
+    max = 1
   )
 }
 
@@ -138,7 +140,8 @@ zero_or_one_of <- function(labels, label) {
       function(value) { value[[2]][[1]] },
       pLiteral("_"),
       do.call(pAlt, c(literals, tag = function(x) x))
-    )
+    ),
+    max = 1
   )
 }
 

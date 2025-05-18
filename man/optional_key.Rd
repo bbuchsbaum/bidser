@@ -12,7 +12,7 @@ optional_key(label, regex = "[A-Za-z0-9]+")
 \item{regex}{A regex pattern that the key's value should match.}
 }
 \value{
-A parser that matches zero or more occurrences of \verb{_<label>-<id>}
+A parser that matches zero or one occurrence of \verb{_<label>-<id>}
 }
 \description{
 Create a parser for an optional BIDS key

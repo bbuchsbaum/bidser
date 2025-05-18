@@ -55,6 +55,10 @@ test_that("can parse various file types", {
   expect_type(encode("sub-sid000009_task-movie_run-03_space-MNI152Lin_res-native_desc-preproc_bold.nii.gz"), "list")
 })
 
+test_that("repeated tokens are not allowed", {
+  expect_null(encode("sub-01_task-rest_bold_bold.nii.gz"))
+})
+
 
 # sub-2001_T1w_brainmask.nii.gz						sub-2001_T1w_smoothwm.R.surf.gii
 # sub-2001_T1w_class-CSF_probtissue.nii.gz				sub-2001_T1w_space-MNI152NLin2009cAsym_brainmask.nii.gz
