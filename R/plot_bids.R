@@ -1214,7 +1214,79 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
 #' @return A ggplot object
 #' @keywords internal
 plot_bids_heatmap <- function(data, color_scheme = "viridis", highlight_missing = TRUE) {
-  # Implementation details...
+  raw_data <- data$raw_data
+
+  # Ensure required columns exist
+  if (!"subid" %in% names(raw_data)) {
+    raw_data$subid <- "subject"
+  }
+
+  if (!"type" %in% names(raw_data)) {
+    if ("folder" %in% names(raw_data)) {
+      raw_data$type <- raw_data$folder
+    } else {
+      raw_data$type <- "data"
+    }
+  }
+
+  # Combine type and task for the y-axis when tasks exist
+  if ("task" %in% names(raw_data)) {
+    raw_data$label <- paste0(raw_data$type,
+                             ifelse(is.na(raw_data$task), "", paste0("\n(", raw_data$task, ")")))
+  } else {
+    raw_data$label <- raw_data$type
+  }
+
+  if (!"file_size" %in% names(raw_data)) {
+    raw_data$file_size <- 1e6
+  }
+
+  heatmap_data <- raw_data %>%
+    dplyr::group_by(subid, label) %>%
+    dplyr::summarize(file_size = sum(file_size, na.rm = TRUE),
+                     file_count = dplyr::n(), .groups = "drop")
+
+  # Fill in missing combinations to highlight absence of data
+  if (highlight_missing) {
+    exp_grid <- expand.grid(
+      subid = unique(raw_data$subid),
+      label = unique(raw_data$label),
+      stringsAsFactors = FALSE
+    )
+
+    heatmap_data <- dplyr::left_join(exp_grid, heatmap_data, by = c("subid", "label")) %>%
+      dplyr::mutate(
+        file_size = ifelse(is.na(file_size), 0, file_size),
+        file_count = ifelse(is.na(file_count), 0, file_count),
+        missing = file_count == 0
+      )
+  } else {
+    heatmap_data$missing <- FALSE
+  }
+
+  heatmap_data$label <- factor(heatmap_data$label, levels = sort(unique(heatmap_data$label)))
+  heatmap_data$subid <- factor(heatmap_data$subid, levels = sort(unique(heatmap_data$subid)))
+
+  p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = subid, y = label, fill = file_size)) +
+    ggplot2::geom_tile(color = "white", size = 0.2,
+                       ggplot2::aes(alpha = ifelse(missing, 0.3, 1))) +
+    ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
+                                  trans = "log10", na.value = "grey90",
+                                  labels = scales::label_bytes(units = "MB")) +
+    ggplot2::scale_alpha_identity() +
+    ggplot2::labs(
+      title = "BIDS Dataset Heatmap",
+      x = "Subject ID",
+      y = "Data Type"
+    ) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+      panel.grid.major = ggplot2::element_blank(),
+      panel.grid.minor = ggplot2::element_blank()
+    )
+
+  return(p)
 }
 
 #' Test the bids_heatmap visualization with example data
