@@ -1,4 +1,5 @@
 #' @importFrom crayon green cyan magenta yellow bold
+#' @importFrom purrr partial
 NULL
 
 #' @noRd
