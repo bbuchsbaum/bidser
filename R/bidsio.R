@@ -209,10 +209,9 @@ DEFAULT_CVARS2 <- c("csf", "white_matter", "global_signal", "std_dvars",
 #' @param subid Subject ID regex
 #' @param task Task regex
 #' @param session Session regex
-#' @param nest If TRUE, results are nested
 #' @return A character vector of file paths
 #' @export
-confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", nest=TRUE) {
+confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*") {
   if (!inherits(x, "bids_project")) {
     stop("`x` must be a `bids_project` object.")
   }
@@ -276,7 +275,7 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
   
   ret <- lapply(sids, function(s) {
     # Use confound_files to get all possible confound files
-    fnames <- confound_files(x, subid=paste0("^", as.character(s), "$"), task=task, session=session, nest=FALSE)
+    fnames <- confound_files(x, subid=paste0("^", as.character(s), "$"), task=task, session=session)
     
     # Filter by run if specified
     if (run != ".*") {
