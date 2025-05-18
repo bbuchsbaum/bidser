@@ -645,7 +645,6 @@ key_match <- function(default=FALSE, ...) {
 #' @param full_path If TRUE, return full file paths. If FALSE, return paths relative to the project root.
 #' @param strict If TRUE, require that all queried keys must exist in matched files.
 #'        If FALSE, allow matches for files missing queried keys.
-#' @param new Deprecated parameter. Should always be FALSE.
 #' @param ... Additional key-value pairs to filter files (e.g., subid = "01", task = "wm").
 #'        These are matched against the corresponding metadata in the BIDS files.
 #' @return A character vector of file paths matching the criteria, or NULL if no matches found.
@@ -673,7 +672,7 @@ key_match <- function(default=FALSE, ...) {
 #' @examples
 #'  proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
 #'  x = search_files(proj, regex="events")
-search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRUE, new=FALSE, ...) {
+search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRUE, ...) {
   f <- function(node) {
     pdir_parts <- strsplit(x$prep_dir, "/")[[1]]
     # If preprocessed data are available and the node path matches the prep_dir structure:
@@ -690,25 +689,10 @@ search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRU
     }
   }
   
-  new=FALSE
-  if (new) {
-    nodes <- data.tree::Traverse(x$bids_tree, filterFun = function(n) n$isLeaf && str_detect(n$name, regex))
-    fnames <- sapply(nodes, "[[", "name")
-    keys <- list(...)
-    if (length(keys) > 0) {
-      reg2 <- sapply(names(keys), function(k) paste0(".*(", k, "-", keys[[k]], ")"))
-      reg2 <- paste0(unlist(reg2), collapse="")
-      keep <- str_detect(fnames, reg2)
-      ret <- fnames[keep]
-    } else {
-      ret <- fnames
-    }
-  } else {
-    matcher <- key_match(default = !strict, ...)
-    ret <- x$bids_tree$Get(f, filterFun = function(z) {
-      z$isLeaf && str_detect(z$name, regex) && matcher(z)
-    }, simplify=FALSE)
-  }
+  matcher <- key_match(default = !strict, ...)
+  ret <- x$bids_tree$Get(f, filterFun = function(z) {
+    z$isLeaf && str_detect(z$name, regex) && matcher(z)
+  }, simplify=FALSE)
   
   if (length(ret) == 0) {
     return(NULL)

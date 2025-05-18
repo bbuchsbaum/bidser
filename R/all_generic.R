@@ -487,7 +487,6 @@ create_preproc_mask <- function(x, subid, thresh=0.99, ...) {
 #' @param full_path If TRUE, return full file paths. If FALSE, return paths relative to the project root.
 #' @param strict If TRUE, require that all queried keys must exist in matched files.
 #'        If FALSE, allow matches for files missing queried keys.
-#' @param new Deprecated parameter. Should always be FALSE.
 #' @param ... Additional key-value pairs to filter files (e.g., subid = "01", task = "wm").
 #'        These are matched against the corresponding metadata in the BIDS files.
 #' @return A character vector of file paths matching the criteria, or NULL if no matches found.
