@@ -27,7 +27,7 @@
 
 \item{run}{Run regex}
 
-\item{cvars}{The names of the confound variables to select. Defaults to \code{DEFAULT_CVARS}.}
+\item{cvars}{The names of the confound variables to select. Defaults to \code{DEFAULT_CVARS}. Canonical names like \code{"csf"} are resolved to matching columns across fmriprep versions.}
 
 \item{npcs}{Perform PCA reduction on confounds and return \code{npcs} PCs.}
 
@@ -40,4 +40,10 @@ A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds.
 }
 \description{
 Reads in fmriprep confound tables for one or more subjects.
+}
+\examples{
+\donttest{
+proj <- bids_project("/path/to/bids", fmriprep = TRUE)
+conf <- read_confounds(proj, cvars = c("csf", "framewise_displacement"))
+}
 }

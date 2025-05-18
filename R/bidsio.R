@@ -202,11 +202,74 @@ DEFAULT_CVARS <- c("CSF", "WhiteMatter", "GlobalSignal", "stdDVARS", "non.stdDVA
                    "aCompCor02", "aCompCor03", "aCompCor04", "aCompCor05", "X", "Y", "Z",
                    "RotX", "RotY", "RotZ")
 
-DEFAULT_CVARS2 <- c("csf", "white_matter", "global_signal", "std_dvars",
-                    "framewise_displacement", "t_comp_cor_00", "t_comp_cor_01", "t_comp_cor_02",
-                    "t_comp_cor_03", "t_comp_cor_04", "t_comp_cor_00", "a_comp_cor_00", "a_comp_cor_01",
-                    "a_comp_cor_02" , "a_comp_cor_03", "a_comp_cor_04", "a_comp_cor_03", "trans_x", "trans_y", "trans_z",
-                    "rot_x", "rot_y", "rot_z")
+# canonical confound variables and their possible aliases across fmriprep versions
+CVARS_ALIASES <- list(
+  csf = c("CSF", "csf"),
+  white_matter = c("WhiteMatter", "white_matter"),
+  global_signal = c("GlobalSignal", "global_signal"),
+  std_dvars = c("stdDVARS", "std_dvars"),
+  non_std_dvars = c("non.stdDVARS", "non_std_dvars"),
+  vx_wisestd_dvars = c("vx.wisestdDVARS", "vx_wisestd_dvars"),
+  framewise_displacement = c("FramewiseDisplacement", "framewise_displacement"),
+  t_comp_cor_00 = c("tCompCor00", "t_comp_cor_00"),
+  t_comp_cor_01 = c("tCompCor01", "t_comp_cor_01"),
+  t_comp_cor_02 = c("tCompCor02", "t_comp_cor_02"),
+  t_comp_cor_03 = c("tCompCor03", "t_comp_cor_03"),
+  t_comp_cor_04 = c("tCompCor04", "t_comp_cor_04"),
+  t_comp_cor_05 = c("tCompCor05", "t_comp_cor_05"),
+  a_comp_cor_00 = c("aCompCor00", "a_comp_cor_00"),
+  a_comp_cor_01 = c("aCompCor01", "a_comp_cor_01"),
+  a_comp_cor_02 = c("aCompCor02", "a_comp_cor_02"),
+  a_comp_cor_03 = c("aCompCor03", "a_comp_cor_03"),
+  a_comp_cor_04 = c("aCompCor04", "a_comp_cor_04"),
+  a_comp_cor_05 = c("aCompCor05", "a_comp_cor_05"),
+  trans_x = c("X", "trans_x"),
+  trans_y = c("Y", "trans_y"),
+  trans_z = c("Z", "trans_z"),
+  rot_x = c("RotX", "rot_x"),
+  rot_y = c("RotY", "rot_y"),
+  rot_z = c("RotZ", "rot_z")
+)
+
+# DEPRECATED: use `CVARS_ALIASES` instead
+DEFAULT_CVARS2 <- names(CVARS_ALIASES)
+
+
+#' Resolve canonical confound variable names
+#'
+#' Given a set of desired confound variables, returns the matching column names
+#' present in a dataset, taking into account aliases across fmriprep versions.
+#'
+#' @param cvars Character vector of canonical or alias confound names.
+#' @param col_names Character vector of available column names.
+#' @param rename If TRUE, a named vector is returned where names are canonical
+#'   variables and values are the matching column names. When FALSE the result is
+#'   an unnamed vector of column names to select.
+#' @return Character vector of resolved column names.
+#' @keywords internal
+resolve_cvars <- function(cvars, col_names, rename = FALSE) {
+  res <- character()
+  for (cv in cvars) {
+    # find canonical entry containing this name
+    canon <- names(CVARS_ALIASES)[sapply(CVARS_ALIASES, function(a) cv %in% c(cv, a))]
+    if (length(canon) == 0) {
+      canon <- cv
+      aliases <- cv
+    } else {
+      canon <- canon[1]
+      aliases <- CVARS_ALIASES[[canon]]
+    }
+    found <- intersect(aliases, col_names)
+    if (length(found) > 0) {
+      if (rename) {
+        res <- c(res, setNames(found[1], canon))
+      } else {
+        res <- c(res, found[1])
+      }
+    }
+  }
+  res
+}
 
 
 #' Locate confound files
@@ -258,6 +321,8 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*") 
 #' @param run Run regex. If the run identifier cannot be extracted from
 #'   the filename, the run value defaults to "1".
 #' @param cvars The names of the confound variables to select. Defaults to \code{DEFAULT_CVARS}.
+#'   Canonical names such as \code{"csf"} are automatically mapped to any
+#'   matching column names found in the dataset using \code{CVARS_ALIASES}.
 #' @param npcs Perform PCA reduction on confounds and return \code{npcs} PCs.
 #' @param perc_var Perform PCA reduction to retain \code{perc_var}% variance.
 #' @param nest If TRUE, nests confound tables by subject/session/run.
@@ -265,6 +330,12 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*") 
 #' @importFrom tidyr nest
 #' @importFrom tidyselect any_of
 #' @return A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds.
+#' @examples
+#' \donttest{
+#' proj <- bids_project("/path/to/bids", fmriprep = TRUE)
+#' # canonical names automatically resolve to actual columns
+#' conf <- read_confounds(proj, cvars = c("csf", "framewise_displacement"))
+#' }
 #' @export
 read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", run=".*",
                                         cvars=DEFAULT_CVARS, npcs=-1, perc_var=-1, nest=TRUE) {
@@ -317,9 +388,12 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
       })
       
       if (is.null(dfx)) return(NULL)
-      
+
+      # Resolve canonical confound names to available columns
+      sel_cvars <- resolve_cvars(cvars, colnames(dfx))
+
       # Select requested confound columns
-      dfx <- dfx %>% dplyr::select(any_of(cvars))
+      dfx <- dfx %>% dplyr::select(any_of(sel_cvars))
       
       # Process confounds if PCA requested
       if ((npcs > 0 || perc_var > 0) && ncol(dfx) > 1) {

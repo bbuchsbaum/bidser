@@ -63,3 +63,12 @@ test_that("nest=FALSE returns flat tibble", {
   expect_equal(nrow(flat), 3)
   expect_true(all(c("participant_id", "run", "session") %in% names(flat)))
 })
+
+test_that("canonical names resolve to dataset columns", {
+  setup <- create_confounds_proj()
+  on.exit(unlink(setup$path, recursive = TRUE, force = TRUE), add = TRUE)
+  conf <- read_confounds(setup$proj,
+                         cvars = c("csf", "white_matter", "framewise_displacement", "global_signal"))
+  cols <- names(conf$data[[1]])
+  expect_true(all(c("CSF", "WhiteMatter", "FramewiseDisplacement", "GlobalSignal") %in% cols))
+})
