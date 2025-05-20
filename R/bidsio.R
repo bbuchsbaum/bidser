@@ -181,10 +181,10 @@ create_preproc_mask.bids_project <- function(x, subid, thresh=.99, mask_kinds = 
   
   maskfiles <- c()
   if ("brainmask" %in% mask_kinds) {
-    maskfiles <- c(maskfiles, search_files(x, subid = subid, deriv = "brainmask", full_path = TRUE, ...))
+    maskfiles <- c(maskfiles, search_files(x, subid = subid, kind = "brainmask", full_path = TRUE, ...))
   }
   if ("mask" %in% mask_kinds) {
-    maskfiles <- c(maskfiles, search_files(x, subid = subid, deriv = "mask", desc = "brain", full_path = TRUE, ...))
+    maskfiles <- c(maskfiles, search_files(x, subid = subid, kind = "mask", desc = "brain", full_path = TRUE, ...))
   }
   maskfiles <- unique(maskfiles)
   if (length(maskfiles) == 0) {
