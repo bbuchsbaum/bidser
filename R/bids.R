@@ -387,14 +387,24 @@ tasks.bids_project <- function(x) {
 }
 
 
+#' @importFrom stringr str_remove
 #' @export
 #' @rdname participants-method
 participants.bids_project <- function(x, ...) {
-  if ("subid" %in% names(x$tbl)) {
-    unique(x$tbl$subid[!is.na(x$tbl$subid)])
-  } else {
-    character(0)
+  ids <- character(0)
+
+  # Prefer participant IDs from the participants.tsv file if available
+  if (!is.null(x$part_df) && "participant_id" %in% names(x$part_df)) {
+    ids <- as.character(x$part_df$participant_id)
   }
+
+  # Also include any IDs parsed from the project table
+  if ("subid" %in% names(x$tbl)) {
+    ids <- c(ids, as.character(x$tbl$subid[!is.na(x$tbl$subid)]))
+  }
+
+  ids <- unique(stringr::str_remove(ids, "^sub-"))
+  sort(ids)
 }
 
 
