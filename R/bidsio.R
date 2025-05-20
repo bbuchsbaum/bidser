@@ -358,6 +358,14 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
   if (!inherits(x, "bids_project")) {
     stop("`x` must be a `bids_project` object.")
   }
+
+  if (!is.numeric(npcs) || length(npcs) != 1 || npcs < 0 || npcs != as.integer(npcs)) {
+    stop("`npcs` must be a non-negative integer.")
+  }
+
+  if (!is.numeric(perc_var) || length(perc_var) != 1 || perc_var < 0 || perc_var > 100) {
+    stop("`perc_var` must be between 0 and 100.")
+  }
   
   # Check participants
   sids <- participants(x)
@@ -446,6 +454,13 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 
 #' @keywords internal
 process_confounds <- function(dfx, center=TRUE, scale=TRUE, npcs=-1, perc_var=-1) {
+  if (!is.numeric(npcs) || length(npcs) != 1 || npcs < 0 || npcs != as.integer(npcs)) {
+    stop("`npcs` must be a non-negative integer.")
+  }
+
+  if (!is.numeric(perc_var) || length(perc_var) != 1 || perc_var < 0 || perc_var > 100) {
+    stop("`perc_var` must be between 0 and 100.")
+  }
   m <- as.matrix(dfx)
   # Impute NAs
   if (anyNA(m)) {

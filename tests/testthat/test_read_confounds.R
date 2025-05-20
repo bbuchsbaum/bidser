@@ -72,3 +72,12 @@ test_that("canonical names resolve to dataset columns", {
   cols <- names(conf$data[[1]])
   expect_true(all(c("CSF", "WhiteMatter", "FramewiseDisplacement", "GlobalSignal") %in% cols))
 })
+
+test_that("invalid PCA parameters trigger errors", {
+  setup <- create_confounds_proj()
+  on.exit(unlink(setup$path, recursive = TRUE, force = TRUE), add = TRUE)
+  expect_error(read_confounds(setup$proj, npcs = -1), "npcs")
+  expect_error(read_confounds(setup$proj, npcs = 1.5), "npcs")
+  expect_error(read_confounds(setup$proj, perc_var = -10), "perc_var")
+  expect_error(read_confounds(setup$proj, perc_var = 110), "perc_var")
+})
