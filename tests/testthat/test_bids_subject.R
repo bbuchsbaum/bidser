@@ -11,6 +11,11 @@ test_that("bids_subject exposes subject-level helpers", {
   sc <- subj$scans()
   expect_equal(nrow(ev), 3)
   expect_equal(length(sc), 3)
+
+  ev_concat <- subj$events(concatenate = TRUE, add_run = TRUE)
+  expect_true(is.data.frame(ev_concat))
+  expect_true(all(c(".task", ".run") %in% names(ev_concat)))
+  expect_equal(length(unique(ev_concat$.run)), 3)
 })
 
 test_that("bids_subject works with fmriprep data", {
@@ -21,4 +26,13 @@ test_that("bids_subject works with fmriprep data", {
   pscans <- subj$preproc_scans()
   expect_true(length(pscans) > 0)
   expect_true(all(grepl("sub-1001", pscans)))
+})
+
+test_that("concatenation returns list when multiple tasks", {
+  proj <- bids_project(system.file("extdata/ds002", package="bidser"), fmriprep=FALSE)
+  subj <- bids_subject(proj, "07")
+  evs <- subj$events(concatenate = TRUE, add_run = TRUE)
+  expect_true(is.list(evs))
+  expect_equal(length(evs), 3)
+  expect_true(all(sapply(evs, is.data.frame)))
 })

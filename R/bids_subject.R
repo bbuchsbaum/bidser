@@ -10,7 +10,10 @@
 #'
 #' @return A list containing helper functions:
 #' \itemize{
-#'   \item{\code{events}:}{Read event files via [read_events()].}
+#'   \item{\code{events}:}{Read event files via [read_events()]. When
+#'         called with `concatenate = TRUE`, returns a tibble (or a list of
+#'         tibbles if multiple tasks are loaded) with `.task` and, optionally,
+#'         `.run` columns appended to each event table.}
 #'   \item{\code{scans}:}{Retrieve functional scan paths via [func_scans()].}
 #'   \item{\code{confounds}:}{Read confound tables with [read_confounds()].}
 #'   \item{\code{preproc_scans}:}{Retrieve preprocessed scan paths with [preproc_scans()].}
@@ -21,6 +24,8 @@
 #' proj <- bids_project(system.file("extdata/ds001", package="bidser"))
 #' subj <- bids_subject(proj, "01")
 #' subj$events()
+#' # Concatenate events across runs with run indicator
+#' subj$events(concatenate = TRUE, add_run = TRUE)
 #' subj$scans()
 bids_subject.bids_project <- function(x, subid, ...) {
   if (!inherits(x, "bids_project")) {
@@ -34,7 +39,40 @@ bids_subject.bids_project <- function(x, subid, ...) {
     stop("Subject not found: ", sid)
   }
   list(
-    events = function(...) read_events(x, subid = sid, ...),
+    events = function(task = ".*", run = ".*", session = ".*",
+                     concatenate = FALSE, add_run = FALSE, ...) {
+      evs <- read_events(x, subid = sid, task = task, run = run,
+                         session = session, ...)
+
+      if (!concatenate) {
+        return(evs)
+      }
+
+      if (nrow(evs) == 0) {
+        return(tibble::tibble())
+      }
+
+      df_list <- lapply(seq_len(nrow(evs)), function(i) {
+        d <- evs$data[[i]]
+        if (add_run) {
+          d$.run <- evs$.run[i]
+        }
+        d$.task <- evs$.task[i]
+        d$.session <- evs$.session[i]
+        d$.subid <- evs$.subid[i]
+        d
+      })
+
+      combined <- dplyr::bind_rows(df_list)
+
+      task_split <- split(combined, combined$.task)
+
+      if (length(task_split) == 1) {
+        task_split[[1]]
+      } else {
+        task_split
+      }
+    },
     scans = function(...) func_scans(x, subid = sid, ...),
     confounds = function(...) read_confounds(x, subid = sid, ...),
     preproc_scans = function(...) preproc_scans(x, subid = sid, ...)
