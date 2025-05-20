@@ -390,8 +390,10 @@ tasks.bids_project <- function(x) {
 #' @export
 #' @rdname participants-method
 participants.bids_project <- function(x, ...) {
-  if ("subid" %in% names(x$tbl)) {
+  if ("subid" %in% names(x$tbl) && any(!is.na(x$tbl$subid))) {
     unique(x$tbl$subid[!is.na(x$tbl$subid)])
+  } else if ("participant_id" %in% names(x$part_df)) {
+    unique(as.character(x$part_df$participant_id))
   } else {
     character(0)
   }
