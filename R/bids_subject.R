@@ -27,18 +27,27 @@ bids_subject.bids_project <- function(x, subid, ...) {
   if (!inherits(x, "bids_project")) {
     stop("`x` must be a `bids_project` object.")
   }
-  sid <- as.character(subid)
-  if (!startsWith(sid, "sub-")) {
-    sid <- paste0("sub-", sid)
+  
+  # Get the plain subject ID (without "sub-") for comparison with participants()
+  plain_subid <- stringr::str_remove(as.character(subid), "^sub-")
+  
+  # Internally, we'll use the full subject ID with "sub-" prefix for node access
+  full_sid_for_node_access <- ifelse(startsWith(as.character(subid), "sub-"), 
+                                   as.character(subid), 
+                                   paste0("sub-", plain_subid))
+
+  # Check if the plain_subid exists in the list of participants (which are also plain)
+  if (!(plain_subid %in% participants(x))) {
+    stop("Subject not found: ", plain_subid, " (derived from input: ", subid, ")")
   }
-  if (!(sid %in% participants(x))) {
-    stop("Subject not found: ", sid)
-  }
+  
+  # The functions below will use the plain_subid for filtering, 
+  # as underlying functions like read_events, func_scans expect plain IDs.
   list(
-    events = function(...) read_events(x, subid = sid, ...),
-    scans = function(...) func_scans(x, subid = sid, ...),
-    confounds = function(...) read_confounds(x, subid = sid, ...),
-    preproc_scans = function(...) preproc_scans(x, subid = sid, ...),
-    brain_mask = function(...) brain_mask(x, subid = sid, ...)
+    events = function(...) read_events(x, subid = plain_subid, ...),
+    scans = function(...) func_scans(x, subid = plain_subid, ...),
+    confounds = function(...) read_confounds(x, subid = plain_subid, ...),
+    preproc_scans = function(...) preproc_scans(x, subid = plain_subid, ...),
+    brain_mask = function(...) brain_mask(x, subid = plain_subid, ...)
   )
 }

@@ -388,7 +388,6 @@ tasks.bids_project <- function(x) {
 
 
 #' @importFrom stringr str_remove
-#' @importFrom stringr str_remove
 #' @export
 #' @rdname participants-method
 participants.bids_project <- function(x, ...) {
@@ -720,38 +719,101 @@ key_match <- function(default=FALSE, ...) {
 #'  proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
 #'  x = search_files(proj, regex="events")
 search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRUE, ...) {
-  f <- function(node) {
-    pdir_parts <- strsplit(x$prep_dir, "/")[[1]]
-    # If preprocessed data are available and the node path matches the prep_dir structure:
-    is_prep <- x$has_fmriprep && 
-      length(node$path) > length(pdir_parts) && 
-      all(node$path[2:(1+length(pdir_parts))] == pdir_parts)
+  # Helper function to extract the relative path from a node
+  extract_relative_path <- function(node) {
+    pdir_parts <- character(0) # Initialize to empty
+    if (x$has_fmriprep && nzchar(x$prep_dir)) { # Check if prep_dir is non-empty
+        pdir_parts <- strsplit(x$prep_dir, "/")[[1]]
+    }
+
+    is_prep_data <- x$has_fmriprep && 
+                   length(pdir_parts) > 0 && # Ensure pdir_parts is not empty
+                   length(node$path) > (1 + length(pdir_parts)) && 
+                   all(node$path[2:(1+length(pdir_parts))] == pdir_parts)
     
-    if (is_prep) {
-      # If inside the preprocessed directory
+    if (is_prep_data) {
       paste0(node$path[2:length(node$path)], collapse="/")
     } else {
-      # If inside raw data directory
-      paste0(node$path[3:length(node$path)], collapse="/")
+      if (length(node$path) > 2 && node$path[2] == "raw") {
+         paste0(node$path[3:length(node$path)], collapse="/")
+      } else if (length(node$path) == 2 && node$path[[1]] == x$name) { # Files directly under project root node, like participants.tsv
+         node$name
+      } else if (node$path[[1]] == x$name && length(node$path) > 1 && node$path[[2]] != "raw" && !is_prep_data) {
+        # This case handles files that might be at the root of the project directory (e.g. dataset_description.json)
+        # or other top-level files/dirs not under 'raw' or 'derivatives'
+        paste0(node$path[2:length(node$path)], collapse="/")
+      } else {
+         # Fallback for other unexpected paths or if node$path is shorter than expected
+         # This could be a root file if node$path is just the project name and the filename
+         if (length(node$path) > 1) paste0(node$path[2:length(node$path)], collapse="/") else node$name
+      }
     }
   }
   
-  matcher <- key_match(default = !strict, ...)
-  ret <- x$bids_tree$Get(f, filterFun = function(z) {
-    z$isLeaf && str_detect(z$name, regex) && matcher(z)
-  }, simplify=FALSE)
+  search_params <- list(...)
+  has_kind_param <- "kind" %in% names(search_params)
+  
+  base_params <- search_params
+  if (has_kind_param && search_params$kind == "bold") {
+    base_params$kind <- NULL 
+  }
+  base_matcher <- key_match(default = !strict, !!!base_params)
+  
+  filter_fun <- function(z) {
+    if (!(z$isLeaf && str_detect(z$name, regex))) {
+      return(FALSE)
+    }
+    if (!base_matcher(z)) {
+      return(FALSE)
+    }
+    if (has_kind_param) {
+      if (search_params$kind == "bold") {
+        is_explicitly_bold <- str_detect_null(z$kind, "^bold$", default = FALSE)
+        is_implicitly_bold <- FALSE
+        if (!is_explicitly_bold) {
+           is_func_folder <- any(z$path == "func") 
+           is_bold_filename <- str_detect(z$name, "_bold\\\\.nii(\\\\.gz)?$")
+           is_implicitly_bold <- is_func_folder && is_bold_filename
+        }
+        if (!(is_explicitly_bold || is_implicitly_bold)) {
+           return(FALSE)
+        }
+      } else {
+        # For other 'kind' values, use standard matching (delegated to base_matcher if kind wasn't removed)
+        # This part is tricky: if kind was specified and NOT bold, it's already in base_matcher.
+        # If kind was specified AND bold, it was removed from base_params. So this 'else' branch
+        # might not be strictly needed if base_matcher handles all non-bold kind cases.
+        # However, to be explicit for non-bold kind filtering:
+        if (!is.null(search_params$kind)) { # ensure kind was actually passed
+            kind_matcher_specific <- key_match(default = !strict, kind = search_params$kind)
+            if (!kind_matcher_specific(z)) {
+                return(FALSE)
+            }
+        }
+      }
+    }
+    return(TRUE)
+  }
+  
+  ret <- x$bids_tree$Get(extract_relative_path, filterFun = filter_fun, simplify = FALSE)
   
   if (length(ret) == 0) {
     return(NULL)
   }
   
-  ret <- if (full_path && !is.null(ret)) {
-    file.path(x$path, ret)
-  } else {
-    ret
+  # Ensure ret is a character vector of unique paths
+  # unlist can produce names, so unname it.
+  ret <- unique(unname(unlist(ret)))
+
+  if (full_path && !is.null(ret)) {
+    # file.path(x$path, ret) might be problematic if x$path is NULL (for virtual projects)
+    # or if ret contains paths that are already absolute (though extract_relative_path should prevent this)
+    if (!is.null(x$path)) {
+      ret <- file.path(x$path, ret)
+    } # If x$path is NULL, we assume `ret` contains the desired (likely relative) paths.
   }
   
-  as.vector(unlist(ret))
+  as.vector(ret)
 }
 
 
