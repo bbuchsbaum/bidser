@@ -13,6 +13,8 @@ create_confounds_proj <- function() {
   jsonlite::write_json(list(Name = "TestConfounds", BIDSVersion = "1.7.0"),
                        file.path(temp_dir, "dataset_description.json"),
                        auto_unbox = TRUE)
+  # add minimal subject directory to satisfy bids_project parser
+  dir.create(file.path(temp_dir, "sub-01"))
   # confounds file in derivatives
   conf_dir <- file.path(temp_dir, "derivatives", "fmriprep", "sub-01", "func")
   dir.create(conf_dir, recursive = TRUE)
