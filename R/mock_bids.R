@@ -285,6 +285,10 @@ reconstruct_node_path <- function(node, prep_dir = "derivatives/fmriprep") {
 #'   and values are the corresponding `tibble` or `data.frame` content for
 #'   those files. These paths must correspond to files defined in `file_structure`
 #'   with a `suffix` like "events.tsv".
+#' @param confound_data A named list where names are relative paths of
+#'   confound TSV files within the derivatives directory and values are
+#'   their `tibble` or `data.frame` content. Paths must match files defined
+#'   in `file_structure`.
 #' @param create_stub Logical (default `FALSE`). If `TRUE`, write a stub BIDS
 #'   directory structure to disk at `stub_path`. Zero-byte files are created
 #'   except for `participants.tsv`, `dataset_description.json`, and `events.tsv`
@@ -373,6 +377,7 @@ create_mock_bids <- function(project_name,
                              file_structure,
                              dataset_description = NULL,
                              event_data = list(),
+                             confound_data = list(),
                              create_stub = FALSE,
                              stub_path = NULL,
                              prep_dir = "derivatives/fmriprep") {
@@ -391,6 +396,8 @@ create_mock_bids <- function(project_name,
   }
   if (!rlang::is_list(event_data)) abort("'event_data' must be a list.")
   if (length(event_data) > 0 && !rlang::is_named(event_data)) abort("'event_data' list must be named with relative file paths.")
+  if (!rlang::is_list(confound_data)) abort("'confound_data' must be a list.")
+  if (length(confound_data) > 0 && !rlang::is_named(confound_data)) abort("'confound_data' list must be named with relative file paths.")
 
   # --- Process Participants ---
   if (is.character(participants)) {
@@ -454,6 +461,7 @@ create_mock_bids <- function(project_name,
 
   # --- Populate Data Tree ---
   generated_event_paths <- character() # Keep track of event files defined
+  generated_confound_paths <- character() # Keep track of confound files defined
 
   for (i in 1:nrow(file_structure)) {
     row <- file_structure[i, ]
@@ -626,9 +634,12 @@ create_mock_bids <- function(project_name,
       leaf_node$session <- encoded_entities$ses
     }
 
-    # Track generated event file paths
+    # Track generated event and confound file paths
     if (isTRUE(endsWith(row$suffix, "events.tsv"))) {
         generated_event_paths <- c(generated_event_paths, relative_path)
+    }
+    if (grepl("(confounds|regressors|timeseries)", row$suffix) && endsWith(row$suffix, ".tsv")) {
+        generated_confound_paths <- c(generated_confound_paths, relative_path)
     }
 
   } # End loop through file_structure
@@ -644,6 +655,16 @@ create_mock_bids <- function(project_name,
   }
   # Ensure event data is tibble
   event_data_store <- lapply(event_data, tibble::as_tibble)
+
+  # --- Validate Confound Data ---
+  confound_data_names <- names(confound_data)
+  mismatched_confound_paths <- confound_data_names[!confound_data_names %in% generated_confound_paths]
+  if (length(mismatched_confound_paths) > 0) {
+    warn(paste("The following names in 'confound_data' do not correspond to any confound files generated from 'file_structure':",
+               paste(mismatched_confound_paths, collapse=", ")))
+    confound_data <- confound_data[confound_data_names %in% generated_confound_paths]
+  }
+  confound_data_store <- lapply(confound_data, tibble::as_tibble)
 
 
   # --- Create Stub Directory (Optional) ---
@@ -692,13 +713,21 @@ create_mock_bids <- function(project_name,
         # Ensure directory exists
         fs::dir_create(fs::path_dir(full_disk_path))
 
-        # Check if it's an event file with data
+        # Check if it's an event or confound file with data
         if (endsWith(node$name, "events.tsv") && rel_path_for_file %in% names(event_data_store)) {
             tryCatch({
                 readr::write_tsv(event_data_store[[rel_path_for_file]], full_disk_path, na = "n/a")
             }, error = function(e) {
                 warn(paste("Failed to write event file stub:", full_disk_path, "-", e$message))
                 fs::file_create(full_disk_path) # Create empty if write fails
+            })
+        } else if (grepl("(confounds|regressors|timeseries)", node$name) && endsWith(node$name, ".tsv") &&
+                   rel_path_for_file %in% names(confound_data_store)) {
+            tryCatch({
+                 readr::write_tsv(confound_data_store[[rel_path_for_file]], full_disk_path, na = "n/a")
+            }, error = function(e) {
+                 warn(paste("Failed to write confound file stub:", full_disk_path, "-", e$message))
+                 fs::file_create(full_disk_path)
             })
         } else {
             # Create zero-byte file
@@ -717,6 +746,7 @@ create_mock_bids <- function(project_name,
       desc = desc,
       bids_tree = bids_tree,
       event_data_store = event_data_store,
+      confound_data_store = confound_data_store,
       path = if (create_stub) actual_stub_path else paste0("mock://", project_name), # Indicate mock path
       has_sessions = has_sessions,
       has_fmriprep = has_fmriprep,
@@ -1340,37 +1370,70 @@ confound_files.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 }
 
 
-# Example placeholder for read_confounds
 #' Read Confound Files (Mock Implementation)
 #' @inheritParams search_files.mock_bids_project
 #' @param x A `mock_bids_project` object.
 #' @param cvars Variables to select (ignored in mock).
 #' @param npcs PCA components (ignored in mock).
 #' @param perc_var PCA variance (ignored in mock).
-#' @param nest Nest output (ignored in mock, returns NULL).
+#' @param nest If `TRUE`, returns a nested tibble keyed by subject, session and run.
 #' @param ... Additional BIDS entities (passed to `search_files`).
-#' @return NULL (or potentially an empty mock structure). Currently returns NULL.
+#' @return A tibble of confound data (nested if `nest = TRUE`).
 #' @export
 read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", session = ".*", run = ".*",
                                              cvars = NULL, npcs = -1, perc_var = -1, nest = TRUE, ...) {
-  inform("`read_confounds` for mock_bids_project is not implemented to return data. Finding files only.")
 
-  # Find confound file paths
-  conf_files <- search_files(x, regex = "(confounds|regressors|timeseries)\\.tsv$",
-                             full_path = FALSE, # Relative path might be useful
-                             sub = subid, # Use 'sub'
-                             task = task, 
-                             ses = session, # Use 'ses'
-                             run = run, ...)
+  conf_paths <- confound_files.mock_bids_project(x, subid = subid, task = task,
+                                                 session = session, run = run,
+                                                 full_path = FALSE, ...)
 
-  if (is.null(conf_files)) {
-     inform("No matching confound files found in mock project structure.")
-  } else {
-     inform(paste("Found potential confound files:", paste(conf_files, collapse=", ")))
+  if (is.null(conf_paths) || length(conf_paths) == 0) {
+    return(tibble::tibble(
+      .subid = character(), .task = character(), .run = character(),
+      .session = character(), data = list()
+    ))
   }
-  # Mock version does not store or return confound data by default
-  # Could be extended to accept confound_data similar to event_data if needed
-  return(NULL)
+
+  all_conf <- list()
+  for (rel_path in conf_paths) {
+    if (rel_path %in% names(x$confound_data_store)) {
+      conf_df <- x$confound_data_store[[rel_path]]
+    } else {
+      conf_df <- tibble::tibble()
+    }
+
+    node_list <- data.tree::Traverse(x$bids_tree, filterFun = function(n) {
+      n$isLeaf && !is.null(n$relative_path) && n$relative_path == rel_path
+    })
+    if (length(node_list) > 0) {
+      nd <- node_list[[1]]
+      meta <- list(
+        .subid = nd$subid %||% nd$sub,
+        .task = nd$task,
+        .run = nd$run,
+        .session = nd$ses %||% nd$session
+      )
+      meta$.subid <- meta$.subid %||% NA_character_
+      meta$.task <- meta$.task %||% NA_character_
+      meta$.run <- meta$.run %||% NA_character_
+      meta$.session <- meta$.session %||% NA_character_
+    } else {
+      meta <- list(.subid = NA_character_, .task = NA_character_,
+                   .run = NA_character_, .session = NA_character_)
+    }
+
+    combined_df <- dplyr::bind_cols(tibble::as_tibble(meta), tibble::as_tibble(conf_df))
+    all_conf[[rel_path]] <- combined_df
+  }
+
+  final_df <- dplyr::bind_rows(all_conf)
+
+  if (!nest) {
+    return(final_df)
+  }
+
+  grouping_vars <- intersect(c(".subid", ".task", ".run", ".session"), names(final_df))
+  final_df %>% dplyr::group_by(!!!rlang::syms(grouping_vars)) %>% tidyr::nest()
 }
 
 
