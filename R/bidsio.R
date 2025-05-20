@@ -362,9 +362,14 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
   
   # Check participants
   sids <- participants(x)
+  if (length(sids) == 0) {
+    warning("No participants found in the BIDS project.")
+    return(NULL)
+  }
   gidx <- grep(subid, sids)
   if (length(gidx) == 0) {
-    stop("No matching participants found for regex: ", subid)
+    warning("No matching participants found for regex: ", subid)
+    return(NULL)
   }
   sids <- sids[gidx]
   
