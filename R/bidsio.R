@@ -408,6 +408,11 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
       # Resolve canonical confound names to available columns
       sel_cvars <- resolve_cvars(cvars, colnames(dfx))
 
+      if (length(sel_cvars) == 0) {
+        warning("No requested confounds were found for file: ", fn)
+        return(NULL)
+      }
+
       # Select requested confound columns
       dfx <- dfx %>% dplyr::select(any_of(sel_cvars))
       

@@ -72,3 +72,11 @@ test_that("canonical names resolve to dataset columns", {
   cols <- names(conf$data[[1]])
   expect_true(all(c("CSF", "WhiteMatter", "FramewiseDisplacement", "GlobalSignal") %in% cols))
 })
+
+test_that("file without requested confounds is skipped", {
+  setup <- create_confounds_proj()
+  on.exit(unlink(setup$path, recursive = TRUE, force = TRUE), add = TRUE)
+  expect_warning(res <- read_confounds(setup$proj, cvars = "junkvar"),
+                 "No requested confounds")
+  expect_null(res)
+})
