@@ -94,7 +94,7 @@ test_that("attempt to find preproc scans with non-existent id returns NULL", {
 
 test_that("returns NULL when project lacks fmriprep data", {
   proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
-  pscans <- preproc_scans(proj)
+  expect_message(pscans <- preproc_scans(proj), "fMRIPrep derivatives not found")
   expect_null(pscans)
 })
 
