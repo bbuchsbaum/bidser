@@ -130,6 +130,9 @@ read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bi
 #' @param thresh Threshold value between 0 and 1 (default 0.99). Values outside
 #'   this range will trigger an error. Voxels with values below the threshold are
 #'   excluded from the mask.
+#' @param mask_kinds Character vector of BIDS file types to search when locating
+#'   mask files. Defaults to both "brainmask" (older fMRIPrep versions) and
+#'   "mask" with \code{desc="brain"} (BIDS 1.6+).
 #' @param ... Additional arguments passed to \code{search_files} for finding mask files
 #'
 #' @return A logical mask volume (\code{LogicalNeuroVol}) that can be used for subsequent analyses with preprocessed functional data.
@@ -163,7 +166,7 @@ read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bi
 #' }
 #'
 #' @export
-create_preproc_mask.bids_project <- function(x, subid, thresh=.99, ...) {
+create_preproc_mask.bids_project <- function(x, subid, thresh=.99, mask_kinds = c("brainmask", "mask"), ...) {
   if (!inherits(x, "bids_project")) {
     stop("`x` must be a `bids_project` object.")
   }
@@ -176,7 +179,14 @@ create_preproc_mask.bids_project <- function(x, subid, thresh=.99, ...) {
     stop("No fmriprep data available. Cannot create preproc mask.")
   }
   
-  maskfiles <- search_files(x, subid=subid, deriv="brainmask", full_path=TRUE, ...)
+  maskfiles <- c()
+  if ("brainmask" %in% mask_kinds) {
+    maskfiles <- c(maskfiles, search_files(x, subid = subid, deriv = "brainmask", full_path = TRUE, ...))
+  }
+  if ("mask" %in% mask_kinds) {
+    maskfiles <- c(maskfiles, search_files(x, subid = subid, deriv = "mask", desc = "brain", full_path = TRUE, ...))
+  }
+  maskfiles <- unique(maskfiles)
   if (length(maskfiles) == 0) {
     stop("No brainmask files found matching the specified subject.")
   }
@@ -193,6 +203,12 @@ create_preproc_mask.bids_project <- function(x, subid, thresh=.99, ...) {
   avg <- Reduce("+", vols)/length(vols)
   avg[avg < thresh] <- 0
   as.logical(avg)
+}
+
+#' @rdname brain_mask
+#' @export
+brain_mask.bids_project <- function(x, subid, ...) {
+  create_preproc_mask(x, subid = subid, ...)
 }
 
 

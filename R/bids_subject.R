@@ -14,6 +14,7 @@
 #'   \item{\code{scans}:}{Retrieve functional scan paths via [func_scans()].}
 #'   \item{\code{confounds}:}{Read confound tables with [read_confounds()].}
 #'   \item{\code{preproc_scans}:}{Retrieve preprocessed scan paths with [preproc_scans()].}
+#'   \item{\code{brain_mask}:}{Create a brain mask via [brain_mask()].}
 #' }
 #' @export
 #' @rdname bids_subject
@@ -37,6 +38,7 @@ bids_subject.bids_project <- function(x, subid, ...) {
     events = function(...) read_events(x, subid = sid, ...),
     scans = function(...) func_scans(x, subid = sid, ...),
     confounds = function(...) read_confounds(x, subid = sid, ...),
-    preproc_scans = function(...) preproc_scans(x, subid = sid, ...)
+    preproc_scans = function(...) preproc_scans(x, subid = sid, ...),
+    brain_mask = function(...) brain_mask(x, subid = sid, ...)
   )
 }

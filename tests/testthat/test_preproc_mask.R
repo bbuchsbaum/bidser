@@ -18,3 +18,11 @@ test_that("create_preproc_mask errors for invalid thresh", {
   expect_error(create_preproc_mask(proj, subid="1001", thresh=-0.1), "thresh")
 })
 
+test_that("create_preproc_mask locates mask files", {
+  skip_if_not(has_phoneme_data(), "Phoneme dataset with fmriprep derivatives not available")
+
+  proj <- bids_project(system.file("extdata/phoneme_stripped", package="bidser"), fmriprep=TRUE)
+  mask <- create_preproc_mask(proj, subid="1001")
+  expect_true(inherits(mask, "LogicalNeuroVol"))
+})
+

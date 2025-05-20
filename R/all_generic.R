@@ -476,6 +476,21 @@ create_preproc_mask <- function(x, subid, thresh=0.99, ...) {
   UseMethod("create_preproc_mask", x)
 }
 
+#' Retrieve a brain mask for a subject
+#'
+#' This convenience function wraps [create_preproc_mask()] and
+#' returns a brain mask volume for a given subject.
+#'
+#' @param x A bids_project object
+#' @param subid A regular expression pattern to match subject IDs
+#' @param ... Additional arguments passed to methods
+#' @return A logical mask volume
+#' @export
+#' @rdname brain_mask
+brain_mask <- function(x, subid, ...) {
+  UseMethod("brain_mask", x)
+}
+
 #' Search files in BIDS structure
 #' 
 #' This function searches for files in a BIDS project that match a specified pattern and
