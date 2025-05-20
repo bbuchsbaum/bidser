@@ -22,7 +22,8 @@ file_structure_df <- tibble::tribble(
   "02",   "test",   "func",    "taskA", "01", "events",     FALSE,     NA,        NA,        
   # Derivatives 
   "01",   NA,       "anat",    NA,      NA,   "T1w",        TRUE,      "preproc", "MNI",  
-  "01",   NA,       "func",    "taskA", "01", "bold",       TRUE,      "preproc", "MNI"
+"01",   NA,       "func",    "taskA", "01", "bold",       TRUE,      "preproc", "MNI",
+"01",   NA,       "func",    "taskA", "01", "desc-confounds_timeseries.tsv", TRUE, "confounds", NA,
 )
 
 # Define event data (paths must match generated structure)
@@ -41,13 +42,21 @@ event_data_list[[event_path_2]] <- tibble::tibble(
   onset = c(1.5, 5.5), duration = c(0.5, 0.5), trial_type = c("condC", "condD")
 )
 
+confound_data_list <- list()
+confound_data_list[[confound_relpath]] <- tibble::tibble(
+  CSF = c(0.1, 0.2),
+  WhiteMatter = c(0.3, 0.4)
+)
+
 # Construct expected derivative filenames/patterns
 # Filename generation helper needs extension in suffix arg
 deriv_anat_filename <- generate_bids_filename(subid = "01", suffix = "T1w.nii.gz", space="MNI", desc="preproc")
 deriv_func_filename <- generate_bids_filename(subid = "01", task = "taskA", run = "01", suffix = "bold.nii.gz", space="MNI", desc="preproc")
+confound_filename <- generate_bids_filename(subid = "01", task = "taskA", run = "01", desc = "confounds", suffix = "timeseries.tsv")
 
 deriv_anat_relpath <- file.path("derivatives", "mockprep", "sub-01", "anat", deriv_anat_filename)
 deriv_func_relpath <- file.path("derivatives", "mockprep", "sub-01", "func", deriv_func_filename)
+confound_relpath <- file.path("derivatives", "mockprep", "sub-01", "func", confound_filename)
 
 # --- Test Creation ---
 test_that("Mock BIDS project can be created", {
@@ -65,6 +74,7 @@ test_that("Mock BIDS project can be created", {
     participants = participants_df,
     file_structure = fs_for_create %>% select(-suffix) %>% rename(suffix=suffix_ext), # Pass suffix with extension
     event_data = event_data_list,
+    confound_data = confound_data_list,
     prep_dir = "derivatives/mockprep" # Use a distinct prep_dir for testing
   )
 
@@ -89,6 +99,7 @@ test_that("Basic queries work on mock BIDS project", {
     participants = participants_df,
     file_structure = fs_for_create %>% select(-suffix) %>% rename(suffix=suffix_ext),
     event_data = event_data_list,
+    confound_data = confound_data_list,
     prep_dir = "derivatives/mockprep"
   )
 
@@ -111,6 +122,7 @@ test_that("File searching methods work on mock BIDS project", {
     participants = participants_df,
     file_structure = fs_for_create %>% select(-suffix) %>% rename(suffix=suffix_ext),
     event_data = event_data_list,
+    confound_data = confound_data_list,
     prep_dir = "derivatives/mockprep"
   )
 
@@ -169,8 +181,9 @@ test_that("Event reading works on mock BIDS project", {
    mock_proj <- create_mock_bids(
     project_name = "MockTaskA",
     participants = participants_df,
-    file_structure = fs_for_create %>% select(-suffix) %>% rename(suffix=suffix_ext),
+   file_structure = fs_for_create %>% select(-suffix) %>% rename(suffix=suffix_ext),
     event_data = event_data_list,
+    confound_data = confound_data_list,
     prep_dir = "derivatives/mockprep"
   )
 
@@ -199,6 +212,34 @@ test_that("Event reading works on mock BIDS project", {
   expect_equal(nrow(events_all), 2) # Expect two rows (one per event file)
 })
 
+# --- Test Confound Utilities ---
+test_that("Confound reading works on mock BIDS project", {
+  fs_for_create <- file_structure_df %>%
+    mutate(suffix_ext = case_when(
+      suffix == "T1w" ~ "T1w.nii.gz",
+      suffix == "bold" ~ "bold.nii.gz",
+      suffix == "events" ~ "events.tsv",
+      TRUE ~ suffix
+    ))
+  mock_proj <- create_mock_bids(
+    project_name = "ConfoundTest",
+    participants = participants_df,
+    file_structure = fs_for_create %>% select(-suffix) %>% rename(suffix=suffix_ext),
+    event_data = event_data_list,
+    confound_data = confound_data_list,
+    prep_dir = "derivatives/mockprep"
+  )
+
+  cf <- confound_files(mock_proj, full_path = FALSE)
+  expect_equal(cf, confound_relpath)
+
+  conf <- read_confounds(mock_proj)
+  expect_s3_class(conf, "tbl_df")
+  expect_equal(nrow(conf), 1)
+  expect_equal(nrow(conf$data[[1]]), 2)
+  expect_true(all(c("CSF", "WhiteMatter") %in% names(conf$data[[1]])))
+})
+
 
 # --- Test Stub Creation (Optional) ---
 # This test writes to disk, might be skipped on CI or needs cleanup
@@ -221,6 +262,7 @@ test_that("Mock BIDS stub creation works (writes to temp)", {
     participants = participants_df,
     file_structure = fs_for_create %>% select(-suffix) %>% rename(suffix=suffix_ext),
     event_data = event_data_list,
+    confound_data = confound_data_list,
     create_stub = TRUE,
     stub_path = temp_stub_path,
     prep_dir = "derivatives/mockprep" # Match prep dir
@@ -275,6 +317,7 @@ test_that("Node attributes inspection", {
     participants = participants_df,
     file_structure = fs_for_create %>% select(-suffix) %>% rename(suffix=suffix_ext),
     event_data = event_data_list,
+    confound_data = confound_data_list,
     prep_dir = "derivatives/mockprep"
   )
   
