@@ -504,19 +504,9 @@ create_mock_bids <- function(project_name,
     relative_path <- file.path(relative_dir, filename)
 
     # Use bidser::encode to get canonical entities (important!)
-    # Requires bidser to be loaded or use :::
+    # Call directly and handle any errors
     encoded_entities <- tryCatch({
-        # Use internal encode if possible, otherwise assume global ::
-         if (exists("encode", envir = environment(create_mock_bids), inherits = FALSE)) {
-             result <- bidser::encode(filename)
-             result
-         } else {
-             # Fallback if running outside package context? Risky.
-              # This requires the bidser package to be loaded globally.
-             # A safer approach is to ensure this function is part of the bidser pkg.
-              result <- encode(filename) # Assumes bidser::encode is available
-              result
-         }
+        bidser::encode(filename)
     }, error = function(e) {
         warn(paste("Could not encode generated filename:", filename, " - May impact querying. Error:", e$message))
         # Fallback: use entities from file_structure row directly with standardized names
