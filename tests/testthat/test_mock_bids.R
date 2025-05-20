@@ -199,6 +199,76 @@ test_that("Event reading works on mock BIDS project", {
   expect_equal(nrow(events_all), 2) # Expect two rows (one per event file)
 })
 
+# --- Test Unmatched Queries and strict=FALSE ---
+test_that("Unmatched queries return NULL or empty tibble", {
+  fs_for_create <- file_structure_df %>%
+    mutate(suffix_ext = case_when(
+      suffix == "T1w" ~ "T1w.nii.gz",
+      suffix == "bold" ~ "bold.nii.gz",
+      suffix == "events" ~ "events.tsv",
+      TRUE ~ suffix
+    ))
+  mock_proj <- create_mock_bids(
+    project_name = "MockTaskA",
+    participants = participants_df,
+    file_structure = fs_for_create %>% select(-suffix) %>% rename(suffix = suffix_ext),
+    event_data = event_data_list,
+    prep_dir = "derivatives/mockprep"
+  )
+
+  # No subject "99" exists
+  expect_null(search_files(mock_proj, sub = "99"))
+  expect_null(event_files(mock_proj, subid = "99"))
+  expect_null(func_scans(mock_proj, subid = "99"))
+
+  empty_events <- read_events(mock_proj, sub = "99")
+  expect_s3_class(empty_events, "tbl_df")
+  expect_equal(nrow(empty_events), 0)
+})
+
+test_that("search_files strict=FALSE matches files with missing entities", {
+  fs_for_create <- file_structure_df %>%
+    mutate(suffix_ext = case_when(
+      suffix == "T1w" ~ "T1w.nii.gz",
+      suffix == "bold" ~ "bold.nii.gz",
+      suffix == "events" ~ "events.tsv",
+      TRUE ~ suffix
+    ))
+  mock_proj <- create_mock_bids(
+    project_name = "MockTaskA",
+    participants = participants_df,
+    file_structure = fs_for_create %>% select(-suffix) %>% rename(suffix = suffix_ext),
+    event_data = event_data_list,
+    prep_dir = "derivatives/mockprep"
+  )
+
+  # strict=TRUE should fail because T1w files lack a task attribute
+  strict_res <- search_files(
+    mock_proj,
+    sub = "01",
+    task = "taskA",
+    kind = "T1w",
+    regex = "\\.nii\\.gz$",
+    fmriprep = FALSE,
+    strict = TRUE,
+    full_path = FALSE
+  )
+  expect_null(strict_res)
+
+  lax_res <- search_files(
+    mock_proj,
+    sub = "01",
+    task = "taskA",
+    kind = "T1w",
+    regex = "\\.nii\\.gz$",
+    fmriprep = FALSE,
+    strict = FALSE,
+    full_path = FALSE
+  )
+  raw_t1w <- generate_bids_filename(subid = "01", suffix = "T1w.nii.gz")
+  expect_equal(lax_res, file.path("sub-01", "anat", raw_t1w))
+})
+
 
 # --- Test Stub Creation (Optional) ---
 # This test writes to disk, might be skipped on CI or needs cleanup
