@@ -388,23 +388,51 @@ tasks.bids_project <- function(x) {
 
 
 #' @importFrom stringr str_remove
+#' @importFrom stringr str_remove
 #' @export
 #' @rdname participants-method
 participants.bids_project <- function(x, ...) {
-  ids <- character(0)
+  collected_ids <- character(0)
 
-  # Prefer participant IDs from the participants.tsv file if available
+  # Get IDs from participants.tsv (part_df)
+  # These might or might not have "sub-" prefix.
   if (!is.null(x$part_df) && "participant_id" %in% names(x$part_df)) {
-    ids <- as.character(x$part_df$participant_id)
+    # Ensure participant_id is character and not NA
+    valid_part_ids <- x$part_df$participant_id[!is.na(x$part_df$participant_id)]
+    if (length(valid_part_ids) > 0) {
+      collected_ids <- c(collected_ids, as.character(valid_part_ids))
+    }
   }
 
-  # Also include any IDs parsed from the project table
-  if ("subid" %in% names(x$tbl)) {
-    ids <- c(ids, as.character(x$tbl$subid[!is.na(x$tbl$subid)]))
+  # Get IDs from parsed file structure (tbl)
+  # These are usually the numeric/alphanumeric part, e.g., "01", 
+  # and typically do not have the "sub-" prefix if parsed from "sub-01".
+  if (!is.null(x$tbl) && "subid" %in% names(x$tbl)) {
+    valid_subids_from_tbl <- x$tbl$subid[!is.na(x$tbl$subid)]
+    if (length(valid_subids_from_tbl) > 0) {
+      collected_ids <- c(collected_ids, as.character(valid_subids_from_tbl))
+    }
   }
 
-  ids <- unique(stringr::str_remove(ids, "^sub-"))
-  sort(ids)
+  if (length(collected_ids) == 0) {
+    return(character(0))
+  }
+
+  # Make unique first
+  unique_ids_before_stripping <- unique(collected_ids)
+  
+  # Remove "sub-" prefix if present from all collected IDs
+  ids_stripped <- stringr::str_remove(unique_ids_before_stripping, "^sub-")
+  
+  # Make unique again after stripping prefix to handle cases like ("sub-01", "01") -> ("01", "01") -> "01"
+  # Also remove any empty strings that might result from IDs like "sub-"
+  final_unique_ids <- unique(ids_stripped[nchar(ids_stripped) > 0])
+
+  if (length(final_unique_ids) == 0) {
+    return(character(0))
+  }
+  
+  sort(final_unique_ids)
 }
 
 

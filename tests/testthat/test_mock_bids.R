@@ -42,21 +42,22 @@ event_data_list[[event_path_2]] <- tibble::tibble(
   onset = c(1.5, 5.5), duration = c(0.5, 0.5), trial_type = c("condC", "condD")
 )
 
-confound_data_list <- list()
-confound_data_list[[confound_relpath]] <- tibble::tibble(
-  CSF = c(0.1, 0.2),
-  WhiteMatter = c(0.3, 0.4)
-)
-
 # Construct expected derivative filenames/patterns
 # Filename generation helper needs extension in suffix arg
 deriv_anat_filename <- generate_bids_filename(subid = "01", suffix = "T1w.nii.gz", space="MNI", desc="preproc")
 deriv_func_filename <- generate_bids_filename(subid = "01", task = "taskA", run = "01", suffix = "bold.nii.gz", space="MNI", desc="preproc")
-confound_filename <- generate_bids_filename(subid = "01", task = "taskA", run = "01", desc = "confounds", suffix = "timeseries.tsv")
 
 deriv_anat_relpath <- file.path("derivatives", "mockprep", "sub-01", "anat", deriv_anat_filename)
 deriv_func_relpath <- file.path("derivatives", "mockprep", "sub-01", "func", deriv_func_filename)
+
+# Define confound data (paths must match generated structure for derivatives)
+confound_filename <- generate_bids_filename(subid = "01", task = "taskA", run = "01", suffix = "timeseries.tsv", desc = "confounds")
 confound_relpath <- file.path("derivatives", "mockprep", "sub-01", "func", confound_filename)
+
+confound_data_list <- list()
+confound_data_list[[confound_relpath]] <- tibble::tibble(
+  CSF = c(0.1, 0.2), WhiteMatter = c(0.3, 0.4), GlobalSignal = c(0.5, 0.6)
+)
 
 # --- Test Creation ---
 test_that("Mock BIDS project can be created", {
@@ -212,8 +213,8 @@ test_that("Event reading works on mock BIDS project", {
   expect_equal(nrow(events_all), 2) # Expect two rows (one per event file)
 })
 
-# --- Test Confound Utilities ---
-test_that("Confound reading works on mock BIDS project", {
+# --- Test Unmatched Queries and strict=FALSE ---
+test_that("Unmatched queries return NULL or empty tibble", {
   fs_for_create <- file_structure_df %>%
     mutate(suffix_ext = case_when(
       suffix == "T1w" ~ "T1w.nii.gz",
@@ -222,22 +223,118 @@ test_that("Confound reading works on mock BIDS project", {
       TRUE ~ suffix
     ))
   mock_proj <- create_mock_bids(
+    project_name = "MockTaskA",
+    participants = participants_df,
+    file_structure = fs_for_create %>% select(-suffix) %>% rename(suffix = suffix_ext),
+    event_data = event_data_list,
+    prep_dir = "derivatives/mockprep"
+  )
+
+  # No subject "99" exists
+  expect_null(search_files(mock_proj, subid = "99")) # use subid
+  expect_null(event_files(mock_proj, subid = "99"))
+  expect_null(func_scans(mock_proj, subid = "99"))
+
+  empty_events <- read_events(mock_proj, subid = "99") # use subid
+  expect_s3_class(empty_events, "tbl_df")
+  expect_equal(nrow(empty_events), 0)
+})
+
+test_that("search_files strict=FALSE matches files with missing entities", {
+  fs_for_create <- file_structure_df %>%
+    mutate(suffix_ext = case_when(
+      suffix == "T1w" ~ "T1w.nii.gz",
+      suffix == "bold" ~ "bold.nii.gz",
+      suffix == "events" ~ "events.tsv",
+      TRUE ~ suffix
+    ))
+  mock_proj <- create_mock_bids(
+    project_name = "MockTaskA",
+    participants = participants_df,
+    file_structure = fs_for_create %>% select(-suffix) %>% rename(suffix = suffix_ext),
+    event_data = event_data_list,
+    prep_dir = "derivatives/mockprep"
+  )
+
+  # strict=TRUE should fail because T1w files lack a task attribute
+  strict_res <- search_files(
+    mock_proj,
+    subid = "01", # use subid
+    task = "taskA",
+    kind = "T1w",
+    regex = "\\\\.nii\\\\.gz$",
+    # fmriprep = FALSE, # search_files does not have fmriprep argument directly
+    strict = TRUE,
+    full_path = FALSE
+  )
+  expect_null(strict_res)
+
+  # To test strict=FALSE correctly, we expect it to find the T1w file for sub-01
+  # even though we are querying for task="taskA" which T1w files don't have.
+  # The search_files function should look in raw data by default unless fmriprep=TRUE is part of ...
+  # and then specifically handled by the internal logic of search_files.
+  # For this test, we're querying raw data (fmriprep=FALSE implied for T1w).
+  lax_res <- search_files(
+    mock_proj,
+    subid = "01", # use subid
+    task = "taskA", # T1w files won't have 'task'
+    kind = "T1w",
+    regex = "\\\\.nii\\\\.gz$",
+    strict = FALSE, # This allows matching even if 'task' is not an attribute of T1w
+    full_path = FALSE
+  )
+  raw_t1w_filename <- generate_bids_filename(subid = "01", suffix = "T1w.nii.gz")
+  # Expected path is in the raw data part of the mock project
+  expected_lax_path <- file.path("sub-01", "anat", raw_t1w_filename)
+  expect_equal(lax_res, expected_lax_path)
+})
+
+# --- Test Confound Utilities ---
+test_that("Confound reading works on mock BIDS project", {
+  fs_for_create <- file_structure_df %>%
+    mutate(suffix_ext = case_when(
+      suffix == "T1w" ~ "T1w.nii.gz",
+      suffix == "bold" ~ "bold.nii.gz",
+      suffix == "events" ~ "events.tsv",
+      TRUE ~ suffix # Fallback
+    ))
+  
+  # Ensure the file_structure_df includes a row for the confound file if create_mock_bids expects it
+  # Or, ensure create_mock_bids can handle confound_data pointing to files not explicitly in file_structure
+  # For this test, we assume create_mock_bids will use confound_data_list to populate the mock files
+  
+  mock_proj <- create_mock_bids(
     project_name = "ConfoundTest",
     participants = participants_df,
     file_structure = fs_for_create %>% select(-suffix) %>% rename(suffix=suffix_ext),
     event_data = event_data_list,
-    confound_data = confound_data_list,
+    confound_data = confound_data_list, # This will be used to create the mock confound file
     prep_dir = "derivatives/mockprep"
   )
 
-  cf <- confound_files(mock_proj, full_path = FALSE)
-  expect_equal(cf, confound_relpath)
+  # Test confound_files
+  # confound_files should find the mock confound file based on its path in confound_data_list keys
+  cf_files <- confound_files(mock_proj, full_path = FALSE)
+  expect_equal(length(cf_files), 1)
+  expect_equal(cf_files, confound_relpath) # Check against the predefined relative path
 
-  conf <- read_confounds(mock_proj)
-  expect_s3_class(conf, "tbl_df")
-  expect_equal(nrow(conf), 1)
-  expect_equal(nrow(conf$data[[1]]), 2)
-  expect_true(all(c("CSF", "WhiteMatter") %in% names(conf$data[[1]])))
+  # Test read_confounds
+  conf_tibble <- read_confounds(mock_proj) # Reads based on what confound_files finds
+  expect_s3_class(conf_tibble, "tbl_df")
+  expect_equal(nrow(conf_tibble), 1) # Expect one row for the single confound file
+  
+  # Check metadata columns
+  expect_true(all(c(".subid", ".task", ".run", ".desc", "data") %in% names(conf_tibble)))
+  expect_equal(conf_tibble$.subid[[1]], "01")
+  expect_equal(conf_tibble$.task[[1]], "taskA")
+  expect_equal(conf_tibble$.run[[1]], "01")
+  expect_equal(conf_tibble$.desc[[1]], "confounds")
+
+  # Check the nested data
+  expect_s3_class(conf_tibble$data[[1]], "tbl_df")
+  expect_equal(nrow(conf_tibble$data[[1]]), 2) # Based on our mock confound_data_list
+  expect_true(all(c("CSF", "WhiteMatter", "GlobalSignal") %in% names(conf_tibble$data[[1]])))
+  expect_equal(conf_tibble$data[[1]]$CSF, c(0.1, 0.2))
 })
 
 
