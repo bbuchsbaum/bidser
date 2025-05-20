@@ -343,6 +343,7 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*") 
 #' @param perc_var Perform PCA reduction to retain \code{perc_var}% variance.
 #' @param nest If TRUE, nests confound tables by subject/session/run.
 #' @import dplyr
+#' @importFrom readr read_tsv
 #' @importFrom tidyr nest
 #' @importFrom tidyselect any_of
 #' @return A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds.
@@ -397,7 +398,7 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
       
       # Read table
       dfx <- tryCatch({
-        read.table(fn, header=TRUE, na.strings=c("NA", "n/a"), stringsAsFactors=FALSE)
+        readr::read_tsv(fn, na=c("n/a", "NA"))
       }, error=function(e) {
         warning("Unable to read file: ", fn, " Error: ", e$message)
         return(NULL)
