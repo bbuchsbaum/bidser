@@ -519,7 +519,14 @@ func_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", sessi
 #' @keywords internal
 #' @noRd
 str_detect_null <- function(x, pat, default=FALSE) {
-  if (is.null(x) || is.na(x)) default else str_detect(x,pat)
+  if (is.null(x) || is.na(x)) {
+    return(default)
+  }
+  # Ensure x is character before passing to str_detect
+  if (!is.character(x)) {
+    x <- as.character(x)
+  }
+  stringr::str_detect(x, pat)
 }
 
 #' Get preprocessed scans from a BIDS project
@@ -673,8 +680,14 @@ key_match <- function(default=FALSE, ...) {
         return(TRUE)
       }
       
+      # Ensure x[[k]] is character if it's not NULL/NA, before passing to str_detect_null
+      node_val <- x[[k]]
+      if (!is.null(node_val) && !is.na(node_val) && !is.character(node_val)) {
+        node_val <- as.character(node_val)
+      }
+
       # Case 4: Use str_detect_null to match pattern
-      return(str_detect_null(x[[k]], keyvals[[k]], default))
+      return(str_detect_null(node_val, keyvals[[k]], default))
     }, logical(1)))
   }
 }
@@ -760,7 +773,16 @@ search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRU
   base_matcher <- key_match(default = !strict, !!!base_params)
   
   filter_fun <- function(z) {
-    if (!(z$isLeaf && str_detect(z$name, regex))) {
+    # Ensure z$name is a character string before using in str_detect
+    node_name <- z$name
+    if (is.null(node_name) || is.na(node_name)) {
+      return(FALSE) # Cannot match if name is missing
+    }
+    if (!is.character(node_name)) {
+      node_name <- as.character(node_name)
+    }
+
+    if (!(z$isLeaf && stringr::str_detect(node_name, regex))) {
       return(FALSE)
     }
     if (!base_matcher(z)) {
