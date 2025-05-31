@@ -3,6 +3,9 @@
 .RData
 .Ruserdata
 old
-repoxmix.*
+repomix.*
 Rplots.pdf
 .cursorrules
+repo.*
+bidser_cheatsheat.md
+
