@@ -495,6 +495,14 @@ create_mock_bids <- function(project_name,
     entities_clean$subid <- row$subid # Ensure subid is always passed
     entities_clean$suffix <- row$suffix # Ensure suffix is always passed
 
+    # If suffix already includes the desc prefix, avoid doubling it
+    if (!is.null(row$desc) && !is.na(row$desc)) {
+      prefix_check <- paste0("desc-", row$desc, "_")
+      if (startsWith(row$suffix, prefix_check)) {
+        entities_clean$desc <- NULL
+      }
+    }
+
     # Generate filename and path
     filename <- tryCatch({
         rlang::exec(generate_bids_filename, !!!entities_clean)
