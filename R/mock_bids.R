@@ -972,6 +972,12 @@ search_files.mock_bids_project <- function(x, regex = ".*", full_path = FALSE, s
        rlang::warn("'fmriprep' filter must be TRUE or FALSE. Ignoring.")
        fmriprep_filter <- NULL
     }
+  } else if (x$has_fmriprep) {
+    # Default behaviour: when derivatives exist but the caller did not specify
+    # the `fmriprep` argument, search raw files only.  This mirrors the
+    # behaviour expected in unit tests where strict=FALSE should still return
+    # raw files even if derivatives are present.
+    fmriprep_filter <- FALSE
   }
 
   # Define the filter function
@@ -1409,15 +1415,18 @@ read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
         .subid = nd$subid %||% nd$sub,
         .task = nd$task,
         .run = nd$run,
-        .session = nd$ses %||% nd$session
+        .session = nd$ses %||% nd$session,
+        .desc = nd$desc
       )
       meta$.subid <- meta$.subid %||% NA_character_
       meta$.task <- meta$.task %||% NA_character_
       meta$.run <- meta$.run %||% NA_character_
       meta$.session <- meta$.session %||% NA_character_
+      meta$.desc <- meta$.desc %||% NA_character_
     } else {
       meta <- list(.subid = NA_character_, .task = NA_character_,
-                   .run = NA_character_, .session = NA_character_)
+                   .run = NA_character_, .session = NA_character_,
+                   .desc = NA_character_)
     }
 
     combined_df <- dplyr::bind_cols(tibble::as_tibble(meta), tibble::as_tibble(conf_df))
@@ -1430,7 +1439,7 @@ read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
     return(final_df)
   }
 
-  grouping_vars <- intersect(c(".subid", ".task", ".run", ".session"), names(final_df))
+  grouping_vars <- intersect(c(".subid", ".task", ".run", ".session", ".desc"), names(final_df))
   final_df %>% dplyr::group_by(!!!rlang::syms(grouping_vars)) %>% tidyr::nest()
 }
 
