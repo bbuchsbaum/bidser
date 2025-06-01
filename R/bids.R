@@ -522,11 +522,7 @@ str_detect_null <- function(x, pat, default=FALSE) {
   if (is.null(x) || is.na(x)) {
     return(default)
   }
-  # Ensure x is character before passing to str_detect
-  if (!is.character(x)) {
-    x <- as.character(x)
-  }
-  stringr::str_detect(x, pat)
+  stringr::str_detect(as.character(x), pat)
 }
 
 #' Get preprocessed scans from a BIDS project
@@ -680,9 +676,9 @@ key_match <- function(default=FALSE, ...) {
         return(TRUE)
       }
       
-      # Ensure x[[k]] is character if it's not NULL/NA, before passing to str_detect_null
+      # Convert value to character when not NULL/NA before pattern matching
       node_val <- x[[k]]
-      if (!is.null(node_val) && !is.na(node_val) && !is.character(node_val)) {
+      if (!is.null(node_val) && !is.na(node_val)) {
         node_val <- as.character(node_val)
       }
 
