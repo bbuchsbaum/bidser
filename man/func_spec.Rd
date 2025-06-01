@@ -6,14 +6,15 @@
 \usage{
 func_spec()
 }
+\value{
+A list containing \code{keystruc}, \code{kinds}, and \code{type} describing
+functional files.
+}
 \description{
 The \code{spec} object describes pattern rules for matching BIDS filenames.
 It consists of a \code{keystruc} table and a \code{kinds} table. The \code{keystruc} table
 defines keys, their regex patterns, their optionality, etc. The \code{kinds} table
 defines allowed file kinds and their suffixes.
-}
-\value{
-A list containing \code{keystruc}, \code{kinds}, and \code{type} for functional files.
 }
 \examples{
 func_spec()

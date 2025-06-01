@@ -14,7 +14,6 @@
 \item{task}{Task regex}
 
 \item{session}{Session regex}
-
 }
 \value{
 A character vector of file paths

@@ -716,17 +716,6 @@ key_match <- function(default=FALSE, ...) {
 #' 
 #' # Get full paths
 #' full_paths <- search_files(proj, regex="events\\\\.tsv$", full_path=TRUE)
-#' @param regex a regular expression to match files
-#' @param full_path return full_path of files
-#' @param strict if `TRUE` require that a queried key must exist in match files. 
-#'     Otherwise, allow matches for files missing queried key.
-#' @param ... additional keys to match on (e.g. subid = "01", task="wm")
-#' @export
-#' @rdname search_files 
-#' @importFrom stringr str_detect
-#' @examples
-#'  proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
-#'  x = search_files(proj, regex="events")
 search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRUE, ...) {
   # Helper function to extract the relative path from a node
   extract_relative_path <- function(node) {
@@ -764,9 +753,9 @@ search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRU
   
   base_params <- search_params
   if (has_kind_param && search_params$kind == "bold") {
-    base_params$kind <- NULL 
+    base_params$kind <- NULL
   }
-  base_matcher <- key_match(default = !strict, !!!base_params)
+  base_matcher <- do.call(key_match, c(list(default = !strict), base_params))
   
   filter_fun <- function(z) {
     # Ensure z$name is a character string before using in str_detect
@@ -803,7 +792,7 @@ search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRU
         # might not be strictly needed if base_matcher handles all non-bold kind cases.
         # However, to be explicit for non-bold kind filtering:
         if (!is.null(search_params$kind)) { # ensure kind was actually passed
-            kind_matcher_specific <- key_match(default = !strict, kind = search_params$kind)
+            kind_matcher_specific <- do.call(key_match, list(default = !strict, kind = search_params$kind))
             if (!kind_matcher_specific(z)) {
                 return(FALSE)
             }
@@ -860,13 +849,13 @@ match_attribute <- function(x, ...) {
 #'
 #' @return A tibble combining all matched event files, with columns `.subid`, `.task`, `.run`, `.session`
 #' and all event columns. If no events are found, returns an empty tibble.
-#'
+#' @rdname load_all_events-method
 #' @importFrom dplyr bind_rows mutate
 #' @importFrom stringr str_match
 #' @importFrom readr read_tsv
 #' @importFrom tibble tibble
 #' @export
-load_all_events <- function(x, subid=".*", task=".*", run=".*", session=".*", full_path=TRUE, ...) {
+load_all_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session=".*", full_path=TRUE, ...) {
   # Find all events files matching criteria
   event_files <- search_files(x, regex="events\\.tsv$", full_path=full_path, strict=TRUE,
                               subid=subid, task=task, run=run, session=session, ...)
@@ -1032,11 +1021,10 @@ bids_check_compliance <- function(x) {
   # participants(x) should return strings like "sub-01", "sub-02", etc.
   
   for (sid in expected_subs) {
-    if (!dir.exists(file.path(x$path, sid))) {
-      issues <- c(issues, paste("Subject directory not found for:", sid))
-    }
-    if (!grepl("^sub-", sid)) {
-      issues <- c(issues, paste("Subject ID does not start with 'sub-':", sid))
+    # participants() returns IDs without "sub-" prefix, so add it for directory checking
+    sub_dir <- if (!grepl("^sub-", sid)) paste0("sub-", sid) else sid
+    if (!dir.exists(file.path(x$path, sub_dir))) {
+      issues <- c(issues, paste("Subject directory not found for:", sub_dir))
     }
   }
   
@@ -1045,7 +1033,9 @@ bids_check_compliance <- function(x) {
     # We assume sessions are directories inside subject directories
     # and should start with "ses-"
     for (sid in expected_subs) {
-      s_path <- file.path(x$path, sid)
+      # participants() returns IDs without "sub-" prefix, so add it for directory checking
+      sub_dir <- if (!grepl("^sub-", sid)) paste0("sub-", sid) else sid
+      s_path <- file.path(x$path, sub_dir)
       if (dir.exists(s_path)) {
         # list sessions
         sess_dirs <- list.dirs(s_path, recursive = FALSE, full.names = FALSE)
@@ -1061,7 +1051,7 @@ bids_check_compliance <- function(x) {
           for (ss in proj_sess) {
             sdir <- paste0("ses-", ss)
             if (!dir.exists(file.path(s_path, sdir))) {
-              issues <- c(issues, paste("Session directory not found for:", sdir, "in", sid))
+              issues <- c(issues, paste("Session directory not found for:", sdir, "in", sub_dir))
             }
             if (!grepl("^ses-", sdir)) {
               issues <- c(issues, paste("Session ID does not start with 'ses-':", sdir))

@@ -2,21 +2,28 @@
 % Please edit documentation in R/plot_bids_project.R
 \name{plot.bids_project}
 \alias{plot.bids_project}
+\alias{plot.mock_bids_project}
 \title{Plot a BIDS project as a dendrogram}
 \usage{
 \method{plot}{bids_project}(x, max_depth = Inf, ...)
+
+\method{plot}{mock_bids_project}(x, max_depth = Inf, ...)
 }
 \arguments{
-\item{x}{A \code{bids_project} object}
-\item{max_depth}{Maximum depth of the tree to display. Defaults to \code{Inf}.}
+\item{x}{A \code{bids_project} object.}
+
+\item{max_depth}{Maximum depth of the tree to display. Defaults to
+\code{Inf} so the full hierarchy is shown.}
+
 \item{...}{Additional arguments passed to \code{graphics::plot}.}
 }
 \value{
-The \code{bids_project} object \code{x} is returned invisibly.
+The input object \code{x} is returned invisibly.
 }
 \description{
-Visualise the hierarchical file structure of a BIDS project with a neat
-dendrogram. Large projects can be truncated by setting \code{max_depth}.
+This method visualises the hierarchical file structure of a BIDS
+project. The tree is converted to a dendrogram and drawn using base
+graphics. Large projects can be trimmed by setting a maximum depth.
 }
 \examples{
 \donttest{

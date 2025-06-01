@@ -25,9 +25,12 @@
 
 \item{session}{Session regex}
 
-\item{run}{Run regex}
+\item{run}{Run regex. If the run identifier cannot be extracted from
+the filename, the run value defaults to "1".}
 
-\item{cvars}{The names of the confound variables to select. Defaults to \code{DEFAULT_CVARS}. Canonical names like \code{"csf"} are resolved to matching columns across fmriprep versions.}
+\item{cvars}{The names of the confound variables to select. Defaults to \code{DEFAULT_CVARS}.
+Canonical names such as \code{"csf"} are automatically mapped to any
+matching column names found in the dataset using \code{CVARS_ALIASES}.}
 
 \item{npcs}{Perform PCA reduction on confounds and return \code{npcs} PCs.}
 
@@ -44,6 +47,7 @@ Reads in fmriprep confound tables for one or more subjects.
 \examples{
 \donttest{
 proj <- bids_project("/path/to/bids", fmriprep = TRUE)
+# canonical names automatically resolve to actual columns
 conf <- read_confounds(proj, cvars = c("csf", "framewise_displacement"))
 }
 }

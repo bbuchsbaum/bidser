@@ -9,7 +9,8 @@ optional_key(label, regex = "[A-Za-z0-9]+")
 \arguments{
 \item{label}{The label of the key to parse.}
 
-\item{regex}{A regex pattern that the key's value should match. Must be a single character string.}
+\item{regex}{A regex pattern that the key's value should match. Must be a
+single character string.}
 }
 \value{
 A parser that matches zero or more occurrences of \verb{_<label>-<id>}

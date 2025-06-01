@@ -28,11 +28,28 @@ plot.bids_project <- function(x, max_depth = Inf, ...) {
   if (is.finite(max_depth)) {
     data.tree::Prune(tree, pruneFun = function(node) node$level <= max_depth)
   }
-  dend <- data.tree::as.dendrogram(tree)
+  # Use data.tree's print method for visualization
+  print(tree)
+  
+  invisible(x)
+}
 
-  oldpar <- graphics::par(no.readonly = TRUE)
-  on.exit(graphics::par(oldpar))
-  graphics::plot(dend, horiz = TRUE, main = x$name, ...)
+#' @export
+#' @rdname plot.bids_project
+plot.mock_bids_project <- function(x, max_depth = Inf, ...) {
+  if (!inherits(x, "mock_bids_project")) {
+    stop("x must be a 'mock_bids_project' object")
+  }
+  if (!requireNamespace("data.tree", quietly = TRUE)) {
+    stop("Package 'data.tree' is required for plotting")
+  }
 
+  tree <- data.tree::Clone(x$bids_tree)
+  if (is.finite(max_depth)) {
+    data.tree::Prune(tree, pruneFun = function(node) node$level <= max_depth)
+  }
+  # Use data.tree's print method for visualization
+  print(tree)
+  
   invisible(x)
 }

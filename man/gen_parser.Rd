@@ -21,6 +21,6 @@ Given a match specification, generate a parser
 }
 \examples{
 spec <- func_spec()
-gen_parser(spec)
+parser <- gen_parser(spec)
 }
 \keyword{internal}

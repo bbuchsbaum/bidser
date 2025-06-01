@@ -449,7 +449,9 @@ func_scans <- function(x, ...) {
 #' # Get full paths to preprocessed scans
 #' full_paths <- preproc_scans(proj, full_path=TRUE)
 #' }
-preproc_scans <- function(x, ...) {
+preproc_scans <- function(x, subid = ".*", task = ".*", run = ".*", variant = NULL, 
+                          space = ".*", session = ".*", modality = "bold", 
+                          kind = ".*", full_path = FALSE, ...) {
   UseMethod("preproc_scans", x)
 }
 

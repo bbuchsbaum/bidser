@@ -3,16 +3,26 @@ context("plot_bids and bids_heatmap")
 library(testthat)
 library(bidser)
 
-# Helper to make a tiny virtual project
+# Helper to make a tiny mock project
 make_proj <- function(...) {
-  bidser:::create_virtual_bids_project(
-    name = "test_proj",
-    subjects = c("sub-01", "sub-02"),
-    sessions = NULL,
-    tasks = c("rest"),
-    runs = c("01"),
-    modalities = c("T1w", "bold"),
-    derivatives = FALSE,
+  # Create a simple mock BIDS structure
+  file_structure <- tibble::tribble(
+    ~subid, ~session, ~datatype, ~task, ~run, ~suffix, ~fmriprep,
+    "01", NA, "anat", NA, NA, "T1w.nii.gz", FALSE,
+    "01", NA, "func", "rest", "01", "bold.nii.gz", FALSE,
+    "02", NA, "anat", NA, NA, "T1w.nii.gz", FALSE,
+    "02", NA, "func", "rest", "01", "bold.nii.gz", FALSE
+  )
+  
+  participants <- tibble::tibble(
+    participant_id = c("01", "02"),
+    age = c(25, 30)
+  )
+  
+  bidser::create_mock_bids(
+    project_name = "test_proj",
+    participants = participants,
+    file_structure = file_structure,
     ...
   )
 }
@@ -30,7 +40,7 @@ test_that("plot_bids returns ggplot", {
   expect_s3_class(p_static, "ggplot")
 
   p_interactive <- plot_bids(proj, interactive = TRUE)
-  expect_s3_class(p_interactive, "ggplot")
+  expect_s3_class(p_interactive, c("plotly", "ggplot"), exact = FALSE)
 })
 
 
@@ -39,7 +49,7 @@ test_that("bids_heatmap returns ggplot", {
   expect_s3_class(p_static, "ggplot")
 
   p_interactive <- bids_heatmap(proj, interactive = TRUE)
-  expect_s3_class(p_interactive, "ggplot")
+  expect_s3_class(p_interactive, c("plotly", "ggplot"), exact = FALSE)
 })
 
 

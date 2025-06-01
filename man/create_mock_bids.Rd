@@ -10,6 +10,7 @@ create_mock_bids(
   file_structure,
   dataset_description = NULL,
   event_data = list(),
+  confound_data = list(),
   create_stub = FALSE,
   stub_path = NULL,
   prep_dir = "derivatives/fmriprep"
@@ -37,6 +38,11 @@ content. Defaults to a minimal valid description.}
 and values are the corresponding \code{tibble} or \code{data.frame} content for
 those files. These paths must correspond to files defined in \code{file_structure}
 with a \code{suffix} like "events.tsv".}
+
+\item{confound_data}{A named list where names are relative paths of
+confound TSV files within the derivatives directory and values are
+their \code{tibble} or \code{data.frame} content. Paths must match files defined
+in \code{file_structure}.}
 
 \item{create_stub}{Logical (default \code{FALSE}). If \code{TRUE}, write a stub BIDS
 directory structure to disk at \code{stub_path}. Zero-byte files are created

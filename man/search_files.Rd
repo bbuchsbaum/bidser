@@ -7,25 +7,20 @@
 \usage{
 search_files(x, ...)
 
-\method{search_files}{bids_project}(
-  x,
-  regex = ".*",
-  full_path = FALSE,
-  strict = TRUE,
-  ...
-)
+\method{search_files}{bids_project}(x, regex = ".*", full_path = FALSE, strict = TRUE, ...)
 }
 \arguments{
 \item{x}{A \code{bids_project} object.}
 
-\item{...}{additional keys to match on (e.g. subid = "01", task="wm")}
+\item{...}{Additional key-value pairs to filter files (e.g., subid = "01", task = "wm").
+These are matched against the corresponding metadata in the BIDS files.}
 
-\item{regex}{a regular expression to match files}
+\item{regex}{A regular expression to match against filenames. Default is ".*" (all files).}
 
-\item{full_path}{return full_path of files}
+\item{full_path}{If TRUE, return full file paths. If FALSE, return paths relative to the project root.}
 
-\item{strict}{if \code{TRUE} require that a queried key must exist in match files.
-Otherwise, allow matches for files missing queried key.}
+\item{strict}{If TRUE, require that all queried keys must exist in matched files.
+If FALSE, allow matches for files missing queried keys.}
 }
 \value{
 A character vector of file paths matching the criteria, or NULL if no matches found.
@@ -63,6 +58,4 @@ sub01_files <- search_files(proj, regex="bold\\\\\\\\.nii\\\\\\\\.gz$", subid="0
 
 # Get full paths
 full_paths <- search_files(proj, regex="events\\\\\\\\.tsv$", full_path=TRUE)
- proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
- x = search_files(proj, regex="events")
 }

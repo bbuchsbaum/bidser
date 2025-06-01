@@ -6,11 +6,12 @@
 \usage{
 funcprepspec()
 }
+\value{
+A list containing \code{keystruc}, \code{kinds}, and \code{type} describing
+fMRIPrep functional files.
+}
 \description{
 Create a spec table for fMRIPrep "func" files
-}
-\value{
-A list containing \code{keystruc}, \code{kinds}, and \code{type} for fMRIPrep functional files.
 }
 \examples{
 funcprepspec()

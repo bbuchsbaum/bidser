@@ -267,7 +267,7 @@ resolve_cvars <- function(cvars, col_names, rename = FALSE) {
   res <- character()
   for (cv in cvars) {
     # find canonical entry containing this name
-    canon <- names(CVARS_ALIASES)[sapply(CVARS_ALIASES, function(a) cv %in% c(cv, a))]
+    canon <- names(CVARS_ALIASES)[sapply(CVARS_ALIASES, function(a) cv %in% a)]
     if (length(canon) == 0) {
       canon <- cv
       aliases <- cv

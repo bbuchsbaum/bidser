@@ -496,7 +496,7 @@ create_mock_bids <- function(project_name,
     entities_clean$suffix <- row$suffix # Ensure suffix is always passed
 
     # If suffix already includes the desc prefix, avoid doubling it
-    if (!is.null(row$desc) && !is.na(row$desc)) {
+    if ("desc" %in% names(row) && !is.null(row$desc) && !is.na(row$desc)) {
       prefix_check <- paste0("desc-", row$desc, "_")
       if (startsWith(row$suffix, prefix_check)) {
         entities_clean$desc <- NULL
@@ -618,6 +618,9 @@ create_mock_bids <- function(project_name,
       leaf_node[[entity_name]] <- encoded_entities[[entity_name]]
     }
     
+    # Add datatype from row for compatibility with plot functions
+    leaf_node$datatype <- row$datatype
+    
     # Ensure both 'sub' and 'subid' are present for consistent searching
     if ("sub" %in% names(encoded_entities) && !("subid" %in% names(encoded_entities))) {
       leaf_node$subid <- encoded_entities$sub
@@ -737,6 +740,94 @@ create_mock_bids <- function(project_name,
   }
 
   # --- Construct Mock Project Object ---
+  
+  # Create raw data table from the bids_tree
+  raw_data_rows <- list()
+  leaf_nodes <- data.tree::Traverse(bids_tree, filterFun = function(n) n$isLeaf)
+  
+  for (node in leaf_nodes) {
+    if (!is.null(node$relative_path)) {
+      row_data <- list(
+        path = node$relative_path,
+        name = node$name,
+        subid = node$subid %||% node$sub,
+        session = node$session %||% node$ses,
+        task = node$task,
+        run = node$run,
+        type = if (!is.null(node$datatype)) {
+          node$datatype
+        } else if (!is.null(node$kind)) {
+          # Map kind to type for compatibility
+          if (node$kind %in% c("T1w", "T2w", "FLAIR")) "anat"
+          else if (node$kind == "bold") "func"
+          else if (node$kind == "events") "func"
+          else node$kind
+        } else {
+          # Guess from path
+          if (grepl("/anat/", node$relative_path)) "anat"
+          else if (grepl("/func/", node$relative_path)) "func"
+          else if (grepl("/dwi/", node$relative_path)) "dwi"
+          else if (grepl("/fmap/", node$relative_path)) "fmap"
+          else "other"
+        },
+        kind = node$kind,
+        suffix = node$suffix,
+        extension = if (!is.null(node$extension)) node$extension else {
+          # Extract extension from filename
+          ext_match <- regmatches(node$name, regexpr("\\.[^.]+$", node$name))
+          if (length(ext_match) > 0) ext_match else NA
+        },
+        file_size = runif(1, 1e6, 50e6) # Random file size for mock
+      )
+      
+      # Add any other attributes from the node, but skip complex types
+      node_attrs <- node$attributes
+      for (attr_name in names(node_attrs)) {
+        if (!attr_name %in% c("name", "relative_path", "children", "parent", "path", "isLeaf", "level") &&
+            !attr_name %in% names(row_data)) {
+          attr_val <- node_attrs[[attr_name]]
+          # Skip complex types that can't be in a data frame
+          if (!is.environment(attr_val) && !is.function(attr_val) && !inherits(attr_val, "Node")) {
+            row_data[[attr_name]] <- attr_val
+          }
+        }
+      }
+      
+      raw_data_rows[[length(raw_data_rows) + 1]] <- row_data
+    }
+  }
+  
+  # Convert to data frame
+  if (length(raw_data_rows) > 0) {
+    raw_data_df <- do.call(rbind, lapply(raw_data_rows, function(x) {
+      # Convert list to data frame row, handling NULLs
+      x[sapply(x, is.null)] <- NA
+      as.data.frame(x, stringsAsFactors = FALSE)
+    }))
+  } else {
+    # Empty data frame with expected columns
+    raw_data_df <- data.frame(
+      path = character(),
+      name = character(),
+      subid = character(),
+      session = character(),
+      task = character(),
+      run = character(),
+      type = character(),
+      kind = character(),
+      suffix = character(),
+      extension = character(),
+      file_size = numeric(),
+      stringsAsFactors = FALSE
+    )
+  }
+  
+  # Get unique subjects, sessions, tasks, runs
+  unique_subjects <- unique(na.omit(raw_data_df$subid))
+  unique_sessions <- if (has_sessions) unique(na.omit(raw_data_df$session)) else character()
+  unique_tasks <- unique(na.omit(raw_data_df$task))
+  unique_runs <- unique(na.omit(raw_data_df$run))
+  
   mock_project <- structure(
     list(
       name = project_name,
@@ -746,9 +837,18 @@ create_mock_bids <- function(project_name,
       event_data_store = event_data_store,
       confound_data_store = confound_data_store,
       path = if (create_stub) actual_stub_path else paste0("mock://", project_name), # Indicate mock path
+      root = if (create_stub) actual_stub_path else paste0("mock://", project_name),
       has_sessions = has_sessions,
       has_fmriprep = has_fmriprep,
-      prep_dir = prep_dir
+      prep_dir = prep_dir,
+      # Add fields expected by plot functions
+      tbl = raw_data_df,
+      raw_data = raw_data_df,
+      subjects = unique_subjects,
+      sessions = unique_sessions,
+      tasks = unique_tasks,
+      runs = unique_runs,
+      is_virtual = TRUE
     ),
     class = c("mock_bids_project", "list") # Inherit from list for basic access
   )
@@ -948,10 +1048,10 @@ search_files.mock_bids_project <- function(x, regex = ".*", full_path = FALSE, s
   
   # Handle parameter name conversion
   # Map 'sub' to 'subid' and vice versa to handle inconsistencies in storage vs search
+  # Only duplicate if not already present to avoid confusion
   if("subid" %in% names(dots) && !("sub" %in% names(dots))) { 
     dots$sub <- dots$subid  # When user passes subid, also check sub
-  }
-  if("sub" %in% names(dots) && !("subid" %in% names(dots))) {
+  } else if("sub" %in% names(dots) && !("subid" %in% names(dots))) {
     dots$subid <- dots$sub  # When user passes sub, also check subid
   }
   
@@ -1375,8 +1475,11 @@ confound_files.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 
 
 #' Read Confound Files (Mock Implementation)
-#' @inheritParams search_files.mock_bids_project
 #' @param x A `mock_bids_project` object.
+#' @param subid Regex pattern for subject IDs. Default `".*"`.
+#' @param task Regex pattern for task names. Default `".*"`.
+#' @param session Regex pattern for session IDs. Default `".*"`.
+#' @param run Regex pattern for run indices. Default `".*"`.
 #' @param cvars Variables to select (ignored in mock).
 #' @param npcs PCA components (ignored in mock).
 #' @param perc_var PCA variance (ignored in mock).

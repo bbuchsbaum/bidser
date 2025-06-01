@@ -4,12 +4,22 @@
 \alias{preproc_scans}
 \title{Get preprocessed functional MRI scans}
 \usage{
-preproc_scans(x, ...)
+preproc_scans(
+  x,
+  subid = ".*",
+  task = ".*",
+  run = ".*",
+  variant = NULL,
+  space = ".*",
+  session = ".*",
+  modality = "bold",
+  kind = ".*",
+  full_path = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{bids_project} object}
-
-\item{...}{Additional arguments passed to internal functions}
 
 \item{subid}{Subject ID regex to match specific subjects (default: ".*" for all subjects)}
 
@@ -28,6 +38,8 @@ preproc_scans(x, ...)
 \item{kind}{Kind regex to match specific kinds (default: ".*" for all kinds)}
 
 \item{full_path}{If TRUE, return full file paths; if FALSE, return paths relative to the project root (default: FALSE)}
+
+\item{...}{Additional arguments passed to internal functions}
 }
 \value{
 A character vector of file paths to preprocessed functional scans matching the criteria.

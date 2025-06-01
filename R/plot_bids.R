@@ -36,25 +36,31 @@
 #' # Or use the specialized heatmap function
 #' bids_heatmap(proj)
 #'
-#' # Create a virtual project and visualize it
-#' virtual_proj <- bids_structure(
-#'   name = "my_project",
-#'   subjects = c("01", "02", "03"),
-#'   sessions = c("pre", "post"),
-#'   tasks = c("rest", "task1", "task2"),
-#'   runs = c(1, 2),
-#'   include_fmriprep = TRUE
+#' # Create a mock project and visualize it
+#' file_structure <- data.frame(
+#'   subid = c("01", "02", "03"),
+#'   session = c("pre", "post", "pre"),
+#'   datatype = c("anat", "func", "func"),
+#'   task = c(NA, "rest", "task1"),
+#'   run = c(NA, "01", "02"),
+#'   suffix = c("T1w.nii.gz", "bold.nii.gz", "bold.nii.gz"),
+#'   fmriprep = FALSE
 #' )
-#' plot_bids(virtual_proj, highlight_missing = TRUE)
+#' mock_proj <- create_mock_bids(
+#'   project_name = "my_project",
+#'   participants = c("sub-01", "sub-02", "sub-03"),
+#'   file_structure = file_structure
+#' )
+#' plot_bids(mock_proj, highlight_missing = TRUE)
 #' }
 plot_bids <- function(x, interactive = TRUE, color_scheme = "viridis",
                       include_derivatives = TRUE, file_size_scale = "log",
                       highlight_missing = TRUE, visualization_mode = "standard",
                       debug = FALSE) {
   
-  # Check input
-  if (!inherits(x, "bids_project")) {
-    stop("Input must be a bids_project object")
+  # Check input - accept both bids_project and mock_bids_project
+  if (!inherits(x, "bids_project") && !inherits(x, "mock_bids_project")) {
+    stop("Input must be a bids_project or mock_bids_project object")
   }
   
   # Load required packages
@@ -425,8 +431,8 @@ plot_bids <- function(x, interactive = TRUE, color_scheme = "viridis",
 #' @return A list containing project info and formatted data
 #' @keywords internal
 prepare_bids_data_for_plot <- function(x, include_derivatives = TRUE) {
-  if (!inherits(x, "bids_project")) {
-    stop("Input must be a bids_project object")
+  if (!inherits(x, "bids_project") && !inherits(x, "mock_bids_project")) {
+    stop("Input must be a bids_project or mock_bids_project object")
   }
   
   # Extract project information
@@ -521,7 +527,7 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
       # Plot
       p <- ggplot(completeness_data, aes(x = subid, y = interaction(session, task), 
                                          fill = total_size)) +
-        geom_tile(color = "white", size = 0.2) +
+        geom_tile(color = "white", linewidth = 0.2) +
         scale_fill_viridis_c(option = color_scheme, name = "Data Size (bytes)", 
                              trans = "log10", na.value = "grey90") +
         labs(
@@ -551,7 +557,7 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
       # Plot
       p <- ggplot(completeness_data, aes(x = subid, y = interaction(session, type),
                                          fill = total_size)) +
-        geom_tile(color = "white", size = 0.2) +
+        geom_tile(color = "white", linewidth = 0.2) +
         scale_fill_viridis_c(option = color_scheme, name = "Data Size (bytes)",
                              trans = "log10", na.value = "grey90") +
         labs(
@@ -585,7 +591,7 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
       
       # Plot
       p <- ggplot(completeness_data, aes(x = subid, y = task, fill = total_size)) +
-        geom_tile(color = "white", size = 0.2) +
+        geom_tile(color = "white", linewidth = 0.2) +
         scale_fill_viridis_c(option = color_scheme, name = "Data Size (bytes)",
                              trans = "log10", na.value = "grey90") +
         labs(
@@ -614,7 +620,7 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
       
       # Plot
       p <- ggplot(completeness_data, aes(x = subid, y = type, fill = total_size)) +
-        geom_tile(color = "white", size = 0.2) +
+        geom_tile(color = "white", linewidth = 0.2) +
         scale_fill_viridis_c(option = color_scheme, name = "Data Size (bytes)",
                              trans = "log10", na.value = "grey90") +
         labs(
@@ -884,9 +890,9 @@ plot_bids_structure <- function(data, color_scheme = "viridis") {
 bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type="func",
                         highlight_missing=TRUE, text_size=2.5, rotate_labels=TRUE) {
   
-  # Check input
-  if (!inherits(x, "bids_project")) {
-    stop("Input must be a bids_project object")
+  # Check input - accept both bids_project and mock_bids_project
+  if (!inherits(x, "bids_project") && !inherits(x, "mock_bids_project")) {
+    stop("Input must be a bids_project or mock_bids_project object")
   }
   
   # Prepare data
@@ -964,7 +970,7 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
       # Create the plot - THIS IS THE MAIN VISUALIZATION
       # x-axis: subject, y-axis: task/run, facet by session, color by file size
       p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = subid, y = task_run, fill = file_size)) +
-        ggplot2::geom_tile(color = "white", size = 0.2, 
+        ggplot2::geom_tile(color = "white", linewidth = 0.2, 
                  ggplot2::aes(alpha = ifelse(file_size == 0, 0.3, 1))) +
         ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
                             trans = "log10", na.value = "grey90",
@@ -1023,7 +1029,7 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
       # Create the plot - THIS IS THE MAIN VISUALIZATION
       # x-axis: subject, y-axis: task/run, color by file size
       p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = subid, y = task_run, fill = file_size)) +
-        ggplot2::geom_tile(color = "white", size = 0.2, 
+        ggplot2::geom_tile(color = "white", linewidth = 0.2, 
                  ggplot2::aes(alpha = ifelse(file_size == 0, 0.3, 1))) +
         ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
                             trans = "log10", na.value = "grey90",
@@ -1095,7 +1101,7 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
       
       # Create the plot
       p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = subid, y = kind, fill = file_size)) +
-        ggplot2::geom_tile(color = "white", size = 0.2, 
+        ggplot2::geom_tile(color = "white", linewidth = 0.2, 
                  ggplot2::aes(alpha = ifelse(file_size == 0, 0.3, 1))) +
         ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
                             trans = "log10", na.value = "grey90",
@@ -1152,7 +1158,7 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
       
       # Create the plot
       p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = subid, y = kind, fill = file_size)) +
-        ggplot2::geom_tile(color = "white", size = 0.2, 
+        ggplot2::geom_tile(color = "white", linewidth = 0.2, 
                  ggplot2::aes(alpha = ifelse(file_size == 0, 0.3, 1))) +
         ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
                             trans = "log10", na.value = "grey90",
@@ -1188,7 +1194,7 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
     
     # Create the plot
     p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = subid, y = 1, fill = file_size)) +
-      ggplot2::geom_tile(color = "white", size = 0.2) +
+      ggplot2::geom_tile(color = "white", linewidth = 0.2) +
       ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
                           trans = "log10", na.value = "grey90",
                           labels = scales::label_bytes(units = "MB")) +
@@ -1298,7 +1304,7 @@ plot_bids_heatmap <- function(data, color_scheme = "viridis", highlight_missing 
   heatmap_data$subid <- factor(heatmap_data$subid, levels = sort(unique(heatmap_data$subid)))
 
   p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = subid, y = label, fill = file_size)) +
-    ggplot2::geom_tile(color = "white", size = 0.2,
+    ggplot2::geom_tile(color = "white", linewidth = 0.2,
                        ggplot2::aes(alpha = ifelse(missing, 0.3, 1))) +
     ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
                                   trans = "log10", na.value = "grey90",
@@ -1374,8 +1380,11 @@ create_virtual_bids_project <- function(name = "Virtual Project",
                                         modalities = c("T1w", "bold"),
                                         derivatives = FALSE) {
   
-  # Create an empty structure
-  structure <- bidser::bids_structure()
+  # Create a mock BIDS structure using create_mock_bids
+  warning("create_virtual_bids_project is deprecated. Use create_mock_bids instead.")
+  
+  # Build file structure data frame
+  file_structure <- data.frame()
   
   # Function to randomly skip some files to create an incomplete dataset
   should_include <- function() {
@@ -1383,113 +1392,147 @@ create_virtual_bids_project <- function(name = "Virtual Project",
     runif(1) < 0.8
   }
   
-  # Add anatomical files
+  # Build the file structure data frame
   for (sub in subjects) {
+    # Remove "sub-" prefix for the data frame
+    sub_id <- gsub("^sub-", "", sub)
+    
     if (!is.null(sessions) && length(sessions) > 0) {
       for (ses in sessions) {
+        # Add anatomical files
         for (mod in modalities) {
           if (mod %in% c("T1w", "T2w") && should_include()) {
-            file_path <- file.path(sub, ses, "anat", 
-                                  paste0(sub, "_", ses, "_", mod, ".nii.gz"))
-            structure <- structure$add_node(file_path)
+            file_structure <- rbind(file_structure, data.frame(
+              subid = sub_id,
+              session = ses,
+              datatype = "anat",
+              task = NA,
+              run = NA,
+              suffix = paste0(mod, ".nii.gz"),
+              fmriprep = FALSE,
+              stringsAsFactors = FALSE
+            ))
           }
         }
-      }
-    } else {
-      for (mod in modalities) {
-        if (mod %in% c("T1w", "T2w") && should_include()) {
-          file_path <- file.path(sub, "anat", 
-                                paste0(sub, "_", mod, ".nii.gz"))
-          structure <- structure$add_node(file_path)
-        }
-      }
-    }
-  }
-  
-  # Add functional files
-  for (sub in subjects) {
-    if (!is.null(sessions) && length(sessions) > 0) {
-      for (ses in sessions) {
+        
+        # Add functional files
         for (task in tasks) {
           for (run in runs) {
             if ("bold" %in% modalities && should_include()) {
-              file_path <- file.path(sub, ses, "func", 
-                                    paste0(sub, "_", ses, "_task-", task, 
-                                          "_run-", run, "_bold.nii.gz"))
-              structure <- structure$add_node(file_path)
+              file_structure <- rbind(file_structure, data.frame(
+                subid = sub_id,
+                session = ses,
+                datatype = "func",
+                task = task,
+                run = run,
+                suffix = "bold.nii.gz",
+                fmriprep = FALSE,
+                stringsAsFactors = FALSE
+              ))
             }
           }
         }
-      }
-    } else {
-      for (task in tasks) {
-        for (run in runs) {
-          if ("bold" %in% modalities && should_include()) {
-            file_path <- file.path(sub, "func", 
-                                  paste0(sub, "_task-", task, 
-                                        "_run-", run, "_bold.nii.gz"))
-            structure <- structure$add_node(file_path)
-          }
-        }
-      }
-    }
-  }
-  
-  # Construct the project object
-  project <- list(
-    name = name,
-    root = paste0("/virtual/", name),
-    structure = structure,
-    is_virtual = TRUE
-  )
-  
-  # Add derivatives if requested
-  if (derivatives) {
-    derivatives_structure <- bidser::bids_structure()
-    
-    for (sub in subjects) {
-      if (!is.null(sessions) && length(sessions) > 0) {
-        for (ses in sessions) {
+        
+        # Add derivative files if requested
+        if (derivatives) {
           for (task in tasks) {
             for (run in runs) {
               if (should_include()) {
-                file_path <- file.path("derivatives", "fmriprep", sub, ses, "func", 
-                                      paste0(sub, "_", ses, "_task-", task, 
-                                            "_run-", run, "_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz"))
-                derivatives_structure <- derivatives_structure$add_node(file_path)
+                file_structure <- rbind(file_structure, data.frame(
+                  subid = sub_id,
+                  session = ses,
+                  datatype = "func",
+                  task = task,
+                  run = run,
+                  suffix = "bold.nii.gz",
+                  fmriprep = TRUE,
+                  space = "MNI152NLin2009cAsym",
+                  desc = "preproc",
+                  stringsAsFactors = FALSE
+                ))
               }
             }
           }
         }
-      } else {
+      }
+    } else {
+      # No sessions
+      # Add anatomical files
+      for (mod in modalities) {
+        if (mod %in% c("T1w", "T2w") && should_include()) {
+          file_structure <- rbind(file_structure, data.frame(
+            subid = sub_id,
+            session = NA,
+            datatype = "anat",
+            task = NA,
+            run = NA,
+            suffix = paste0(mod, ".nii.gz"),
+            fmriprep = FALSE,
+            stringsAsFactors = FALSE
+          ))
+        }
+      }
+      
+      # Add functional files
+      for (task in tasks) {
+        for (run in runs) {
+          if ("bold" %in% modalities && should_include()) {
+            file_structure <- rbind(file_structure, data.frame(
+              subid = sub_id,
+              session = NA,
+              datatype = "func",
+              task = task,
+              run = run,
+              suffix = "bold.nii.gz",
+              fmriprep = FALSE,
+              stringsAsFactors = FALSE
+            ))
+          }
+        }
+      }
+      
+      # Add derivative files if requested
+      if (derivatives) {
         for (task in tasks) {
           for (run in runs) {
             if (should_include()) {
-              file_path <- file.path("derivatives", "fmriprep", sub, "func", 
-                                    paste0(sub, "_task-", task, 
-                                          "_run-", run, "_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz"))
-              derivatives_structure <- derivatives_structure$add_node(file_path)
+              file_structure <- rbind(file_structure, data.frame(
+                subid = sub_id,
+                session = NA,
+                datatype = "func",
+                task = task,
+                run = run,
+                suffix = "bold.nii.gz",
+                fmriprep = TRUE,
+                space = "MNI152NLin2009cAsym",
+                desc = "preproc",
+                stringsAsFactors = FALSE
+              ))
             }
           }
         }
       }
     }
-    
-    project$derivatives <- derivatives_structure
   }
   
-  # Add class and generate raw data table with random file sizes
-  class(project) <- "bids_project"
+  # Create participants data frame
+  # Remove "sub-" prefix from subjects
+  subject_ids <- gsub("^sub-", "", subjects)
+  participants <- data.frame(
+    participant_id = subjects,
+    stringsAsFactors = FALSE
+  )
   
-  # Get the raw data table
-  raw_data <- bidser::raw_data(project)
+  # Create the mock BIDS project using create_mock_bids
+  mock_project <- bidser::create_mock_bids(
+    project_name = name,
+    participants = participants,
+    file_structure = file_structure,
+    prep_dir = if (derivatives) "derivatives/fmriprep" else NULL
+  )
   
-  # Add simulated file sizes (in bytes) for testing visualization
-  raw_data <- raw_data %>%
-    dplyr::mutate(file_size = round(runif(dplyr::n(), 1e6, 50e6)))
+  # Copy some properties for compatibility with old code
+  mock_project$is_virtual <- TRUE
   
-  # Store the raw data with file sizes
-  project$raw_data <- raw_data
-  
-  return(project)
+  return(mock_project)
 } 

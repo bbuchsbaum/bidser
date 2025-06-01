@@ -6,11 +6,12 @@
 \usage{
 anat_spec()
 }
+\value{
+A list containing \code{keystruc}, \code{kinds}, and \code{type} describing
+anatomical files.
+}
 \description{
 Create a spec table for "anat" files
-}
-\value{
-A list containing \code{keystruc}, \code{kinds}, and \code{type} for anatomical files.
 }
 \examples{
 anat_spec()

@@ -56,15 +56,21 @@ plot_bids(proj, visualization_mode = "complete")
 # Or use the specialized heatmap function
 bids_heatmap(proj)
 
-# Create a virtual project and visualize it
-virtual_proj <- bids_structure(
-  name = "my_project",
-  subjects = c("01", "02", "03"),
-  sessions = c("pre", "post"),
-  tasks = c("rest", "task1", "task2"),
-  runs = c(1, 2),
-  include_fmriprep = TRUE
+# Create a mock project and visualize it
+file_structure <- data.frame(
+  subid = c("01", "02", "03"),
+  session = c("pre", "post", "pre"),
+  datatype = c("anat", "func", "func"),
+  task = c(NA, "rest", "task1"),
+  run = c(NA, "01", "02"),
+  suffix = c("T1w.nii.gz", "bold.nii.gz", "bold.nii.gz"),
+  fmriprep = FALSE
 )
-plot_bids(virtual_proj, highlight_missing = TRUE)
+mock_proj <- create_mock_bids(
+  project_name = "my_project",
+  participants = c("sub-01", "sub-02", "sub-03"),
+  file_structure = file_structure
+)
+plot_bids(mock_proj, highlight_missing = TRUE)
 }
 }

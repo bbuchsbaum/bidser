@@ -20,18 +20,26 @@
 \arguments{
 \item{x}{A \code{mock_bids_project} object.}
 
+\item{subid}{Regex pattern for subject IDs. Default \code{".*"}.}
+
+\item{task}{Regex pattern for task names. Default \code{".*"}.}
+
+\item{session}{Regex pattern for session IDs. Default \code{".*"}.}
+
+\item{run}{Regex pattern for run indices. Default \code{".*"}.}
+
 \item{cvars}{Variables to select (ignored in mock).}
 
 \item{npcs}{PCA components (ignored in mock).}
 
 \item{perc_var}{PCA variance (ignored in mock).}
 
-\item{nest}{Nest output (ignored in mock, returns NULL).}
+\item{nest}{If \code{TRUE}, returns a nested tibble keyed by subject, session and run.}
 
 \item{...}{Additional BIDS entities (passed to \code{search_files}).}
 }
 \value{
-NULL (or potentially an empty mock structure). Currently returns NULL.
+A tibble of confound data (nested if \code{nest = TRUE}).
 }
 \description{
 Read Confound Files (Mock Implementation)

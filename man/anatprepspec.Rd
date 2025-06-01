@@ -6,11 +6,12 @@
 \usage{
 anatprepspec()
 }
+\value{
+A list containing \code{keystruc}, \code{kinds}, and \code{type} describing
+fMRIPrep anatomical files.
+}
 \description{
 Create a spec table for fMRIPrep "anat" files
-}
-\value{
-A list containing \code{keystruc}, \code{kinds}, and \code{type} for fMRIPrep anatomical files.
 }
 \examples{
 anatprepspec()

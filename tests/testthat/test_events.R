@@ -38,7 +38,7 @@ test_that("run filtering works", {
 
 test_that("session filtering works", {
   proj <- bids_project(system.file("extdata/ds114", package="bidser"), fmriprep=FALSE)
-  ev <- read_events(proj, session="test")
+  ev <- read_events(proj, session="^test$")
   testthat::expect_equal(nrow(ev), 10)
   testthat::expect_true(all(ev$.session == "test"))
 })

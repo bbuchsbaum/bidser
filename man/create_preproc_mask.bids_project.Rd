@@ -4,14 +4,26 @@
 \alias{create_preproc_mask.bids_project}
 \title{Create a binary brain mask from preprocessed scans}
 \usage{
-\method{create_preproc_mask}{bids_project}(x, subid, thresh = 0.99, ...)
+\method{create_preproc_mask}{bids_project}(
+  x,
+  subid,
+  thresh = 0.99,
+  mask_kinds = c("brainmask", "mask"),
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{bids_project} object with fMRIPrep derivatives}
 
 \item{subid}{Regular expression to match subject IDs (e.g., "01" for subject 01, ".*" for all subjects)}
 
-\item{thresh}{Threshold value between 0 and 1 (default 0.99) - voxels with values below this threshold are excluded from the mask}
+\item{thresh}{Threshold value between 0 and 1 (default 0.99). Values outside
+this range will trigger an error. Voxels with values below the threshold are
+excluded from the mask.}
+
+\item{mask_kinds}{Character vector of BIDS file types to search when locating
+mask files. Defaults to both "brainmask" (older fMRIPrep versions) and
+"mask" with \code{desc="brain"} (BIDS 1.6+).}
 
 \item{...}{Additional arguments passed to \code{search_files} for finding mask files}
 }

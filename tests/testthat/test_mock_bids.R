@@ -262,7 +262,7 @@ test_that("search_files strict=FALSE matches files with missing entities", {
     subid = "01", # use subid
     task = "taskA",
     kind = "T1w",
-    regex = "\\\\.nii\\\\.gz$",
+    regex = "\\.nii\\.gz$",
     # fmriprep = FALSE, # search_files does not have fmriprep argument directly
     strict = TRUE,
     full_path = FALSE
@@ -279,14 +279,13 @@ test_that("search_files strict=FALSE matches files with missing entities", {
     subid = "01", # use subid
     task = "taskA", # T1w files won't have 'task'
     kind = "T1w",
-    regex = "\\\\.nii\\\\.gz$",
+    regex = "\\.nii\\.gz$",
     strict = FALSE, # This allows matching even if 'task' is not an attribute of T1w
     full_path = FALSE
   )
-  raw_t1w_filename <- generate_bids_filename(subid = "01", suffix = "T1w.nii.gz")
-  # Expected path is in the raw data part of the mock project
-  expected_lax_path <- file.path("sub-01", "anat", raw_t1w_filename)
-  expect_equal(lax_res, expected_lax_path)
+  # With strict=FALSE, search_files should find the T1w file even though we're searching for task="taskA"
+  # T1w files don't have a task attribute, but strict=FALSE allows the match
+  expect_equal(lax_res, "sub-01/anat/sub-01_T1w.nii.gz")
 })
 
 # --- Test Confound Utilities ---
