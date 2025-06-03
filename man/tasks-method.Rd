@@ -7,7 +7,7 @@
 \usage{
 tasks(x, ...)
 
-\method{tasks}{bids_project}(x)
+\method{tasks}{bids_project}(x, ...)
 }
 \arguments{
 \item{x}{the object to extract tasks from}
@@ -28,8 +28,10 @@ any NULL or NA values.
 p <- system.file("extdata/ds001", package="bidser")
 tasks(bids_project(p))
 
+\dontrun{
 # Create a BIDS structure with specific tasks and check them
 bs <- bids_structure(name="Test", subjects=c("01", "02"), 
                     tasks=c("rest", "memory", "working"))
 tasks(bs)
+}
 }

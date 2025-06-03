@@ -9,9 +9,9 @@ preproc_scans(
   subid = ".*",
   task = ".*",
   run = ".*",
+  session = ".*",
   variant = NULL,
   space = ".*",
-  session = ".*",
   modality = "bold",
   kind = ".*",
   full_path = FALSE,
@@ -27,11 +27,11 @@ preproc_scans(
 
 \item{run}{Run regex to match specific runs (default: ".*" for all runs)}
 
+\item{session}{Session regex to match specific sessions (default: ".*" for all sessions)}
+
 \item{variant}{Preprocessing variant to match (default: NULL, which matches files without a variant)}
 
 \item{space}{Space regex to match specific spaces (default: ".*" for all spaces)}
-
-\item{session}{Session regex to match specific sessions (default: ".*" for all sessions)}
 
 \item{modality}{Image modality to match (default: "bold" for functional MRI)}
 
@@ -53,7 +53,7 @@ by having either 'desc-preproc' or 'kind-preproc' in their filename.
 }
 \examples{
 # Get all preprocessed scans from a BIDS project with fMRIPrep derivatives
-\donttest{
+\dontrun{
 # Load a BIDS project with fMRIPrep derivatives
 proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
 

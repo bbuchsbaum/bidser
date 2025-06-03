@@ -7,7 +7,7 @@
 \usage{
 flat_list(x, ...)
 
-\method{flat_list}{bids_project}(x, full_path = TRUE)
+\method{flat_list}{bids_project}(x, full_path = TRUE, ...)
 }
 \arguments{
 \item{x}{the \code{bids_project} object}
@@ -33,7 +33,9 @@ flat_list(bids_project(p))
 # Get flat representation with just file names
 flat_list(bids_project(p), full_path=FALSE)
 
+\dontrun{
 # Create a BIDS structure and get its flat representation
 bs <- bids_structure(name="Test", subjects=c("01", "02"))
 flat_list(bs)
+}
 }

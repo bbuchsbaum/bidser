@@ -35,6 +35,7 @@ noise components. The function can optionally perform PCA reduction on the confo
 and return either nested or flat tibbles.
 }
 \examples{
+\dontrun{
 # Create a BIDS project with fMRIPrep derivatives
 fmriprep_path <- system.file("extdata/phoneme_stripped", package="bidser")
 proj <- bids_project(fmriprep_path, fmriprep=TRUE)
@@ -67,5 +68,5 @@ custom_conf <- read_confounds(proj,
                                     "trans_x", "trans_y", "trans_z"),
                              npcs=3,
                              nest=FALSE)
-
+}
 }

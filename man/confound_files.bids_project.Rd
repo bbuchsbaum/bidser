@@ -4,7 +4,7 @@
 \alias{confound_files.bids_project}
 \title{Locate confound files}
 \usage{
-\method{confound_files}{bids_project}(x, subid = ".*", task = ".*", session = ".*")
+\method{confound_files}{bids_project}(x, subid = ".*", task = ".*", session = ".*", ...)
 }
 \arguments{
 \item{x}{A \code{bids_project} object}
@@ -14,6 +14,8 @@
 \item{task}{Task regex}
 
 \item{session}{Session regex}
+
+\item{...}{Additional arguments (not currently used)}
 }
 \value{
 A character vector of file paths

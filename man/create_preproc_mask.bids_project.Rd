@@ -47,7 +47,7 @@ result in a more conservative mask that includes only voxels that are consistent
 as brain across all subjects/runs. Lower values create a more inclusive mask.
 }
 \examples{
-\donttest{
+\dontrun{
 # Load a BIDS project with fMRIPrep derivatives
 proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
 

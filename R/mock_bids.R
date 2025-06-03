@@ -315,7 +315,7 @@ reconstruct_node_path <- function(node, prep_dir = "derivatives/fmriprep") {
 #'   "02",   "test",   "func",    "taskA", "01", "bold.nii.gz",            FALSE,     NA,
 #'   "02",   "test",   "func",    "taskA", "01", "events.tsv",             FALSE,     NA,
 #'   # Example derivative
-#'   "01",   NA,       "func",    "taskA", "01", "preproc_bold.nii.gz",    TRUE,      "preproc" # Note: suffix carries desc
+#'   "01",   NA,       "func",    "taskA", "01", "preproc_bold.nii.gz",    TRUE,      "preproc"
 #' )
 #'
 #' # Define event data (paths must match generated structure)
@@ -413,7 +413,8 @@ create_mock_bids <- function(project_name,
   # Ensure participant_id is character
   part_df$participant_id <- as.character(part_df$participant_id)
    # Ensure participant IDs in file_structure are valid
-  valid_subs <- part_df$participant_id
+   # Remove "sub-" prefix from participant IDs for comparison with file_structure subids
+  valid_subs <- stringr::str_remove(part_df$participant_id, "^sub-")
   invalid_file_subs <- unique(file_structure$subid[!file_structure$subid %in% valid_subs])
    if (length(invalid_file_subs) > 0) {
        abort(paste("The following subids in 'file_structure' are not present in 'participants':", paste(invalid_file_subs, collapse=", ")))
@@ -874,7 +875,7 @@ create_mock_bids <- function(project_name,
 #' @examples
 #' # Create a simple mock project
 #' parts <- data.frame(participant_id = "01")
-#' fs <- data.frame(participant_id = "01", datatype="func", suffix="bold.nii.gz", fmriprep=FALSE)
+#' fs <- data.frame(subid = "01", datatype="func", suffix="bold.nii.gz", fmriprep=FALSE)
 #' mock_proj <- create_mock_bids("SimpleMock", parts, fs)
 #'
 #' # Print the summary
@@ -1230,8 +1231,7 @@ event_files.mock_bids_project <- function(x, subid = ".*", task = ".*", run = ".
 #' @export
 preproc_scans.mock_bids_project <- function(x, subid = ".*", task = ".*", run = ".*", session = ".*",
                                            variant = NULL, space = ".*", modality = "bold",
-                                           kind = "bold", desc = "preproc", suffix = "nii\\.gz$",
-                                           full_path = TRUE, ...) {
+                                           kind = ".*", full_path = FALSE, ...) {
   if (!x$has_fmriprep) {
     rlang::inform("Mock project does not have derivatives enabled.")
     return(NULL)
@@ -1240,7 +1240,7 @@ preproc_scans.mock_bids_project <- function(x, subid = ".*", task = ".*", run = 
   # Build entity list for filtering
   filter_entities <- list(
       kind = kind,       # Usually the BIDS type like 'bold' or 'T1w'
-      desc = desc,       # e.g., 'preproc'
+      desc = "preproc",  # Fixed desc for preprocessed files
       space = space,
       sub = subid,       # Pass both parameter names for consistent matching
       subid = subid,
@@ -1256,7 +1256,7 @@ preproc_scans.mock_bids_project <- function(x, subid = ".*", task = ".*", run = 
   # Build arguments for search_files call
   search_args <- list(
       x = x,
-      regex = paste0(".*\\.", suffix), # Regex for filename ending
+      regex = ".*\\.nii(\\.gz)?$", # Fixed regex for nifti files
       full_path = full_path,
       fmriprep = TRUE # Explicitly search only derivatives
   )

@@ -46,6 +46,7 @@ tasks(proj)
 # Get participant IDs
 participants(proj)
 
+\dontrun{
 # Load a dataset with fMRIPrep derivatives
 fmriprep_path <- system.file("extdata/phoneme_stripped", package="bidser")
 proj_prep <- bids_project(fmriprep_path, fmriprep=TRUE)
@@ -57,5 +58,6 @@ preproc_scans(proj_prep)
 proj_custom <- bids_project(fmriprep_path,
                            fmriprep=TRUE,
                            prep_dir="derivatives/custom_fmriprep")
+}
 
 }

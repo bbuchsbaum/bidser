@@ -9,4 +9,3 @@ anat_parser()
 \description{
 Anatomical parser constructor
 }
-\keyword{internal}

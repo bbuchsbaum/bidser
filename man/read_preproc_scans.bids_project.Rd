@@ -48,7 +48,7 @@ BIDS project. If no mask is provided, it will create one using the \code{create_
 function.
 }
 \examples{
-\donttest{
+\dontrun{
 # Load a BIDS project with fMRIPrep derivatives
 proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
 

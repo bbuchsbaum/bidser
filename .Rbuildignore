@@ -16,3 +16,7 @@ old
 ^appveyor\.yml$
 ^inst/extdata/.*sub-.*_task-.*_run-.*_bold\.nii\.gz$
 ^inst/extdata/.*derivatives/.*preproc_bold\.nii\.gz$
+CLAUDE.md
+bidser_cheatsheet.md
+repomix-output.txt
+repomix-output.xml

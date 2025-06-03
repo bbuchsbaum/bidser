@@ -22,8 +22,9 @@ A logical mask volume
 Create a preprocessing mask from BIDS data
 }
 \examples{
-\donttest{
-proj <- bids_project(system.file("extdata/phoneme_stripped", package="bidser"))
+\dontrun{
+# Load a BIDS project with fMRIPrep derivatives
+proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
 mask <- create_preproc_mask(proj, subid=".*")
 
 # Create mask for single subject

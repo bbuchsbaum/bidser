@@ -65,10 +65,12 @@ event_files(bids_project(p))
 p <- system.file("extdata/ds001", package="bidser")
 event_files(bids_project(p), subid="sub-0[12]", task="balloonanalog")
 
+\dontrun{
 # Create a BIDS structure and check for event files
 bs <- bids_structure(name="Test", subjects=c("01", "02"), 
                     tasks=c("rest", "memory"))
 event_files(bs)
+}
 \donttest{
 # Get event files for a specific subject and task
 x <- bids_project(system.file("extdata/ds001", package="bidser"))

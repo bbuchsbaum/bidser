@@ -54,6 +54,7 @@ task_pairs <- file_pairs(proj,
                         pair="bold-events",
                         task="balloonanalogrisktask")
 
+\dontrun{
 # Create a project with preprocessed data
 prep_proj <- bids_project(system.file("extdata/phoneme_stripped", package="bidser"),
                          fmriprep=TRUE)
@@ -63,5 +64,6 @@ preproc_pairs <- file_pairs(prep_proj, pair="preproc-events")
 
 # Check for missing pairs
 missing_pairs <- preproc_pairs[is.na(preproc_pairs$events), ]
+}
 
 }

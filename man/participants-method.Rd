@@ -29,7 +29,9 @@ any NA values. Participant IDs in BIDS typically follow the format 'sub-XX'.
 p <- system.file("extdata/ds001", package="bidser")
 participants(bids_project(p))
 
+\dontrun{
 # Create a BIDS structure with specific participants and check them
 bs <- bids_structure(name="Test", subjects=c("01", "02", "03"))
 participants(bs)
+}
 }

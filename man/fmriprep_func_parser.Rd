@@ -9,4 +9,3 @@ fmriprep_func_parser()
 \description{
 fMRIPrep functional parser constructor
 }
-\keyword{internal}

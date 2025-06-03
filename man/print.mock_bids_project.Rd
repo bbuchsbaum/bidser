@@ -22,7 +22,7 @@ BIDS entities.
 \examples{
 # Create a simple mock project
 parts <- data.frame(participant_id = "01")
-fs <- data.frame(participant_id = "01", datatype="func", suffix="bold.nii.gz", fmriprep=FALSE)
+fs <- data.frame(subid = "01", datatype="func", suffix="bold.nii.gz", fmriprep=FALSE)
 mock_proj <- create_mock_bids("SimpleMock", parts, fs)
 
 # Print the summary

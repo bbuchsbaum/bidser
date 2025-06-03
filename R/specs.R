@@ -5,10 +5,8 @@
 #'   the possible file types and suffixes.
 #' @param typename The name given to the final type element. Default is "kind".
 #' @return A parser function generated from the specification.
-#' @examples
-#' spec <- func_spec()
-#' parser <- gen_parser(spec)
 #' @keywords internal
+#' @noRd
 gen_parser <- function(spec, typename = "kind") {
   # Check input
   if (!is.list(spec) || !all(c("keystruc", "kinds", "type") %in% names(spec))) {
@@ -122,9 +120,8 @@ gen_parser <- function(spec, typename = "kind") {
 #'
 #' @return A list containing `keystruc`, `kinds`, and `type` describing
 #'   functional files.
-#' @examples
-#' func_spec()
 #' @keywords internal
+#' @noRd
 func_spec <- function() {
   keystruc <- tibble::tribble(
     ~name,          ~key, ~optional, ~pattern,         ~order,
@@ -156,9 +153,8 @@ func_spec <- function() {
 #'
 #' @return A list containing `keystruc`, `kinds`, and `type` describing
 #'   anatomical files.
-#' @examples
-#' anat_spec()
 #' @keywords internal
+#' @noRd
 anat_spec <- function() {
   keystruc <- tibble::tribble(
     ~name,            ~key, ~optional, ~pattern,         ~order,
@@ -200,9 +196,8 @@ anat_spec <- function() {
 #'
 #' @return A list containing `keystruc`, `kinds`, and `type` describing
 #'   fMRIPrep functional files.
-#' @examples
-#' funcprepspec()
 #' @keywords internal
+#' @noRd
 funcprepspec <- function() {
   keystruc <- tibble::tribble(
     ~name,          ~key,     ~optional, ~pattern,       ~order,
@@ -248,9 +243,8 @@ funcprepspec <- function() {
 #'
 #' @return A list containing `keystruc`, `kinds`, and `type` describing
 #'   fMRIPrep anatomical files.
-#' @examples
-#' anatprepspec()
 #' @keywords internal
+#' @noRd
 anatprepspec <- function() {
   anat_types <- c("defacemask","T1w", "T2w","T1map", "T2map", "T2star","FLAIR", "FLASH", "PDmap","PD","PDT2",
                   "inplaneT1", "inplaneT2", "angio")
@@ -310,9 +304,8 @@ anatprepspec <- function() {
 #'
 #' @return A list containing `keystruc`, `kinds`, and `type` describing
 #'   fieldmap files.
-#' @examples
-#' fmapspec()
 #' @keywords internal
+#' @noRd
 fmapspec <- function() {
   keystruc <- tibble::tribble(
     ~name,            ~key, ~optional, ~pattern,         ~order,

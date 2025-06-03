@@ -166,21 +166,8 @@ zero_or_one_of <- function(labels, label) {
 #'   - A list with the matched components if successful
 #'   - NULL if the pattern doesn't match
 #'
-#' @examples
-#' # Create a parser for BOLD files
-#' bold_parser <- gen_lit("bold", ".nii.gz", function(x) list(type="bold"))
-#' bold_parser("sub-01_task-rest_bold.nii.gz")  # Returns list(type="bold")
-#' bold_parser("sub-01_T1w.nii.gz")  # Returns NULL (no match)
-#'
-#' # Create a parser for T1w files
-#' t1w_parser <- gen_lit("T1w", ".nii.gz", function(x) list(type="T1w"))
-#' t1w_parser("sub-01_T1w.nii.gz")  # Returns list(type="T1w")
-#'
-#' # Create a parser for event files
-#' event_parser <- gen_lit("events", ".tsv", function(x) list(type="events"))
-#' event_parser("sub-01_task-rest_events.tsv")  # Returns list(type="events")
-#'
 #' @keywords internal
+#' @noRd
 gen_lit <- function(type, suffix, extractor) {
   if (!is.character(type) || length(type) != 1) {
     stop("`type` must be a single character string.")

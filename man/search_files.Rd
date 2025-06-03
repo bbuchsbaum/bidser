@@ -42,19 +42,22 @@ proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FA
 event_files <- search_files(proj, regex="events\\\\.tsv$")
 
 # Search with additional criteria
-sub01_files <- search_files(proj, regex="bold\\\\.nii\\\\.gz$", subid="01", task="balloonanalogrisktask")
+sub01_files <- search_files(proj, regex="bold\\\\.nii\\\\.gz$", subid="01", 
+                            task="balloonanalogrisktask")
 
 # Get full paths
 full_paths <- search_files(proj, regex="events\\\\.tsv$", full_path=TRUE)
 
 # Search with strict matching
-strict_matches <- search_files(proj, regex="\\\\.tsv$", strict=TRUE, task="balloonanalogrisktask")
+strict_matches <- search_files(proj, regex="\\\\.tsv$", strict=TRUE, 
+                               task="balloonanalogrisktask")
 # Search for event files in a BIDS dataset
 proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
 event_files <- search_files(proj, regex="events\\\\\\\\.tsv$")
 
 # Search with additional criteria (note: ds001 only has one subject '01')
-sub01_files <- search_files(proj, regex="bold\\\\\\\\.nii\\\\\\\\.gz$", subid="01", task="balloonanalogrisktask")
+sub01_files <- search_files(proj, regex="bold\\\\\\\\.nii\\\\\\\\.gz$", subid="01", 
+                            task="balloonanalogrisktask")
 
 # Get full paths
 full_paths <- search_files(proj, regex="events\\\\\\\\.tsv$", full_path=TRUE)

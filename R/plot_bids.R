@@ -20,7 +20,7 @@
 #' @import viridis
 #' @export
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' proj <- bids_project(system.file("extdata/ds001", package="bidser"))
 #' plot_bids(proj)
 #'
@@ -533,7 +533,7 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
         labs(
           title = "Data Completeness by Subject, Session, and Task",
           x = "Subject ID",
-          y = "Session × Task",
+          y = "Session x Task",
           fill = "Data Size"
         ) +
         theme_minimal() +
@@ -563,7 +563,7 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
         labs(
           title = "Data Completeness by Subject, Session, and Type",
           x = "Subject ID",
-          y = "Session × Type",
+          y = "Session x Type",
           fill = "Data Size"
         ) +
         theme_minimal() +
@@ -971,7 +971,7 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
       # x-axis: subject, y-axis: task/run, facet by session, color by file size
       p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = subid, y = task_run, fill = file_size)) +
         ggplot2::geom_tile(color = "white", linewidth = 0.2, 
-                 ggplot2::aes(alpha = ifelse(file_size == 0, 0.3, 1))) +
+                 ggplot2::aes(alpha = ifelse(file_count == 0, 0.3, 1))) +
         ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
                             trans = "log10", na.value = "grey90",
                             labels = scales::label_bytes(units = "MB")) +
@@ -979,7 +979,7 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
         ggplot2::facet_wrap(~ session, scales = "free_x", ncol = 1) +
         ggplot2::labs(
           title = paste0("BIDS Functional Data: ", x$name),
-          subtitle = "Subject × Task-Run Heatmap",
+          subtitle = "Subject x Task-Run Heatmap",
           x = "Subject ID",
           y = "Task and Run"
         )
@@ -1030,14 +1030,14 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
       # x-axis: subject, y-axis: task/run, color by file size
       p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = subid, y = task_run, fill = file_size)) +
         ggplot2::geom_tile(color = "white", linewidth = 0.2, 
-                 ggplot2::aes(alpha = ifelse(file_size == 0, 0.3, 1))) +
+                 ggplot2::aes(alpha = ifelse(file_count == 0, 0.3, 1))) +
         ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
                             trans = "log10", na.value = "grey90",
                             labels = scales::label_bytes(units = "MB")) +
         ggplot2::scale_alpha_identity() +
         ggplot2::labs(
           title = paste0("BIDS Functional Data: ", x$name),
-          subtitle = "Subject × Task-Run Heatmap",
+          subtitle = "Subject x Task-Run Heatmap",
           x = "Subject ID",
           y = "Task and Run"
         )
@@ -1056,12 +1056,21 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
     # For anatomical data, use anatomical modality (T1w, T2w, etc.)
     # x-axis: subject, y-axis: anatomical type, color by file size
     
-    # Check if 'kind' column exists, if not use 'modality' or create a default
+    # Check if 'kind' column exists, if not use 'modality' or extract from filename
     if (!"kind" %in% names(filtered_data)) {
-      if ("modality" %in% names(filtered_data)) {
+      if ("modality" %in% names(filtered_data) && !all(is.na(filtered_data$modality))) {
         filtered_data$kind <- filtered_data$modality
       } else {
-        filtered_data$kind <- "anatomical"
+        # Extract anatomical type from filename
+        filtered_data$kind <- sapply(filtered_data$name, function(fname) {
+          if (grepl("_T1w\\.", fname)) return("T1w")
+          if (grepl("_T2w\\.", fname)) return("T2w")
+          if (grepl("_inplaneT2\\.", fname)) return("inplaneT2")
+          if (grepl("_FLAIR\\.", fname)) return("FLAIR")
+          if (grepl("_PD\\.", fname)) return("PD")
+          if (grepl("_PDT2\\.", fname)) return("PDT2")
+          return("anatomical")
+        })
       }
     }
     
@@ -1093,7 +1102,7 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
         heatmap_data <- dplyr::left_join(expected_grid, heatmap_data, 
                                 by = c("subid", "session", "kind")) %>%
           dplyr::mutate(
-            file_size = ifelse(is.na(file_size), 0, file_size),
+            file_size = ifelse(is.na(file_size), 1e3, file_size),  # Use small positive value for log safety
             file_count = ifelse(is.na(file_count), 0, file_count),
             missing = file_count == 0
           )
@@ -1102,7 +1111,7 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
       # Create the plot
       p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = subid, y = kind, fill = file_size)) +
         ggplot2::geom_tile(color = "white", linewidth = 0.2, 
-                 ggplot2::aes(alpha = ifelse(file_size == 0, 0.3, 1))) +
+                 ggplot2::aes(alpha = ifelse(file_count == 0, 0.3, 1))) +
         ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
                             trans = "log10", na.value = "grey90",
                             labels = scales::label_bytes(units = "MB")) +
@@ -1110,7 +1119,7 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
         ggplot2::facet_wrap(~ session, scales = "free_x", ncol = 1) +
         ggplot2::labs(
           title = paste0("BIDS Anatomical Data: ", x$name),
-          subtitle = "Subject × Image Type Heatmap",
+          subtitle = "Subject x Image Type Heatmap",
           x = "Subject ID",
           y = "Anatomical Type"
         )
@@ -1150,7 +1159,7 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
         heatmap_data <- dplyr::left_join(expected_grid, heatmap_data, 
                                 by = c("subid", "kind")) %>%
           dplyr::mutate(
-            file_size = ifelse(is.na(file_size), 0, file_size),
+            file_size = ifelse(is.na(file_size), 1e3, file_size),  # Use small positive value for log safety
             file_count = ifelse(is.na(file_count), 0, file_count),
             missing = file_count == 0
           )
@@ -1159,14 +1168,14 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
       # Create the plot
       p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = subid, y = kind, fill = file_size)) +
         ggplot2::geom_tile(color = "white", linewidth = 0.2, 
-                 ggplot2::aes(alpha = ifelse(file_size == 0, 0.3, 1))) +
+                 ggplot2::aes(alpha = ifelse(file_count == 0, 0.3, 1))) +
         ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
                             trans = "log10", na.value = "grey90",
                             labels = scales::label_bytes(units = "MB")) +
         ggplot2::scale_alpha_identity() +
         ggplot2::labs(
           title = paste0("BIDS Anatomical Data: ", x$name),
-          subtitle = "Subject × Image Type Heatmap",
+          subtitle = "Subject x Image Type Heatmap",
           x = "Subject ID",
           y = "Anatomical Type"
         )
@@ -1232,7 +1241,7 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
         hoverlabel = list(bgcolor = "white"),
         title = list(
           text = paste0("BIDS ", file_type, " Data: ", x$name,
-                       "<br><sup>Subject × ", 
+                       "<br><sup>Subject x ", 
                        if(file_type == "func") "Task-Run" else "Image Type", 
                        " Heatmap</sup>")
         )

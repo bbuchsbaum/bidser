@@ -9,9 +9,9 @@
   subid = ".*",
   task = ".*",
   run = ".*",
+  session = ".*",
   variant = NULL,
   space = ".*",
-  session = ".*",
   modality = "bold",
   kind = ".*",
   full_path = FALSE,
@@ -27,13 +27,13 @@
 
 \item{run}{A regex pattern for matching runs. Default is ".*".}
 
+\item{session}{A regex pattern for matching sessions. Default is ".*".}
+
 \item{variant}{A regex pattern for matching preprocessing variants. Default is NULL
 (no variant filtering).}
 
 \item{space}{A regex pattern for matching spaces (e.g., "MNI152NLin2009cAsym").
 Default is ".*".}
-
-\item{session}{A regex pattern for matching sessions. Default is ".*".}
 
 \item{modality}{A regex pattern for matching modality. Default is "bold".
 Set this to something else if you need a different modality.}
@@ -61,6 +61,7 @@ task, run, session, and space. The function is particularly useful for accessing
 preprocessed data for analysis pipelines.
 }
 \examples{
+\dontrun{
 # Create a BIDS project with fMRIPrep derivatives
 proj <- bids_project(system.file("extdata/phoneme_stripped", package="bidser"),
                      fmriprep=TRUE)
@@ -88,5 +89,6 @@ filtered_scans <- preproc_scans(proj,
                                task="phoneme",
                                run="01",
                                space="MNI152NLin2009cAsym")
+}
 
 }

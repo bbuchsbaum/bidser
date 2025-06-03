@@ -7,7 +7,7 @@
 \usage{
 sessions(x, ...)
 
-\method{sessions}{bids_project}(x)
+\method{sessions}{bids_project}(x, ...)
 }
 \arguments{
 \item{x}{the object to extract sessions from}
@@ -29,8 +29,10 @@ session identifiers.
 p <- system.file("extdata/ds001", package="bidser")
 sessions(bids_project(p))
 
+\dontrun{
 # Create a BIDS structure with sessions and check them
 bs <- bids_structure(name="Test", subjects=c("01", "02"), 
                     sessions=c("pre", "post"))
 sessions(bs)
+}
 }

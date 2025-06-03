@@ -7,14 +7,12 @@
 \usage{
 encode(x, ...)
 
-\method{encode}{character}(fname)
+\method{encode}{character}(x, ...)
 }
 \arguments{
-\item{x}{The string (filename) to encode}
+\item{x}{The filename string to encode}
 
 \item{...}{Additional arguments passed to methods}
-
-\item{fname}{The filename string to encode}
 }
 \value{
 A list of key-value pairs extracted from the filename

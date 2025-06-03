@@ -60,7 +60,7 @@ read_func_scans.bids_project <- function(x, mask, mode = c("normal", "bigvec"),
 #' function.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Load a BIDS project with fMRIPrep derivatives
 #' proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
 #'
@@ -148,7 +148,7 @@ read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bi
 #' as brain across all subjects/runs. Lower values create a more inclusive mask.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Load a BIDS project with fMRIPrep derivatives
 #' proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
 #'
@@ -294,9 +294,10 @@ resolve_cvars <- function(cvars, col_names, rename = FALSE) {
 #' @param subid Subject ID regex
 #' @param task Task regex
 #' @param session Session regex
+#' @param ... Additional arguments (not currently used)
 #' @return A character vector of file paths
 #' @export
-confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*") {
+confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", ...) {
   if (!inherits(x, "bids_project")) {
     stop("`x` must be a `bids_project` object.")
   }
@@ -342,20 +343,21 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*") 
 #' @param npcs Perform PCA reduction on confounds and return \code{npcs} PCs.
 #' @param perc_var Perform PCA reduction to retain \code{perc_var}% variance.
 #' @param nest If TRUE, nests confound tables by subject/session/run.
+#' @param ... Additional arguments (not currently used)
 #' @import dplyr
 #' @importFrom readr read_tsv
 #' @importFrom tidyr nest
 #' @importFrom tidyselect any_of
 #' @return A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds.
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' proj <- bids_project("/path/to/bids", fmriprep = TRUE)
 #' # canonical names automatically resolve to actual columns
 #' conf <- read_confounds(proj, cvars = c("csf", "framewise_displacement"))
 #' }
 #' @export
 read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", run=".*",
-                                        cvars=DEFAULT_CVARS, npcs=-1, perc_var=-1, nest=TRUE) {
+                                        cvars=DEFAULT_CVARS, npcs=-1, perc_var=-1, nest=TRUE, ...) {
   if (!inherits(x, "bids_project")) {
     stop("`x` must be a `bids_project` object.")
   }

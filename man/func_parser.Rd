@@ -9,4 +9,3 @@ func_parser()
 \description{
 Functional parser constructor
 }
-\keyword{internal}

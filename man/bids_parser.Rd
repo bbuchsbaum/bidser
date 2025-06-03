@@ -9,4 +9,3 @@ bids_parser()
 \description{
 This parser tries to match against various known parsers (anat, func, fmriprep anat/func).
 }
-\keyword{internal}

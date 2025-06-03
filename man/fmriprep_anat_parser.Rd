@@ -9,4 +9,3 @@ fmriprep_anat_parser()
 \description{
 fMRIPrep anatomical parser constructor
 }
-\keyword{internal}

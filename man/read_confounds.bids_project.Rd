@@ -13,7 +13,8 @@
   cvars = DEFAULT_CVARS,
   npcs = -1,
   perc_var = -1,
-  nest = TRUE
+  nest = TRUE,
+  ...
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ matching column names found in the dataset using \code{CVARS_ALIASES}.}
 \item{perc_var}{Perform PCA reduction to retain \code{perc_var}\% variance.}
 
 \item{nest}{If TRUE, nests confound tables by subject/session/run.}
+
+\item{...}{Additional arguments (not currently used)}
 }
 \value{
 A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds.
@@ -45,7 +48,7 @@ A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds.
 Reads in fmriprep confound tables for one or more subjects.
 }
 \examples{
-\donttest{
+\dontrun{
 proj <- bids_project("/path/to/bids", fmriprep = TRUE)
 # canonical names automatically resolve to actual columns
 conf <- read_confounds(proj, cvars = c("csf", "framewise_displacement"))

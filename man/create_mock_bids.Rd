@@ -78,7 +78,7 @@ file_structure_df <- tibble::tribble(
   "02",   "test",   "func",    "taskA", "01", "bold.nii.gz",            FALSE,     NA,
   "02",   "test",   "func",    "taskA", "01", "events.tsv",             FALSE,     NA,
   # Example derivative
-  "01",   NA,       "func",    "taskA", "01", "preproc_bold.nii.gz",    TRUE,      "preproc" # Note: suffix carries desc
+  "01",   NA,       "func",    "taskA", "01", "preproc_bold.nii.gz",    TRUE,      "preproc"
 )
 
 # Define event data (paths must match generated structure)

@@ -77,10 +77,12 @@ decode <- function(x,...) {
 #' p <- system.file("extdata/ds001", package="bidser")
 #' sessions(bids_project(p))
 #' 
+#' \dontrun{
 #' # Create a BIDS structure with sessions and check them
 #' bs <- bids_structure(name="Test", subjects=c("01", "02"), 
 #'                     sessions=c("pre", "post"))
 #' sessions(bs)
+#' }
 sessions <- function (x, ...) {
   UseMethod("sessions", x)
 }
@@ -103,10 +105,12 @@ sessions <- function (x, ...) {
 #' p <- system.file("extdata/ds001", package="bidser")
 #' tasks(bids_project(p))
 #' 
+#' \dontrun{
 #' # Create a BIDS structure with specific tasks and check them
 #' bs <- bids_structure(name="Test", subjects=c("01", "02"), 
 #'                     tasks=c("rest", "memory", "working"))
 #' tasks(bs)
+#' }
 tasks <- function (x, ...) {
   UseMethod("tasks", x)
 }
@@ -133,9 +137,11 @@ tasks <- function (x, ...) {
 #' # Get flat representation with just file names
 #' flat_list(bids_project(p), full_path=FALSE)
 #' 
+#' \dontrun{
 #' # Create a BIDS structure and get its flat representation
 #' bs <- bids_structure(name="Test", subjects=c("01", "02"))
 #' flat_list(bs)
+#' }
 flat_list <- function(x, ...) {
   UseMethod("flat_list", x)
 }
@@ -159,9 +165,11 @@ flat_list <- function(x, ...) {
 #' p <- system.file("extdata/ds001", package="bidser")
 #' participants(bids_project(p))
 #' 
+#' \dontrun{
 #' # Create a BIDS structure with specific participants and check them
 #' bs <- bids_structure(name="Test", subjects=c("01", "02", "03"))
 #' participants(bs)
+#' }
 participants <- function (x, ...) {
   UseMethod("participants", x)
 }
@@ -195,10 +203,12 @@ participants <- function (x, ...) {
 #' p <- system.file("extdata/ds001", package="bidser")
 #' event_files(bids_project(p), subid="sub-0[12]", task="balloonanalog")
 #' 
+#' \dontrun{
 #' # Create a BIDS structure and check for event files
 #' bs <- bids_structure(name="Test", subjects=c("01", "02"), 
 #'                     tasks=c("rest", "memory"))
 #' event_files(bs)
+#' }
 event_files <- function (x, ...) {
   UseMethod("event_files", x)
 }
@@ -224,11 +234,11 @@ event_files <- function (x, ...) {
 #' @export
 #' @rdname confound_files-method
 #' @examples 
+#' \dontrun{
 #' # Get all confound files from a BIDS project with fMRIPrep derivatives
 #' p <- system.file("extdata/phoneme_stripped", package="bidser")
 #' proj <- bids_project(p, fmriprep=TRUE)
 #' confound_files(proj)
-#' 
 #' # Get confound files for specific subjects and tasks
 #' confound_files(proj, subid="sub-01", task="phoneme")
 #' 
@@ -236,6 +246,7 @@ event_files <- function (x, ...) {
 #' bs <- bids_structure(name="Test", subjects=c("01", "02"), 
 #'                     tasks=c("rest"), include_fmriprep=TRUE)
 #' confound_files(bs)
+#' }
 confound_files <- function (x, ...) {
   UseMethod("confound_files", x)
 }
@@ -313,6 +324,7 @@ read_events <- function(x, ...) {
 #'   all confound variables. Returns NULL if no matching files are found.
 #'
 #' @examples
+#' \dontrun{
 #' # Create a BIDS project with fMRIPrep derivatives
 #' fmriprep_path <- system.file("extdata/phoneme_stripped", package="bidser")
 #' proj <- bids_project(fmriprep_path, fmriprep=TRUE)
@@ -345,7 +357,7 @@ read_events <- function(x, ...) {
 #'                                     "trans_x", "trans_y", "trans_z"),
 #'                              npcs=3,
 #'                              nest=FALSE)
-#'
+#' }
 #' @export
 read_confounds <- function(x, ...) {
   UseMethod("read_confounds")
@@ -423,7 +435,7 @@ func_scans <- function(x, ...) {
 #' @rdname preproc_scans-method
 #' @examples
 #' # Get all preprocessed scans from a BIDS project with fMRIPrep derivatives
-#' \donttest{
+#' \dontrun{
 #' # Load a BIDS project with fMRIPrep derivatives
 #' proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
 #' 
@@ -449,8 +461,8 @@ func_scans <- function(x, ...) {
 #' # Get full paths to preprocessed scans
 #' full_paths <- preproc_scans(proj, full_path=TRUE)
 #' }
-preproc_scans <- function(x, subid = ".*", task = ".*", run = ".*", variant = NULL, 
-                          space = ".*", session = ".*", modality = "bold", 
+preproc_scans <- function(x, subid = ".*", task = ".*", run = ".*", session = ".*",
+                          variant = NULL, space = ".*", modality = "bold", 
                           kind = ".*", full_path = FALSE, ...) {
   UseMethod("preproc_scans", x)
 }
@@ -464,8 +476,9 @@ preproc_scans <- function(x, subid = ".*", task = ".*", run = ".*", variant = NU
 #' @return A logical mask volume
 #' @export
 #' @examples
-#' \donttest{
-#' proj <- bids_project(system.file("extdata/phoneme_stripped", package="bidser"))
+#' \dontrun{
+#' # Load a BIDS project with fMRIPrep derivatives
+#' proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
 #' mask <- create_preproc_mask(proj, subid=".*")
 #'
 #' # Create mask for single subject
@@ -515,13 +528,15 @@ brain_mask <- function(x, subid, ...) {
 #' event_files <- search_files(proj, regex="events\\.tsv$")
 #' 
 #' # Search with additional criteria
-#' sub01_files <- search_files(proj, regex="bold\\.nii\\.gz$", subid="01", task="balloonanalogrisktask")
+#' sub01_files <- search_files(proj, regex="bold\\.nii\\.gz$", subid="01", 
+#'                             task="balloonanalogrisktask")
 #' 
 #' # Get full paths
 #' full_paths <- search_files(proj, regex="events\\.tsv$", full_path=TRUE)
 #' 
 #' # Search with strict matching
-#' strict_matches <- search_files(proj, regex="\\.tsv$", strict=TRUE, task="balloonanalogrisktask")
+#' strict_matches <- search_files(proj, regex="\\.tsv$", strict=TRUE, 
+#'                                task="balloonanalogrisktask")
 search_files <- function(x, ...) {
   UseMethod("search_files", x)
 }

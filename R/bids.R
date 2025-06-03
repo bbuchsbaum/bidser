@@ -1,6 +1,19 @@
 #' @importFrom crayon green cyan magenta yellow bold
 #' @importFrom purrr partial
+#' @importFrom stats median na.omit prcomp reorder runif setNames
+#' @importFrom utils read.table
+#' @importFrom httr GET stop_for_status content
+#' @importFrom rio import
 NULL
+
+# Global variables used in dplyr/ggplot2 operations to avoid R CMD check warnings
+utils::globalVariables(c(
+  # Variables used in dplyr operations
+  "subid", "session", "task", "run", "type", "kind", "modality", "suffix",
+  "file_size", "file_count", "total_size", "derivative", "proportion", "total",
+  "participant_id", "name", "path", "pathString", "size", "task_run", "runs",
+  "total_files", "label", "missing"
+))
 
 #' @noRd
 set_key <- function(fname, key, value) {
@@ -13,10 +26,10 @@ set_key <- function(fname, key, value) {
 
 #' @export
 #' @rdname encode
-#' @param fname The filename string to encode
-encode.character <- function(fname) {
+#' @param x The filename string to encode
+encode.character <- function(x, ...) {
   p <- bids_parser()
-  ret <- parse(p, fname)
+  ret <- parse(p, x)
   if (!is.null(ret)) {
     v <- ret$result$value
     v[!sapply(v, is.null)]
@@ -165,6 +178,7 @@ add_file <- function(bids, name,...) {
 #' # Get participant IDs
 #' participants(proj)
 #'
+#' \dontrun{
 #' # Load a dataset with fMRIPrep derivatives
 #' fmriprep_path <- system.file("extdata/phoneme_stripped", package="bidser")
 #' proj_prep <- bids_project(fmriprep_path, fmriprep=TRUE)
@@ -176,6 +190,7 @@ add_file <- function(bids, name,...) {
 #' proj_custom <- bids_project(fmriprep_path,
 #'                            fmriprep=TRUE,
 #'                            prep_dir="derivatives/custom_fmriprep")
+#' }
 #'
 #' @export
 bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmriprep") {
@@ -287,7 +302,7 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmripre
 #' @export
 #' @rdname flat_list-method
 #' @method flat_list bids_project
-flat_list.bids_project <- function(x, full_path=TRUE) {
+flat_list.bids_project <- function(x, full_path=TRUE, ...) {
   if (full_path) {
     data.tree::ToDataFrameTable(x$bids_tree, "pathString", "name") %>% filter(stringr::str_detect(name, "^sub-")) %>%
     rename(path=pathString) %>% select(path)
@@ -367,7 +382,7 @@ print.bids_project <- function(x, ...) {
 #' @export
 #' @rdname sessions-method
 #' @method sessions bids_project
-sessions.bids_project <- function(x) {
+sessions.bids_project <- function(x, ...) {
   if (x$has_sessions) {
     sort(unique(unlist(x$bids_tree$Get(
       "session",
@@ -381,7 +396,7 @@ sessions.bids_project <- function(x) {
 #' @export
 #' @rdname tasks-method
 #' @method tasks bids_project
-tasks.bids_project <- function(x) {
+tasks.bids_project <- function(x, ...) {
   sort(unique(x$bids_tree$Get("task", filterFun = function(x) {!is.na(x$task) && !is.null(x$task) } )))
   ##unique(x$bids_tree$Get("task", filterFun = function(x) !is.null(x$task) & !is.na(x$task)))
 }
@@ -555,6 +570,7 @@ str_detect_null <- function(x, pat, default=FALSE) {
 #'   - The specified criteria don't match any files
 #'
 #' @examples
+#' \dontrun{
 #' # Create a BIDS project with fMRIPrep derivatives
 #' proj <- bids_project(system.file("extdata/phoneme_stripped", package="bidser"),
 #'                      fmriprep=TRUE)
@@ -582,10 +598,11 @@ str_detect_null <- function(x, pat, default=FALSE) {
 #'                                task="phoneme",
 #'                                run="01",
 #'                                space="MNI152NLin2009cAsym")
+#' }
 #'
 #' @export
-preproc_scans.bids_project <- function(x, subid=".*", task=".*", run=".*", variant=NULL,
-                                      space=".*", session=".*", modality="bold", kind=".*",
+preproc_scans.bids_project <- function(x, subid=".*", task=".*", run=".*", session=".*",
+                                      variant=NULL, space=".*", modality="bold", kind=".*",
                                       full_path=FALSE, ...) {
   # Function to extract path from node
   f <- function(node) paste0(node$path[2:length(node$path)], collapse="/")
@@ -712,7 +729,8 @@ key_match <- function(default=FALSE, ...) {
 #' event_files <- search_files(proj, regex="events\\\\.tsv$")
 #' 
 #' # Search with additional criteria (note: ds001 only has one subject '01')
-#' sub01_files <- search_files(proj, regex="bold\\\\.nii\\\\.gz$", subid="01", task="balloonanalogrisktask")
+#' sub01_files <- search_files(proj, regex="bold\\\\.nii\\\\.gz$", subid="01", 
+#'                             task="balloonanalogrisktask")
 #' 
 #' # Get full paths
 #' full_paths <- search_files(proj, regex="events\\\\.tsv$", full_path=TRUE)

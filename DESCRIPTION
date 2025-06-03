@@ -36,7 +36,9 @@ Imports:
   rlang,
   stringdist,
   tibble,
-  tidyr
+  tidyr,
+  httr,
+  rio
 Remotes: 
   SWotherspoon/Combin8R,
   bbuchsbaum/neuroim2

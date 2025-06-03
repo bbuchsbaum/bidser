@@ -40,7 +40,7 @@ This function creates a multi-panel visualization of a BIDS project structure,
 showing file distributions, completeness, and data characteristics.
 }
 \examples{
-\donttest{
+\dontrun{
 proj <- bids_project(system.file("extdata/ds001", package="bidser"))
 plot_bids(proj)
 

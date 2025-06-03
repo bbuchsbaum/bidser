@@ -9,4 +9,3 @@ fmap_parser()
 \description{
 Fieldmap parser constructor
 }
-\keyword{internal}
