@@ -132,9 +132,13 @@ fscans_16 <- func_scans(proj, subid="16")
 
 ```
 
-```{r, echo=FALSE, results='asis'} 
+```{r, echo=FALSE, results='asis'}
 
-gluedown::md_bullet(basename(fscans_16))
+if (length(fscans_16) > 0) {
+  gluedown::md_bullet(basename(fscans_16))
+} else {
+  cat("No scans found for subject 16\n")
+}
 ```
 
 ## Reading in Task Event files
