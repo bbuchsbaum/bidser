@@ -116,7 +116,7 @@ If we are only interested in functional bolds scans (rather than any file with "
 fscans <- func_scans(proj)
 
 ## take the first 5 files, since there are alot.
-fscans <- head(bold, 5)
+fscans <- head(fscans, 5)
 ```
 
 ```{r, echo=FALSE, results='asis'} 

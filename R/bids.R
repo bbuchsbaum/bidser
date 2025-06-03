@@ -509,8 +509,8 @@ func_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", sessi
   
   ret <- x$bids_tree$children$raw$Get(f, filterFun = function(z) {
     if (z$isLeaf && !is.null(z$task) &&  !is.null(z$type) && str_detect_null(z$kind,kind)
-        && str_detect_null(z$subid, subid)  && str_detect_null(z$task, task) 
-        && str_detect_null(z$session, session, default=TRUE) 
+        && str_detect_null(z$subid, subid)  && str_detect_null(z$task, task)
+        && str_detect_null(z$session, session, default=TRUE)
         && str_detect_null(z$run, run, default=TRUE) && str_detect_null(z$suffix, "nii(.gz)?$")) {
       TRUE
     } else {
@@ -518,16 +518,17 @@ func_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", sessi
     }
   })
   
-  #ret <- names(ret)
-  #paths <- sapply(stringr::str_split(ret, "_"), function(sp) {
-  #  paste0(sp[[1]], "/", sp[[2]], "/func")
-  #})
-  #paste0(paths, "/", ret)
-  if (full_path && !is.null(ret)) {
-    ret <- paste0(x$path, "/", ret)
+  if (length(ret) == 0) {
+    return(NULL)
   }
-  
-  unname(ret)
+
+  ret <- unique(unname(unlist(ret)))
+
+  if (full_path) {
+    ret <- file.path(x$path, ret)
+  }
+
+  as.vector(ret)
 }
 
 
