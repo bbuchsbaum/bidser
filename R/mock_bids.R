@@ -7,7 +7,7 @@
 #' @importFrom fs file_size dir_create file_create path_dir file_exists dir_exists
 #' @importFrom tibble as_tibble is_tibble tibble add_row deframe enframe has_name lst is_tibble
 #' @importFrom rlang sym := abort warn inform is_scalar_character is_scalar_logical list2 exec enquo quo_name is_installed is_interactive check_installed check_dots_empty check_dots_used check_dots_unnamed caller_env current_env global_env interrupt %||% maybe_missing missing_arg seq2 set_names try_fetch with_options zap format_error_bullets is_string as_name inject parse_expr eval_tidy expr exprs new_environment env env_bind env_get env_has env_parent env_parents env_poke expr_deparse f_lhs f_rhs is_call is_call_simple is_formula is_integerish is_list is_named is_null is_primitive is_true is_false is_symbol local_options parse_expr caller_env empty_env global_env is_environment new_formula new_quosure quo quo_get_env quo_get_expr quo_is_call quo_is_missing quo_is_null quo_is_symbol quos rep_along splice with_handlers
-#' @importFrom crayon has_color bold cyan green magenta yellow %+% blue red silver white make_style style has_style num_colors num_colors
+#' @importFrom crayon has_color bold cyan green magenta yellow
 NULL
 
 # ---------------------------------------------------------------------------

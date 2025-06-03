@@ -16,7 +16,7 @@
 #' @import dplyr
 #' @import tidyr
 #' @import patchwork
-#' @import plotly
+#' @importFrom plotly ggplotly layout
 #' @import viridis
 #' @export
 #' @examples
