@@ -366,7 +366,7 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #' @importFrom tidyselect any_of
 #' @return A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds.
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' proj <- bids_project("/path/to/bids", fmriprep = TRUE)
 #' # canonical names automatically resolve to actual columns
 #' conf <- read_confounds(proj, cvars = c("csf", "framewise_displacement"))

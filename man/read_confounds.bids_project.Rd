@@ -48,7 +48,7 @@ A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds.
 Reads in fmriprep confound tables for one or more subjects.
 }
 \examples{
-\donttest{
+\dontrun{
 proj <- bids_project("/path/to/bids", fmriprep = TRUE)
 # canonical names automatically resolve to actual columns
 conf <- read_confounds(proj, cvars = c("csf", "framewise_displacement"))

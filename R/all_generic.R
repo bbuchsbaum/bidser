@@ -473,6 +473,7 @@ func_scans <- function(x, ...) {
 #' @param subid Subject ID regex to match specific subjects (default: ".*" for all subjects)
 #' @param task Task regex to match specific tasks (default: ".*" for all tasks)
 #' @param run Run regex to match specific runs (default: ".*" for all runs)
+#' @param session Session regex to match specific sessions (default: ".*" for all sessions)
 #' @param variant Preprocessing variant to match (default: NULL, which matches files without a variant)
 #' @param space Space regex to match specific spaces (default: ".*" for all spaces)
 #' @param modality Image modality to match (default: "bold" for functional MRI)

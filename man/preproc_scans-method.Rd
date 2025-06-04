@@ -27,6 +27,8 @@ preproc_scans(
 
 \item{run}{Run regex to match specific runs (default: ".*" for all runs)}
 
+\item{session}{Session regex to match specific sessions (default: ".*" for all sessions)}
+
 \item{variant}{Preprocessing variant to match (default: NULL, which matches files without a variant)}
 
 \item{space}{Space regex to match specific spaces (default: ".*" for all spaces)}
