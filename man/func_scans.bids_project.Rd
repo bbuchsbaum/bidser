@@ -48,29 +48,38 @@ criteria such as subject ID, task name, run number, and session. It can return
 either full or relative file paths to the functional scans.
 }
 \examples{
+\donttest{
 # Create a BIDS project
-ds001_path <- system.file("extdata/ds001", package="bidser")
-proj <- bids_project(ds001_path)
-
-# Get all functional scans
-all_scans <- func_scans(proj)
-
-# Get scans for specific subjects
-sub_scans <- func_scans(proj, subid="0[123]")
-
-# Get scans for a specific task
-task_scans <- func_scans(proj, task="rest")
-
-# Get scans from specific runs
-run_scans <- func_scans(proj, run="0[123]")
-
-# Combine multiple filters
-filtered_scans <- func_scans(proj,
-                            subid="01",
-                            task="rest",
-                            run="01")
-
-# Get relative paths instead of full paths
-rel_scans <- func_scans(proj, full_path=FALSE)
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  
+  # Get all functional scans
+  all_scans <- func_scans(proj)
+  
+  # Get scans for specific subjects
+  sub_scans <- func_scans(proj, subid="0[123]")
+  
+  # Get scans for a specific task
+  task_scans <- func_scans(proj, task="rest")
+  
+  # Get scans from specific runs
+  run_scans <- func_scans(proj, run="0[123]")
+  
+  # Combine multiple filters
+  filtered_scans <- func_scans(proj,
+                              subid="01",
+                              task="rest",
+                              run="01")
+  
+  # Get relative paths instead of full paths
+  rel_scans <- func_scans(proj, full_path=FALSE)
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
+}
 
 }

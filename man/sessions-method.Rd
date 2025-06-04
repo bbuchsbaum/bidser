@@ -25,14 +25,17 @@ within subject directories. This function extracts and returns the unique
 session identifiers.
 }
 \examples{
+\donttest{
 # Get sessions from a BIDS project
-p <- system.file("extdata/ds001", package="bidser")
-sessions(bids_project(p))
-
-\dontrun{
-# Create a BIDS structure with sessions and check them
-bs <- bids_structure(name="Test", subjects=c("01", "02"), 
-                    sessions=c("pre", "post"))
-sessions(bs)
+tryCatch({
+  ds007_path <- get_example_bids_dataset("ds007")
+  proj <- bids_project(ds007_path)
+  sessions(proj)
+  
+  # Clean up
+  unlink(ds007_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
 }

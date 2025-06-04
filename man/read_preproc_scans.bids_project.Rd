@@ -48,28 +48,36 @@ BIDS project. If no mask is provided, it will create one using the \code{create_
 function.
 }
 \examples{
-\dontrun{
+\donttest{
 # Load a BIDS project with fMRIPrep derivatives
-proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
-
-# Read preprocessed scans for all subjects
-# (mask will be created automatically)
-all_scans <- read_preproc_scans(proj)
-
-# Read preprocessed scans for a specific subject
-sub01_scans <- read_preproc_scans(proj, subid="01")
-
-# Read preprocessed scans for a specific task and run
-task_scans <- read_preproc_scans(proj, 
-                                task="rest",
-                                run="01")
-
-# Specify mode for large datasets
-bigvec_scans <- read_preproc_scans(proj, mode="bigvec")
-
-# Provide a custom mask
-mask <- create_preproc_mask(proj, thresh=0.95)
-masked_scans <- read_preproc_scans(proj, mask=mask)
+tryCatch({
+  ds_path <- get_example_bids_dataset("phoneme_stripped")
+  proj <- bids_project(ds_path, fmriprep=TRUE)
+  
+  # Read preprocessed scans for all subjects
+  # (mask will be created automatically)
+  all_scans <- read_preproc_scans(proj)
+  
+  # Read preprocessed scans for a specific subject
+  sub01_scans <- read_preproc_scans(proj, subid="01")
+  
+  # Read preprocessed scans for a specific task and run
+  task_scans <- read_preproc_scans(proj, 
+                                  task="phoneme",
+                                  run="01")
+  
+  # Specify mode for large datasets
+  bigvec_scans <- read_preproc_scans(proj, mode="bigvec")
+  
+  # Provide a custom mask
+  mask <- create_preproc_mask(proj, thresh=0.95)
+  masked_scans <- read_preproc_scans(proj, mask=mask)
+  
+  # Clean up
+  unlink(ds_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires derivatives dataset: ", e$message)
+})
 }
 
 }

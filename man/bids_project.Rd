@@ -36,28 +36,38 @@ raw and preprocessed data, querying subjects, sessions, and tasks, reading event
 files, and checking BIDS compliance.
 }
 \examples{
-# Load a basic BIDS dataset
-ds001_path <- system.file("extdata/ds001", package="bidser")
-proj <- bids_project(ds001_path)
-
-# Check available tasks
-tasks(proj)
-
-# Get participant IDs
-participants(proj)
-
-\dontrun{
-# Load a dataset with fMRIPrep derivatives
-fmriprep_path <- system.file("extdata/phoneme_stripped", package="bidser")
-proj_prep <- bids_project(fmriprep_path, fmriprep=TRUE)
-
-# Access preprocessed data
-preproc_scans(proj_prep)
-
-# Load a dataset with a custom fMRIPrep directory
-proj_custom <- bids_project(fmriprep_path,
-                           fmriprep=TRUE,
-                           prep_dir="derivatives/custom_fmriprep")
+\donttest{
+# Create a BIDS project
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  
+  # Get all functional scans
+  all_scans <- func_scans(proj)
+  
+  # Get scans for specific subjects
+  sub_scans <- func_scans(proj, subid="0[123]")
+  
+  # Get scans for a specific task
+  task_scans <- func_scans(proj, task="rest")
+  
+  # Get scans from specific runs
+  run_scans <- func_scans(proj, run="0[123]")
+  
+  # Combine multiple filters
+  filtered_scans <- func_scans(proj,
+                              subid="01",
+                              task="rest",
+                              run="01")
+  
+  # Get relative paths instead of full paths
+  rel_scans <- func_scans(proj, full_path=FALSE)
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
 
 }

@@ -61,34 +61,41 @@ task, run, session, and space. The function is particularly useful for accessing
 preprocessed data for analysis pipelines.
 }
 \examples{
-\dontrun{
+\donttest{
 # Create a BIDS project with fMRIPrep derivatives
-proj <- bids_project(system.file("extdata/phoneme_stripped", package="bidser"),
-                     fmriprep=TRUE)
-
-# Get all preprocessed BOLD scans
-all_scans <- preproc_scans(proj)
-
-# Get preprocessed scans for specific subjects
-sub_scans <- preproc_scans(proj, subid="0[12]")
-
-# Get scans in MNI space
-mni_scans <- preproc_scans(proj, space="MNI152NLin2009cAsym")
-
-# Get scans for a specific task with full paths
-task_scans <- preproc_scans(proj,
-                           task="phoneme",
-                           full_path=TRUE)
-
-# Get scans from a specific session
-session_scans <- preproc_scans(proj, session="test")
-
-# Combine multiple filters
-filtered_scans <- preproc_scans(proj,
-                               subid="01",
-                               task="phoneme",
-                               run="01",
-                               space="MNI152NLin2009cAsym")
+tryCatch({
+  ds_path <- get_example_bids_dataset("phoneme_stripped")
+  proj <- bids_project(ds_path, fmriprep=TRUE)
+  
+  # Get all preprocessed BOLD scans
+  all_scans <- preproc_scans(proj)
+  
+  # Get preprocessed scans for specific subjects
+  sub_scans <- preproc_scans(proj, subid="0[12]")
+  
+  # Get scans in MNI space
+  mni_scans <- preproc_scans(proj, space="MNI152NLin2009cAsym")
+  
+  # Get scans for a specific task with full paths
+  task_scans <- preproc_scans(proj,
+                             task="phoneme",
+                             full_path=TRUE)
+  
+  # Get scans from a specific session
+  session_scans <- preproc_scans(proj, session="test")
+  
+  # Combine multiple filters
+  filtered_scans <- preproc_scans(proj,
+                                 subid="01",
+                                 task="phoneme",
+                                 run="01",
+                                 space="MNI152NLin2009cAsym")
+  
+  # Clean up
+  unlink(ds_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
 
 }

@@ -60,28 +60,36 @@ read_func_scans.bids_project <- function(x, mask, mode = c("normal", "bigvec"),
 #' function.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load a BIDS project with fMRIPrep derivatives
-#' proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
-#'
-#' # Read preprocessed scans for all subjects
-#' # (mask will be created automatically)
-#' all_scans <- read_preproc_scans(proj)
-#'
-#' # Read preprocessed scans for a specific subject
-#' sub01_scans <- read_preproc_scans(proj, subid="01")
-#'
-#' # Read preprocessed scans for a specific task and run
-#' task_scans <- read_preproc_scans(proj, 
-#'                                 task="rest",
-#'                                 run="01")
-#'
-#' # Specify mode for large datasets
-#' bigvec_scans <- read_preproc_scans(proj, mode="bigvec")
-#'
-#' # Provide a custom mask
-#' mask <- create_preproc_mask(proj, thresh=0.95)
-#' masked_scans <- read_preproc_scans(proj, mask=mask)
+#' tryCatch({
+#'   ds_path <- get_example_bids_dataset("phoneme_stripped")
+#'   proj <- bids_project(ds_path, fmriprep=TRUE)
+#'   
+#'   # Read preprocessed scans for all subjects
+#'   # (mask will be created automatically)
+#'   all_scans <- read_preproc_scans(proj)
+#'   
+#'   # Read preprocessed scans for a specific subject
+#'   sub01_scans <- read_preproc_scans(proj, subid="01")
+#'   
+#'   # Read preprocessed scans for a specific task and run
+#'   task_scans <- read_preproc_scans(proj, 
+#'                                   task="phoneme",
+#'                                   run="01")
+#'   
+#'   # Specify mode for large datasets
+#'   bigvec_scans <- read_preproc_scans(proj, mode="bigvec")
+#'   
+#'   # Provide a custom mask
+#'   mask <- create_preproc_mask(proj, thresh=0.95)
+#'   masked_scans <- read_preproc_scans(proj, mask=mask)
+#'   
+#'   # Clean up
+#'   unlink(ds_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires derivatives dataset: ", e$message)
+#' })
 #' }
 #'
 #' @export
@@ -148,21 +156,29 @@ read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bi
 #' as brain across all subjects/runs. Lower values create a more inclusive mask.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load a BIDS project with fMRIPrep derivatives
-#' proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
-#'
-#' # Create a mask for all subjects (conservative threshold)
-#' all_subj_mask <- create_preproc_mask(proj, subid=".*")
-#'
-#' # Create a mask for a specific subject
-#' sub01_mask <- create_preproc_mask(proj, subid="01")
-#'
-#' # Create a more inclusive mask with a lower threshold
-#' inclusive_mask <- create_preproc_mask(proj, subid=".*", thresh=0.8)
-#'
-#' # Use additional search criteria
-#' task_mask <- create_preproc_mask(proj, subid=".*", task="rest")
+#' tryCatch({
+#'   ds_path <- get_example_bids_dataset("phoneme_stripped")
+#'   proj <- bids_project(ds_path, fmriprep=TRUE)
+#'   
+#'   # Create a mask for all subjects (conservative threshold)
+#'   all_subj_mask <- create_preproc_mask(proj, subid=".*")
+#'   
+#'   # Create a mask for a specific subject
+#'   sub01_mask <- create_preproc_mask(proj, subid="01")
+#'   
+#'   # Create a more inclusive mask with a lower threshold
+#'   inclusive_mask <- create_preproc_mask(proj, subid=".*", thresh=0.8)
+#'   
+#'   # Use additional search criteria
+#'   task_mask <- create_preproc_mask(proj, subid=".*", task="phoneme")
+#'   
+#'   # Clean up
+#'   unlink(ds_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires derivatives dataset: ", e$message)
+#' })
 #' }
 #'
 #' @export
@@ -350,7 +366,7 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #' @importFrom tidyselect any_of
 #' @return A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' proj <- bids_project("/path/to/bids", fmriprep = TRUE)
 #' # canonical names automatically resolve to actual columns
 #' conf <- read_confounds(proj, cvars = c("csf", "framewise_displacement"))

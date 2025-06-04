@@ -37,28 +37,48 @@ and optional key-value criteria. It can search in both raw data and preprocessed
 derivatives (if available).
 }
 \examples{
+\donttest{
+# Search for event files in a BIDS dataset  
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path, fmriprep=FALSE)
+  event_files <- search_files(proj, regex="events\\\\.tsv$")
+  
+  # Search with additional criteria
+  sub01_files <- search_files(proj, regex="bold\\\\.nii\\\\.gz$", subid="01", 
+                              task="balloonanalogrisktask")
+  
+  # Get full paths
+  full_paths <- search_files(proj, regex="events\\\\.tsv$", full_path=TRUE)
+  
+  # Search with strict matching
+  strict_matches <- search_files(proj, regex="\\\\.tsv$", strict=TRUE, 
+                                 task="balloonanalogrisktask")
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
+}
+\donttest{
 # Search for event files in a BIDS dataset
-proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
-event_files <- search_files(proj, regex="events\\\\.tsv$")
-
-# Search with additional criteria
-sub01_files <- search_files(proj, regex="bold\\\\.nii\\\\.gz$", subid="01", 
-                            task="balloonanalogrisktask")
-
-# Get full paths
-full_paths <- search_files(proj, regex="events\\\\.tsv$", full_path=TRUE)
-
-# Search with strict matching
-strict_matches <- search_files(proj, regex="\\\\.tsv$", strict=TRUE, 
-                               task="balloonanalogrisktask")
-# Search for event files in a BIDS dataset
-proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
-event_files <- search_files(proj, regex="events\\\\\\\\.tsv$")
-
-# Search with additional criteria (note: ds001 only has one subject '01')
-sub01_files <- search_files(proj, regex="bold\\\\\\\\.nii\\\\\\\\.gz$", subid="01", 
-                            task="balloonanalogrisktask")
-
-# Get full paths
-full_paths <- search_files(proj, regex="events\\\\\\\\.tsv$", full_path=TRUE)
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path, fmriprep=FALSE)
+  event_files <- search_files(proj, regex="events\\\\.tsv$")
+  
+  # Search with additional criteria (note: ds001 only has one subject '01')
+  sub01_files <- search_files(proj, regex="bold\\\\.nii\\\\.gz$", subid="01", 
+                              task="balloonanalogrisktask")
+  
+  # Get full paths
+  full_paths <- search_files(proj, regex="events\\\\.tsv$", full_path=TRUE)
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
+}
 }

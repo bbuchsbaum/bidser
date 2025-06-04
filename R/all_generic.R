@@ -73,15 +73,18 @@ decode <- function(x,...) {
 #' @export
 #' @rdname sessions-method
 #' @examples 
+#' \donttest{
 #' # Get sessions from a BIDS project
-#' p <- system.file("extdata/ds001", package="bidser")
-#' sessions(bids_project(p))
-#' 
-#' \dontrun{
-#' # Create a BIDS structure with sessions and check them
-#' bs <- bids_structure(name="Test", subjects=c("01", "02"), 
-#'                     sessions=c("pre", "post"))
-#' sessions(bs)
+#' tryCatch({
+#'   ds007_path <- get_example_bids_dataset("ds007")
+#'   proj <- bids_project(ds007_path)
+#'   sessions(proj)
+#'   
+#'   # Clean up
+#'   unlink(ds007_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
 sessions <- function (x, ...) {
   UseMethod("sessions", x)
@@ -101,15 +104,18 @@ sessions <- function (x, ...) {
 #' @export
 #' @rdname tasks-method
 #' @examples 
+#' \donttest{
 #' # Get tasks from a BIDS project
-#' p <- system.file("extdata/ds001", package="bidser")
-#' tasks(bids_project(p))
-#' 
-#' \dontrun{
-#' # Create a BIDS structure with specific tasks and check them
-#' bs <- bids_structure(name="Test", subjects=c("01", "02"), 
-#'                     tasks=c("rest", "memory", "working"))
-#' tasks(bs)
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   tasks(proj)
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
 tasks <- function (x, ...) {
   UseMethod("tasks", x)
@@ -130,17 +136,21 @@ tasks <- function (x, ...) {
 #' @export
 #' @rdname flat_list-method
 #' @examples 
+#' \donttest{
 #' # Get flat representation with full paths
-#' p <- system.file("extdata/ds001", package="bidser")
-#' flat_list(bids_project(p))
-#' 
-#' # Get flat representation with just file names
-#' flat_list(bids_project(p), full_path=FALSE)
-#' 
-#' \dontrun{
-#' # Create a BIDS structure and get its flat representation
-#' bs <- bids_structure(name="Test", subjects=c("01", "02"))
-#' flat_list(bs)
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   flat_list(proj)
+#'   
+#'   # Get flat representation with just file names
+#'   flat_list(proj, full_path=FALSE)
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
 flat_list <- function(x, ...) {
   UseMethod("flat_list", x)
@@ -161,14 +171,18 @@ flat_list <- function(x, ...) {
 #' @export
 #' @rdname participants-method
 #' @examples 
+#' \donttest{
 #' # Get participants from a BIDS project
-#' p <- system.file("extdata/ds001", package="bidser")
-#' participants(bids_project(p))
-#' 
-#' \dontrun{
-#' # Create a BIDS structure with specific participants and check them
-#' bs <- bids_structure(name="Test", subjects=c("01", "02", "03"))
-#' participants(bs)
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   participants(proj)
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
 participants <- function (x, ...) {
   UseMethod("participants", x)
@@ -195,19 +209,23 @@ participants <- function (x, ...) {
 #' @export
 #' @rdname event_files-method
 #' @examples 
+#' \donttest{
 #' # Get all event files from a BIDS project
-#' p <- system.file("extdata/ds001", package="bidser")
-#' event_files(bids_project(p))
-#' 
-#' # Get event files for specific subjects and tasks
-#' p <- system.file("extdata/ds001", package="bidser")
-#' event_files(bids_project(p), subid="sub-0[12]", task="balloonanalog")
-#' 
-#' \dontrun{
-#' # Create a BIDS structure and check for event files
-#' bs <- bids_structure(name="Test", subjects=c("01", "02"), 
-#'                     tasks=c("rest", "memory"))
-#' event_files(bs)
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   event_files(proj)
+#'   
+#'   # Get event files for specific subjects and tasks
+#'   if (length(participants(proj)) > 0) {
+#'     event_files(proj, subid=participants(proj)[1], task="balloonanalogrisktask")
+#'   }
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
 event_files <- function (x, ...) {
   UseMethod("event_files", x)
@@ -234,18 +252,22 @@ event_files <- function (x, ...) {
 #' @export
 #' @rdname confound_files-method
 #' @examples 
-#' \dontrun{
+#' \donttest{
 #' # Get all confound files from a BIDS project with fMRIPrep derivatives
-#' p <- system.file("extdata/phoneme_stripped", package="bidser")
-#' proj <- bids_project(p, fmriprep=TRUE)
-#' confound_files(proj)
-#' # Get confound files for specific subjects and tasks
-#' confound_files(proj, subid="sub-01", task="phoneme")
-#' 
-#' # Create a BIDS structure with fMRIPrep and check for confound files
-#' bs <- bids_structure(name="Test", subjects=c("01", "02"), 
-#'                     tasks=c("rest"), include_fmriprep=TRUE)
-#' confound_files(bs)
+#' tryCatch({
+#'   # Try to get a derivatives dataset
+#'   ds_path <- get_example_bids_dataset("phoneme_stripped")
+#'   proj <- bids_project(ds_path, fmriprep=TRUE)
+#'   conf_files <- confound_files(proj)
+#'   
+#'   # Get confound files for specific subjects and tasks
+#'   confound_files(proj, subid="sub-01", task="phoneme")
+#'   
+#'   # Clean up
+#'   unlink(ds_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
 confound_files <- function (x, ...) {
   UseMethod("confound_files", x)
@@ -269,30 +291,38 @@ confound_files <- function (x, ...) {
 #'   If no matching data is found, returns an empty tibble with appropriate columns.
 #'
 #' @examples
+#' \donttest{
 #' # Create a BIDS project
-#' ds001_path <- system.file("extdata/ds001", package="bidser")
-#' proj <- bids_project(ds001_path)
-#'
-#' # Read all event files
-#' all_events <- read_events(proj)
-#'
-#' # Read events for specific subjects
-#' sub_events <- read_events(proj, subid="0[123]")
-#'
-#' # Read events for a specific task
-#' task_events <- read_events(proj, task="balloonanalogrisktask")
-#'
-#' # Combine multiple filters
-#' filtered_events <- read_events(proj,
-#'                               subid="01",
-#'                               task="balloonanalogrisktask")
-#'
-#' # Access nested data
-#' if (nrow(filtered_events) > 0) {
-#'   first_run <- filtered_events$data[[1]]
-#'   print(head(first_run))
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   
+#'   # Read all event files
+#'   all_events <- read_events(proj)
+#'   
+#'   # Read events for specific subjects
+#'   sub_events <- read_events(proj, subid="0[123]")
+#'   
+#'   # Read events for a specific task
+#'   task_events <- read_events(proj, task="balloonanalogrisktask")
+#'   
+#'   # Combine multiple filters
+#'   filtered_events <- read_events(proj,
+#'                                 subid="01",
+#'                                 task="balloonanalogrisktask")
+#'   
+#'   # Access nested data
+#'   if (nrow(filtered_events) > 0) {
+#'     first_run <- filtered_events$data[[1]]
+#'     print(head(first_run))
+#'   }
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
-#'
 #' @export
 read_events <- function(x, ...) {
   UseMethod("read_events")
@@ -324,39 +354,46 @@ read_events <- function(x, ...) {
 #'   all confound variables. Returns NULL if no matching files are found.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Create a BIDS project with fMRIPrep derivatives
-#' fmriprep_path <- system.file("extdata/phoneme_stripped", package="bidser")
-#' proj <- bids_project(fmriprep_path, fmriprep=TRUE)
-#'
-#' # Read all confound files
-#' all_conf <- read_confounds(proj)
-#'
-#' # Read confounds for specific subjects and tasks
-#' sub_conf <- read_confounds(proj,
-#'                           subid="01",
-#'                           task="phoneme")
-#'
-#' # Select specific confound variables
-#' motion_conf <- read_confounds(proj,
-#'                              cvars=c("framewise_displacement",
-#'                                     "trans_x", "trans_y", "trans_z",
-#'                                     "rot_x", "rot_y", "rot_z"))
-#'
-#' # Perform PCA reduction
-#' pca_conf <- read_confounds(proj, npcs=5)
-#'
-#' # Get confounds as a flat tibble
-#' flat_conf <- read_confounds(proj, nest=FALSE)
-#'
-#' # Combine multiple options
-#' custom_conf <- read_confounds(proj,
-#'                              subid="01",
-#'                              task="phoneme",
-#'                              cvars=c("framewise_displacement",
-#'                                     "trans_x", "trans_y", "trans_z"),
-#'                              npcs=3,
-#'                              nest=FALSE)
+#' tryCatch({
+#'   ds_path <- get_example_bids_dataset("phoneme_stripped")
+#'   proj <- bids_project(ds_path, fmriprep=TRUE)
+#'   
+#'   # Read all confound files
+#'   all_conf <- read_confounds(proj)
+#'   
+#'   # Read confounds for specific subjects and tasks
+#'   sub_conf <- read_confounds(proj,
+#'                             subid="01",
+#'                             task="phoneme")
+#'   
+#'   # Select specific confound variables
+#'   motion_conf <- read_confounds(proj,
+#'                                cvars=c("framewise_displacement",
+#'                                       "trans_x", "trans_y", "trans_z",
+#'                                       "rot_x", "rot_y", "rot_z"))
+#'   
+#'   # Perform PCA reduction
+#'   pca_conf <- read_confounds(proj, npcs=5)
+#'   
+#'   # Get confounds as a flat tibble
+#'   flat_conf <- read_confounds(proj, nest=FALSE)
+#'   
+#'   # Combine multiple options
+#'   custom_conf <- read_confounds(proj,
+#'                                subid="01",
+#'                                task="phoneme",
+#'                                cvars=c("framewise_displacement",
+#'                                       "trans_x", "trans_y", "trans_z"),
+#'                                npcs=3,
+#'                                nest=FALSE)
+#'   
+#'   # Clean up
+#'   unlink(ds_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
 #' @export
 read_confounds <- function(x, ...) {
@@ -384,27 +421,42 @@ read_confounds <- function(x, ...) {
 #'   Returns NULL if no matching files are found.
 #'
 #' @examples
+#' \donttest{
 #' # Create a BIDS project object
-#' proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-#'
-#' # Get all functional scans
-#' all_scans <- func_scans(proj)
-#'
-#' # Get scans for specific subjects
-#' sub_scans <- func_scans(proj, subid="sub-0[123]")
-#'
-#' # Get scans for a specific task and run
-#' task_scans <- func_scans(proj, 
-#'                         task="balloonanalogrisktask",
-#'                         run="01")
-#'
-#' # Get scans with relative paths
-#' rel_scans <- func_scans(proj, full_path=FALSE)
-#'
-#' # Get scans from a project with sessions
-#' ds007 <- bids_project(system.file("extdata/ds007", package="bidser"))
-#' session_scans <- func_scans(ds007, session="test")
-#'
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   
+#'   # Get all functional scans
+#'   all_scans <- func_scans(proj)
+#'   
+#'   # Get scans for specific subjects
+#'   if (length(participants(proj)) > 0) {
+#'     sub_scans <- func_scans(proj, subid=participants(proj)[1])
+#'   }
+#'   
+#'   # Get scans for a specific task and run
+#'   if (length(tasks(proj)) > 0) {
+#'     task_scans <- func_scans(proj, task=tasks(proj)[1], run="01")
+#'   }
+#'   
+#'   # Get scans with relative paths
+#'   rel_scans <- func_scans(proj, full_path=FALSE)
+#'   
+#'   # Also try with a dataset that has sessions
+#'   ds007_path <- get_example_bids_dataset("ds007")
+#'   ds007_proj <- bids_project(ds007_path)
+#'   if (length(sessions(ds007_proj)) > 0) {
+#'     session_scans <- func_scans(ds007_proj, session=sessions(ds007_proj)[1])
+#'   }
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#'   unlink(ds007_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
 #' @export
 func_scans <- function(x, ...) {
   UseMethod("func_scans", x)
@@ -423,7 +475,6 @@ func_scans <- function(x, ...) {
 #' @param run Run regex to match specific runs (default: ".*" for all runs)
 #' @param variant Preprocessing variant to match (default: NULL, which matches files without a variant)
 #' @param space Space regex to match specific spaces (default: ".*" for all spaces)
-#' @param session Session regex to match specific sessions (default: ".*" for all sessions)
 #' @param modality Image modality to match (default: "bold" for functional MRI)
 #' @param kind Kind regex to match specific kinds (default: ".*" for all kinds)
 #' @param full_path If TRUE, return full file paths; if FALSE, return paths relative to the project root (default: FALSE)
@@ -435,31 +486,25 @@ func_scans <- function(x, ...) {
 #' @rdname preproc_scans-method
 #' @examples
 #' # Get all preprocessed scans from a BIDS project with fMRIPrep derivatives
-#' \dontrun{
-#' # Load a BIDS project with fMRIPrep derivatives
-#' proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
-#' 
-#' # Get all preprocessed scans
-#' scans <- preproc_scans(proj)
-#' 
-#' # Get preprocessed scans for a specific subject
-#' sub01_scans <- preproc_scans(proj, subid="01")
-#' 
-#' # Get preprocessed scans for a specific task and space
-#' task_scans <- preproc_scans(proj, task="rest", space="MNI152NLin2009cAsym")
-#' 
-#' # Get preprocessed scans for a specific session (if the dataset has sessions)
-#' session_scans <- preproc_scans(proj, session="01")
-#' 
-#' # Filter by multiple criteria
-#' filtered_scans <- preproc_scans(proj, 
-#'                                subid="01",
-#'                                task="rest", 
-#'                                run="01", 
-#'                                space="MNI152NLin2009cAsym")
-#' 
-#' # Get full paths to preprocessed scans
-#' full_paths <- preproc_scans(proj, full_path=TRUE)
+#' \donttest{
+#' # Download and load a BIDS project with fMRIPrep derivatives
+#' tryCatch({
+#'   ds001_deriv_path <- get_example_bids_dataset("ds000001-fmriprep")
+#'   proj <- bids_project(ds001_deriv_path, fmriprep=TRUE)
+#'   
+#'   # Get all preprocessed scans
+#'   scans <- preproc_scans(proj)
+#'   
+#'   # Get preprocessed scans for a specific subject
+#'   if (!is.null(scans) && length(scans) > 0) {
+#'     sub01_scans <- preproc_scans(proj, subid="01")
+#'   }
+#'   
+#'   # Clean up
+#'   unlink(ds001_deriv_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires derivatives dataset: ", e$message)
+#' })
 #' }
 preproc_scans <- function(x, subid = ".*", task = ".*", run = ".*", session = ".*",
                           variant = NULL, space = ".*", modality = "bold", 
@@ -476,16 +521,21 @@ preproc_scans <- function(x, subid = ".*", task = ".*", run = ".*", session = ".
 #' @return A logical mask volume
 #' @export
 #' @examples
-#' \dontrun{
-#' # Load a BIDS project with fMRIPrep derivatives
-#' proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
-#' mask <- create_preproc_mask(proj, subid=".*")
-#'
-#' # Create mask for single subject
-#' sub01_mask <- create_preproc_mask(proj, subid="01")
-#'
-#' # Create mask with different threshold
-#' mask_thresh <- create_preproc_mask(proj, subid=".*", thresh=0.95)
+#' \donttest{
+#' # Download and load a BIDS project with fMRIPrep derivatives
+#' tryCatch({
+#'   ds001_deriv_path <- get_example_bids_dataset("ds000001-fmriprep")
+#'   proj <- bids_project(ds001_deriv_path, fmriprep=TRUE)
+#'   mask <- create_preproc_mask(proj, subid=".*")
+#'   
+#'   # Create mask for single subject
+#'   sub01_mask <- create_preproc_mask(proj, subid="01")
+#'   
+#'   # Clean up
+#'   unlink(ds001_deriv_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires derivatives dataset: ", e$message)
+#' })
 #' }
 create_preproc_mask <- function(x, subid, thresh=0.99, ...) {
   UseMethod("create_preproc_mask", x)
@@ -502,6 +552,23 @@ create_preproc_mask <- function(x, subid, thresh=0.99, ...) {
 #' @return A logical mask volume
 #' @export
 #' @rdname brain_mask
+#' @examples
+#' \donttest{
+#' # Download and load a BIDS project with fMRIPrep derivatives
+#' tryCatch({
+#'   ds001_deriv_path <- get_example_bids_dataset("ds000001-fmriprep")
+#'   proj <- bids_project(ds001_deriv_path, fmriprep=TRUE)
+#'   mask <- brain_mask(proj, subid="01")
+#'   
+#'   # Create mask for multiple subjects
+#'   multi_mask <- brain_mask(proj, subid=".*")
+#'   
+#'   # Clean up
+#'   unlink(ds001_deriv_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires derivatives dataset: ", e$message)
+#' })
+#' }
 brain_mask <- function(x, subid, ...) {
   UseMethod("brain_mask", x)
 }
@@ -523,20 +590,30 @@ brain_mask <- function(x, subid, ...) {
 #' @export
 #' @rdname search_files
 #' @examples
-#' # Search for event files in a BIDS dataset
-#' proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
-#' event_files <- search_files(proj, regex="events\\.tsv$")
-#' 
-#' # Search with additional criteria
-#' sub01_files <- search_files(proj, regex="bold\\.nii\\.gz$", subid="01", 
-#'                             task="balloonanalogrisktask")
-#' 
-#' # Get full paths
-#' full_paths <- search_files(proj, regex="events\\.tsv$", full_path=TRUE)
-#' 
-#' # Search with strict matching
-#' strict_matches <- search_files(proj, regex="\\.tsv$", strict=TRUE, 
-#'                                task="balloonanalogrisktask")
+#' \donttest{
+#' # Search for event files in a BIDS dataset  
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path, fmriprep=FALSE)
+#'   event_files <- search_files(proj, regex="events\\.tsv$")
+#'   
+#'   # Search with additional criteria
+#'   sub01_files <- search_files(proj, regex="bold\\.nii\\.gz$", subid="01", 
+#'                               task="balloonanalogrisktask")
+#'   
+#'   # Get full paths
+#'   full_paths <- search_files(proj, regex="events\\.tsv$", full_path=TRUE)
+#'   
+#'   # Search with strict matching
+#'   strict_matches <- search_files(proj, regex="\\.tsv$", strict=TRUE, 
+#'                                  task="balloonanalogrisktask")
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
 search_files <- function(x, ...) {
   UseMethod("search_files", x)
 }
@@ -558,18 +635,26 @@ search_files <- function(x, ...) {
 #' @export
 #' @rdname load_all_events-method
 #' @examples
+#' \donttest{
 #' # Example with a bids_project (assuming events exist)
-#' 
-#' proj <- try(bids_project(system.file("extdata/ds001", package="bidser")))
-#' if (!inherits(proj, "try-error")) {
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
 #'   all_events <- load_all_events(proj)
 #'   print(all_events)
 #'   
 #'   # Load specific subject/task
-#'   sub01_events <- load_all_events(proj, subid="01", task="balloon")
-#'   print(sub01_events)
+#'   if (length(participants(proj)) > 0) {
+#'     sub01_events <- load_all_events(proj, subid=participants(proj)[1], task="balloonanalogrisktask")
+#'     print(sub01_events)
+#'   }
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
-#' 
 load_all_events <- function(x, ...) {
   UseMethod("load_all_events")
 }
@@ -580,8 +665,18 @@ load_all_events <- function(x, ...) {
 #' @return A list containing summary statistics about the BIDS dataset
 #' @export
 #' @examples
-#' proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-#' summary <- bids_summary(proj)
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   summary <- bids_summary(proj)
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
 bids_summary <- function(x) {
   UseMethod("bids_summary")
 }
@@ -592,8 +687,18 @@ bids_summary <- function(x) {
 #' @return A list with compliance check results
 #' @export
 #' @examples
-#' proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-#' compliance <- bids_check_compliance(proj)
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   compliance <- bids_check_compliance(proj)
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
 bids_check_compliance <- function(x) {
   UseMethod("bids_check_compliance")
 }
@@ -610,10 +715,20 @@ bids_check_compliance <- function(x) {
 #' @export
 #' @rdname bids_subject
 #' @examples
-#' proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-#' subj <- bids_subject(proj, "01")
-#' subj$events()
-#' subj$scans()
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   subj <- bids_subject(proj, "01")
+#'   subj$events()
+#'   subj$scans()
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
 bids_subject <- function(x, subid, ...) {
   UseMethod("bids_subject")
 }

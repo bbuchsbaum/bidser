@@ -7,14 +7,16 @@
 \usage{
 bids_subject(x, subid, ...)
 
-\method{bids_subject}{bids_project}(x, subid, ...)
+bids_subject.bids_project(x, subid, ...)
+
+bids_subject(x, subid, ...)
 }
 \arguments{
 \item{x}{A \code{bids_project} object.}
 
-\item{subid}{Subject identifier. Can be with or without the \verb{sub-} prefix.}
+\item{subid}{Character string. The subject ID to extract (without the "sub-" prefix).}
 
-\item{...}{Additional arguments (unused).}
+\item{...}{Additional arguments (not currently used).}
 }
 \value{
 A list of helper functions for the subject.
@@ -27,6 +29,9 @@ A list containing helper functions:
 \item{\code{preproc_scans}:}{Retrieve preprocessed scan paths with \code{\link[=preproc_scans]{preproc_scans()}}.}
 \item{\code{brain_mask}:}{Create a brain mask via \code{\link[=brain_mask]{brain_mask()}}.}
 }
+
+A new \code{bids_project} object containing only the specified subject's data.
+Returns NULL if the subject is not found in the project.
 }
 \description{
 \code{bids_subject} returns a lightweight interface with helper functions
@@ -35,14 +40,56 @@ for retrieving data associated with one subject.
 \code{bids_subject} returns a lightweight facade that exposes convenience
 functions to work with all data associated with one subject within a
 BIDS project.
+
+This function extracts a single subject's data from a BIDS project, creating
+a new BIDS project object containing only that subject's files and metadata.
 }
 \examples{
-proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-subj <- bids_subject(proj, "01")
-subj$events()
-subj$scans()
-proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-subj <- bids_subject(proj, "01")
-subj$events()
-subj$scans()
+\donttest{
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  subj <- bids_subject(proj, "01")
+  subj$events()
+  subj$scans()
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
+}
+\donttest{
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  subj <- bids_subject(proj, "01")
+  subj$events()
+  subj$scans()
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
+}
+\donttest{
+# Extract a single subject from a BIDS project
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  
+  # Extract subject 01
+  sub01 <- bids_subject(proj, "01")
+  
+  # Check subject data
+  print(participants(sub01))
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
+}
+
 }

@@ -6,6 +6,16 @@
 \usage{
 anat_parser()
 }
+\value{
+An anatomical BIDS parser object for parsing anatomical files
+}
 \description{
 Anatomical parser constructor
+}
+\examples{
+# Create an anatomical parser
+parser <- anat_parser()
+
+# Parse an anatomical file
+result <- parse(parser, "sub-01_T1w.nii.gz")
 }

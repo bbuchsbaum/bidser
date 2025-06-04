@@ -28,28 +28,36 @@ functional MRI scans. The function can filter events by subject and task, and
 returns a nested tibble for easy data manipulation.
 }
 \examples{
+\donttest{
 # Create a BIDS project
-ds001_path <- system.file("extdata/ds001", package="bidser")
-proj <- bids_project(ds001_path)
-
-# Read all event files
-all_events <- read_events(proj)
-
-# Read events for specific subjects
-sub_events <- read_events(proj, subid="0[123]")
-
-# Read events for a specific task
-task_events <- read_events(proj, task="balloonanalogrisktask")
-
-# Combine multiple filters
-filtered_events <- read_events(proj,
-                              subid="01",
-                              task="balloonanalogrisktask")
-
-# Access nested data
-if (nrow(filtered_events) > 0) {
-  first_run <- filtered_events$data[[1]]
-  print(head(first_run))
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  
+  # Read all event files
+  all_events <- read_events(proj)
+  
+  # Read events for specific subjects
+  sub_events <- read_events(proj, subid="0[123]")
+  
+  # Read events for a specific task
+  task_events <- read_events(proj, task="balloonanalogrisktask")
+  
+  # Combine multiple filters
+  filtered_events <- read_events(proj,
+                                subid="01",
+                                task="balloonanalogrisktask")
+  
+  # Access nested data
+  if (nrow(filtered_events) > 0) {
+    first_run <- filtered_events$data[[1]]
+    print(head(first_run))
+  }
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
-
 }

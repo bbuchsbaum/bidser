@@ -35,38 +35,45 @@ noise components. The function can optionally perform PCA reduction on the confo
 and return either nested or flat tibbles.
 }
 \examples{
-\dontrun{
+\donttest{
 # Create a BIDS project with fMRIPrep derivatives
-fmriprep_path <- system.file("extdata/phoneme_stripped", package="bidser")
-proj <- bids_project(fmriprep_path, fmriprep=TRUE)
-
-# Read all confound files
-all_conf <- read_confounds(proj)
-
-# Read confounds for specific subjects and tasks
-sub_conf <- read_confounds(proj,
-                          subid="01",
-                          task="phoneme")
-
-# Select specific confound variables
-motion_conf <- read_confounds(proj,
-                             cvars=c("framewise_displacement",
-                                    "trans_x", "trans_y", "trans_z",
-                                    "rot_x", "rot_y", "rot_z"))
-
-# Perform PCA reduction
-pca_conf <- read_confounds(proj, npcs=5)
-
-# Get confounds as a flat tibble
-flat_conf <- read_confounds(proj, nest=FALSE)
-
-# Combine multiple options
-custom_conf <- read_confounds(proj,
-                             subid="01",
-                             task="phoneme",
-                             cvars=c("framewise_displacement",
-                                    "trans_x", "trans_y", "trans_z"),
-                             npcs=3,
-                             nest=FALSE)
+tryCatch({
+  ds_path <- get_example_bids_dataset("phoneme_stripped")
+  proj <- bids_project(ds_path, fmriprep=TRUE)
+  
+  # Read all confound files
+  all_conf <- read_confounds(proj)
+  
+  # Read confounds for specific subjects and tasks
+  sub_conf <- read_confounds(proj,
+                            subid="01",
+                            task="phoneme")
+  
+  # Select specific confound variables
+  motion_conf <- read_confounds(proj,
+                               cvars=c("framewise_displacement",
+                                      "trans_x", "trans_y", "trans_z",
+                                      "rot_x", "rot_y", "rot_z"))
+  
+  # Perform PCA reduction
+  pca_conf <- read_confounds(proj, npcs=5)
+  
+  # Get confounds as a flat tibble
+  flat_conf <- read_confounds(proj, nest=FALSE)
+  
+  # Combine multiple options
+  custom_conf <- read_confounds(proj,
+                               subid="01",
+                               task="phoneme",
+                               cvars=c("framewise_displacement",
+                                      "trans_x", "trans_y", "trans_z"),
+                               npcs=3,
+                               nest=FALSE)
+  
+  # Clean up
+  unlink(ds_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
 }

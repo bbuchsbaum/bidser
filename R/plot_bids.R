@@ -20,38 +20,21 @@
 #' @import viridis
 #' @export
 #' @examples
-#' \dontrun{
-#' proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-#' plot_bids(proj)
-#'
-#' # Create a non-interactive plot with a different color scheme
-#' plot_bids(proj, interactive = FALSE, color_scheme = "plasma")
-#'
-#' # Create a focused heatmap visualization
-#' plot_bids(proj, visualization_mode = "heatmap")
-#'
-#' # Create a comprehensive visualization with all plot types
-#' plot_bids(proj, visualization_mode = "complete")
-#' 
-#' # Or use the specialized heatmap function
-#' bids_heatmap(proj)
-#'
-#' # Create a mock project and visualize it
-#' file_structure <- data.frame(
-#'   subid = c("01", "02", "03"),
-#'   session = c("pre", "post", "pre"),
-#'   datatype = c("anat", "func", "func"),
-#'   task = c(NA, "rest", "task1"),
-#'   run = c(NA, "01", "02"),
-#'   suffix = c("T1w.nii.gz", "bold.nii.gz", "bold.nii.gz"),
-#'   fmriprep = FALSE
-#' )
-#' mock_proj <- create_mock_bids(
-#'   project_name = "my_project",
-#'   participants = c("sub-01", "sub-02", "sub-03"),
-#'   file_structure = file_structure
-#' )
-#' plot_bids(mock_proj, highlight_missing = TRUE)
+#' \donttest{
+#' # Create a basic BIDS project and plot it
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   plot_bids(proj)
+#'   
+#'   # Create an interactive plot
+#'   plot_bids(proj, interactive=TRUE)
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
 plot_bids <- function(x, interactive = TRUE, color_scheme = "viridis",
                       include_derivatives = TRUE, file_size_scale = "log",
@@ -863,28 +846,29 @@ plot_bids_structure <- function(data, color_scheme = "viridis") {
 #' @examples
 #' \donttest{
 #' # Create a basic interactive heatmap for a BIDS dataset
-#' proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-#' bids_heatmap(proj)
-#'
-#' # Create a static heatmap with custom settings
-#' bids_heatmap(proj, 
-#'              interactive = FALSE,
-#'              color_scheme = "plasma",
-#'              text_size = 3,
-#'              rotate_labels = FALSE)
-#'
-#' # Visualize anatomical data with missing data highlighted
-#' bids_heatmap(proj, 
-#'              file_type = "anat",
-#'              highlight_missing = TRUE,
-#'              color_scheme = "magma")
-#'
-#' # Create a compact visualization for a large dataset
-#' ds007 <- bids_project(system.file("extdata/ds007", package="bidser"))
-#' bids_heatmap(ds007, 
-#'              text_size = 2,
-#'              rotate_labels = TRUE,
-#'              highlight_missing = FALSE)
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   bids_heatmap(proj)
+#'   
+#'   # Create a static heatmap with custom settings
+#'   bids_heatmap(proj, 
+#'                interactive = FALSE,
+#'                color_scheme = "plasma",
+#'                text_size = 3,
+#'                rotate_labels = FALSE)
+#'   
+#'   # Visualize anatomical data with missing data highlighted
+#'   bids_heatmap(proj, 
+#'                file_type = "anat",
+#'                highlight_missing = TRUE,
+#'                color_scheme = "magma")
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
 #' @export
 bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type="func",
@@ -1344,13 +1328,17 @@ plot_bids_heatmap <- function(data, color_scheme = "viridis", highlight_missing 
 #' @noRd
 test_bids_heatmap <- function() {
   # First try to use a real dataset if it exists
-  example_path <- system.file("extdata/ds001", package = "bidser")
-  
-  if (dir.exists(example_path) && length(list.files(example_path)) > 0) {
-    message("Using real dataset from package: ", example_path)
+  tryCatch({
+    example_path <- get_example_bids_dataset("ds001")
+    message("Using real dataset: ", example_path)
     x <- bidser::bids_project(example_path)
-  } else {
-    message("Real dataset not found, creating virtual project")
+    # Return heatmap visualization
+    result <- bids_heatmap(x, interactive = TRUE, file_type = "func")
+    # Clean up
+    unlink(example_path, recursive=TRUE)
+    return(result)
+  }, error = function(e) {
+    message("Real dataset not available, creating virtual project: ", e$message)
     x <- create_virtual_bids_project(
       name = "Test Project",
       subjects = paste0("sub-", sprintf("%02d", 1:10)),
@@ -1360,10 +1348,9 @@ test_bids_heatmap <- function() {
       modalities = c("T1w", "T2w", "bold"),
       derivatives = TRUE
     )
-  }
-  
-  # Return heatmap visualization
-  bids_heatmap(x, interactive = TRUE, file_type = "func")
+    # Return heatmap visualization
+    return(bids_heatmap(x, interactive = TRUE, file_type = "func"))
+  })
 }
 
 #' Create a virtual BIDS project for testing

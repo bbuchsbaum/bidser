@@ -6,6 +6,16 @@
 \usage{
 fmriprep_anat_parser()
 }
+\value{
+An fMRIPrep anatomical parser object for parsing preprocessed anatomical files
+}
 \description{
 fMRIPrep anatomical parser constructor
+}
+\examples{
+# Create an fMRIPrep anatomical parser
+parser <- fmriprep_anat_parser()
+
+# Parse a preprocessed anatomical file
+result <- parse(parser, "sub-01_space-MNI152NLin2009cAsym_desc-preproc_T1w.nii.gz")
 }

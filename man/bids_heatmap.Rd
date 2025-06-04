@@ -41,27 +41,28 @@ the project. This is particularly useful for quality control and identifying mis
 \examples{
 \donttest{
 # Create a basic interactive heatmap for a BIDS dataset
-proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-bids_heatmap(proj)
-
-# Create a static heatmap with custom settings
-bids_heatmap(proj, 
-             interactive = FALSE,
-             color_scheme = "plasma",
-             text_size = 3,
-             rotate_labels = FALSE)
-
-# Visualize anatomical data with missing data highlighted
-bids_heatmap(proj, 
-             file_type = "anat",
-             highlight_missing = TRUE,
-             color_scheme = "magma")
-
-# Create a compact visualization for a large dataset
-ds007 <- bids_project(system.file("extdata/ds007", package="bidser"))
-bids_heatmap(ds007, 
-             text_size = 2,
-             rotate_labels = TRUE,
-             highlight_missing = FALSE)
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  bids_heatmap(proj)
+  
+  # Create a static heatmap with custom settings
+  bids_heatmap(proj, 
+               interactive = FALSE,
+               color_scheme = "plasma",
+               text_size = 3,
+               rotate_labels = FALSE)
+  
+  # Visualize anatomical data with missing data highlighted
+  bids_heatmap(proj, 
+               file_type = "anat",
+               highlight_missing = TRUE,
+               color_scheme = "magma")
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
 }

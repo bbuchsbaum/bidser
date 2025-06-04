@@ -6,6 +6,16 @@
 \usage{
 func_parser()
 }
+\value{
+A functional BIDS parser object for parsing functional MRI files
+}
 \description{
 Functional parser constructor
+}
+\examples{
+# Create a functional parser
+parser <- func_parser()
+
+# Parse a functional file
+result <- parse(parser, "sub-01_task-rest_run-01_bold.nii.gz")
 }

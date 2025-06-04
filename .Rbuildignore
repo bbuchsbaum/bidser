@@ -22,3 +22,5 @@ repomix-output.txt
 repomix-output.xml
 .cursorrules
 .claude
+^doc$
+^Meta$

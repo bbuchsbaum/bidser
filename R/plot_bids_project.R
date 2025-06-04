@@ -13,8 +13,16 @@
 #' @export
 #' @examples
 #' \donttest{
-#' proj <- bids_project(system.file("extdata/ds001", package = "bidser"))
-#' plot(proj)
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   plot(proj)
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
 plot.bids_project <- function(x, max_depth = Inf, ...) {
   if (!inherits(x, "bids_project")) {

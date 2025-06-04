@@ -6,24 +6,24 @@ proj_path <- system.file("extdata/phoneme_stripped", package="bidser")
 
 # Check if dataset is available - if not, all tests will be skipped
 if (nchar(proj_path) == 0 || !dir.exists(proj_path)) {
-  skip_all("phoneme_stripped dataset not found - tests will be skipped")
+  skip("phoneme_stripped dataset not found - tests will be skipped")
 }
 
 # Check if there are files in the dataset
 dataset_files <- list.files(proj_path, recursive = TRUE)
 if (length(dataset_files) == 0) {
-  skip_all("phoneme_stripped dataset is empty - tests will be skipped")
+  skip("phoneme_stripped dataset is empty - tests will be skipped")
 }
 
 proj <- tryCatch({
   bids_project(proj_path)
 }, error = function(e) {
-  skip_all(paste("Could not create BIDS project from phoneme_stripped:", e$message))
+  skip(paste("Could not create BIDS project from phoneme_stripped:", e$message))
 })
 
 # Check if project was created successfully and has expected structure
 if (is.null(proj) || length(participants(proj)) == 0) {
-  skip_all("phoneme_stripped BIDS project has no participants - likely check environment issue")
+  skip("phoneme_stripped BIDS project has no participants - likely check environment issue")
 }
 
 # Helper to get expected relative paths (stripping the project name prefix)

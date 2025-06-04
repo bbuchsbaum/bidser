@@ -47,16 +47,24 @@ filters (subid, task, run, session) and loads them into a single tibble.
 If \code{full_path=TRUE}, full file paths are returned; otherwise relative paths.
 }
 \examples{
+\donttest{
 # Example with a bids_project (assuming events exist)
-
-proj <- try(bids_project(system.file("extdata/ds001", package="bidser")))
-if (!inherits(proj, "try-error")) {
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
   all_events <- load_all_events(proj)
   print(all_events)
   
   # Load specific subject/task
-  sub01_events <- load_all_events(proj, subid="01", task="balloon")
-  print(sub01_events)
+  if (length(participants(proj)) > 0) {
+    sub01_events <- load_all_events(proj, subid=participants(proj)[1], task="balloonanalogrisktask")
+    print(sub01_events)
+  }
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
-
 }

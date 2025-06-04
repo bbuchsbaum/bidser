@@ -29,9 +29,10 @@ set_key <- function(fname, key, value) {
 #' @param x The filename string to encode
 encode.character <- function(x, ...) {
   p <- bids_parser()
-  ret <- parse(p, x)
+  ret <- bidser::parse(p, x)  # Use explicit namespace to avoid masking issues
   if (!is.null(ret)) {
-    v <- ret$result$value
+    # The regex-based parser returns result directly at ret$result
+    v <- ret$result
     v[!sapply(v, is.null)]
   } else {
     NULL
@@ -168,28 +169,38 @@ add_file <- function(bids, name,...) {
 #'   Returns NULL if the directory does not contain a valid BIDS dataset.
 #'
 #' @examples
-#' # Load a basic BIDS dataset
-#' ds001_path <- system.file("extdata/ds001", package="bidser")
-#' proj <- bids_project(ds001_path)
-#'
-#' # Check available tasks
-#' tasks(proj)
-#'
-#' # Get participant IDs
-#' participants(proj)
-#'
-#' \dontrun{
-#' # Load a dataset with fMRIPrep derivatives
-#' fmriprep_path <- system.file("extdata/phoneme_stripped", package="bidser")
-#' proj_prep <- bids_project(fmriprep_path, fmriprep=TRUE)
-#'
-#' # Access preprocessed data
-#' preproc_scans(proj_prep)
-#'
-#' # Load a dataset with a custom fMRIPrep directory
-#' proj_custom <- bids_project(fmriprep_path,
-#'                            fmriprep=TRUE,
-#'                            prep_dir="derivatives/custom_fmriprep")
+#' \donttest{
+#' # Create a BIDS project
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   
+#'   # Get all functional scans
+#'   all_scans <- func_scans(proj)
+#'   
+#'   # Get scans for specific subjects
+#'   sub_scans <- func_scans(proj, subid="0[123]")
+#'   
+#'   # Get scans for a specific task
+#'   task_scans <- func_scans(proj, task="rest")
+#'   
+#'   # Get scans from specific runs
+#'   run_scans <- func_scans(proj, run="0[123]")
+#'   
+#'   # Combine multiple filters
+#'   filtered_scans <- func_scans(proj,
+#'                               subid="01",
+#'                               task="rest",
+#'                               run="01")
+#'   
+#'   # Get relative paths instead of full paths
+#'   rel_scans <- func_scans(proj, full_path=FALSE)
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
 #'
 #' @export
@@ -233,57 +244,69 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmripre
   
   has_sessions <- FALSE
 
-  pb <- progress::progress_bar$new(total = length(sdirs))
+  # pb <- progress::progress_bar$new(total = length(sdirs))
 
   for (sdir in sdirs) {
-   
-    if (file.exists(paste0(path, "/", sdir))) {
-      #node <- bids_raw$AddChild(sdir)
-      node <- add_node(bids_raw, sdir)
-      if (fmriprep && file.exists(paste0(path, "/", prep_dir, "/", sdir))) {
-        #prepnode <- bids_prep$AddChild(sdir)
-        prepnode <- add_node(bids_prep, sdir)
-      }
-    } else {
+    # Check if subject exists in raw data or derivatives
+    has_raw_data <- file.exists(paste0(path, "/", sdir))
+    has_derivatives_data <- fmriprep && file.exists(paste0(path, "/", prep_dir, "/", sdir))
+    
+    # Skip if subject doesn't exist in either location
+    if (!has_raw_data && !has_derivatives_data) {
+      # pb$tick()
       next
     }
+    
+    # Create nodes only if the data exists
+    node <- NULL
+    prepnode <- NULL
+    
+    if (has_raw_data) {
+      node <- add_node(bids_raw, sdir)
+    }
+    
+    if (has_derivatives_data) {
+      prepnode <- add_node(bids_prep, sdir)
+    }
 
-    sessions <- get_sessions(path, sdir)
+    # Get sessions from raw data if it exists, otherwise from derivatives
+    sessions_path <- if (has_raw_data) path else paste0(path, "/", prep_dir)
+    sessions <- get_sessions(sessions_path, sdir)
 
     if (length(sessions) > 0) {
       has_sessions <- TRUE
       for (sess in sessions) {
-        #snode <- node$AddChild(sess)
-        snode <- add_node(node, sess, session=gsub("ses-", "", sess))
-        #snode$session <- gsub("ses-", "", sess)
-      
-        descend(snode, paste0(path, "/", sdir, "/", sess), "anat", aparser)
-        descend(snode, paste0(path, "/", sdir, "/", sess), "func", fparser)
+        # Process raw data sessions if they exist
+        if (has_raw_data) {
+          snode <- add_node(node, sess, session=gsub("ses-", "", sess))
+          descend(snode, paste0(path, "/", sdir, "/", sess), "anat", aparser)
+          descend(snode, paste0(path, "/", sdir, "/", sess), "func", fparser)
+        }
         
-        if (fmriprep) {
-          #snode_prepped <- prepnode$AddChild(sess)
-          #snode_prepped$session <- gsub("ses-", "", sess)
+        # Process derivatives sessions if they exist
+        if (has_derivatives_data) {
           snode_prepped <- add_node(prepnode, sess, session=gsub("ses-", "", sess))
-          
           descend(snode_prepped, paste0(path, "/", prep_dir, "/", sdir, "/", sess), "anat", prep_anat_parser)
           descend(snode_prepped, paste0(path, "/", prep_dir, "/", sdir, "/", sess), "func", prep_func_parser)
-          
         }
       }
     } else {
-      descend(node, paste0(path, "/", sdir), "anat", aparser)
-      descend(node, paste0(path, "/", sdir), "func", fparser)
+      # No sessions - process directly
+      if (has_raw_data) {
+        descend(node, paste0(path, "/", sdir), "anat", aparser)
+        descend(node, paste0(path, "/", sdir), "func", fparser)
+      }
       
-      if (fmriprep) {
+      if (has_derivatives_data) {
         descend(prepnode, paste0(path, "/", prep_dir, "/", sdir), "anat", prep_anat_parser)
         descend(prepnode, paste0(path, "/", prep_dir, "/", sdir), "func", prep_func_parser)
       }
     }
     
-    pb$tick()
+    # pb$tick()
   }
   
-  tbl <- tibble::as_tibble(data.tree::ToDataFrameTypeCol(bids, 'name', 'type', 'subid', 'session', 'task', 'run', 'modality', 'suffix'))
+  tbl <- tibble::as_tibble(data.tree::ToDataFrameTypeCol(bids, 'name', 'type', 'subid', 'session', 'task', 'run', 'modality', 'suffix', 'desc', 'space'))
   tbl <- tbl %>% select(-starts_with("level_"))
   
   ret <- list(name=project_name, 
@@ -474,30 +497,39 @@ participants.bids_project <- function(x, ...) {
 #'   - The specified criteria don't match any files
 #'
 #' @examples
+#' \donttest{
 #' # Create a BIDS project
-#' ds001_path <- system.file("extdata/ds001", package="bidser")
-#' proj <- bids_project(ds001_path)
-#'
-#' # Get all functional scans
-#' all_scans <- func_scans(proj)
-#'
-#' # Get scans for specific subjects
-#' sub_scans <- func_scans(proj, subid="0[123]")
-#'
-#' # Get scans for a specific task
-#' task_scans <- func_scans(proj, task="rest")
-#'
-#' # Get scans from specific runs
-#' run_scans <- func_scans(proj, run="0[123]")
-#'
-#' # Combine multiple filters
-#' filtered_scans <- func_scans(proj,
-#'                             subid="01",
-#'                             task="rest",
-#'                             run="01")
-#'
-#' # Get relative paths instead of full paths
-#' rel_scans <- func_scans(proj, full_path=FALSE)
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   
+#'   # Get all functional scans
+#'   all_scans <- func_scans(proj)
+#'   
+#'   # Get scans for specific subjects
+#'   sub_scans <- func_scans(proj, subid="0[123]")
+#'   
+#'   # Get scans for a specific task
+#'   task_scans <- func_scans(proj, task="rest")
+#'   
+#'   # Get scans from specific runs
+#'   run_scans <- func_scans(proj, run="0[123]")
+#'   
+#'   # Combine multiple filters
+#'   filtered_scans <- func_scans(proj,
+#'                               subid="01",
+#'                               task="rest",
+#'                               run="01")
+#'   
+#'   # Get relative paths instead of full paths
+#'   rel_scans <- func_scans(proj, full_path=FALSE)
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
 #'
 #' @export
 func_scans.bids_project <- function (x, subid=".*", task=".*", run = ".*", session=".*", 
@@ -571,34 +603,41 @@ str_detect_null <- function(x, pat, default=FALSE) {
 #'   - The specified criteria don't match any files
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Create a BIDS project with fMRIPrep derivatives
-#' proj <- bids_project(system.file("extdata/phoneme_stripped", package="bidser"),
-#'                      fmriprep=TRUE)
-#'
-#' # Get all preprocessed BOLD scans
-#' all_scans <- preproc_scans(proj)
-#'
-#' # Get preprocessed scans for specific subjects
-#' sub_scans <- preproc_scans(proj, subid="0[12]")
-#'
-#' # Get scans in MNI space
-#' mni_scans <- preproc_scans(proj, space="MNI152NLin2009cAsym")
-#'
-#' # Get scans for a specific task with full paths
-#' task_scans <- preproc_scans(proj,
-#'                            task="phoneme",
-#'                            full_path=TRUE)
-#'
-#' # Get scans from a specific session
-#' session_scans <- preproc_scans(proj, session="test")
-#'
-#' # Combine multiple filters
-#' filtered_scans <- preproc_scans(proj,
-#'                                subid="01",
-#'                                task="phoneme",
-#'                                run="01",
-#'                                space="MNI152NLin2009cAsym")
+#' tryCatch({
+#'   ds_path <- get_example_bids_dataset("phoneme_stripped")
+#'   proj <- bids_project(ds_path, fmriprep=TRUE)
+#'   
+#'   # Get all preprocessed BOLD scans
+#'   all_scans <- preproc_scans(proj)
+#'   
+#'   # Get preprocessed scans for specific subjects
+#'   sub_scans <- preproc_scans(proj, subid="0[12]")
+#'   
+#'   # Get scans in MNI space
+#'   mni_scans <- preproc_scans(proj, space="MNI152NLin2009cAsym")
+#'   
+#'   # Get scans for a specific task with full paths
+#'   task_scans <- preproc_scans(proj,
+#'                              task="phoneme",
+#'                              full_path=TRUE)
+#'   
+#'   # Get scans from a specific session
+#'   session_scans <- preproc_scans(proj, session="test")
+#'   
+#'   # Combine multiple filters
+#'   filtered_scans <- preproc_scans(proj,
+#'                                  subid="01",
+#'                                  task="phoneme",
+#'                                  run="01",
+#'                                  space="MNI152NLin2009cAsym")
+#'   
+#'   # Clean up
+#'   unlink(ds_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
 #'
 #' @export
@@ -625,8 +664,13 @@ preproc_scans.bids_project <- function(x, subid=".*", task=".*", run=".*", sessi
     is_leaf = function(z) z$isLeaf,
     is_nifti = function(z) str_detect_null(z$suffix, "nii(.gz)?$"),
     
-    # Metadata criteria
-    matches_modality = function(z) str_detect_null(z$modality, modality, default=TRUE),
+    # Metadata criteria - for fMRIPrep files, 'kind' often contains what would be 'modality' in raw files
+    matches_modality = function(z) {
+      # For fMRIPrep files, check both 'modality' and 'kind' fields
+      modality_match <- str_detect_null(z$modality, modality, default=FALSE)
+      kind_match <- str_detect_null(z$kind, modality, default=FALSE) 
+      return(modality_match || kind_match)
+    },
     matches_kind = function(z) str_detect_null(z$kind, kind, default=TRUE),
     matches_subid = function(z) str_detect_null(z$subid, subid),
     matches_task = function(z) str_detect_null(z$task, task, default=TRUE),
@@ -725,16 +769,26 @@ key_match <- function(default=FALSE, ...) {
 #' @rdname search_files 
 #' @importFrom stringr str_detect
 #' @examples
+#' \donttest{
 #' # Search for event files in a BIDS dataset
-#' proj <- bids_project(system.file("extdata/ds001", package="bidser"), fmriprep=FALSE)
-#' event_files <- search_files(proj, regex="events\\\\.tsv$")
-#' 
-#' # Search with additional criteria (note: ds001 only has one subject '01')
-#' sub01_files <- search_files(proj, regex="bold\\\\.nii\\\\.gz$", subid="01", 
-#'                             task="balloonanalogrisktask")
-#' 
-#' # Get full paths
-#' full_paths <- search_files(proj, regex="events\\\\.tsv$", full_path=TRUE)
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path, fmriprep=FALSE)
+#'   event_files <- search_files(proj, regex="events\\.tsv$")
+#'   
+#'   # Search with additional criteria (note: ds001 only has one subject '01')
+#'   sub01_files <- search_files(proj, regex="bold\\.nii\\.gz$", subid="01", 
+#'                               task="balloonanalogrisktask")
+#'   
+#'   # Get full paths
+#'   full_paths <- search_files(proj, regex="events\\.tsv$", full_path=TRUE)
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
 search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRUE, ...) {
   # Helper function to extract the relative path from a node
   extract_relative_path <- function(node) {
@@ -1085,5 +1139,60 @@ bids_check_compliance <- function(x) {
   passed <- length(issues) == 0
   
   list(passed = passed, issues = issues)
+}
+
+#' @keywords internal
+#' @noRd
+get_example_bids_dataset <- function(dataset_name = "ds001") {
+  if (!requireNamespace("httr", quietly = TRUE)) {
+    stop("Package 'httr' is required for downloading example data")
+  }
+  
+  # Check if we have internet connectivity
+  has_internet <- function() {
+    tryCatch({
+      httr::HEAD("https://github.com", httr::timeout(5))
+      TRUE
+    }, error = function(e) FALSE)
+  }
+  
+  if (!has_internet()) {
+    stop("Internet connection required to download example BIDS data")
+  }
+  
+  # Create a temporary directory for the dataset
+  temp_dir <- file.path(tempdir(), paste0("bids_example_", dataset_name))
+  
+  if (dir.exists(temp_dir)) {
+    return(temp_dir)
+  }
+  
+  # Download the dataset from BIDS examples
+  tryCatch({
+    # Download the ZIP file
+    zip_url <- paste0("https://github.com/bids-standard/bids-examples/archive/refs/heads/master.zip")
+    zip_file <- file.path(tempdir(), "bids-examples.zip")
+    
+    if (!file.exists(zip_file)) {
+      utils::download.file(zip_url, zip_file, mode = "wb", quiet = TRUE)
+    }
+    
+    # Extract only the specific dataset
+    utils::unzip(zip_file, 
+                files = paste0("bids-examples-master/", dataset_name, "/"),
+                exdir = tempdir(),
+                junkpaths = FALSE)
+    
+    # Move to the expected location
+    source_dir <- file.path(tempdir(), "bids-examples-master", dataset_name)
+    if (dir.exists(source_dir)) {
+      file.rename(source_dir, temp_dir)
+      return(temp_dir)
+    } else {
+      stop("Dataset '", dataset_name, "' not found in BIDS examples")
+    }
+  }, error = function(e) {
+    stop("Failed to download BIDS example data: ", e$message)
+  })
 }
 

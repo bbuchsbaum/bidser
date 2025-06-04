@@ -40,37 +40,20 @@ This function creates a multi-panel visualization of a BIDS project structure,
 showing file distributions, completeness, and data characteristics.
 }
 \examples{
-\dontrun{
-proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-plot_bids(proj)
-
-# Create a non-interactive plot with a different color scheme
-plot_bids(proj, interactive = FALSE, color_scheme = "plasma")
-
-# Create a focused heatmap visualization
-plot_bids(proj, visualization_mode = "heatmap")
-
-# Create a comprehensive visualization with all plot types
-plot_bids(proj, visualization_mode = "complete")
-
-# Or use the specialized heatmap function
-bids_heatmap(proj)
-
-# Create a mock project and visualize it
-file_structure <- data.frame(
-  subid = c("01", "02", "03"),
-  session = c("pre", "post", "pre"),
-  datatype = c("anat", "func", "func"),
-  task = c(NA, "rest", "task1"),
-  run = c(NA, "01", "02"),
-  suffix = c("T1w.nii.gz", "bold.nii.gz", "bold.nii.gz"),
-  fmriprep = FALSE
-)
-mock_proj <- create_mock_bids(
-  project_name = "my_project",
-  participants = c("sub-01", "sub-02", "sub-03"),
-  file_structure = file_structure
-)
-plot_bids(mock_proj, highlight_missing = TRUE)
+\donttest{
+# Create a basic BIDS project and plot it
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  plot_bids(proj)
+  
+  # Create an interactive plot
+  plot_bids(proj, interactive=TRUE)
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
 }

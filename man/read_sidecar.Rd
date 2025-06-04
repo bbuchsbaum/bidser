@@ -51,22 +51,28 @@ becomes one row in the returned tibble. This is particularly useful for extracti
 imaging files, such as acquisition parameters, task descriptions, and other relevant information.
 }
 \examples{
+\donttest{
 # Read all BOLD sidecar files from a BIDS dataset
-proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-metadata <- read_sidecar(proj)
-
-# Read sidecar files for a specific subject and task
-sub01_meta <- read_sidecar(proj, 
-                          subid="01", 
-                          task="balloonanalogrisktask")
-
-# Read sidecar files for anatomical data
-anat_meta <- read_sidecar(proj, 
-                         modality="T1w",
-                         full_path=FALSE)
-
-# Read sidecar files for a specific session
-ds007 <- bids_project(system.file("extdata/ds007", package="bidser"))
-session_meta <- read_sidecar(ds007, session="test")
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  metadata <- read_sidecar(proj)
+  
+  # Read sidecar files for a specific subject and task
+  sub01_meta <- read_sidecar(proj, 
+                            subid="01", 
+                            task="balloonanalogrisktask")
+  
+  # Read sidecar files for anatomical data
+  anat_meta <- read_sidecar(proj, 
+                           modality="T1w",
+                           full_path=FALSE)
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
+}
 
 }

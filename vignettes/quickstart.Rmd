@@ -31,14 +31,21 @@ library(tibble)
 library(dplyr)
 library(gluedown)
 
-proj_path <- system.file("extdata/ds001", package="bidser")
-proj <- bids_project(proj_path)
-
-print(proj)
+# Download example BIDS dataset
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  
+  print(proj)
+}, error = function(e) {
+  message("This vignette requires an internet connection to download example data.")
+  message("Error: ", e$message)
+  knitr::knit_exit()
+})
 
 ```
 
-We can see that this is a project with 16 participants with anatomical and functional scans and a task called **balloonanalogrisktask**.
+We can see that this is a project with multiple participants with anatomical and functional scans and a task called **balloonanalogrisktask**.
 
 We can also make some basic queries of the project to gather information. For example, does the project have any "sessions"?
 
@@ -124,20 +131,21 @@ fscans <- head(fscans, 5)
 gluedown::md_bullet(fscans)
 ```
 
-Suppose though that we only want the scans from subject "16"?
+Suppose though that we only want the scans from a specific subject? Let's try the first subject:
 
 ```{r, results='asis'} 
 
-fscans_16 <- func_scans(proj, subid="16")
+first_subject <- participants(proj)[1]
+fscans_sub <- func_scans(proj, subid=first_subject)
 
 ```
 
 ```{r, echo=FALSE, results='asis'}
 
-if (length(fscans_16) > 0) {
-  gluedown::md_bullet(basename(fscans_16))
+if (length(fscans_sub) > 0) {
+  gluedown::md_bullet(basename(fscans_sub))
 } else {
-  cat("No scans found for subject 16\n")
+  cat("No scans found for subject", first_subject, "\n")
 }
 ```
 
@@ -157,7 +165,9 @@ Now we can filter the table as we like, for example, to extract the data only fr
 ```{r, result="asis"}
 library(tidyr)
 library(dplyr)
-ev1 <- evs %>% dplyr::filter(.subid == "01") %>% unnest(cols=c(data))
+
+first_participant <- participants(proj)[1]
+ev1 <- evs %>% dplyr::filter(.subid == first_participant) %>% unnest(cols=c(data))
 head(ev1)
 ```
 
@@ -167,19 +177,35 @@ head(ev1)
 If you have processed a dataset with FMRIPrep, `bidser` can be used to read in the many of the resultant derivative files. If a project has an FMRIPrep derivatives folder, then we can read in the BIDS hierarchy plus derivatives as follows:
 
 ```{r}
-proj_path <- system.file("extdata/phoneme_stripped", package="bidser")
-proj <- bids_project(proj_path, fmriprep=TRUE)
-
-print(proj)
+# Try to get a derivatives dataset - note this may not be available
+tryCatch({
+  # Some BIDS examples may have derivatives, or we can demonstrate with empty structure
+  deriv_path <- get_example_bids_dataset("ds000001-fmriprep")
+  proj_deriv <- bids_project(deriv_path, fmriprep=TRUE)
+  
+  print(proj_deriv)
+  
+  # Now we can access various derivative files with convenience functions.
+  # For example, to read in "preproc" scans we can use the `preproc_scans` function.
+  pscans <- preproc_scans(proj_deriv)
+  if (!is.null(pscans) && length(pscans) > 0) {
+    print(head(as.character(pscans)))
+  } else {
+    message("No preprocessed scans found in this example dataset")
+  }
+  
+  # Clean up derivatives dataset
+  unlink(deriv_path, recursive=TRUE)
+  
+}, error = function(e) {
+  message("Derivatives example not available: ", e$message)
+  message("This is normal - not all BIDS examples include fMRIPrep derivatives.")
+})
 ```
 
-By default it is assumed that the FMRIPrep files are in 'derivatives/fmriprep'.
-
-Now we can access various derivative files with convenience functions. For example, to read in "preproc" scans we can use the `preproc_scans` function.
-
-```{r}
-
-pscans <- preproc_scans(proj, subid="1001")
-print(as.character(pscans))
-
+```{r cleanup, include=FALSE}
+# Clean up the downloaded dataset
+if (exists("ds001_path")) {
+  unlink(ds001_path, recursive=TRUE)
+}
 ```

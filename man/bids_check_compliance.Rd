@@ -33,6 +33,16 @@ Note: This is not a full BIDS validator. For complete validation, use the
 official BIDS validator.
 }
 \examples{
-proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-compliance <- bids_check_compliance(proj)
+\donttest{
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  compliance <- bids_check_compliance(proj)
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
+}
 }

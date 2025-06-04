@@ -24,14 +24,17 @@ This function extracts and returns the unique task identifiers, filtering out
 any NULL or NA values.
 }
 \examples{
+\donttest{
 # Get tasks from a BIDS project
-p <- system.file("extdata/ds001", package="bidser")
-tasks(bids_project(p))
-
-\dontrun{
-# Create a BIDS structure with specific tasks and check them
-bs <- bids_structure(name="Test", subjects=c("01", "02"), 
-                    tasks=c("rest", "memory", "working"))
-tasks(bs)
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  tasks(proj)
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
 }

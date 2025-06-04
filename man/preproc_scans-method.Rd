@@ -27,8 +27,6 @@ preproc_scans(
 
 \item{run}{Run regex to match specific runs (default: ".*" for all runs)}
 
-\item{session}{Session regex to match specific sessions (default: ".*" for all sessions)}
-
 \item{variant}{Preprocessing variant to match (default: NULL, which matches files without a variant)}
 
 \item{space}{Space regex to match specific spaces (default: ".*" for all spaces)}
@@ -53,30 +51,24 @@ by having either 'desc-preproc' or 'kind-preproc' in their filename.
 }
 \examples{
 # Get all preprocessed scans from a BIDS project with fMRIPrep derivatives
-\dontrun{
-# Load a BIDS project with fMRIPrep derivatives
-proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
-
-# Get all preprocessed scans
-scans <- preproc_scans(proj)
-
-# Get preprocessed scans for a specific subject
-sub01_scans <- preproc_scans(proj, subid="01")
-
-# Get preprocessed scans for a specific task and space
-task_scans <- preproc_scans(proj, task="rest", space="MNI152NLin2009cAsym")
-
-# Get preprocessed scans for a specific session (if the dataset has sessions)
-session_scans <- preproc_scans(proj, session="01")
-
-# Filter by multiple criteria
-filtered_scans <- preproc_scans(proj, 
-                               subid="01",
-                               task="rest", 
-                               run="01", 
-                               space="MNI152NLin2009cAsym")
-
-# Get full paths to preprocessed scans
-full_paths <- preproc_scans(proj, full_path=TRUE)
+\donttest{
+# Download and load a BIDS project with fMRIPrep derivatives
+tryCatch({
+  ds001_deriv_path <- get_example_bids_dataset("ds000001-fmriprep")
+  proj <- bids_project(ds001_deriv_path, fmriprep=TRUE)
+  
+  # Get all preprocessed scans
+  scans <- preproc_scans(proj)
+  
+  # Get preprocessed scans for a specific subject
+  if (!is.null(scans) && length(scans) > 0) {
+    sub01_scans <- preproc_scans(proj, subid="01")
+  }
+  
+  # Clean up
+  unlink(ds001_deriv_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires derivatives dataset: ", e$message)
+})
 }
 }

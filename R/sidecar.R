@@ -24,23 +24,29 @@
 #'   If no files are found, returns an empty tibble.
 #'
 #' @examples
+#' \donttest{
 #' # Read all BOLD sidecar files from a BIDS dataset
-#' proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-#' metadata <- read_sidecar(proj)
-#'
-#' # Read sidecar files for a specific subject and task
-#' sub01_meta <- read_sidecar(proj, 
-#'                           subid="01", 
-#'                           task="balloonanalogrisktask")
-#'
-#' # Read sidecar files for anatomical data
-#' anat_meta <- read_sidecar(proj, 
-#'                          modality="T1w",
-#'                          full_path=FALSE)
-#'
-#' # Read sidecar files for a specific session
-#' ds007 <- bids_project(system.file("extdata/ds007", package="bidser"))
-#' session_meta <- read_sidecar(ds007, session="test")
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   metadata <- read_sidecar(proj)
+#'   
+#'   # Read sidecar files for a specific subject and task
+#'   sub01_meta <- read_sidecar(proj, 
+#'                             subid="01", 
+#'                             task="balloonanalogrisktask")
+#'   
+#'   # Read sidecar files for anatomical data
+#'   anat_meta <- read_sidecar(proj, 
+#'                            modality="T1w",
+#'                            full_path=FALSE)
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
 #'
 #' @importFrom tibble tibble
 #' @importFrom dplyr bind_rows mutate
@@ -120,6 +126,38 @@ read_sidecar <- function(x, subid=".*", task=".*", run=".*", session=".*", modal
 #' @param ... Additional arguments passed to `read_sidecar()`.
 #'
 #' @return A numeric value representing the RepetitionTime in seconds, or NA if not found.
+#'
+#' @examples
+#' \donttest{
+#' # Download and get TR for a specific subject and task
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   
+#'   if (length(participants(proj)) > 0 && length(tasks(proj)) > 0) {
+#'     tr <- get_repetition_time(proj, 
+#'                              subid=participants(proj)[1], 
+#'                              task=tasks(proj)[1])
+#'     cat("TR:", tr, "seconds\n")
+#'   }
+#'   
+#'   # Try with a dataset that has sessions
+#'   ds007_path <- get_example_bids_dataset("ds007")
+#'   ds007_proj <- bids_project(ds007_path)
+#'   if (length(participants(ds007_proj)) > 0 && length(sessions(ds007_proj)) > 0) {
+#'     tr_session <- get_repetition_time(ds007_proj,
+#'                                      subid=participants(ds007_proj)[1],
+#'                                      session=sessions(ds007_proj)[1])
+#'     cat("TR with session:", tr_session, "seconds\n")
+#'   }
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#'   unlink(ds007_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
 #'
 #' @export
 get_repetition_time <- function(x, subid, task, run=".*", session=".*", ...) {

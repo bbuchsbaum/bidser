@@ -15,8 +15,16 @@
 #' @examples
 #' \donttest{
 #' # Get event files for a specific subject and task
-#' x <- bids_project(system.file("extdata/ds001", package="bidser"))
-#' files <- event_files(x, subid="01", task="balloonanalogrisktask")
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   x <- bids_project(ds001_path)
+#'   files <- event_files(x, subid="01", task="balloonanalogrisktask")
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
 event_files.bids_project <- function(x, subid=".*", task=".*", run=".*", session=".*", full_path=TRUE, ...) {
   # Validate input
@@ -77,29 +85,39 @@ event_files.bids_project <- function(x, subid=".*", task=".*", run=".*", session
 #' @importFrom rlang .data
 #' @importFrom readr read_tsv
 #' @examples
+#' \donttest{
 #' # Create a BIDS project object
-#' proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-#'
-#' # Read all event files
-#' all_events <- read_events(proj)
-#'
-#' # Read events for a specific subject and task
-#' sub01_events <- read_events(proj, 
-#'                           subid="01", 
-#'                           task="balloonanalogrisktask")
-#'
-#' # Read events for multiple subjects and a specific run
-#' multi_sub_events <- read_events(proj, 
-#'                               subid="0[1-3]", 
-#'                               run="01")
-#'
-#' # Access nested data for analysis
-#' if (nrow(sub01_events) > 0) {
-#'   # Get first subject's data
-#'   first_sub_data <- sub01_events$data[[1]]
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
 #'   
-#'   # Calculate mean trial duration
-#'   mean_duration <- mean(first_sub_data$duration)
+#'   # Read all event files
+#'   all_events <- read_events(proj)
+#'   
+#'   # Read events for a specific subject and task
+#'   sub01_events <- read_events(proj, 
+#'                             subid="01", 
+#'                             task="balloonanalogrisktask")
+#'   
+#'   # Read events for multiple subjects and a specific run
+#'   multi_sub_events <- read_events(proj, 
+#'                                 subid="0[1-3]", 
+#'                                 run="01")
+#'   
+#'   # Access nested data for analysis
+#'   if (nrow(sub01_events) > 0) {
+#'     # Get first subject's data
+#'     first_sub_data <- sub01_events$data[[1]]
+#'     
+#'     # Calculate mean trial duration
+#'     mean_duration <- mean(first_sub_data$duration)
+#'   }
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
 #' @export
 read_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session=".*", ...) {

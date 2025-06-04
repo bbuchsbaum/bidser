@@ -773,6 +773,8 @@ create_mock_bids <- function(project_name,
         },
         kind = node$kind,
         suffix = node$suffix,
+        desc = node$desc,  # Add desc attribute
+        space = node$space,  # Add space attribute
         extension = if (!is.null(node$extension)) node$extension else {
           # Extract extension from filename
           ext_match <- regmatches(node$name, regexpr("\\.[^.]+$", node$name))

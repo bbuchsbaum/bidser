@@ -56,18 +56,22 @@ specified by \code{x$prep_dir} and were defined in the \code{file_structure}
 passed to \code{create_mock_bids} with \code{fmriprep=TRUE}.
 }
 \examples{
-\dontrun{
+\donttest{
 # Get all confound files from a BIDS project with fMRIPrep derivatives
-p <- system.file("extdata/phoneme_stripped", package="bidser")
-proj <- bids_project(p, fmriprep=TRUE)
-confound_files(proj)
-# Get confound files for specific subjects and tasks
-confound_files(proj, subid="sub-01", task="phoneme")
-
-# Create a BIDS structure with fMRIPrep and check for confound files
-bs <- bids_structure(name="Test", subjects=c("01", "02"), 
-                    tasks=c("rest"), include_fmriprep=TRUE)
-confound_files(bs)
+tryCatch({
+  # Try to get a derivatives dataset
+  ds_path <- get_example_bids_dataset("phoneme_stripped")
+  proj <- bids_project(ds_path, fmriprep=TRUE)
+  conf_files <- confound_files(proj)
+  
+  # Get confound files for specific subjects and tasks
+  confound_files(proj, subid="sub-01", task="phoneme")
+  
+  # Clean up
+  unlink(ds_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
 # Setup mock project with a derivative confound file
 participants_df <- tibble::tibble(participant_id = "01")

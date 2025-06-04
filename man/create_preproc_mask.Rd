@@ -22,15 +22,20 @@ A logical mask volume
 Create a preprocessing mask from BIDS data
 }
 \examples{
-\dontrun{
-# Load a BIDS project with fMRIPrep derivatives
-proj <- bids_project("/path/to/bids/dataset", fmriprep=TRUE)
-mask <- create_preproc_mask(proj, subid=".*")
-
-# Create mask for single subject
-sub01_mask <- create_preproc_mask(proj, subid="01")
-
-# Create mask with different threshold
-mask_thresh <- create_preproc_mask(proj, subid=".*", thresh=0.95)
+\donttest{
+# Download and load a BIDS project with fMRIPrep derivatives
+tryCatch({
+  ds001_deriv_path <- get_example_bids_dataset("ds000001-fmriprep")
+  proj <- bids_project(ds001_deriv_path, fmriprep=TRUE)
+  mask <- create_preproc_mask(proj, subid=".*")
+  
+  # Create mask for single subject
+  sub01_mask <- create_preproc_mask(proj, subid="01")
+  
+  # Clean up
+  unlink(ds001_deriv_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires derivatives dataset: ", e$message)
+})
 }
 }

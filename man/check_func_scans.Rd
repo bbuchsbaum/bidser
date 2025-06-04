@@ -43,36 +43,22 @@ identify potential issues such as missing scans, inconsistent file sizes, or une
 variations in the data.
 }
 \examples{
-# Create a BIDS project object
-proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-
-# Check functional scans
-scan_check <- check_func_scans(proj)
-
-# View available tasks
-print(scan_check$tasklist)
-
-# Check scan counts per subject
-print(scan_check$scans_per_subject)
-
-# Example with multiple tasks
-ds007 <- bids_project(system.file("extdata/ds007", package="bidser"))
-multi_check <- check_func_scans(ds007)
-
-# View scan distribution across tasks
-print(multi_check$scans_per_task)
-
-# Check for potential issues
-if (nrow(multi_check$scans) > 0) {
-  # Look for subjects with fewer scans than expected
-  expected_scans <- 4  # Example: expecting 4 scans per subject
-  missing <- multi_check$scans_per_subject[
-    multi_check$scans_per_subject$n < expected_scans,
-  ]
-  if (nrow(missing) > 0) {
-    print("Subjects with missing scans:")
-    print(missing)
-  }
+\donttest{
+# Check functional scans in a BIDS dataset
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  scan_check <- check_func_scans(proj)
+  print(scan_check)
+  
+  # Filter for specific subjects
+  sub01_check <- check_func_scans(proj, subid="01")
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
 
 }

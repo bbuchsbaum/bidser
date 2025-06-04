@@ -25,13 +25,17 @@ It extracts the subject identifiers from the project's data table, filtering out
 any NA values. Participant IDs in BIDS typically follow the format 'sub-XX'.
 }
 \examples{
+\donttest{
 # Get participants from a BIDS project
-p <- system.file("extdata/ds001", package="bidser")
-participants(bids_project(p))
-
-\dontrun{
-# Create a BIDS structure with specific participants and check them
-bs <- bids_structure(name="Test", subjects=c("01", "02", "03"))
-participants(bs)
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  participants(proj)
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
 }

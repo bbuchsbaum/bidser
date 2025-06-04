@@ -27,7 +27,15 @@ graphics. Large projects can be trimmed by setting a maximum depth.
 }
 \examples{
 \donttest{
-proj <- bids_project(system.file("extdata/ds001", package = "bidser"))
-plot(proj)
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  plot(proj)
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
 }

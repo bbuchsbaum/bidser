@@ -57,23 +57,35 @@ task-based functional MRI data, including onset times, durations, and trial type
 Finds event files matching the given subject, task, run, and session criteria.
 }
 \examples{
+\donttest{
 # Get all event files from a BIDS project
-p <- system.file("extdata/ds001", package="bidser")
-event_files(bids_project(p))
-
-# Get event files for specific subjects and tasks
-p <- system.file("extdata/ds001", package="bidser")
-event_files(bids_project(p), subid="sub-0[12]", task="balloonanalog")
-
-\dontrun{
-# Create a BIDS structure and check for event files
-bs <- bids_structure(name="Test", subjects=c("01", "02"), 
-                    tasks=c("rest", "memory"))
-event_files(bs)
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  event_files(proj)
+  
+  # Get event files for specific subjects and tasks
+  if (length(participants(proj)) > 0) {
+    event_files(proj, subid=participants(proj)[1], task="balloonanalogrisktask")
+  }
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
 \donttest{
 # Get event files for a specific subject and task
-x <- bids_project(system.file("extdata/ds001", package="bidser"))
-files <- event_files(x, subid="01", task="balloonanalogrisktask")
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  x <- bids_project(ds001_path)
+  files <- event_files(x, subid="01", task="balloonanalogrisktask")
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
 }

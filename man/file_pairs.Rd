@@ -43,27 +43,25 @@ returning a tibble with matched filenames. It's useful for verifying that corres
 exist for each subject and task, such as ensuring every BOLD file has an associated events file.
 }
 \examples{
+\donttest{
 # Create a BIDS project object
-proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-
-# Match BOLD files with their corresponding event files
-bold_pairs <- file_pairs(proj, pair="bold-events")
-
-# Check pairs for a specific task
-task_pairs <- file_pairs(proj, 
-                        pair="bold-events",
-                        task="balloonanalogrisktask")
-
-\dontrun{
-# Create a project with preprocessed data
-prep_proj <- bids_project(system.file("extdata/phoneme_stripped", package="bidser"),
-                         fmriprep=TRUE)
-
-# Match preprocessed files with event files
-preproc_pairs <- file_pairs(prep_proj, pair="preproc-events")
-
-# Check for missing pairs
-missing_pairs <- preproc_pairs[is.na(preproc_pairs$events), ]
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  
+  # Match BOLD files with their corresponding event files
+  bold_pairs <- file_pairs(proj, pair="bold-events")
+  
+  # Check pairs for a specific task
+  task_pairs <- file_pairs(proj, 
+                          pair="bold-events",
+                          task="balloonanalogrisktask")
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
 
 }

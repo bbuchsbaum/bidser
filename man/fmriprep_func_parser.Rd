@@ -6,6 +6,16 @@
 \usage{
 fmriprep_func_parser()
 }
+\value{
+An fMRIPrep functional parser object for parsing preprocessed functional files
+}
 \description{
 fMRIPrep functional parser constructor
+}
+\examples{
+# Create an fMRIPrep functional parser
+parser <- fmriprep_func_parser()
+
+# Parse a preprocessed functional file
+result <- parse(parser, "sub-01_task-rest_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz")
 }

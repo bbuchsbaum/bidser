@@ -16,7 +16,6 @@ RoxygenNote: 7.3.2.9000
 Imports:
   stringr,
   data.tree,
-  Combin8R,
   neuroim2,
   progress,
   tidyselect,
@@ -39,9 +38,6 @@ Imports:
   tidyr,
   httr,
   rio
-Remotes: 
-  SWotherspoon/Combin8R,
-  bbuchsbaum/neuroim2
 Suggests: 
     knitr,
     rmarkdown,

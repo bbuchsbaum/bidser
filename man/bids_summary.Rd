@@ -32,6 +32,16 @@ Provides a quick summary of dataset statistics, including:
 }
 }
 \examples{
-proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-summary <- bids_summary(proj)
+\donttest{
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  summary <- bids_summary(proj)
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
+}
 }

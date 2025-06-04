@@ -2,6 +2,8 @@
 
 library(testthat)
 library(tibble)
+library(dplyr)
+library(bidser)
 # Ensure bidser is loaded, or use bidser:: where needed if testing externally
 # library(bidser) 
 
@@ -29,8 +31,8 @@ file_structure_df <- tibble::tribble(
 # Define event data (paths must match generated structure)
 # Use hardcoded paths based on what generate_bids_filename would likely produce
 # Note: suffix in generate_bids_filename needs the extension!
-event_filename_1 <- generate_bids_filename(subid = "01", task = "taskA", run = "01", suffix = "events.tsv")
-event_filename_2 <- generate_bids_filename(subid = "02", session = "test", task = "taskA", run = "01", suffix = "events.tsv")
+event_filename_1 <- bidser:::generate_bids_filename(subid = "01", task = "taskA", run = "01", suffix = "events.tsv")
+event_filename_2 <- bidser:::generate_bids_filename(subid = "02", session = "test", task = "taskA", run = "01", suffix = "events.tsv")
 event_path_1 <- file.path("sub-01", "func", event_filename_1)
 event_path_2 <- file.path("sub-02", "ses-test", "func", event_filename_2)
 
@@ -44,14 +46,14 @@ event_data_list[[event_path_2]] <- tibble::tibble(
 
 # Construct expected derivative filenames/patterns
 # Filename generation helper needs extension in suffix arg
-deriv_anat_filename <- generate_bids_filename(subid = "01", suffix = "T1w.nii.gz", space="MNI", desc="preproc")
-deriv_func_filename <- generate_bids_filename(subid = "01", task = "taskA", run = "01", suffix = "bold.nii.gz", space="MNI", desc="preproc")
+deriv_anat_filename <- bidser:::generate_bids_filename(subid = "01", suffix = "T1w.nii.gz", space="MNI", desc="preproc")
+deriv_func_filename <- bidser:::generate_bids_filename(subid = "01", task = "taskA", run = "01", suffix = "bold.nii.gz", space="MNI", desc="preproc")
 
 deriv_anat_relpath <- file.path("derivatives", "mockprep", "sub-01", "anat", deriv_anat_filename)
 deriv_func_relpath <- file.path("derivatives", "mockprep", "sub-01", "func", deriv_func_filename)
 
 # Define confound data (paths must match generated structure for derivatives)
-confound_filename <- generate_bids_filename(subid = "01", task = "taskA", run = "01", suffix = "timeseries.tsv", desc = "confounds")
+confound_filename <- bidser:::generate_bids_filename(subid = "01", task = "taskA", run = "01", suffix = "timeseries.tsv", desc = "confounds")
 confound_relpath <- file.path("derivatives", "mockprep", "sub-01", "func", confound_filename)
 
 confound_data_list <- list()
@@ -131,8 +133,8 @@ test_that("File searching methods work on mock BIDS project", {
   # Filter by kind="T1w", fmriprep=FALSE, regex for extension
   t1w_files_raw <- search_files(mock_proj, kind = "T1w", regex = "\\.nii\\.gz$", fmriprep = FALSE, full_path = FALSE)
   expect_equal(length(t1w_files_raw), 2) # Should find 2 raw T1w files
-  raw_t1w_f1 <- generate_bids_filename(subid="01", suffix="T1w.nii.gz")
-  raw_t1w_f2 <- generate_bids_filename(subid="02", session="test", suffix="T1w.nii.gz")
+  raw_t1w_f1 <- bidser:::generate_bids_filename(subid="01", suffix="T1w.nii.gz")
+  raw_t1w_f2 <- bidser:::generate_bids_filename(subid="02", session="test", suffix="T1w.nii.gz")
   expect_true(all(sort(t1w_files_raw) %in% sort(c(file.path("sub-01","anat",raw_t1w_f1),
                                                   file.path("sub-02","ses-test","anat",raw_t1w_f2)))))
 
@@ -140,7 +142,7 @@ test_that("File searching methods work on mock BIDS project", {
   # Pass suffix as the extension pattern, use 'sub'
   fscans_sub1 <- func_scans(mock_proj, sub = "01", suffix = "nii\\.gz$", full_path = FALSE)
   expect_equal(length(fscans_sub1), 1) # Should find 1 raw bold for sub-01
-  raw_bold_f1 <- generate_bids_filename(subid="01", task="taskA", run="01", suffix="bold.nii.gz")
+  raw_bold_f1 <- bidser:::generate_bids_filename(subid="01", task="taskA", run="01", suffix="bold.nii.gz")
   expect_equal(fscans_sub1, file.path("sub-01", "func", raw_bold_f1))
 
   fscans_all <- func_scans(mock_proj, suffix = "nii\\.gz$", full_path = FALSE)
@@ -162,9 +164,9 @@ test_that("File searching methods work on mock BIDS project", {
   expect_equal(length(preproc_func), 1) # Should find 1 derivative func
   expect_equal(preproc_func, deriv_func_relpath)
 
-  # search_files for derivatives (anatomical)
-  # Filter by kind="T1w", fmriprep=TRUE, regex for extension. Use 'sub'.
-  preproc_anat <- search_files(mock_proj, sub = "01", kind="T1w", space="MNI", desc="preproc", regex = "\\.nii\\.gz$", fmriprep=TRUE, full_path = FALSE)
+  # preproc_scans for derivatives (anatomical)
+  # Filter by kind="T1w", space="MNI", desc="preproc". Use 'sub'.
+  preproc_anat <- search_files(mock_proj, sub = "01", kind="T1w", space="MNI", desc="preproc", regex = "\\.nii\\.gz$", fmriprep = TRUE, full_path = FALSE)
   expect_equal(length(preproc_anat), 1) # Should find 1 derivative anat
   expect_equal(preproc_anat, deriv_anat_relpath)
 })
@@ -369,7 +371,7 @@ test_that("Mock BIDS stub creation works (writes to temp)", {
   expect_true(file.exists(file.path(temp_stub_path, "dataset_description.json")))
   expect_true(dir.exists(file.path(temp_stub_path, "sub-01", "func")))
   # Check for a raw file using its expected generated name
-  raw_bold_f1 <- generate_bids_filename(subid="01", task="taskA", run="01", suffix="bold.nii.gz")
+  raw_bold_f1 <- bidser:::generate_bids_filename(subid="01", task="taskA", run="01", suffix="bold.nii.gz")
   expect_true(file.exists(file.path(temp_stub_path, "sub-01/func", raw_bold_f1)))
   expect_true(dir.exists(file.path(temp_stub_path, "derivatives", "mockprep", "sub-01", "func")))
   
@@ -553,7 +555,7 @@ test_that("inspect create_mock_bids internals", {
   print(test_row)
   
   # Manually generate filename
-  filename <- generate_bids_filename(
+  filename <- bidser:::generate_bids_filename(
     subid = test_row$subid,
     task = test_row$task,
     run = test_row$run,

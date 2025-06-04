@@ -6,6 +6,16 @@
 \usage{
 fmap_parser()
 }
+\value{
+A fieldmap BIDS parser object for parsing fieldmap files
+}
 \description{
 Fieldmap parser constructor
+}
+\examples{
+# Create a fieldmap parser
+parser <- fmap_parser()
+
+# Parse a fieldmap file
+result <- parse(parser, "sub-01_magnitude1.nii.gz")
 }

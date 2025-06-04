@@ -26,16 +26,20 @@ formatted as a data frame. It extracts file paths or file names from the BIDS tr
 structure, filtering for entries that start with "sub-" to focus on subject-level data.
 }
 \examples{
+\donttest{
 # Get flat representation with full paths
-p <- system.file("extdata/ds001", package="bidser")
-flat_list(bids_project(p))
-
-# Get flat representation with just file names
-flat_list(bids_project(p), full_path=FALSE)
-
-\dontrun{
-# Create a BIDS structure and get its flat representation
-bs <- bids_structure(name="Test", subjects=c("01", "02"))
-flat_list(bs)
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  flat_list(proj)
+  
+  # Get flat representation with just file names
+  flat_list(proj, full_path=FALSE)
+  
+  # Clean up
+  unlink(ds001_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires internet connection: ", e$message)
+})
 }
 }

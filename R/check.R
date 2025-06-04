@@ -26,36 +26,22 @@
 #'   - `size_per_subject`: Tibble with file size statistics by subject
 #'
 #' @examples
-#' # Create a BIDS project object
-#' proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-#'
-#' # Check functional scans
-#' scan_check <- check_func_scans(proj)
-#'
-#' # View available tasks
-#' print(scan_check$tasklist)
-#'
-#' # Check scan counts per subject
-#' print(scan_check$scans_per_subject)
-#'
-#' # Example with multiple tasks
-#' ds007 <- bids_project(system.file("extdata/ds007", package="bidser"))
-#' multi_check <- check_func_scans(ds007)
-#'
-#' # View scan distribution across tasks
-#' print(multi_check$scans_per_task)
-#'
-#' # Check for potential issues
-#' if (nrow(multi_check$scans) > 0) {
-#'   # Look for subjects with fewer scans than expected
-#'   expected_scans <- 4  # Example: expecting 4 scans per subject
-#'   missing <- multi_check$scans_per_subject[
-#'     multi_check$scans_per_subject$n < expected_scans,
-#'   ]
-#'   if (nrow(missing) > 0) {
-#'     print("Subjects with missing scans:")
-#'     print(missing)
-#'   }
+#' \donttest{
+#' # Check functional scans in a BIDS dataset
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   scan_check <- check_func_scans(proj)
+#'   print(scan_check)
+#'   
+#'   # Filter for specific subjects
+#'   sub01_check <- check_func_scans(proj, subid="01")
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
 #'
 #' @importFrom fs file_size
@@ -165,27 +151,25 @@ check_func_scans <- function(x) {
 #'   - Additional columns for matched metadata (e.g., run, session)
 #'
 #' @examples
+#' \donttest{
 #' # Create a BIDS project object
-#' proj <- bids_project(system.file("extdata/ds001", package="bidser"))
-#'
-#' # Match BOLD files with their corresponding event files
-#' bold_pairs <- file_pairs(proj, pair="bold-events")
-#'
-#' # Check pairs for a specific task
-#' task_pairs <- file_pairs(proj, 
-#'                         pair="bold-events",
-#'                         task="balloonanalogrisktask")
-#'
-#' \dontrun{
-#' # Create a project with preprocessed data
-#' prep_proj <- bids_project(system.file("extdata/phoneme_stripped", package="bidser"),
-#'                          fmriprep=TRUE)
-#'
-#' # Match preprocessed files with event files
-#' preproc_pairs <- file_pairs(prep_proj, pair="preproc-events")
-#'
-#' # Check for missing pairs
-#' missing_pairs <- preproc_pairs[is.na(preproc_pairs$events), ]
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   
+#'   # Match BOLD files with their corresponding event files
+#'   bold_pairs <- file_pairs(proj, pair="bold-events")
+#'   
+#'   # Check pairs for a specific task
+#'   task_pairs <- file_pairs(proj, 
+#'                           pair="bold-events",
+#'                           task="balloonanalogrisktask")
+#'   
+#'   # Clean up
+#'   unlink(ds001_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
 #' }
 #'
 #' @importFrom dplyr filter mutate tibble bind_rows group_by summarize
