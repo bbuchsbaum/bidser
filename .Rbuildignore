@@ -24,3 +24,4 @@ repomix-output.xml
 .claude
 ^doc$
 ^Meta$
+^pkgdown$

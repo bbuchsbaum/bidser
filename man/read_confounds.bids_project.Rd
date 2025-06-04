@@ -48,9 +48,25 @@ A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds.
 Reads in fmriprep confound tables for one or more subjects.
 }
 \examples{
-\dontrun{
-proj <- bids_project("/path/to/bids", fmriprep = TRUE)
-# canonical names automatically resolve to actual columns
-conf <- read_confounds(proj, cvars = c("csf", "framewise_displacement"))
+\donttest{
+# Try to load a BIDS project with fMRIPrep derivatives
+tryCatch({
+  ds_path <- get_example_bids_dataset("ds000001-fmriprep")
+  proj <- bids_project(ds_path, fmriprep=TRUE)
+  
+  # Read confounds with canonical names (automatically resolve to actual columns)
+  conf <- read_confounds(proj, cvars = c("csf", "framewise_displacement"))
+  
+  # Read confounds for specific subjects and tasks
+  conf_sub <- read_confounds(proj, subid="01", task="balloonanalogrisktask")
+  
+  # Get confounds as flat tibble
+  conf_flat <- read_confounds(proj, nest=FALSE)
+  
+  # Clean up
+  unlink(ds_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires derivatives dataset with confounds: ", e$message)
+})
 }
 }

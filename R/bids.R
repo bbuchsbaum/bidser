@@ -1141,8 +1141,31 @@ bids_check_compliance <- function(x) {
   list(passed = passed, issues = issues)
 }
 
-#' @keywords internal
-#' @noRd
+#' Download Example BIDS Dataset
+#'
+#' Downloads and extracts an example BIDS dataset for testing and demonstration purposes.
+#' The datasets are sourced from the official BIDS examples repository on GitHub.
+#'
+#' @param dataset_name Character string specifying which dataset to download. 
+#'   Common options include "ds001", "ds002", "ds007", "phoneme_stripped", etc.
+#' @return Character string containing the path to the downloaded dataset directory.
+#' @details This function requires an internet connection to download data from GitHub.
+#'   The datasets are cached in the temporary directory, so repeated calls with the same
+#'   dataset_name will reuse the already downloaded data.
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds_path)
+#'   print(participants(proj))
+#'   
+#'   # Clean up
+#'   unlink(ds_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
+#' @export
 get_example_bids_dataset <- function(dataset_name = "ds001") {
   if (!requireNamespace("httr", quietly = TRUE)) {
     stop("Package 'httr' is required for downloading example data")
@@ -1177,9 +1200,18 @@ get_example_bids_dataset <- function(dataset_name = "ds001") {
       utils::download.file(zip_url, zip_file, mode = "wb", quiet = TRUE)
     }
     
-    # Extract only the specific dataset
+    # Get list of files in the ZIP and filter for our dataset
+    zip_contents <- utils::unzip(zip_file, list = TRUE)
+    dataset_pattern <- paste0("bids-examples-master/", dataset_name, "/")
+    dataset_files <- zip_contents$Name[grepl(dataset_pattern, zip_contents$Name, fixed = TRUE)]
+    
+    if (length(dataset_files) == 0) {
+      stop("Dataset '", dataset_name, "' not found in BIDS examples")
+    }
+    
+    # Extract the specific dataset files
     utils::unzip(zip_file, 
-                files = paste0("bids-examples-master/", dataset_name, "/"),
+                files = dataset_files,
                 exdir = tempdir(),
                 junkpaths = FALSE)
     

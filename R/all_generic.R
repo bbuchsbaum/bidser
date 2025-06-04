@@ -255,13 +255,12 @@ event_files <- function (x, ...) {
 #' \donttest{
 #' # Get all confound files from a BIDS project with fMRIPrep derivatives
 #' tryCatch({
-#'   # Try to get a derivatives dataset
-#'   ds_path <- get_example_bids_dataset("phoneme_stripped")
+#'   ds_path <- get_example_bids_dataset("ds000001-fmriprep")
 #'   proj <- bids_project(ds_path, fmriprep=TRUE)
 #'   conf_files <- confound_files(proj)
 #'   
 #'   # Get confound files for specific subjects and tasks
-#'   confound_files(proj, subid="sub-01", task="phoneme")
+#'   confound_files(proj, subid="sub-01", task="balloonanalogrisktask")
 #'   
 #'   # Clean up
 #'   unlink(ds_path, recursive=TRUE)
@@ -357,7 +356,7 @@ read_events <- function(x, ...) {
 #' \donttest{
 #' # Create a BIDS project with fMRIPrep derivatives
 #' tryCatch({
-#'   ds_path <- get_example_bids_dataset("phoneme_stripped")
+#'   ds_path <- get_example_bids_dataset("ds000001-fmriprep")
 #'   proj <- bids_project(ds_path, fmriprep=TRUE)
 #'   
 #'   # Read all confound files
@@ -366,7 +365,7 @@ read_events <- function(x, ...) {
 #'   # Read confounds for specific subjects and tasks
 #'   sub_conf <- read_confounds(proj,
 #'                             subid="01",
-#'                             task="phoneme")
+#'                             task="balloonanalogrisktask")
 #'   
 #'   # Select specific confound variables
 #'   motion_conf <- read_confounds(proj,
@@ -383,7 +382,7 @@ read_events <- function(x, ...) {
 #'   # Combine multiple options
 #'   custom_conf <- read_confounds(proj,
 #'                                subid="01",
-#'                                task="phoneme",
+#'                                task="balloonanalogrisktask",
 #'                                cvars=c("framewise_displacement",
 #'                                       "trans_x", "trans_y", "trans_z"),
 #'                                npcs=3,

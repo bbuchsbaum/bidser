@@ -38,7 +38,7 @@ and return either nested or flat tibbles.
 \donttest{
 # Create a BIDS project with fMRIPrep derivatives
 tryCatch({
-  ds_path <- get_example_bids_dataset("phoneme_stripped")
+  ds_path <- get_example_bids_dataset("ds000001-fmriprep")
   proj <- bids_project(ds_path, fmriprep=TRUE)
   
   # Read all confound files
@@ -47,7 +47,7 @@ tryCatch({
   # Read confounds for specific subjects and tasks
   sub_conf <- read_confounds(proj,
                             subid="01",
-                            task="phoneme")
+                            task="balloonanalogrisktask")
   
   # Select specific confound variables
   motion_conf <- read_confounds(proj,
@@ -64,7 +64,7 @@ tryCatch({
   # Combine multiple options
   custom_conf <- read_confounds(proj,
                                subid="01",
-                               task="phoneme",
+                               task="balloonanalogrisktask",
                                cvars=c("framewise_displacement",
                                       "trans_x", "trans_y", "trans_z"),
                                npcs=3,

@@ -51,7 +51,7 @@ function.
 \donttest{
 # Load a BIDS project with fMRIPrep derivatives
 tryCatch({
-  ds_path <- get_example_bids_dataset("phoneme_stripped")
+  ds_path <- get_example_bids_dataset("ds000001-fmriprep")
   proj <- bids_project(ds_path, fmriprep=TRUE)
   
   # Read preprocessed scans for all subjects
@@ -63,7 +63,7 @@ tryCatch({
   
   # Read preprocessed scans for a specific task and run
   task_scans <- read_preproc_scans(proj, 
-                                  task="phoneme",
+                                  task="balloonanalogrisktask",
                                   run="01")
   
   # Specify mode for large datasets

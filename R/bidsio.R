@@ -63,7 +63,7 @@ read_func_scans.bids_project <- function(x, mask, mode = c("normal", "bigvec"),
 #' \donttest{
 #' # Load a BIDS project with fMRIPrep derivatives
 #' tryCatch({
-#'   ds_path <- get_example_bids_dataset("phoneme_stripped")
+#'   ds_path <- get_example_bids_dataset("ds000001-fmriprep")
 #'   proj <- bids_project(ds_path, fmriprep=TRUE)
 #'   
 #'   # Read preprocessed scans for all subjects
@@ -75,7 +75,7 @@ read_func_scans.bids_project <- function(x, mask, mode = c("normal", "bigvec"),
 #'   
 #'   # Read preprocessed scans for a specific task and run
 #'   task_scans <- read_preproc_scans(proj, 
-#'                                   task="phoneme",
+#'                                   task="balloonanalogrisktask",
 #'                                   run="01")
 #'   
 #'   # Specify mode for large datasets
@@ -159,7 +159,7 @@ read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bi
 #' \donttest{
 #' # Load a BIDS project with fMRIPrep derivatives
 #' tryCatch({
-#'   ds_path <- get_example_bids_dataset("phoneme_stripped")
+#'   ds_path <- get_example_bids_dataset("ds000001-fmriprep")
 #'   proj <- bids_project(ds_path, fmriprep=TRUE)
 #'   
 #'   # Create a mask for all subjects (conservative threshold)
@@ -172,7 +172,7 @@ read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bi
 #'   inclusive_mask <- create_preproc_mask(proj, subid=".*", thresh=0.8)
 #'   
 #'   # Use additional search criteria
-#'   task_mask <- create_preproc_mask(proj, subid=".*", task="phoneme")
+#'   task_mask <- create_preproc_mask(proj, subid=".*", task="balloonanalogrisktask")
 #'   
 #'   # Clean up
 #'   unlink(ds_path, recursive=TRUE)
@@ -366,10 +366,26 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #' @importFrom tidyselect any_of
 #' @return A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds.
 #' @examples
-#' \dontrun{
-#' proj <- bids_project("/path/to/bids", fmriprep = TRUE)
-#' # canonical names automatically resolve to actual columns
-#' conf <- read_confounds(proj, cvars = c("csf", "framewise_displacement"))
+#' \donttest{
+#' # Try to load a BIDS project with fMRIPrep derivatives
+#' tryCatch({
+#'   ds_path <- get_example_bids_dataset("ds000001-fmriprep")
+#'   proj <- bids_project(ds_path, fmriprep=TRUE)
+#'   
+#'   # Read confounds with canonical names (automatically resolve to actual columns)
+#'   conf <- read_confounds(proj, cvars = c("csf", "framewise_displacement"))
+#'   
+#'   # Read confounds for specific subjects and tasks
+#'   conf_sub <- read_confounds(proj, subid="01", task="balloonanalogrisktask")
+#'   
+#'   # Get confounds as flat tibble
+#'   conf_flat <- read_confounds(proj, nest=FALSE)
+#'   
+#'   # Clean up
+#'   unlink(ds_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires derivatives dataset with confounds: ", e$message)
+#' })
 #' }
 #' @export
 read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", run=".*",

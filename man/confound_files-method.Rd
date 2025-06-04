@@ -59,13 +59,12 @@ passed to \code{create_mock_bids} with \code{fmriprep=TRUE}.
 \donttest{
 # Get all confound files from a BIDS project with fMRIPrep derivatives
 tryCatch({
-  # Try to get a derivatives dataset
-  ds_path <- get_example_bids_dataset("phoneme_stripped")
+  ds_path <- get_example_bids_dataset("ds000001-fmriprep")
   proj <- bids_project(ds_path, fmriprep=TRUE)
   conf_files <- confound_files(proj)
   
   # Get confound files for specific subjects and tasks
-  confound_files(proj, subid="sub-01", task="phoneme")
+  confound_files(proj, subid="sub-01", task="balloonanalogrisktask")
   
   # Clean up
   unlink(ds_path, recursive=TRUE)

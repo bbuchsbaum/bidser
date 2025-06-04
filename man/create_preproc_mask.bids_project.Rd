@@ -50,7 +50,7 @@ as brain across all subjects/runs. Lower values create a more inclusive mask.
 \donttest{
 # Load a BIDS project with fMRIPrep derivatives
 tryCatch({
-  ds_path <- get_example_bids_dataset("phoneme_stripped")
+  ds_path <- get_example_bids_dataset("ds000001-fmriprep")
   proj <- bids_project(ds_path, fmriprep=TRUE)
   
   # Create a mask for all subjects (conservative threshold)
@@ -63,7 +63,7 @@ tryCatch({
   inclusive_mask <- create_preproc_mask(proj, subid=".*", thresh=0.8)
   
   # Use additional search criteria
-  task_mask <- create_preproc_mask(proj, subid=".*", task="phoneme")
+  task_mask <- create_preproc_mask(proj, subid=".*", task="balloonanalogrisktask")
   
   # Clean up
   unlink(ds_path, recursive=TRUE)

@@ -44,3 +44,4 @@ Suggests:
     covr,
     gluedown
 VignetteBuilder: knitr
+URL: https://bbuchsbaum.github.io/bidser/

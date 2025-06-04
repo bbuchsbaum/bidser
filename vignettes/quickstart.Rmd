@@ -33,7 +33,7 @@ library(gluedown)
 
 # Download example BIDS dataset
 tryCatch({
-  ds001_path <- get_example_bids_dataset("ds001")
+  ds001_path <- bidser:::get_example_bids_dataset("ds001")
   proj <- bids_project(ds001_path)
   
   print(proj)
