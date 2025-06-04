@@ -1192,17 +1192,20 @@ get_example_bids_dataset <- function(dataset_name = "ds001") {
   
   # Download the dataset from BIDS examples
   tryCatch({
-    # Download the ZIP file
+    # Download the ZIP file ("master" branch is the historical default)
     zip_url <- paste0("https://github.com/bids-standard/bids-examples/archive/refs/heads/master.zip")
     zip_file <- file.path(tempdir(), "bids-examples.zip")
-    
+
     if (!file.exists(zip_file)) {
       utils::download.file(zip_url, zip_file, mode = "wb", quiet = TRUE)
     }
-    
-    # Get list of files in the ZIP and filter for our dataset
+
+    # Determine the root folder name (e.g. bids-examples-master or bids-examples-main)
     zip_contents <- utils::unzip(zip_file, list = TRUE)
-    dataset_pattern <- paste0("bids-examples-master/", dataset_name, "/")
+    root_folder <- sub("/.*", "", zip_contents$Name[1])
+
+    # Filter files belonging to the requested dataset
+    dataset_pattern <- paste0(root_folder, "/", dataset_name, "/")
     dataset_files <- zip_contents$Name[grepl(dataset_pattern, zip_contents$Name, fixed = TRUE)]
     
     if (length(dataset_files) == 0) {
@@ -1216,7 +1219,7 @@ get_example_bids_dataset <- function(dataset_name = "ds001") {
                 junkpaths = FALSE)
     
     # Move to the expected location
-    source_dir <- file.path(tempdir(), "bids-examples-master", dataset_name)
+    source_dir <- file.path(tempdir(), root_folder, dataset_name)
     if (dir.exists(source_dir)) {
       file.rename(source_dir, temp_dir)
       return(temp_dir)
