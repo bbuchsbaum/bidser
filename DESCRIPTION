@@ -17,7 +17,6 @@ Imports:
   stringr,
   data.tree,
   neuroim2,
-  progress,
   tidyselect,
   dplyr,
   ggplot2,
