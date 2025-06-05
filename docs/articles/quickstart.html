@@ -64,23 +64,70 @@
     
     
 <div class="section level2">
-<h2 id="brief-introduction-to-bidser">Brief Introduction to <code>bidser</code><a class="anchor" aria-label="anchor" href="#brief-introduction-to-bidser"></a>
+<h2 id="introduction-to-bidser">Introduction to bidser<a class="anchor" aria-label="anchor" href="#introduction-to-bidser"></a>
 </h2>
-<p><code>bidser</code> is an R package for working with the <a href="https://bids.neuroimaging.io/" class="external-link">BIDS</a> neuroimaging projects. The
-goal of the package is to allow one to query files that are stored in a
-hierarchical BIDS structure. Below we load in a BIDS example project,
-which is stored and accessed through a <code>bids_project</code>
-object.</p>
-<p>There is a Python package called <a href="https://github.com/bids-standard/pybids" class="external-link">pybids</a> that can be
-used to work with BIDS in Python and is more developed.</p>
+<p><code>bidser</code> is an R package designed for working with
+neuroimaging data organized according to the <a href="https://bids.neuroimaging.io/" class="external-link">Brain Imaging Data Structure
+(BIDS)</a> standard. BIDS is a specification that describes how to
+organize and name neuroimaging and behavioral data, making datasets more
+accessible, shareable, and easier to analyze.</p>
+<div class="section level3">
+<h3 id="what-is-bids">What is BIDS?<a class="anchor" aria-label="anchor" href="#what-is-bids"></a>
+</h3>
+<p>BIDS organizes data into a hierarchical folder structure with
+standardized naming conventions:</p>
+<ul>
+<li>
+<strong>Subjects</strong> are identified by folders named
+<code>sub-XX</code>
+</li>
+<li>
+<strong>Sessions</strong> (optional) are identified by folders named
+<code>ses-XX</code>
+</li>
+<li>
+<strong>Data types</strong> are organized into modality-specific
+folders (<code>anat</code>, <code>func</code>, <code>dwi</code>,
+etc.)</li>
+<li>
+<strong>Files</strong> follow specific naming patterns that encode
+metadata (subject, session, task, run, etc.)</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="what-does-bidser-do">What does bidser do?<a class="anchor" aria-label="anchor" href="#what-does-bidser-do"></a>
+</h3>
+<p><code>bidser</code> provides tools to:</p>
+<ul>
+<li>
+<strong>Query and filter</strong> files based on BIDS metadata
+(subject, task, run, etc.)</li>
+<li>
+<strong>Read event files</strong> that describe experimental
+paradigms</li>
+<li>
+<strong>Work with fMRIPrep derivatives</strong> for preprocessed
+data</li>
+<li>
+<strong>Navigate complex BIDS hierarchies</strong> without manually
+constructing file paths</li>
+</ul>
+<p>Let’s explore these capabilities using a real BIDS dataset.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="loading-a-bids-dataset">Loading a BIDS Dataset<a class="anchor" aria-label="anchor" href="#loading-a-bids-dataset"></a>
+</h2>
+<p>We’ll use the <code>ds001</code> dataset from the BIDS examples,
+which contains data from a “Balloon Analog Risk Task” experiment with 16
+subjects.</p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'bidser'</span></span>
 <span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     parse</span></span></code></pre>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bbuchsbaum.github.io/bidser/">bidser</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bbuchsbaum.github.io/bidser/">bidser</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -96,7 +143,7 @@ used to work with BIDS in Python and is more developed.</p>
 <span></span>
 <span><span class="co"># Download example BIDS dataset</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="op">{</span></span>
-<span>  <span class="va">ds001_path</span> <span class="op">&lt;-</span> <span class="fu">get_example_bids_dataset</span><span class="op">(</span><span class="st">"ds001"</span><span class="op">)</span></span>
+<span>  <span class="va">ds001_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_example_bids_dataset.html">get_example_bids_dataset</a></span><span class="op">(</span><span class="st">"ds001"</span><span class="op">)</span></span>
 <span>  <span class="va">proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">ds001_path</span><span class="op">)</span></span>
 <span>  </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span>
@@ -105,10 +152,351 @@ used to work with BIDS in Python and is more developed.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Error: "</span>, <span class="va">e</span><span class="op">$</span><span class="va">message</span><span class="op">)</span></span>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/knit_exit.html" class="external-link">knit_exit</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="co">#&gt; This vignette requires an internet connection to download example data.</span></span>
-<span><span class="co">#&gt; Error: could not find function "get_example_bids_dataset"</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="font-weight: bold;">BIDS Project Summary</span> </span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Project Name: </span> <span style="color: #00BBBB; font-weight: bold;">bids_example_ds001</span> </span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Participants (n): </span> <span style="color: #00BB00; font-weight: bold;">16</span> </span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Tasks: </span> <span style="color: #BBBB00;">balloonanalogrisktask</span> </span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Image Types: </span> <span style="color: #00BB00;">anat, func</span> </span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Modalities: </span> <span style="color: #00BB00;">(none)</span> </span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Keys: </span> <span style="color: #BBBB00;">folder, kind, relative_path, subid, suffix, type, run, task</span></span></span></code></pre></div>
+<p>The <code>bids_project</code> object provides a high-level interface
+to the dataset. We can see it contains 16 subjects with both anatomical
+and functional data.</p>
 </div>
-  </main>
+<div class="section level2">
+<h2 id="basic-dataset-queries">Basic Dataset Queries<a class="anchor" aria-label="anchor" href="#basic-dataset-queries"></a>
+</h2>
+<div class="section level3">
+<h3 id="dataset-structure">Dataset Structure<a class="anchor" aria-label="anchor" href="#dataset-structure"></a>
+</h3>
+<p>Let’s explore the basic structure of this dataset:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Check if the dataset has multiple sessions per subject</span></span>
+<span><span class="fu"><a href="../reference/sessions-method.html">sessions</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span>
+<span><span class="co">#&gt; NULL</span></span>
+<span></span>
+<span><span class="co"># Get all participant IDs</span></span>
+<span><span class="fu"><a href="../reference/participants-method.html">participants</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "01" "02" "03" "04" "05" "06" "07" "08" "09" "10" "11" "12" "13" "14" "15"</span></span>
+<span><span class="co">#&gt; [16] "16"</span></span>
+<span></span>
+<span><span class="co"># What tasks are included?</span></span>
+<span><span class="fu"><a href="../reference/tasks-method.html">tasks</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "balloonanalogrisktask"</span></span>
+<span></span>
+<span><span class="co"># Get a summary of the dataset</span></span>
+<span><span class="fu"><a href="../reference/bids_summary.html">bids_summary</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $n_subjects</span></span>
+<span><span class="co">#&gt; [1] 16</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $n_sessions</span></span>
+<span><span class="co">#&gt; NULL</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $tasks</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
+<span><span class="co">#&gt;   task                  n_runs</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> balloonanalogrisktask      3</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $total_runs</span></span>
+<span><span class="co">#&gt; [1] 3</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="finding-files-by-type">Finding Files by Type<a class="anchor" aria-label="anchor" href="#finding-files-by-type"></a>
+</h3>
+<p>bidser provides several ways to find files. Let’s start with the most
+common neuroimaging file types:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Find all anatomical T1-weighted images</span></span>
+<span><span class="va">t1w_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/search_files.html">search_files</a></span><span class="op">(</span><span class="va">proj</span>, regex <span class="op">=</span> <span class="st">"T1w\\.nii"</span>, full_path <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Found"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">t1w_files</span><span class="op">)</span>, <span class="st">"T1w images"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Found 16 T1w images"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">t1w_files</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "sub-01/anat/sub-01_T1w.nii.gz" "sub-02/anat/sub-02_T1w.nii.gz"</span></span>
+<span><span class="co">#&gt; [3] "sub-03/anat/sub-03_T1w.nii.gz" "sub-04/anat/sub-04_T1w.nii.gz"</span></span>
+<span><span class="co">#&gt; [5] "sub-05/anat/sub-05_T1w.nii.gz" "sub-06/anat/sub-06_T1w.nii.gz"</span></span>
+<span></span>
+<span><span class="co"># Find all functional BOLD scans</span></span>
+<span><span class="va">bold_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, full_path <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Found"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bold_files</span><span class="op">)</span>, <span class="st">"functional scans"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Found 48 functional scans"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bold_files</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [2] "sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [3] "sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [4] "sub-02/func/sub-02_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [5] "sub-02/func/sub-02_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [6] "sub-02/func/sub-02_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="filtering-by-subject-and-task">Filtering by Subject and Task<a class="anchor" aria-label="anchor" href="#filtering-by-subject-and-task"></a>
+</h3>
+<p>One of bidser’s key strengths is filtering data by BIDS metadata:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get functional scans for specific subjects</span></span>
+<span><span class="va">sub01_scans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">"01"</span><span class="op">)</span></span>
+<span><span class="va">sub02_scans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">"02"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Subject 01 has"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sub01_scans</span><span class="op">)</span>, <span class="st">"scans"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Subject 01 has 3 scans"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Subject 02 has"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sub02_scans</span><span class="op">)</span>, <span class="st">"scans"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Subject 02 has 3 scans"</span></span>
+<span></span>
+<span><span class="co"># Filter by task (ds001 only has one task, but this shows the syntax)</span></span>
+<span><span class="va">task_scans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, task <span class="op">=</span> <span class="st">"balloonanalogrisktask"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Found"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">task_scans</span><span class="op">)</span>, <span class="st">"scans for the balloon task"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Found 48 scans for the balloon task"</span></span>
+<span></span>
+<span><span class="co"># Combine filters: specific subject AND task</span></span>
+<span><span class="va">sub01_task_scans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">"01"</span>, task <span class="op">=</span> <span class="st">"balloonanalogrisktask"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Subject 01 has"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sub01_task_scans</span><span class="op">)</span>, <span class="st">"balloon task scans"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Subject 01 has 3 balloon task scans"</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="working-with-multiple-subjects">Working with Multiple Subjects<a class="anchor" aria-label="anchor" href="#working-with-multiple-subjects"></a>
+</h3>
+<p>You can use regular expressions to select multiple subjects at
+once:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get scans for subjects 01, 02, and 03</span></span>
+<span><span class="va">first_three_scans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">"0[123]"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"First 3 subjects have"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">first_three_scans</span><span class="op">)</span>, <span class="st">"scans total"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "First 3 subjects have 9 scans total"</span></span>
+<span></span>
+<span><span class="co"># Get scans for all subjects (equivalent to default)</span></span>
+<span><span class="va">all_scans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">".*"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"All subjects have"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">all_scans</span><span class="op">)</span>, <span class="st">"scans total"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "All subjects have 48 scans total"</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="working-with-event-files">Working with Event Files<a class="anchor" aria-label="anchor" href="#working-with-event-files"></a>
+</h2>
+<p>Event files describe the experimental paradigm - when stimuli were
+presented, what responses occurred, etc. This is crucial for task-based
+fMRI analysis.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Find all event files</span></span>
+<span><span class="va">event_file_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/event_files-method.html">event_files</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Found"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">event_file_paths</span><span class="op">)</span>, <span class="st">"event files"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Found 48 event files"</span></span>
+<span></span>
+<span><span class="co"># Read event data into a nested data frame</span></span>
+<span><span class="va">events_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu"><a href="../reference/read_events.html">read_events</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">events_data</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Groups:   .task, .session, .run, .subid [6]</span></span></span>
+<span><span class="co">#&gt;   .subid .session .run  .task                 data              </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>            </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [158 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 01     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [156 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 01     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [149 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 02     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [185 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 02     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [184 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 02     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [186 × 9]&gt;</span></span></span></code></pre></div>
+<p>Let’s explore the event data structure:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Look at events for the first subject</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">first_subject_events</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span></span>
+<span>  <span class="va">events_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">.subid</span> <span class="op">==</span> <span class="st">"01"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>    <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Event structure for subject 01:"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Event structure for subject 01:"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">first_subject_events</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 13</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Groups:   .task, .session, .run, .subid [1]</span></span></span>
+<span><span class="co">#&gt;   .subid .session .run  .task              onset duration trial_type cash_demean</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris…  0.061    0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris…  4.96     0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris…  7.18     0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris… 10.4      0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris… 13.4      0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris… 16.8      0.772 explode_d…          <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5 more variables: control_pumps_demean &lt;dbl&gt;, explode_demean &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   pumps_demean &lt;dbl&gt;, response_time &lt;dbl&gt;, .file &lt;chr&gt;</span></span></span>
+<span></span>
+<span><span class="co"># What columns are in the event data?</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Event file columns:"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Event file columns:"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">first_subject_events</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] ".subid"               ".session"             ".run"                </span></span>
+<span><span class="co">#&gt;  [4] ".task"                "onset"                "duration"            </span></span>
+<span><span class="co">#&gt;  [7] "trial_type"           "cash_demean"          "control_pumps_demean"</span></span>
+<span><span class="co">#&gt; [10] "explode_demean"       "pumps_demean"         "response_time"       </span></span>
+<span><span class="co">#&gt; [13] ".file"</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="analyzing-event-data">Analyzing Event Data<a class="anchor" aria-label="anchor" href="#analyzing-event-data"></a>
+</h3>
+<p>Let’s do some basic exploration of the experimental design:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># How many trials per subject?</span></span>
+<span><span class="va">trial_counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span></span>
+<span>  <span class="va">events_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">.subid</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>n_trials <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Trials per subject:"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Trials per subject:"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">trial_counts</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 16 × 2</span></span></span>
+<span><span class="co">#&gt;    .subid n_trials</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 01          463</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 02          555</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 03          494</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 04          510</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 05          419</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 06          536</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 07          492</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 08          494</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 09          497</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 10          521</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> 11          471</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> 12          453</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> 13          485</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> 14          503</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> 15          411</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> 16          419</span></span>
+<span></span>
+<span><span class="co"># What trial types are there?</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="st">"trial_type"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">first_subject_events</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">trial_types</span> <span class="op">&lt;-</span> <span class="va">first_subject_events</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">trial_type</span>, name <span class="op">=</span> <span class="st">"frequency"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Trial types in the experiment:"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">trial_types</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; [1] "Trial types in the experiment:"</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 12 × 6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Groups:   .task, .session, .run, .subid [3]</span></span></span>
+<span><span class="co">#&gt;    .task                 .session .run  .subid trial_type           frequency</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       01    01     cash_demean                  9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       01    01     control_pumps_demean        52</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       01    01     explode_demean              10</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       01    01     pumps_demean                87</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       02    01     cash_demean                 12</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       02    01     control_pumps_demean        61</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       02    01     explode_demean              10</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       02    01     pumps_demean                73</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       03    01     cash_demean                 12</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       03    01     control_pumps_demean        51</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       03    01     explode_demean              12</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       03    01     pumps_demean                74</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="advanced-querying">Advanced Querying<a class="anchor" aria-label="anchor" href="#advanced-querying"></a>
+</h2>
+<div class="section level3">
+<h3 id="custom-file-searches">Custom File Searches<a class="anchor" aria-label="anchor" href="#custom-file-searches"></a>
+</h3>
+<p>The <code><a href="../reference/search_files.html">search_files()</a></code> function is very flexible for custom
+queries:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Find all JSON sidecar files</span></span>
+<span><span class="va">json_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/search_files.html">search_files</a></span><span class="op">(</span><span class="va">proj</span>, regex <span class="op">=</span> <span class="st">"\\.json$"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Found"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">json_files</span><span class="op">)</span>, <span class="st">"JSON files"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Found 0 JSON files"</span></span>
+<span></span>
+<span><span class="co"># Find files for specific runs</span></span>
+<span><span class="va">run1_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/search_files.html">search_files</a></span><span class="op">(</span><span class="va">proj</span>, regex <span class="op">=</span> <span class="st">"bold"</span>, run <span class="op">=</span> <span class="st">"01"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Found"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">run1_files</span><span class="op">)</span>, <span class="st">"files from run 01"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Found 16 files from run 01"</span></span>
+<span></span>
+<span><span class="co"># Complex pattern matching</span></span>
+<span><span class="co"># Find T1w files for subjects 01-05</span></span>
+<span><span class="va">t1w_subset</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/search_files.html">search_files</a></span><span class="op">(</span><span class="va">proj</span>, regex <span class="op">=</span> <span class="st">"T1w"</span>, subid <span class="op">=</span> <span class="st">"0[1-5]"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Found"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">t1w_subset</span><span class="op">)</span>, <span class="st">"T1w files for subjects 01-05"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Found 5 T1w files for subjects 01-05"</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="getting-full-file-paths">Getting Full File Paths<a class="anchor" aria-label="anchor" href="#getting-full-file-paths"></a>
+</h3>
+<p>Sometimes you need the complete file paths for analysis:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get full paths to functional scans for analysis</span></span>
+<span><span class="va">full_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">"01"</span>, full_path <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Full paths to subject 01's functional scans:"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Full paths to subject 01's functional scans:"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">full_paths</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "/private/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/Rtmpqj4rkX/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [2] "/private/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/Rtmpqj4rkX/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [3] "/private/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/Rtmpqj4rkX/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span>
+<span></span>
+<span><span class="co"># Check that files actually exist</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">full_paths</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">files_exist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">full_paths</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"All files exist:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">files_exist</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; [1] "All files exist: TRUE"</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="next-steps">Next Steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
+</h2>
+<p>This quickstart covered the basic functionality of bidser for
+querying BIDS datasets. For more advanced usage, see:</p>
+<ul>
+<li>
+<strong>fMRIPrep integration</strong>: Working with preprocessed
+derivatives</li>
+<li>
+<strong>Data loading</strong>: Reading neuroimaging data with
+<code>neurobase</code> or <code>RNifti</code>
+</li>
+<li>
+<strong>Confound regression</strong>: Using physiological and motion
+regressors</li>
+<li>
+<strong>Group analysis</strong>: Combining data across subjects
+efficiently</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="reading-files-produced-by-fmriprep">Reading files produced by FMRIPrep<a class="anchor" aria-label="anchor" href="#reading-files-produced-by-fmriprep"></a>
+</h2>
+<p>If you have processed a dataset with FMRIPrep, <code>bidser</code>
+can be used to read in many of the resultant derivative files. If a
+project has an FMRIPrep derivatives folder, then we can read in the BIDS
+hierarchy plus derivatives as follows:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Try to get a derivatives dataset - note this may not be available</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="op">{</span></span>
+<span>  <span class="co"># Some BIDS examples may have derivatives, or we can demonstrate with empty structure</span></span>
+<span>  <span class="va">deriv_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_example_bids_dataset.html">get_example_bids_dataset</a></span><span class="op">(</span><span class="st">"ds000001-fmriprep"</span><span class="op">)</span></span>
+<span>  <span class="va">proj_deriv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">deriv_path</span>, fmriprep<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">proj_deriv</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># Now we can access various derivative files with convenience functions.</span></span>
+<span>  <span class="co"># For example, to read in "preproc" scans we can use the `preproc_scans` function.</span></span>
+<span>  <span class="va">pscans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preproc_scans-method.html">preproc_scans</a></span><span class="op">(</span><span class="va">proj_deriv</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">pscans</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">pscans</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">pscans</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No preprocessed scans found in this example dataset"</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  </span>
+<span>  <span class="co"># Clean up derivatives dataset</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">deriv_path</span>, recursive<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  </span>
+<span><span class="op">}</span>, error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Derivatives example not available: "</span>, <span class="va">e</span><span class="op">$</span><span class="va">message</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"This is normal - not all BIDS examples include fMRIPrep derivatives."</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Derivatives example not available: participants.tsv is missing</span></span>
+<span><span class="co">#&gt; This is normal - not all BIDS examples include fMRIPrep derivatives.</span></span></code></pre></div>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 

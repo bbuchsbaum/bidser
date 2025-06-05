@@ -91,7 +91,7 @@ Returns NULL if the directory does not contain a valid BIDS dataset.</p></li>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Create a BIDS project</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">ds001_path</span> <span class="op">&lt;-</span> <span class="fu">get_example_bids_dataset</span><span class="op">(</span><span class="st">"ds001"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">ds001_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_example_bids_dataset.html">get_example_bids_dataset</a></span><span class="op">(</span><span class="st">"ds001"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">proj</span> <span class="op">&lt;-</span> <span class="fu">bids_project</span><span class="op">(</span><span class="va">ds001_path</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># Get all functional scans</span></span></span>
@@ -120,7 +120,6 @@ Returns NULL if the directory does not contain a valid BIDS dataset.</p></li>
 <span class="r-in"><span><span class="op">}</span>, error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Example requires internet connection: "</span>, <span class="va">e</span><span class="op">$</span><span class="va">message</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Example requires internet connection: could not find function "get_example_bids_dataset"</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

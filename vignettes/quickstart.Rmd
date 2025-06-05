@@ -15,17 +15,39 @@ knitr::opts_chunk$set(
 ```
 
 
-## Brief Introduction to `bidser`
+## Introduction to bidser
 
-`bidser` is an R package for working with the [BIDS](https://bids.neuroimaging.io/) neuroimaging projects. The goal of the package is to allow one to query files that are stored in a hierarchical BIDS structure. Below we load in a BIDS example project, which is stored and accessed through a `bids_project` object.
+`bidser` is an R package designed for working with neuroimaging data organized according to the [Brain Imaging Data Structure (BIDS)](https://bids.neuroimaging.io/) standard. BIDS is a specification that describes how to organize and name neuroimaging and behavioral data, making datasets more accessible, shareable, and easier to analyze.
 
-There is a Python package called [pybids](https://github.com/bids-standard/pybids) that can be used to work with BIDS in Python and is more developed.
+### What is BIDS?
+
+BIDS organizes data into a hierarchical folder structure with standardized naming conventions:
+
+- **Subjects** are identified by folders named `sub-XX`
+- **Sessions** (optional) are identified by folders named `ses-XX`
+- **Data types** are organized into modality-specific folders (`anat`, `func`, `dwi`, etc.)
+- **Files** follow specific naming patterns that encode metadata (subject, session, task, run, etc.)
+
+### What does bidser do?
+
+`bidser` provides tools to:
+
+- **Query and filter** files based on BIDS metadata (subject, task, run, etc.)
+- **Read event files** that describe experimental paradigms
+- **Work with fMRIPrep derivatives** for preprocessed data
+- **Navigate complex BIDS hierarchies** without manually constructing file paths
+
+Let's explore these capabilities using a real BIDS dataset.
+
+## Loading a BIDS Dataset
+
+We'll use the `ds001` dataset from the BIDS examples, which contains data from a "Balloon Analog Risk Task" experiment with 16 subjects.
+
 ```{r echo=FALSE}
 library(bidser)
 ```
 
 ```{r setup}
-
 library(bidser)
 library(tibble)
 library(dplyr)
@@ -33,7 +55,7 @@ library(gluedown)
 
 # Download example BIDS dataset
 tryCatch({
-  ds001_path <- bidser:::get_example_bids_dataset("ds001")
+  ds001_path <- get_example_bids_dataset("ds001")
   proj <- bids_project(ds001_path)
   
   print(proj)
@@ -42,139 +64,190 @@ tryCatch({
   message("Error: ", e$message)
   knitr::knit_exit()
 })
-
 ```
 
-We can see that this is a project with multiple participants with anatomical and functional scans and a task called **balloonanalogrisktask**.
+The `bids_project` object provides a high-level interface to the dataset. We can see it contains 16 subjects with both anatomical and functional data.
 
-We can also make some basic queries of the project to gather information. For example, does the project have any "sessions"?
+## Basic Dataset Queries
+
+### Dataset Structure
+
+Let's explore the basic structure of this dataset:
 
 ```{r}
-
+# Check if the dataset has multiple sessions per subject
 sessions(proj)
+
+# Get all participant IDs
+participants(proj)
+
+# What tasks are included?
+tasks(proj)
+
+# Get a summary of the dataset
+bids_summary(proj)
 ```
 
-No sessions. And what are the participant ids?
+### Finding Files by Type
+
+bidser provides several ways to find files. Let's start with the most common neuroimaging file types:
 
 ```{r}
-sids <- participants(proj)
+# Find all anatomical T1-weighted images
+t1w_files <- search_files(proj, regex = "T1w\\.nii", full_path = FALSE)
+print(paste("Found", length(t1w_files), "T1w images"))
+head(t1w_files)
+
+# Find all functional BOLD scans
+bold_files <- func_scans(proj, full_path = FALSE)
+print(paste("Found", length(bold_files), "functional scans"))
+head(bold_files)
 ```
 
-```{r, results="asis", echo=FALSE}
+### Filtering by Subject and Task
 
-gluedown::md_bullet(sids)
-
-```
-
-Does it have task event files?
+One of bidser's key strengths is filtering data by BIDS metadata:
 
 ```{r}
+# Get functional scans for specific subjects
+sub01_scans <- func_scans(proj, subid = "01")
+sub02_scans <- func_scans(proj, subid = "02")
 
+print(paste("Subject 01 has", length(sub01_scans), "scans"))
+print(paste("Subject 02 has", length(sub02_scans), "scans"))
 
-fnames <- head(basename(event_files(proj)), n=3)
-## print the first three event files
+# Filter by task (ds001 only has one task, but this shows the syntax)
+task_scans <- func_scans(proj, task = "balloonanalogrisktask")
+print(paste("Found", length(task_scans), "scans for the balloon task"))
 
+# Combine filters: specific subject AND task
+sub01_task_scans <- func_scans(proj, subid = "01", task = "balloonanalogrisktask")
+print(paste("Subject 01 has", length(sub01_task_scans), "balloon task scans"))
 ```
 
-```{r, echo=FALSE, results='asis'} 
+### Working with Multiple Subjects
 
-gluedown::md_order(fnames, seq = FALSE)
+You can use regular expressions to select multiple subjects at once:
+
+```{r}
+# Get scans for subjects 01, 02, and 03
+first_three_scans <- func_scans(proj, subid = "0[123]")
+print(paste("First 3 subjects have", length(first_three_scans), "scans total"))
+
+# Get scans for all subjects (equivalent to default)
+all_scans <- func_scans(proj, subid = ".*")
+print(paste("All subjects have", length(all_scans), "scans total"))
 ```
 
+## Working with Event Files
 
-## Searching the BIDS structure
+Event files describe the experimental paradigm - when stimuli were presented, what responses occurred, etc. This is crucial for task-based fMRI analysis.
 
-Lets now search for some arbitrary files. For example, we wish to retrieve all the "T1w" anatomical images.
+```{r}
+# Find all event files
+event_file_paths <- event_files(proj)
+print(paste("Found", length(event_file_paths), "event files"))
 
-
-```{r, echo=FALSE, results='asis'} 
-
-t1w <- search_files(proj, "T1w")
-
+# Read event data into a nested data frame
+events_data <- suppressMessages(read_events(proj))
+head(events_data)
 ```
 
-```{r, echo=FALSE, results='asis'} 
+Let's explore the event data structure:
 
-gluedown::md_bullet(t1w)
+```{r}
+# Look at events for the first subject
+library(tidyr)
+
+first_subject_events <- suppressMessages(
+  events_data %>% 
+    filter(.subid == "01") %>% 
+    unnest(cols = c(data))
+)
+
+print("Event structure for subject 01:")
+print(head(first_subject_events))
+
+# What columns are in the event data?
+print("Event file columns:")
+print(names(first_subject_events))
 ```
 
-Now we search for any scans containing the string "bold".
+### Analyzing Event Data
 
-```{r, results='asis'} 
+Let's do some basic exploration of the experimental design:
 
-bold <- search_files(proj, "bold")
+```{r}
+# How many trials per subject?
+trial_counts <- suppressMessages(
+  events_data %>%
+    unnest(cols = c(data)) %>%
+    group_by(.subid) %>%
+    summarise(n_trials = n(), .groups = "drop")
+)
 
-## take the first 5 files, since there are alot.
-bold <- head(bold, 5)
-```
+print("Trials per subject:")
+print(trial_counts)
 
-```{r, echo=FALSE, results='asis'} 
-
-gluedown::md_bullet(bold)
-```
-
-
-## Specialized querying functions
-
-If we are only interested in functional bolds scans (rather than any file with "bold" in it), there is a special function called `func_scans` to return such files
-
-```{r, results='asis'} 
-
-fscans <- func_scans(proj)
-
-## take the first 5 files, since there are alot.
-fscans <- head(fscans, 5)
-```
-
-```{r, echo=FALSE, results='asis'} 
-
-gluedown::md_bullet(fscans)
-```
-
-Suppose though that we only want the scans from a specific subject? Let's try the first subject:
-
-```{r, results='asis'} 
-
-first_subject <- participants(proj)[1]
-fscans_sub <- func_scans(proj, subid=first_subject)
-
-```
-
-```{r, echo=FALSE, results='asis'}
-
-if (length(fscans_sub) > 0) {
-  gluedown::md_bullet(basename(fscans_sub))
-} else {
-  cat("No scans found for subject", first_subject, "\n")
+# What trial types are there?
+if ("trial_type" %in% names(first_subject_events)) {
+  trial_types <- first_subject_events %>%
+    count(trial_type, name = "frequency")
+  print("Trial types in the experiment:")
+  print(trial_types)
 }
 ```
 
-## Reading in Task Event files
+## Advanced Querying
 
-BIDS event files describe the event-structure of *f*mri experiments. They can be easy read in to R as a set of `data.frame`s using the `read_events` function. As can be seen in the output below, `read_events` returns a `data.frame` with four columns: `.subid`, `.run`, `.task`, `data`. The `data` is nested in the table because there is no guantee that all events files have the same columns (for example, event files associated with different tasks). 
+### Custom File Searches
+
+The `search_files()` function is very flexible for custom queries:
 
 ```{r}
+# Find all JSON sidecar files
+json_files <- search_files(proj, regex = "\\.json$")
+print(paste("Found", length(json_files), "JSON files"))
 
-evs <- read_events(proj)
-head(evs)
+# Find files for specific runs
+run1_files <- search_files(proj, regex = "bold", run = "01")
+print(paste("Found", length(run1_files), "files from run 01"))
 
+# Complex pattern matching
+# Find T1w files for subjects 01-05
+t1w_subset <- search_files(proj, regex = "T1w", subid = "0[1-5]")
+print(paste("Found", length(t1w_subset), "T1w files for subjects 01-05"))
 ```
 
-Now we can filter the table as we like, for example, to extract the data only from the first participant. We can then "unnest" the `data` variable to access the actual event structure.
+### Getting Full File Paths
 
-```{r, result="asis"}
-library(tidyr)
-library(dplyr)
+Sometimes you need the complete file paths for analysis:
 
-first_participant <- participants(proj)[1]
-ev1 <- evs %>% dplyr::filter(.subid == first_participant) %>% unnest(cols=c(data))
-head(ev1)
+```{r}
+# Get full paths to functional scans for analysis
+full_paths <- func_scans(proj, subid = "01", full_path = TRUE)
+print("Full paths to subject 01's functional scans:")
+print(full_paths)
+
+# Check that files actually exist
+if (length(full_paths) > 0) {
+  files_exist <- file.exists(full_paths)
+  print(paste("All files exist:", all(files_exist)))
+}
 ```
 
+## Next Steps
+
+This quickstart covered the basic functionality of bidser for querying BIDS datasets. For more advanced usage, see:
+
+- **fMRIPrep integration**: Working with preprocessed derivatives
+- **Data loading**: Reading neuroimaging data with `neurobase` or `RNifti`
+- **Confound regression**: Using physiological and motion regressors
+- **Group analysis**: Combining data across subjects efficiently
 
 ## Reading files produced by FMRIPrep
 
-If you have processed a dataset with FMRIPrep, `bidser` can be used to read in the many of the resultant derivative files. If a project has an FMRIPrep derivatives folder, then we can read in the BIDS hierarchy plus derivatives as follows:
+If you have processed a dataset with FMRIPrep, `bidser` can be used to read in many of the resultant derivative files. If a project has an FMRIPrep derivatives folder, then we can read in the BIDS hierarchy plus derivatives as follows:
 
 ```{r}
 # Try to get a derivatives dataset - note this may not be available

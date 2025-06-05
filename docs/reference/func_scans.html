@@ -114,7 +114,7 @@ Returns NULL if no matching files are found.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Create a BIDS project object</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">ds001_path</span> <span class="op">&lt;-</span> <span class="fu">get_example_bids_dataset</span><span class="op">(</span><span class="st">"ds001"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">ds001_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_example_bids_dataset.html">get_example_bids_dataset</a></span><span class="op">(</span><span class="st">"ds001"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">ds001_path</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># Get all functional scans</span></span></span>
@@ -134,7 +134,7 @@ Returns NULL if no matching files are found.</p>
 <span class="r-in"><span>  <span class="va">rel_scans</span> <span class="op">&lt;-</span> <span class="fu">func_scans</span><span class="op">(</span><span class="va">proj</span>, full_path<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># Also try with a dataset that has sessions</span></span></span>
-<span class="r-in"><span>  <span class="va">ds007_path</span> <span class="op">&lt;-</span> <span class="fu">get_example_bids_dataset</span><span class="op">(</span><span class="st">"ds007"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">ds007_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_example_bids_dataset.html">get_example_bids_dataset</a></span><span class="op">(</span><span class="st">"ds007"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">ds007_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">ds007_path</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="sessions-method.html">sessions</a></span><span class="op">(</span><span class="va">ds007_proj</span><span class="op">)</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="va">session_scans</span> <span class="op">&lt;-</span> <span class="fu">func_scans</span><span class="op">(</span><span class="va">ds007_proj</span>, session<span class="op">=</span><span class="fu"><a href="sessions-method.html">sessions</a></span><span class="op">(</span><span class="va">ds007_proj</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
@@ -146,7 +146,6 @@ Returns NULL if no matching files are found.</p>
 <span class="r-in"><span><span class="op">}</span>, error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Example requires internet connection: "</span>, <span class="va">e</span><span class="op">$</span><span class="va">message</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Example requires internet connection: could not find function "get_example_bids_dataset"</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

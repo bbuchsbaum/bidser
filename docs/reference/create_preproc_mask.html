@@ -74,7 +74,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Download and load a BIDS project with fMRIPrep derivatives</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">ds001_deriv_path</span> <span class="op">&lt;-</span> <span class="fu">get_example_bids_dataset</span><span class="op">(</span><span class="st">"ds000001-fmriprep"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">ds001_deriv_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_example_bids_dataset.html">get_example_bids_dataset</a></span><span class="op">(</span><span class="st">"ds000001-fmriprep"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">ds001_deriv_path</span>, fmriprep<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">mask</span> <span class="op">&lt;-</span> <span class="fu">create_preproc_mask</span><span class="op">(</span><span class="va">proj</span>, subid<span class="op">=</span><span class="st">".*"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  </span></span>
@@ -86,7 +86,7 @@
 <span class="r-in"><span><span class="op">}</span>, error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Example requires derivatives dataset: "</span>, <span class="va">e</span><span class="op">$</span><span class="va">message</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Example requires derivatives dataset: could not find function "get_example_bids_dataset"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Example requires derivatives dataset: participants.tsv is missing</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
