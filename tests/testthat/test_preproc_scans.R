@@ -119,7 +119,7 @@ test_that("can get relative paths for preprocessed files", {
   expect_equal(length(abs_pscans), length(rel_pscans))
   
   # Absolute paths should include the full system path
-  expect_true(all(grepl("^/", abs_pscans)))
+  expect_true(all(grepl("^(?:/|[A-Za-z]:)", abs_pscans)))
   
   # Relative paths should start with derivatives/fmriprep
   expect_true(all(grepl("^derivatives/fmriprep", rel_pscans)))
