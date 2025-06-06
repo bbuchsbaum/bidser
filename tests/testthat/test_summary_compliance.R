@@ -58,3 +58,33 @@ test_that("bids_check_compliance passes on ds001", {
     skip(paste("Could not test bids_check_compliance with ds001:", e$message))
   })
 })
+
+test_that("bids_check_compliance detects missing files", {
+  fs <- tibble::tribble(
+    ~subid, ~datatype, ~suffix, ~fmriprep,
+    "01", "func", "bold.nii.gz", FALSE
+  )
+
+  tmp_dir <- tempfile("bids_stub")
+  proj <- create_mock_bids(
+    project_name = "CompTest",
+    participants = c("01"),
+    file_structure = fs,
+    event_data = list(),
+    confound_data = list(),
+    create_stub = TRUE,
+    stub_path = tmp_dir
+  )
+
+  bp <- bids_project(tmp_dir, fmriprep = FALSE)
+
+  file.remove(file.path(tmp_dir, "participants.tsv"))
+  file.remove(file.path(tmp_dir, "dataset_description.json"))
+  unlink(file.path(tmp_dir, "sub-01"), recursive = TRUE)
+
+  chk <- bids_check_compliance(bp)
+  expect_false(chk$passed)
+  expect_true(any(grepl("participants.tsv", chk$issues)))
+  expect_true(any(grepl("dataset_description.json", chk$issues)))
+  expect_true(any(grepl("Subject directory not found", chk$issues)))
+})
