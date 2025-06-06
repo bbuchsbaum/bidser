@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![Codecov test
-coverage](https://codecov.io/gh/bbuchsbaum/bidser/branch/master/graph/badge.svg)](https://codecov.io/gh/bbuchsbaum/bidser?branch=master)
+coverage](https://codecov.io/gh/bbuchsbaum/bidser/branch/master/graph/badge.svg)](https://app.codecov.io/gh/bbuchsbaum/bidser?branch=master)
 <!-- badges: end -->
 
 [BIDS](https://bids.neuroimaging.io/) in R – (it’s a start!)

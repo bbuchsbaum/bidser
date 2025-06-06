@@ -1,6 +1,6 @@
 Package: bidser
 Version: 0.0.0.9000
-Title: Work with BIDS projects
+Title: Work with BIDS Projects
 Description: Tools for working with Brain Imaging Data Structure (BIDS) formatted neuroimaging datasets.
     The package provides functionality for reading, validating, and querying BIDS-compliant 
     projects, creating mock BIDS datasets for testing, and extracting preprocessed data from 
