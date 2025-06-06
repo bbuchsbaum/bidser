@@ -85,12 +85,40 @@ a new BIDS project object containing only that subject's files and metadata.</p>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A list of helper functions for the subject.</p>
-<p>A list containing helper functions:</p><ul><li><p><code>events</code>:Read event files via <code><a href="read_events.html">read_events()</a></code>.</p></li>
-<li><p><code>scans</code>:Retrieve functional scan paths via <code><a href="func_scans.html">func_scans()</a></code>.</p></li>
-<li><p><code>confounds</code>:Read confound tables with <code><a href="read_confounds.html">read_confounds()</a></code>.</p></li>
-<li><p><code>preproc_scans</code>:Retrieve preprocessed scan paths with <code><a href="preproc_scans-method.html">preproc_scans()</a></code>.</p></li>
-<li><p><code>brain_mask</code>:Create a brain mask via <code><a href="brain_mask.html">brain_mask()</a></code>.</p></li>
-</ul><p>A new <code>bids_project</code> object containing only the specified subject's data.
+<p>A list containing subject-specific helper functions. Each function
+automatically filters results for the specified subject. The returned object
+contains the following callable functions:</p><dl><dt><code>events(...)</code></dt>
+<dd><p>Returns nested tibble with event data for this subject.
+Equivalent to <code>read_events(project, subid = "XX", ...)</code>.
+Additional arguments (task, session, run, nest, etc.) can be passed.</p></dd>
+
+<dt><code>event_files(...)</code></dt>
+<dd><p>Returns character vector of event file paths for this subject.
+Equivalent to <code>event_files(project, subid = "XX", ...)</code>.
+Additional arguments (task, session, run, full_path, etc.) can be passed.</p></dd>
+
+<dt><code>scans(...)</code></dt>
+<dd><p>Returns character vector of functional scan file paths for this subject.
+Equivalent to <code>func_scans(project, subid = "XX", ...)</code>.
+Additional arguments (task, session, run, kind, full_path, etc.) can be passed.</p></dd>
+
+<dt><code>confounds(...)</code></dt>
+<dd><p>Returns confound data for this subject (requires fMRIPrep derivatives).
+Equivalent to <code>read_confounds(project, subid = "XX", ...)</code>.
+Additional arguments (task, session, run, cvars, npcs, etc.) can be passed.</p></dd>
+
+<dt><code>preproc_scans(...)</code></dt>
+<dd><p>Returns preprocessed scan paths for this subject (requires fMRIPrep derivatives).
+Equivalent to <code>preproc_scans(project, subid = "XX", ...)</code>.
+Additional arguments (task, session, run, space, variant, etc.) can be passed.</p></dd>
+
+<dt><code>brain_mask(...)</code></dt>
+<dd><p>Creates brain mask for this subject (requires fMRIPrep derivatives).
+Equivalent to <code>brain_mask(project, subid = "XX", ...)</code>.
+Additional arguments (thresh, etc.) can be passed.</p></dd>
+
+
+</dl><p>A new <code>bids_project</code> object containing only the specified subject's data.
 Returns NULL if the subject is not found in the project.</p>
     </div>
 
@@ -138,15 +166,34 @@ Returns NULL if the subject is not found in the project.</p>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">ds001_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_example_bids_dataset.html">get_example_bids_dataset</a></span><span class="op">(</span><span class="st">"ds001"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">ds001_path</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">subj</span> <span class="op">&lt;-</span> <span class="fu">bids_subject</span><span class="op">(</span><span class="va">proj</span>, <span class="st">"01"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">subj</span><span class="op">$</span><span class="fu">events</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">subj</span><span class="op">$</span><span class="fu">scans</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  </span></span>
-<span class="r-in"><span>  <span class="co"># Clean up</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">ds001_path</span>, recursive<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Create subject interface for subject 01</span></span></span>
+<span class="r-in"><span>  <span class="va">subj</span> <span class="op">&lt;-</span> <span class="fu">bids_subject</span><span class="op">(</span><span class="va">proj</span>, <span class="st">"01"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># Get functional scan paths for this subject</span></span></span>
+<span class="r-in"><span>  <span class="va">scan_paths</span> <span class="op">&lt;-</span> <span class="va">subj</span><span class="op">$</span><span class="fu">scans</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Subject 01 has"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">scan_paths</span><span class="op">)</span>, <span class="st">"functional scans"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># Get event file paths for this subject</span></span></span>
+<span class="r-in"><span>  <span class="va">event_paths</span> <span class="op">&lt;-</span> <span class="va">subj</span><span class="op">$</span><span class="fu">event_files</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Subject 01 has"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">event_paths</span><span class="op">)</span>, <span class="st">"event files"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># Read event data for this subject</span></span></span>
+<span class="r-in"><span>  <span class="va">event_data</span> <span class="op">&lt;-</span> <span class="va">subj</span><span class="op">$</span><span class="fu">events</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Event data structure:"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">event_data</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># You can still pass additional filtering arguments</span></span></span>
+<span class="r-in"><span>  <span class="co"># For example, get only specific tasks:</span></span></span>
+<span class="r-in"><span>  <span class="va">task_scans</span> <span class="op">&lt;-</span> <span class="va">subj</span><span class="op">$</span><span class="fu">scans</span><span class="op">(</span>task <span class="op">=</span> <span class="st">"balloonanalogrisktask"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># Note: Don't unlink - cached for performance</span></span></span>
+<span class="r-in"><span>  <span class="co"># unlink(ds001_path, recursive=TRUE)</span></span></span>
 <span class="r-in"><span><span class="op">}</span>, error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Example requires internet connection: "</span>, <span class="va">e</span><span class="op">$</span><span class="va">message</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Subject 01 has 3 functional scans"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Subject 01 has 3 event files"</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">158</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">8</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Delimiter:</span> "\t"</span>
@@ -171,25 +218,35 @@ Returns NULL if the subject is not found in the project.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Event data structure:"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 5</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Groups:   .task, .session, .run, .subid [3]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .subid .session .run  .task                 data              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [158 × 9]&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 01     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [156 × 9]&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 01     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [149 × 9]&gt;</span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="co"># Extract a single subject from a BIDS project</span></span></span>
+<span class="r-in"><span><span class="co"># Create a subject interface</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="va">ds001_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_example_bids_dataset.html">get_example_bids_dataset</a></span><span class="op">(</span><span class="st">"ds001"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">ds001_path</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  </span></span>
-<span class="r-in"><span>  <span class="co"># Extract subject 01</span></span></span>
-<span class="r-in"><span>  <span class="va">sub01</span> <span class="op">&lt;-</span> <span class="fu">bids_subject</span><span class="op">(</span><span class="va">proj</span>, <span class="st">"01"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Create subject interface for subject 01  </span></span></span>
+<span class="r-in"><span>  <span class="va">subj</span> <span class="op">&lt;-</span> <span class="fu">bids_subject</span><span class="op">(</span><span class="va">proj</span>, <span class="st">"01"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  </span></span>
-<span class="r-in"><span>  <span class="co"># Check subject data</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="participants-method.html">participants</a></span><span class="op">(</span><span class="va">sub01</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Use the helper functions</span></span></span>
+<span class="r-in"><span>  <span class="va">scans</span> <span class="op">&lt;-</span> <span class="va">subj</span><span class="op">$</span><span class="fu">scans</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">events</span> <span class="op">&lt;-</span> <span class="va">subj</span><span class="op">$</span><span class="fu">event_files</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Subject 01:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">scans</span><span class="op">)</span>, <span class="st">"scans,"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">events</span><span class="op">)</span>, <span class="st">"events"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  </span></span>
-<span class="r-in"><span>  <span class="co"># Clean up</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">ds001_path</span>, recursive<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Note: Don't unlink - cached for performance</span></span></span>
+<span class="r-in"><span>  <span class="co"># unlink(ds001_path, recursive=TRUE)  </span></span></span>
 <span class="r-in"><span><span class="op">}</span>, error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Example requires internet connection: "</span>, <span class="va">e</span><span class="op">$</span><span class="va">message</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Example requires internet connection: no applicable method for 'participants' applied to an object of class "list"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Subject 01: 3 scans, 3 events"</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
