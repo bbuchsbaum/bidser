@@ -507,22 +507,22 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
         )
       
       # Plot
-      p <- ggplot(completeness_data, aes(x = subid, y = interaction(session, task), 
+      p <- ggplot2::ggplot(completeness_data, ggplot2::aes(x = subid, y = interaction(session, task),
                                          fill = total_size)) +
-        geom_tile(color = "white", linewidth = 0.2) +
-        scale_fill_viridis_c(option = color_scheme, name = "Data Size (bytes)", 
+        ggplot2::geom_tile(color = "white", linewidth = 0.2) +
+        ggplot2::scale_fill_viridis_c(option = color_scheme, name = "Data Size (bytes)",
                              trans = "log10", na.value = "grey90") +
-        labs(
+        ggplot2::labs(
           title = "Data Completeness by Subject, Session, and Task",
           x = "Subject ID",
           y = "Session x Task",
           fill = "Data Size"
         ) +
-        theme_minimal() +
-        theme(
-          axis.text.x = element_text(angle = 45, hjust = 1),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank()
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+          axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+          panel.grid.major = ggplot2::element_blank(),
+          panel.grid.minor = ggplot2::element_blank()
         )
     } else {
       # With sessions but no tasks: subject x session x type
@@ -537,22 +537,22 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
         )
       
       # Plot
-      p <- ggplot(completeness_data, aes(x = subid, y = interaction(session, type),
+      p <- ggplot2::ggplot(completeness_data, ggplot2::aes(x = subid, y = interaction(session, type),
                                          fill = total_size)) +
-        geom_tile(color = "white", linewidth = 0.2) +
-        scale_fill_viridis_c(option = color_scheme, name = "Data Size (bytes)",
+        ggplot2::geom_tile(color = "white", linewidth = 0.2) +
+        ggplot2::scale_fill_viridis_c(option = color_scheme, name = "Data Size (bytes)",
                              trans = "log10", na.value = "grey90") +
-        labs(
+        ggplot2::labs(
           title = "Data Completeness by Subject, Session, and Type",
           x = "Subject ID",
           y = "Session x Type",
           fill = "Data Size"
         ) +
-        theme_minimal() +
-        theme(
-          axis.text.x = element_text(angle = 45, hjust = 1),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank()
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+          axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+          panel.grid.major = ggplot2::element_blank(),
+          panel.grid.minor = ggplot2::element_blank()
         )
     }
   } else {
@@ -572,21 +572,21 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
         )
       
       # Plot
-      p <- ggplot(completeness_data, aes(x = subid, y = task, fill = total_size)) +
-        geom_tile(color = "white", linewidth = 0.2) +
-        scale_fill_viridis_c(option = color_scheme, name = "Data Size (bytes)",
+      p <- ggplot2::ggplot(completeness_data, ggplot2::aes(x = subid, y = task, fill = total_size)) +
+        ggplot2::geom_tile(color = "white", linewidth = 0.2) +
+        ggplot2::scale_fill_viridis_c(option = color_scheme, name = "Data Size (bytes)",
                              trans = "log10", na.value = "grey90") +
-        labs(
+        ggplot2::labs(
           title = "Data Completeness by Subject and Task",
           x = "Subject ID",
           y = "Task",
           fill = "Data Size"
         ) +
-        theme_minimal() +
-        theme(
-          axis.text.x = element_text(angle = 45, hjust = 1),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank()
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+          axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+          panel.grid.major = ggplot2::element_blank(),
+          panel.grid.minor = ggplot2::element_blank()
         )
     } else {
       # No sessions and no tasks: subject x type
@@ -601,21 +601,21 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
         )
       
       # Plot
-      p <- ggplot(completeness_data, aes(x = subid, y = type, fill = total_size)) +
-        geom_tile(color = "white", linewidth = 0.2) +
-        scale_fill_viridis_c(option = color_scheme, name = "Data Size (bytes)",
+      p <- ggplot2::ggplot(completeness_data, ggplot2::aes(x = subid, y = type, fill = total_size)) +
+        ggplot2::geom_tile(color = "white", linewidth = 0.2) +
+        ggplot2::scale_fill_viridis_c(option = color_scheme, name = "Data Size (bytes)",
                              trans = "log10", na.value = "grey90") +
-        labs(
+        ggplot2::labs(
           title = "Data Completeness by Subject and Type",
           x = "Subject ID",
           y = "Data Type",
           fill = "Data Size"
         ) +
-        theme_minimal() +
-        theme(
-          axis.text.x = element_text(angle = 45, hjust = 1),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank()
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+          axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+          panel.grid.major = ggplot2::element_blank(),
+          panel.grid.minor = ggplot2::element_blank()
         )
     }
   }
@@ -642,25 +642,25 @@ plot_bids_file_sizes <- function(data, color_scheme = "viridis", scale = "log") 
   }
   
   # Create a boxplot of file sizes by type
-  p <- ggplot(raw_data, aes(x = type, y = file_size, fill = type)) +
-    geom_boxplot(alpha = 0.8, outlier.shape = 21, outlier.size = 1.5) +
-    scale_fill_viridis_d(option = color_scheme) +
-    labs(
+  p <- ggplot2::ggplot(raw_data, ggplot2::aes(x = type, y = file_size, fill = type)) +
+    ggplot2::geom_boxplot(alpha = 0.8, outlier.shape = 21, outlier.size = 1.5) +
+    ggplot2::scale_fill_viridis_d(option = color_scheme) +
+    ggplot2::labs(
       title = "File Size Distribution by Type",
       x = "Data Type",
       y = "File Size (bytes)"
     ) +
-    theme_minimal() +
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1),
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
       legend.position = "none"
     )
   
   # Apply scale transformation
   if (scale == "log") {
-    p <- p + scale_y_log10()
+    p <- p + ggplot2::scale_y_log10()
   } else if (scale == "sqrt") {
-    p <- p + scale_y_sqrt()
+    p <- p + ggplot2::scale_y_sqrt()
   }
   
   return(p)
@@ -814,17 +814,17 @@ plot_bids_structure <- function(data, color_scheme = "viridis") {
   structure_data$subid <- factor(structure_data$subid, levels = subject_order)
   
   # Create the plot
-  p <- ggplot(structure_data, aes(x = subid, y = proportion, fill = type)) +
-    geom_bar(stat = "identity", position = "stack") +
-    scale_fill_viridis_d(option = color_scheme, name = "Data Type") +
-    labs(
+  p <- ggplot2::ggplot(structure_data, ggplot2::aes(x = subid, y = proportion, fill = type)) +
+    ggplot2::geom_bar(stat = "identity", position = "stack") +
+    ggplot2::scale_fill_viridis_d(option = color_scheme, name = "Data Type") +
+    ggplot2::labs(
       title = "Proportion of Data Types by Subject",
       x = "Subject ID",
       y = "Proportion of Files"
     ) +
-    theme_minimal() +
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1)
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)
     )
   
   return(p)

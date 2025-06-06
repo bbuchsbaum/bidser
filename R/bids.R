@@ -1173,11 +1173,11 @@ get_example_bids_dataset <- function(dataset_name = "ds001") {
     stop("Package 'httr' is required for downloading example data")
   }
   
-  # Session-level cache for better performance
-  if (!exists(".bidser_examples_cache", envir = .GlobalEnv)) {
-    assign(".bidser_examples_cache", new.env(), envir = .GlobalEnv)
+  # Session-level cache for better performance (stored in package environment)
+  if (!exists(".bidser_examples_cache", envir = bidser_pkg_env)) {
+    bidser_pkg_env$.bidser_examples_cache <- new.env()
   }
-  cache_env <- get(".bidser_examples_cache", envir = .GlobalEnv)
+  cache_env <- bidser_pkg_env$.bidser_examples_cache
   
   # Check session cache first
   if (exists(dataset_name, envir = cache_env)) {
@@ -1262,8 +1262,8 @@ get_example_bids_dataset <- function(dataset_name = "ds001") {
 #' clear_example_bids_cache()
 #' @export
 clear_example_bids_cache <- function() {
-  if (exists(".bidser_examples_cache", envir = .GlobalEnv)) {
-    cache_env <- get(".bidser_examples_cache", envir = .GlobalEnv)
+  if (exists(".bidser_examples_cache", envir = bidser_pkg_env)) {
+    cache_env <- bidser_pkg_env$.bidser_examples_cache
     rm(list = ls(envir = cache_env), envir = cache_env)
     message("Example BIDS dataset cache cleared")
   }
