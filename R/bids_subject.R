@@ -8,13 +8,40 @@
 #' @param subid Subject identifier. Can be with or without the `sub-` prefix.
 #' @param ... Additional arguments (unused).
 #'
-#' @return A list containing helper functions:
-#' \itemize{
-#'   \item{\code{events}:}{Read event files via [read_events()].}
-#'   \item{\code{scans}:}{Retrieve functional scan paths via [func_scans()].}
-#'   \item{\code{confounds}:}{Read confound tables with [read_confounds()].}
-#'   \item{\code{preproc_scans}:}{Retrieve preprocessed scan paths with [preproc_scans()].}
-#'   \item{\code{brain_mask}:}{Create a brain mask via [brain_mask()].}
+#' @return A list containing subject-specific helper functions. Each function
+#'   automatically filters results for the specified subject. The returned object
+#'   contains the following callable functions:
+#' \describe{
+#'   \item{\code{events(...)}}{
+#'     Returns nested tibble with event data for this subject.
+#'     Equivalent to \code{read_events(project, subid = "XX", ...)}.
+#'     Additional arguments (task, session, run, nest, etc.) can be passed.
+#'   }
+#'   \item{\code{event_files(...)}}{
+#'     Returns character vector of event file paths for this subject.
+#'     Equivalent to \code{event_files(project, subid = "XX", ...)}.
+#'     Additional arguments (task, session, run, full_path, etc.) can be passed.
+#'   }
+#'   \item{\code{scans(...)}}{
+#'     Returns character vector of functional scan file paths for this subject.
+#'     Equivalent to \code{func_scans(project, subid = "XX", ...)}.
+#'     Additional arguments (task, session, run, kind, full_path, etc.) can be passed.
+#'   }
+#'   \item{\code{confounds(...)}}{
+#'     Returns confound data for this subject (requires fMRIPrep derivatives).
+#'     Equivalent to \code{read_confounds(project, subid = "XX", ...)}.
+#'     Additional arguments (task, session, run, cvars, npcs, etc.) can be passed.
+#'   }
+#'   \item{\code{preproc_scans(...)}}{
+#'     Returns preprocessed scan paths for this subject (requires fMRIPrep derivatives).
+#'     Equivalent to \code{preproc_scans(project, subid = "XX", ...)}.
+#'     Additional arguments (task, session, run, space, variant, etc.) can be passed.
+#'   }
+#'   \item{\code{brain_mask(...)}}{
+#'     Creates brain mask for this subject (requires fMRIPrep derivatives).
+#'     Equivalent to \code{brain_mask(project, subid = "XX", ...)}.
+#'     Additional arguments (thresh, etc.) can be passed.
+#'   }
 #' }
 #' @export
 #' @rdname bids_subject
@@ -23,12 +50,29 @@
 #' tryCatch({
 #'   ds001_path <- get_example_bids_dataset("ds001")
 #'   proj <- bids_project(ds001_path)
-#'   subj <- bids_subject(proj, "01")
-#'   subj$events()
-#'   subj$scans()
 #'   
-#'   # Clean up
-#'   unlink(ds001_path, recursive=TRUE)
+#'   # Create subject interface for subject 01
+#'   subj <- bids_subject(proj, "01")
+#'   
+#'   # Get functional scan paths for this subject
+#'   scan_paths <- subj$scans()
+#'   print(paste("Subject 01 has", length(scan_paths), "functional scans"))
+#'   
+#'   # Get event file paths for this subject
+#'   event_paths <- subj$event_files()
+#'   print(paste("Subject 01 has", length(event_paths), "event files"))
+#'   
+#'   # Read event data for this subject
+#'   event_data <- subj$events()
+#'   print("Event data structure:")
+#'   print(event_data)
+#'   
+#'   # You can still pass additional filtering arguments
+#'   # For example, get only specific tasks:
+#'   task_scans <- subj$scans(task = "balloonanalogrisktask")
+#'   
+#'   # Note: Don't unlink - cached for performance
+#'   # unlink(ds001_path, recursive=TRUE)
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -55,6 +99,7 @@ bids_subject.bids_project <- function(x, subid, ...) {
   # as underlying functions like read_events, func_scans expect plain IDs.
   list(
     events = function(...) read_events(x, subid = plain_subid, ...),
+    event_files = function(...) event_files(x, subid = plain_subid, ...),
     scans = function(...) func_scans(x, subid = plain_subid, ...),
     confounds = function(...) read_confounds(x, subid = plain_subid, ...),
     preproc_scans = function(...) preproc_scans(x, subid = plain_subid, ...),
@@ -76,19 +121,21 @@ bids_subject.bids_project <- function(x, subid, ...) {
 #'
 #' @examples
 #' \donttest{
-#' # Extract a single subject from a BIDS project
+#' # Create a subject interface
 #' tryCatch({
 #'   ds001_path <- get_example_bids_dataset("ds001")
 #'   proj <- bids_project(ds001_path)
 #'   
-#'   # Extract subject 01
-#'   sub01 <- bids_subject(proj, "01")
+#'   # Create subject interface for subject 01  
+#'   subj <- bids_subject(proj, "01")
 #'   
-#'   # Check subject data
-#'   print(participants(sub01))
+#'   # Use the helper functions
+#'   scans <- subj$scans()
+#'   events <- subj$event_files()
+#'   print(paste("Subject 01:", length(scans), "scans,", length(events), "events"))
 #'   
-#'   # Clean up
-#'   unlink(ds001_path, recursive=TRUE)
+#'   # Note: Don't unlink - cached for performance
+#'   # unlink(ds001_path, recursive=TRUE)  
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -117,6 +164,7 @@ bids_subject <- function(x, subid, ...) {
   # as underlying functions like read_events, func_scans expect plain IDs.
   list(
     events = function(...) read_events(x, subid = plain_subid, ...),
+    event_files = function(...) event_files(x, subid = plain_subid, ...),
     scans = function(...) func_scans(x, subid = plain_subid, ...),
     confounds = function(...) read_confounds(x, subid = plain_subid, ...),
     preproc_scans = function(...) preproc_scans(x, subid = plain_subid, ...),

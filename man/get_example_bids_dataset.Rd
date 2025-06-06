@@ -19,8 +19,10 @@ The datasets are sourced from the official BIDS examples repository on GitHub.
 }
 \details{
 This function requires an internet connection to download data from GitHub.
-The datasets are cached in the temporary directory, so repeated calls with the same
-dataset_name will reuse the already downloaded data.
+The datasets are cached in the temporary directory AND in memory for the session,
+so repeated calls with the same dataset_name will reuse the already downloaded data.
+Note: Don't call \code{unlink()} on the returned path in examples, as this defeats
+the caching mechanism and forces re-downloads.
 }
 \examples{
 \donttest{
@@ -29,8 +31,8 @@ tryCatch({
   proj <- bids_project(ds_path)
   print(participants(proj))
   
-  # Clean up
-  unlink(ds_path, recursive=TRUE)
+  # Note: Don't unlink the path - it's cached for performance
+  # unlink(ds_path, recursive=TRUE)  # DON'T DO THIS
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })

@@ -80,8 +80,8 @@ decode <- function(x,...) {
 #'   proj <- bids_project(ds007_path)
 #'   sessions(proj)
 #'   
-#'   # Clean up
-#'   unlink(ds007_path, recursive=TRUE)
+#'   # Clean up (disabled for performance - cached dataset)
+#'   # unlink(ds007_path, recursive=TRUE)
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })

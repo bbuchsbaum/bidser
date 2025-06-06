@@ -12,12 +12,7 @@
 #' @param visualization_mode Character. The mode of visualization to use ("standard", "heatmap", or "complete")
 #' @param debug Logical. Whether to print debugging information (default FALSE)
 #' @return A plot object (ggplot2, plotly, or other depending on settings)
-#' @import ggplot2
-#' @import dplyr
-#' @import tidyr
-#' @import patchwork
-#' @importFrom plotly ggplotly layout
-#' @import viridis
+#' @importFrom dplyr filter group_by summarize mutate ungroup arrange pull left_join
 #' @export
 #' @examples
 #' \donttest{
@@ -47,10 +42,13 @@ plot_bids <- function(x, interactive = TRUE, color_scheme = "viridis",
   }
   
   # Load required packages
-  for (pkg in c("ggplot2", "dplyr", "viridis", "scales")) {
+  for (pkg in c("ggplot2", "viridis", "scales")) {
     if (!requireNamespace(pkg, quietly = TRUE)) {
-      stop("Package ", pkg, " is required but not installed")
+      stop("Package ", pkg, " is required for plotting but not installed. Please install it with: install.packages('", pkg, "')")
     }
+  }
+  if (!requireNamespace("patchwork", quietly = TRUE) && visualization_mode != "heatmap") {
+    stop("Package patchwork is required for multi-panel plots but not installed. Please install it with: install.packages('patchwork')")
   }
   if (interactive && !requireNamespace("plotly", quietly = TRUE)) {
     warning("Package plotly is required for interactive plots but not installed. Falling back to static plot.")
@@ -254,7 +252,7 @@ plot_bids <- function(x, interactive = TRUE, color_scheme = "viridis",
     plots <- list()
     
     # Safely create each plot component
-    tryCatch({
+    combined_plot <- tryCatch({
       # 1. Create the advanced heatmap
       plots$heatmap <- bids_heatmap(project_data, color_scheme, highlight_missing)
       if (debug) cat("Created heatmap plot\n")
@@ -288,7 +286,7 @@ plot_bids <- function(x, interactive = TRUE, color_scheme = "viridis",
       }
       
       # Combine plots using patchwork
-      combined_plot <- (plots$heatmap) / 
+      (plots$heatmap) / 
                         (plots$completeness + plots$file_sizes) / 
                         (plots$tasks + plots$structure) +
                         patchwork::plot_annotation(
@@ -305,17 +303,17 @@ plot_bids <- function(x, interactive = TRUE, color_scheme = "viridis",
     }, error = function(e) {
       warning("Error creating complete visualization: ", e$message)
       # Return an empty plot with error message
-      return(ggplot2::ggplot() + 
+      ggplot2::ggplot() + 
              ggplot2::annotate("text", x = 0, y = 0, 
                               label = paste("Error creating visualization:", e$message)) +
-             ggplot2::theme_void())
+             ggplot2::theme_void()
     })
   } else {
     # Default "standard" mode
     plots <- list()
     
     # Safely create each plot component
-    tryCatch({
+    combined_plot <- tryCatch({
       # 1. Create the data completeness heatmap
       plots$completeness <- plot_bids_completeness(project_data, color_scheme)
       if (debug) cat("Created completeness plot\n")
@@ -345,7 +343,7 @@ plot_bids <- function(x, interactive = TRUE, color_scheme = "viridis",
       }
       
       # Combine plots using patchwork
-      combined_plot <- (plots$completeness + plots$file_sizes) / 
+      (plots$completeness + plots$file_sizes) / 
                         (plots$tasks + plots$structure) +
                         patchwork::plot_annotation(
                           title = paste0("BIDS Dataset Overview: ", x$name),
@@ -359,10 +357,10 @@ plot_bids <- function(x, interactive = TRUE, color_scheme = "viridis",
     }, error = function(e) {
       warning("Error creating standard visualization: ", e$message)
       # Return an empty plot with error message
-      return(ggplot2::ggplot() + 
+      ggplot2::ggplot() + 
              ggplot2::annotate("text", x = 0, y = 0, 
                               label = paste("Error creating visualization:", e$message)) +
-             ggplot2::theme_void())
+             ggplot2::theme_void()
     })
   }
   
@@ -475,6 +473,7 @@ prepare_bids_data_for_plot <- function(x, include_derivatives = TRUE) {
 #' @param color_scheme Color scheme to use
 #' @return A ggplot object
 #' @keywords internal
+
 plot_bids_completeness <- function(data, color_scheme = "viridis") {
   # Extract data
   raw_data <- data$raw_data
@@ -633,6 +632,7 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
 #' @param scale Scale to use for file sizes ("log", "sqrt", or "linear")
 #' @return A ggplot object
 #' @keywords internal
+
 plot_bids_file_sizes <- function(data, color_scheme = "viridis", scale = "log") {
   # Extract data
   raw_data <- data$raw_data
@@ -674,6 +674,7 @@ plot_bids_file_sizes <- function(data, color_scheme = "viridis", scale = "log") 
 #' @param color_scheme Color scheme to use
 #' @return A ggplot object
 #' @keywords internal
+
 plot_bids_tasks <- function(data, color_scheme = "viridis") {
   # Extract data
   raw_data <- data$raw_data
@@ -781,6 +782,7 @@ plot_bids_tasks <- function(data, color_scheme = "viridis") {
 #' @param color_scheme Color scheme to use
 #' @return A ggplot object
 #' @keywords internal
+
 #' @noRd
 plot_bids_structure <- function(data, color_scheme = "viridis") {
   # Extract data
@@ -843,6 +845,7 @@ plot_bids_structure <- function(data, color_scheme = "viridis") {
 #' @param text_size Numeric. Size of text labels (default 2.5)
 #' @param rotate_labels Logical. Whether to rotate the axis labels (default TRUE)
 #' @return A plot object (ggplot2 or plotly depending on interactive parameter)
+
 #' @examples
 #' \donttest{
 #' # Create a basic interactive heatmap for a BIDS dataset
@@ -877,6 +880,17 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
   # Check input - accept both bids_project and mock_bids_project
   if (!inherits(x, "bids_project") && !inherits(x, "mock_bids_project")) {
     stop("Input must be a bids_project or mock_bids_project object")
+  }
+  
+  # Check required packages
+  for (pkg in c("ggplot2", "viridis", "scales")) {
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      stop("Package ", pkg, " is required for plotting but not installed. Please install it with: install.packages('", pkg, "')")
+    }
+  }
+  if (interactive && !requireNamespace("plotly", quietly = TRUE)) {
+    warning("Package plotly is required for interactive plots but not installed. Falling back to static plot.")
+    interactive <- FALSE
   }
   
   # Prepare data
@@ -1242,6 +1256,7 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
 #' @param highlight_missing Whether to highlight missing data
 #' @return A ggplot object
 #' @keywords internal
+
 plot_bids_heatmap <- function(data, color_scheme = "viridis", highlight_missing = TRUE) {
   raw_data <- data$raw_data
 

@@ -1150,8 +1150,10 @@ bids_check_compliance <- function(x) {
 #'   Common options include "ds001", "ds002", "ds007", "phoneme_stripped", etc.
 #' @return Character string containing the path to the downloaded dataset directory.
 #' @details This function requires an internet connection to download data from GitHub.
-#'   The datasets are cached in the temporary directory, so repeated calls with the same
-#'   dataset_name will reuse the already downloaded data.
+#'   The datasets are cached in the temporary directory AND in memory for the session, 
+#'   so repeated calls with the same dataset_name will reuse the already downloaded data.
+#'   Note: Don't call \code{unlink()} on the returned path in examples, as this defeats
+#'   the caching mechanism and forces re-downloads.
 #' @examples
 #' \donttest{
 #' tryCatch({
@@ -1159,8 +1161,8 @@ bids_check_compliance <- function(x) {
 #'   proj <- bids_project(ds_path)
 #'   print(participants(proj))
 #'   
-#'   # Clean up
-#'   unlink(ds_path, recursive=TRUE)
+#'   # Note: Don't unlink the path - it's cached for performance
+#'   # unlink(ds_path, recursive=TRUE)  # DON'T DO THIS
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -1169,6 +1171,20 @@ bids_check_compliance <- function(x) {
 get_example_bids_dataset <- function(dataset_name = "ds001") {
   if (!requireNamespace("httr", quietly = TRUE)) {
     stop("Package 'httr' is required for downloading example data")
+  }
+  
+  # Session-level cache for better performance
+  if (!exists(".bidser_examples_cache", envir = .GlobalEnv)) {
+    assign(".bidser_examples_cache", new.env(), envir = .GlobalEnv)
+  }
+  cache_env <- get(".bidser_examples_cache", envir = .GlobalEnv)
+  
+  # Check session cache first
+  if (exists(dataset_name, envir = cache_env)) {
+    cached_path <- get(dataset_name, envir = cache_env)
+    if (dir.exists(cached_path)) {
+      return(cached_path)
+    }
   }
   
   # Check if we have internet connectivity
@@ -1187,6 +1203,8 @@ get_example_bids_dataset <- function(dataset_name = "ds001") {
   temp_dir <- file.path(tempdir(), paste0("bids_example_", dataset_name))
   
   if (dir.exists(temp_dir)) {
+    # Cache and return
+    assign(dataset_name, temp_dir, envir = cache_env)
     return(temp_dir)
   }
   
@@ -1222,6 +1240,8 @@ get_example_bids_dataset <- function(dataset_name = "ds001") {
     source_dir <- file.path(tempdir(), root_folder, dataset_name)
     if (dir.exists(source_dir)) {
       file.rename(source_dir, temp_dir)
+      # Cache the result
+      assign(dataset_name, temp_dir, envir = cache_env)
       return(temp_dir)
     } else {
       stop("Dataset '", dataset_name, "' not found in BIDS examples")
@@ -1229,5 +1249,24 @@ get_example_bids_dataset <- function(dataset_name = "ds001") {
   }, error = function(e) {
     stop("Failed to download BIDS example data: ", e$message)
   })
+}
+
+#' Clear Example BIDS Dataset Cache
+#'
+#' Clears the session-level cache of downloaded example BIDS datasets.
+#' This can be useful to free up memory or force re-download of datasets.
+#'
+#' @return Invisible NULL
+#' @examples
+#' # Clear the cache
+#' clear_example_bids_cache()
+#' @export
+clear_example_bids_cache <- function() {
+  if (exists(".bidser_examples_cache", envir = .GlobalEnv)) {
+    cache_env <- get(".bidser_examples_cache", envir = .GlobalEnv)
+    rm(list = ls(envir = cache_env), envir = cache_env)
+    message("Example BIDS dataset cache cleared")
+  }
+  invisible(NULL)
 }
 

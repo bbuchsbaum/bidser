@@ -198,6 +198,85 @@ if ("trial_type" %in% names(first_subject_events)) {
 }
 ```
 
+## Working with Individual Subjects
+
+The `bids_subject()` function provides a convenient interface for working with data from a single subject. It returns a lightweight object with helper functions that automatically filter data for that subject.
+
+```{r}
+# Create a subject-specific interface for subject 01
+subject_01 <- bids_subject(proj, "01")
+
+# The subject object provides several helper functions:
+# Get all functional scans for this subject
+sub01_scans <- subject_01$scans()
+print(paste("Subject 01 has", length(sub01_scans), "functional scans"))
+
+# Get event files for this subject
+sub01_events <- subject_01$events()
+print(paste("Subject 01 has", length(sub01_events), "event files"))
+
+# Read event data for this subject
+sub01_event_data <- suppressMessages(subject_01$read_events())
+print("Event data structure for subject 01:")
+print(sub01_event_data)
+```
+
+This approach is particularly useful when you're doing subject-level analyses:
+
+```{r}
+# Example: Analyze data for multiple subjects using the subject interface
+subjects_to_analyze <- c("01", "02", "03")
+
+for (subj_id in subjects_to_analyze) {
+  # Create subject interface
+  subj <- bids_subject(proj, subj_id)
+  
+  # Get subject-specific data
+  scans <- subj$scans()
+  events <- subj$events()
+  
+  cat(sprintf("Subject %s: %d scans, %d event files\n", 
+              subj_id, length(scans), length(events)))
+}
+```
+
+The subject interface makes it easy to write analysis pipelines that iterate over subjects without manually constructing filters:
+
+```{r}
+# Compare trial counts across subjects using the subject interface
+subject_trial_summary <- tibble(
+  subject = character(),
+  n_trials = numeric(),
+  n_scans = numeric()
+)
+
+for (subj_id in participants(proj)[1:3]) {  # Just first 3 subjects for demo
+  subj <- bids_subject(proj, subj_id)
+  
+  # Count trials
+  event_data <- suppressMessages(subj$read_events())
+  n_trials <- if (nrow(event_data) > 0) {
+    event_data %>% 
+      unnest(cols = c(data)) %>% 
+      nrow()
+  } else {
+    0
+  }
+  
+  # Count scans
+  n_scans <- length(subj$scans())
+  
+  # Add to summary
+  subject_trial_summary <- bind_rows(
+    subject_trial_summary,
+    tibble(subject = subj_id, n_trials = n_trials, n_scans = n_scans)
+  )
+}
+
+print("Trial and scan summary by subject:")
+print(subject_trial_summary)
+```
+
 ## Advanced Querying
 
 ### Custom File Searches

@@ -3,6 +3,13 @@ context("plot_bids and bids_heatmap")
 library(testthat)
 library(bidser)
 
+# Load plotting packages required for tests
+library(ggplot2)
+library(plotly)
+library(viridis)
+library(scales)
+library(patchwork)
+
 # Helper to make a tiny mock project
 make_proj <- function(...) {
   # Create a simple mock BIDS structure

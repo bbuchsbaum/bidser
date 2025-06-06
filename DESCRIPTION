@@ -19,11 +19,6 @@ Imports:
   neuroim2,
   tidyselect,
   dplyr,
-  ggplot2,
-  scales,
-  plotly,
-  patchwork,
-  viridis,
   assertthat,
   crayon,
   fs,
@@ -38,6 +33,11 @@ Imports:
   httr,
   rio
 Suggests: 
+    ggplot2,
+    plotly,
+    patchwork,
+    viridis,
+    scales,
     knitr,
     rmarkdown,
     testthat,
