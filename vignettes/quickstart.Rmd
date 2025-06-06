@@ -216,7 +216,7 @@ sub01_events <- subject_01$events()
 print(paste("Subject 01 has", length(sub01_events), "event files"))
 
 # Read event data for this subject
-sub01_event_data <- suppressMessages(subject_01$read_events())
+sub01_event_data <- suppressMessages(subject_01$events())
 print("Event data structure for subject 01:")
 print(sub01_event_data)
 ```
@@ -254,7 +254,7 @@ for (subj_id in participants(proj)[1:3]) {  # Just first 3 subjects for demo
   subj <- bids_subject(proj, subj_id)
   
   # Count trials
-  event_data <- suppressMessages(subj$read_events())
+  event_data <- suppressMessages(subj$events())
   n_trials <- if (nrow(event_data) > 0) {
     event_data %>% 
       unnest(cols = c(data)) %>% 
