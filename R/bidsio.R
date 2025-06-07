@@ -9,6 +9,22 @@
 #' @param modality The image modality (usually "bold")
 #' @param ... Extra arguments passed to \code{neuroim2::read_vec}
 #' @return An instance of type \code{NeuroVec}
+#' @rdname read_func_scans
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds_path <- get_example_bids_dataset("ds000001-fmriprep")
+#'   proj <- bids_project(ds_path, fmriprep=TRUE)
+#'   mask <- brain_mask(proj, subid="01")
+#'   vec <- read_func_scans.bids_project(proj, mask,
+#'                                      subid="01",
+#'                                      task="balloonanalogrisktask",
+#'                                      run="01")
+#'   unlink(ds_path, recursive=TRUE)
+#' }, error = function(e) {
+#'   message("Example requires derivatives dataset: ", e$message)
+#' })
+#' }
 #' @export
 read_func_scans.bids_project <- function(x, mask, mode = c("normal", "bigvec"),
                                          subid="^sub-.*", task=".*", run = ".*", modality="bold", ...) {
@@ -312,6 +328,7 @@ resolve_cvars <- function(cvars, col_names, rename = FALSE) {
 #' @param session Session regex
 #' @param ... Additional arguments (not currently used)
 #' @return A character vector of file paths
+#' @rdname confound_files-method
 #' @export
 confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", ...) {
   if (!inherits(x, "bids_project")) {
