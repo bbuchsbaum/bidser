@@ -32,37 +32,96 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Contributing to bidser</h1>
-      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/bidser/blob/master/CONTRIBUTING.md" class="external-link"><code>CONTRIBUTING.md</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/bidser/blob/master/.github/CONTRIBUTING.md" class="external-link"><code>.github/CONTRIBUTING.md</code></a></small>
     </div>
 
 <div id="contributing-to-bidser" class="section level1">
 
-<p>Thank you for your interest in contributing to <strong>bidser</strong>!</p>
+<p>Thank you for your interest in contributing to bidser! This document outlines the development workflow and continuous integration setup.</p>
 <div class="section level2">
-<h2 id="getting-started">Getting Started<a class="anchor" aria-label="anchor" href="#getting-started"></a></h2>
-<ol style="list-style-type: decimal"><li>Fork the repository and clone your fork locally.</li>
-<li>Install package dependencies in R:</li>
-</ol><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_deps</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<ol start="3" style="list-style-type: decimal"><li>Make sure the package builds and checks without errors:</li>
-</ol><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<h2 id="development-workflow">Development Workflow<a class="anchor" aria-label="anchor" href="#development-workflow"></a></h2>
+<ol style="list-style-type: decimal"><li>
+<strong>Fork</strong> the repository and create a new branch for your feature/fix</li>
+<li>
+<strong>Make changes</strong> following the existing code style</li>
+<li>
+<strong>Add tests</strong> for any new functionality</li>
+<li>
+<strong>Update documentation</strong> if needed</li>
+<li>
+<strong>Submit a pull request</strong> with a clear description</li>
+</ol></div>
+<div class="section level2">
+<h2 id="continuous-integration">Continuous Integration<a class="anchor" aria-label="anchor" href="#continuous-integration"></a></h2>
+<p>This package uses GitHub Actions for continuous integration with the following workflows:</p>
+<div class="section level3">
+<h3 id="core-workflows">Core Workflows<a class="anchor" aria-label="anchor" href="#core-workflows"></a></h3>
+<ul><li>
+<strong>R-CMD-check.yaml</strong>: Comprehensive package checking across multiple operating systems (Ubuntu, macOS, Windows) and R versions (devel, release, oldrel-1)</li>
+<li>
+<strong>test-coverage.yaml</strong>: Runs test suite and uploads coverage reports to Codecov</li>
+<li>
+<strong>lint.yaml</strong>: Code style checking using the <code>lintr</code> package</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-workflows">Documentation Workflows<a class="anchor" aria-label="anchor" href="#documentation-workflows"></a></h3>
+<ul><li>
+<strong>pkgdown.yaml</strong>: Builds and deploys the package website to GitHub Pages</li>
+<li>
+<strong>render-readme.yaml</strong>: Automatically updates README.md when README.Rmd changes</li>
+</ul></div>
+<div class="section level3">
+<h3 id="quality-assurance">Quality Assurance<a class="anchor" aria-label="anchor" href="#quality-assurance"></a></h3>
+<ul><li>
+<strong>pkgcheck.yaml</strong>: Additional package validation using rOpenSci tools</li>
+</ul></div>
 </div>
 <div class="section level2">
-<h2 id="making-changes">Making Changes<a class="anchor" aria-label="anchor" href="#making-changes"></a></h2>
-<ul><li>Use feature branches for your work and keep commits focused.</li>
-<li>Add or update unit tests in <code>tests/testthat/</code> when appropriate.</li>
-<li>Generate documentation with <code>devtools::document()</code> and ensure examples run.</li>
+<h2 id="code-style">Code Style<a class="anchor" aria-label="anchor" href="#code-style"></a></h2>
+<ul><li>We use <code>lintr</code> for code style checking (configured in <code>.lintr</code>)</li>
+<li>Line length limit: 120 characters</li>
+<li>Follow existing naming conventions in the codebase</li>
 </ul></div>
 <div class="section level2">
-<h2 id="submitting-pull-requests">Submitting Pull Requests<a class="anchor" aria-label="anchor" href="#submitting-pull-requests"></a></h2>
-<ol style="list-style-type: decimal"><li>Ensure <code>R CMD check</code> passes with no errors or warnings:</li>
-</ol><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<ol start="2" style="list-style-type: decimal"><li>Open a pull request on GitHub and describe your changes.</li>
-<li>Be responsive to review feedback and update your branch as needed.</li>
-</ol><p>We appreciate all contributions that help improve <strong>bidser</strong>.</p>
+<h2 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a></h2>
+<ul><li>All new functions should have corresponding tests in <code>tests/testthat/</code>
+</li>
+<li>Tests are run automatically on all platforms via GitHub Actions</li>
+<li>Aim for good test coverage (current coverage tracked via Codecov)</li>
+</ul></div>
+<div class="section level2">
+<h2 id="local-development">Local Development<a class="anchor" aria-label="anchor" href="#local-development"></a></h2>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Install development dependencies</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_dev_deps</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Run tests locally</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Check package</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Check code style</span></span>
+<span><span class="fu">lintr</span><span class="fu">::</span><span class="fu"><a href="https://lintr.r-lib.org/reference/lint.html" class="external-link">lint_package</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="example-data">Example Data<a class="anchor" aria-label="anchor" href="#example-data"></a></h2>
+<p>The package uses BIDS example datasets for testing and documentation. These are cached to improve performance:</p>
+<ul><li>Don’t call <code><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink()</a></code> on dataset paths in examples</li>
+<li>Use <code><a href="reference/get_example_bids_dataset.html">get_example_bids_dataset()</a></code> which has intelligent caching</li>
+<li>Clear cache if needed with <code><a href="reference/clear_example_bids_cache.html">clear_example_bids_cache()</a></code>
+</li>
+</ul></div>
+<div class="section level2">
+<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a></h2>
+<ul><li>All functions must be documented with roxygen2</li>
+<li>Include <code>@examples</code> for all exported functions</li>
+<li>Use <code>\donttest{}</code> for examples requiring internet</li>
+<li>Vignettes should demonstrate real-world usage</li>
+</ul></div>
+<div class="section level2">
+<h2 id="questions">Questions?<a class="anchor" aria-label="anchor" href="#questions"></a></h2>
+<p>Feel free to open an issue for questions about contributing!</p>
 </div>
 </div>
 
