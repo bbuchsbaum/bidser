@@ -1,0 +1,27 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "name": "bidser",
+  "description": "Tools for working with Brain Imaging Data Structure (BIDS) formatted neuroimaging datasets. The package provides functionality for reading, validating, and querying BIDS-compliant projects, creating mock BIDS datasets for testing, and extracting preprocessed data from BIDS derivatives. It supports searching and filtering BIDS files by various entities such as subject, session, task, and run to streamline neuroimaging data workflow.",
+  "license": "MIT",
+  "version": "0.0.0.9000",
+  "codeRepository": "https://github.com/bbuchsbaum/bidser",
+  "issueTracker": "https://github.com/bbuchsbaum/bidser/issues",
+  "programmingLanguage": "R",
+  "keywords": ["BIDS", "neuroimaging", "MRI", "data management", "R"],
+  "author": {
+    "@type": "Person",
+    "givenName": "Bradley",
+    "familyName": "Buchsbaum",
+    "email": "brad.buchsbaum@gmail.com",
+    "role": ["author", "maintainer"]
+  },
+  "maintainer": {
+    "@type": "Person",
+    "givenName": "Bradley",
+    "familyName": "Buchsbaum",
+    "email": "brad.buchsbaum@gmail.com"
+  },
+  "url": "https://bbuchsbaum.github.io/bidser/",
+  "developmentStatus": "development"
+}
