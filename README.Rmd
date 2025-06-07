@@ -16,7 +16,10 @@ knitr::opts_chunk$set(
 # bidser
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/bbuchsbaum/bidser/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/bbuchsbaum/bidser/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/bbuchsbaum/bidser/branch/master/graph/badge.svg)](https://app.codecov.io/gh/bbuchsbaum/bidser?branch=master)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![CRAN status](https://www.r-pkg.org/badges/version/bidser)](https://CRAN.R-project.org/package=bidser)
 <!-- badges: end -->
 
 [BIDS](https://bids.neuroimaging.io/) in R -- (it's a start!)

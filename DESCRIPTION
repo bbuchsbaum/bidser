@@ -42,6 +42,7 @@ Suggests:
     rmarkdown,
     testthat,
     covr,
+    lintr,
     gluedown
 VignetteBuilder: knitr
 URL: https://bbuchsbaum.github.io/bidser/
