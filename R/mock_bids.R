@@ -1043,6 +1043,7 @@ tasks.mock_bids_project <- function(x, ...) {
 #' @param ... Additional BIDS entities to match (e.g., `subid = "01"`, `task = "rest"`).
 #'        Values are treated as regex patterns unless they are simple strings without regex characters.
 #' @return A character vector of matching file paths, or `NULL` if no matches.
+#' @rdname search_files
 #' @export
 search_files.mock_bids_project <- function(x, regex = ".*", full_path = FALSE, strict = TRUE, ...) {
   # Extract fmriprep parameter if provided
@@ -1280,6 +1281,7 @@ preproc_scans.mock_bids_project <- function(x, subid = ".*", task = ".*", run = 
 #' @param ... Additional arguments passed to `event_files`.
 #' @return A nested tibble with columns `.subid`, `.task`, `.run`, `.session` (if applicable),
 #'   and `data` (containing the event tibbles), or an empty tibble if no matching data.
+#' @rdname read_events-method
 #' @export
 read_events.mock_bids_project <- function(x, subid = ".*", task = ".*", run = ".*", session = ".*", ...) {
 
@@ -1488,6 +1490,7 @@ confound_files.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 #' @param nest If `TRUE`, returns a nested tibble keyed by subject, session and run.
 #' @param ... Additional BIDS entities (passed to `search_files`).
 #' @return A tibble of confound data (nested if `nest = TRUE`).
+#' @rdname read_confounds-method
 #' @export
 read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", session = ".*", run = ".*",
                                              cvars = NULL, npcs = -1, perc_var = -1, nest = TRUE, ...) {
