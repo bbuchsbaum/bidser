@@ -15,6 +15,9 @@ utils::globalVariables(c(
   "total_files", "label", "missing"
 ))
 
+# Package environment for caching
+bidser_pkg_env <- new.env(parent = emptyenv())
+
 #' @noRd
 set_key <- function(fname, key, value) {
   p <- encode(fname)
@@ -22,7 +25,232 @@ set_key <- function(fname, key, value) {
   p
 }
 
+#' Apply a transformation to BIDS files
+#'
+#' This function orchestrates the process of selecting files from a BIDS project,
+#' applying a transformation to each file, and saving the output in a new BIDS
+#' derivative directory. It leverages the existing bidser parsing and search
+#' infrastructure.
+#'
+#' @param x A `bids_project` object.
+#' @param transformer A function that performs the transformation. It must take 
+#'   the input file path and return the output file path. The transformer is 
+#'   responsible for creating the output file.
+#' @param pipeline_name The name for the new derivative pipeline.
+#' @param ... Additional arguments passed to \code{\link{search_files}} to select
+#'   files (e.g., \code{subid = "01"}, \code{task = "rest"}).
+#'
+#' @return A character vector of paths to the newly created files.
+#'
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds_path)
+#'
+#'   # Create a simple transformer that adds a description
+#'   add_desc_transformer <- function(infile) {
+#'     entities <- encode(basename(infile))
+#'     entities$desc <- if (is.null(entities$desc)) "smooth6mm" else 
+#'                      paste(entities$desc, "smooth6mm", sep="")
+#'     
+#'     # Generate new filename
+#'     new_name <- decode_bids_entities(entities)
+#'     outfile <- file.path(dirname(infile), new_name)
+#'     
+#'     # For demo, just copy the file (real transformer would process it)
+#'     file.copy(infile, outfile)
+#'     return(outfile)
+#'   }
+#'
+#'   # Apply transformation to functional files for subject 01
+#'   new_files <- bids_transform(proj, add_desc_transformer, "smoothed",
+#'                               subid = "01", suffix = "bold.nii.gz")
+#'   print(length(new_files))
+#'
+#' }, error = function(e) {
+#'   message("Example failed: ", e$message)
+#' })
+#' }
+#' @export
+bids_transform <- function(x, transformer, pipeline_name, ...) {
+  if (!inherits(x, "bids_project")) {
+    stop("`x` must be a `bids_project` object.")
+  }
+  
+  # Use existing search_files with additional arguments
+  files_to_transform <- search_files(x, full_path = TRUE, ...)
+  
+  if (is.null(files_to_transform) || length(files_to_transform) == 0) {
+    message("No files found matching the selection criteria.")
+    return(character(0))
+  }
 
+  # Create output directory
+  deriv_root <- file.path(x$path, "derivatives", pipeline_name)
+  if (!dir.exists(deriv_root)) {
+    dir.create(deriv_root, recursive = TRUE)
+  }
+  
+  new_files <- character(0)
+  
+  for (infile in files_to_transform) {
+    # Preserve directory structure relative to project root
+    rel_path <- gsub(paste0("^", normalizePath(x$path), .Platform$file.sep), "", 
+                     normalizePath(infile), fixed = TRUE)
+    
+    # Find subject directory part for derivatives structure
+    path_parts <- strsplit(rel_path, .Platform$file.sep)[[1]]
+    sub_idx <- which(startsWith(path_parts, "sub-"))
+    
+    if (length(sub_idx) > 0) {
+      subdir_part <- paste(path_parts[sub_idx[1]:(length(path_parts)-1)], 
+                          collapse = .Platform$file.sep)
+      output_dir <- file.path(deriv_root, subdir_part)
+    } else {
+      output_dir <- deriv_root
+    }
+    
+    if (!dir.exists(output_dir)) {
+      dir.create(output_dir, recursive = TRUE)
+    }
+    
+    # Apply transformer
+    tryCatch({
+      new_file <- transformer(infile, output_dir)
+      if (!is.null(new_file) && file.exists(new_file)) {
+        new_files <- c(new_files, new_file)
+      }
+    }, error = function(e) {
+      warning("Transformation failed for '", basename(infile), "': ", e$message)
+    })
+  }
+  
+  new_files
+}
+
+#' Decode BIDS entities back into a filename
+#'
+#' This function reconstructs a BIDS filename from parsed entities, using the
+#' standard BIDS entity ordering.
+#'
+#' @param entities A named list of BIDS entities (from \code{\link{encode}}).
+#' @return A character string representing the BIDS filename.
+#' @export
+#' @examples
+#' # Parse a filename and reconstruct it
+#' entities <- encode("sub-01_task-rest_run-01_bold.nii.gz")
+#' filename <- decode_bids_entities(entities)
+#' print(filename)
+#' 
+#' # Modify entities and create new filename
+#' entities$desc <- "smooth6mm"
+#' new_filename <- decode_bids_entities(entities)
+#' print(new_filename)
+decode_bids_entities <- function(entities) {
+  if (is.null(entities) || !is.list(entities)) {
+    stop("entities must be a named list from encode()")
+  }
+  
+  # Standard BIDS entity order
+  ordered_keys <- c("sub", "ses", "task", "acq", "ce", "dir", "rec", "run", "echo")
+  
+  # Build filename parts
+  parts <- character(0)
+  entities_copy <- entities
+  
+  # Add ordered entities first
+  for (key in ordered_keys) {
+    name_key <- switch(key,
+                      "sub" = "subid",
+                      "ses" = "session", 
+                      key)
+    
+    if (name_key %in% names(entities_copy) && !is.null(entities_copy[[name_key]])) {
+      parts <- c(parts, paste0(key, "-", entities_copy[[name_key]]))
+      entities_copy[[name_key]] <- NULL
+    }
+  }
+  
+  # Add remaining entities (excluding suffix, kind, type)
+  remaining_keys <- setdiff(names(entities_copy), c("suffix", "kind", "type"))
+  remaining_keys <- sort(remaining_keys) # For consistency
+  
+  for (key in remaining_keys) {
+    if (!is.null(entities_copy[[key]])) {
+      parts <- c(parts, paste0(key, "-", entities_copy[[key]]))
+    }
+  }
+  
+  # Add kind and suffix
+  kind <- entities_copy$kind %||% "unknown"
+  suffix <- entities_copy$suffix %||% "nii.gz"
+  
+  base_name <- paste(parts, collapse = "_")
+  paste(base_name, kind, suffix, sep = c("_", "."))
+}
+
+#' Create a simple smoothing transformer
+#'
+#' This creates a transformer function that adds a smoothing description to
+#' BIDS filenames. This is a lightweight example - real implementations would
+#' perform actual image processing.
+#'
+#' @param fwhm The smoothing FWHM to add to the description.
+#' @param suffix_pattern Optional regex pattern to match specific file types.
+#' @return A transformer function for use with \code{\link{bids_transform}}.
+#' @export
+#' @examples
+#' \donttest{
+#' # Create a smoothing transformer
+#' smooth_6mm <- create_smooth_transformer(6)
+#' 
+#' # Use with bids_transform (example)
+#' # ds_path <- get_example_bids_dataset("ds001")
+#' # proj <- bids_project(ds_path)
+#' # new_files <- bids_transform(proj, smooth_6mm, "smoothed", 
+#' #                             subid = "01", suffix = "bold.nii.gz")
+#' }
+create_smooth_transformer <- function(fwhm, suffix_pattern = "bold\\.nii") {
+  function(infile, outdir) {
+    # Skip files that don't match suffix pattern
+    if (!is.null(suffix_pattern) && !grepl(suffix_pattern, basename(infile))) {
+      return(NULL)
+    }
+    
+    # Parse filename using existing encode function
+    entities <- encode(basename(infile))
+    if (is.null(entities)) {
+      warning("Could not parse BIDS filename: ", basename(infile))
+      return(NULL)
+    }
+    
+    # Add smoothing description
+    smooth_desc <- paste0("smooth", fwhm, "mm")
+    entities$desc <- if (is.null(entities$desc)) smooth_desc else 
+                     paste(entities$desc, smooth_desc, sep="")
+    
+    # Generate output filename using existing decode function
+    new_filename <- decode_bids_entities(entities)
+    outfile <- file.path(outdir, new_filename)
+    
+    # For demonstration, just copy the file
+    # Real implementation would perform smoothing here:
+    # if (requireNamespace("RNifti", quietly = TRUE)) {
+    #   img <- RNifti::readNifti(infile)
+    #   # Apply smoothing...
+    #   RNifti::writeNifti(smoothed_img, outfile)
+    # }
+    
+    message("Processing: ", basename(infile), " -> ", basename(outfile))
+    file.copy(infile, outfile, overwrite = TRUE)
+    
+    return(outfile)
+  }
+}
+
+# Null-coalescing operator
+`%||%` <- function(x, y) if (is.null(x)) y else x
 
 #' @export
 #' @rdname encode
