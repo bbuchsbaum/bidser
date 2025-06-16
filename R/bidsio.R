@@ -341,22 +341,73 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
     return(NULL)
   }
   
-  # Search for confound files with different possible formats *within derivatives*
-  fnames1 <- search_files(x, subid=subid, task=task, session=session, deriv="confounds", full_path=TRUE)
-  fnames2 <- search_files(x, subid=subid, task=task, session=session, desc="confounds", full_path=TRUE)
-  fnames3 <- search_files(x, subid=subid, task=task, session=session, kind="confounds", full_path=TRUE)
+  # Get the prep directory name from the project
+  pdir <- x$prep_dir
+  if (is.null(pdir) || !nzchar(pdir)) {
+    warning("No prep_dir specified in BIDS project")
+    return(NULL)
+  }
   
-  # Also search for files with _confounds.tsv suffix pattern *within derivatives*
-  fnames4 <- search_files(x, regex="_confounds\\.tsv$", subid=subid, task=task, session=session, full_path=TRUE)
+  # Search within the fmriprep derivatives tree only
+  if (!(pdir %in% names(x$bids_tree$children))) {
+    warning("fMRIPrep derivatives directory '", pdir, "' not found in BIDS tree")
+    return(NULL)
+  }
   
-  # Combine all results and remove duplicates
-  found_files <- unique(c(fnames1, fnames2, fnames3, fnames4))
+  # Extract relative path helper specific to derivatives
+  extract_relative_path_deriv <- function(node) {
+    # For derivatives, the path structure is: project/prep_dir/sub-XX/...
+    pdir_parts <- strsplit(pdir, "/")[[1]]
+    if (length(node$path) > (1 + length(pdir_parts))) {
+      paste0(node$path[2:length(node$path)], collapse="/")
+    } else {
+      node$name
+    }
+  }
+  
+  # Create filter function for confounds
+  filter_fun <- function(z) {
+    if (!z$isLeaf) return(FALSE)
+    
+    # Check filename matches confounds pattern
+    node_name <- z$name
+    if (is.null(node_name) || is.na(node_name)) return(FALSE)
+    
+    is_confounds_file <- stringr::str_detect(node_name, "_confounds\\.tsv$") ||
+                        str_detect_null(z$desc, "confounds") ||
+                        str_detect_null(z$kind, "confounds")
+    
+    if (!is_confounds_file) return(FALSE)
+    
+    # Check BIDS entity matches
+    subid_match <- str_detect_null(z$subid, subid, default = TRUE)
+    task_match <- str_detect_null(z$task, task, default = TRUE)
+    session_match <- str_detect_null(z$session, session, default = TRUE)
+    
+    return(subid_match && task_match && session_match)
+  }
+  
+  # Search only within the fmriprep derivatives tree
+  found_files <- x$bids_tree$children[[pdir]]$Get(extract_relative_path_deriv, 
+                                                   filterFun = filter_fun, 
+                                                   simplify = FALSE)
   
   if (length(found_files) == 0) {
     return(NULL)
   }
   
-  return(found_files)
+  # Convert to full paths
+  found_files <- unique(unname(unlist(found_files)))
+  full_paths <- file.path(x$path, found_files)
+  
+  # Filter to only files that actually exist
+  existing_files <- full_paths[file.exists(full_paths)]
+  
+  if (length(existing_files) == 0) {
+    return(NULL)
+  }
+  
+  return(existing_files)
 }
 
 
