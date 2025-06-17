@@ -288,12 +288,12 @@ fMRI analysis.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># Groups:   .task, .session, .run, .subid [6]</span></span></span>
 <span><span class="co">#&gt;   .subid .session .run  .task                 data              </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>            </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [158 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 01     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [156 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 01     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [149 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 02     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [185 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 02     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [184 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 02     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [186 × 9]&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [158 × 2]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 01     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [156 × 2]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 01     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [149 × 2]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 02     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [185 × 2]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 02     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [184 × 2]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 02     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [186 × 2]&gt;</span></span></span></code></pre></div>
 <p>Let’s explore the event data structure:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Look at events for the first subject</span></span>
@@ -308,28 +308,29 @@ fMRI analysis.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Event structure for subject 01:"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Event structure for subject 01:"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">first_subject_events</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 13</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 6</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Groups:   .task, .session, .run, .subid [1]</span></span></span>
-<span><span class="co">#&gt;   .subid .session .run  .task              onset duration trial_type cash_demean</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris…  0.061    0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris…  4.96     0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris…  7.18     0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris… 10.4      0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris… 13.4      0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris… 16.8      0.772 explode_d…          <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5 more variables: control_pumps_demean &lt;dbl&gt;, explode_demean &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   pumps_demean &lt;dbl&gt;, response_time &lt;dbl&gt;, .file &lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt;   .subid .session .run  .task                 onset\tduration\ttrial_typ…¹ .file</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">"</span>0.061\t0.772\tpumps_demean… /tmp…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">"</span>4.958\t0.772\tpumps_demean… /tmp…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">"</span>7.179\t0.772\tpumps_demean… /tmp…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">"</span>10.416\t0.772\tpumps_demea… /tmp…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">"</span>13.419\t0.772\tpumps_demea… /tmp…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">"</span>16.754\t0.772\texplode_dem… /tmp…</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   ¹​`onset\tduration\ttrial_type\tcash_demean\tcontrol_pumps_demean\texplode_demean\tpumps_demean\tresponse_time`</span></span></span>
 <span></span>
 <span><span class="co"># What columns are in the event data?</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Event file columns:"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Event file columns:"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">first_subject_events</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] ".subid"               ".session"             ".run"                </span></span>
-<span><span class="co">#&gt;  [4] ".task"                "onset"                "duration"            </span></span>
-<span><span class="co">#&gt;  [7] "trial_type"           "cash_demean"          "control_pumps_demean"</span></span>
-<span><span class="co">#&gt; [10] "explode_demean"       "pumps_demean"         "response_time"       </span></span>
-<span><span class="co">#&gt; [13] ".file"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] ".subid"                                                                                                     </span></span>
+<span><span class="co">#&gt; [2] ".session"                                                                                                   </span></span>
+<span><span class="co">#&gt; [3] ".run"                                                                                                       </span></span>
+<span><span class="co">#&gt; [4] ".task"                                                                                                      </span></span>
+<span><span class="co">#&gt; [5] "onset\tduration\ttrial_type\tcash_demean\tcontrol_pumps_demean\texplode_demean\tpumps_demean\tresponse_time"</span></span>
+<span><span class="co">#&gt; [6] ".file"</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="analyzing-event-data">Analyzing Event Data<a class="anchor" aria-label="anchor" href="#analyzing-event-data"></a>
 </h3>
@@ -372,24 +373,7 @@ fMRI analysis.</p>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">trial_type</span>, name <span class="op">=</span> <span class="st">"frequency"</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Trial types in the experiment:"</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">trial_types</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="co">#&gt; [1] "Trial types in the experiment:"</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 12 × 6</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Groups:   .task, .session, .run, .subid [3]</span></span></span>
-<span><span class="co">#&gt;    .task                 .session .run  .subid trial_type           frequency</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       01    01     cash_demean                  9</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       01    01     control_pumps_demean        52</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       01    01     explode_demean              10</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       01    01     pumps_demean                87</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       02    01     cash_demean                 12</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       02    01     control_pumps_demean        61</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       02    01     explode_demean              10</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       02    01     pumps_demean                73</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       03    01     cash_demean                 12</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       03    01     control_pumps_demean        51</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       03    01     explode_demean              12</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> balloonanalogrisktask <span style="color: #BB0000;">NA</span>       03    01     pumps_demean                74</span></span></code></pre></div>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -411,27 +395,24 @@ for that subject.</p>
 <span></span>
 <span><span class="co"># Get event files for this subject</span></span>
 <span><span class="va">sub01_events</span> <span class="op">&lt;-</span> <span class="va">subject_01</span><span class="op">$</span><span class="fu">events</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">158</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">8</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">158</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> "\t"</span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): trial_type</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">dbl</span> (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> " "</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">156</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">8</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">156</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> "\t"</span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): trial_type</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">dbl</span> (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> " "</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">149</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">8</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">149</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> "\t"</span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): trial_type</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">dbl</span> (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> " "</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span>
@@ -447,9 +428,9 @@ for that subject.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># Groups:   .task, .session, .run, .subid [3]</span></span></span>
 <span><span class="co">#&gt;   .subid .session .run  .task                 data              </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>            </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [158 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 01     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [156 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 01     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [149 × 9]&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [158 × 2]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 01     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [156 × 2]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 01     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [149 × 2]&gt;</span></span></span></code></pre></div>
 <p>This approach is particularly useful when you’re doing subject-level
 analyses:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -467,77 +448,68 @@ analyses:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Subject %s: %d scans, %d event files\n"</span>, </span>
 <span>              <span class="va">subj_id</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">scans</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">events</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">158</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">8</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">158</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> "\t"</span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): trial_type</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">dbl</span> (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> " "</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">156</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">8</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">156</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> "\t"</span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): trial_type</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">dbl</span> (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> " "</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">149</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">8</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">149</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> "\t"</span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): trial_type</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">dbl</span> (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> " "</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span>
 <span><span class="co">#&gt; Subject 01: 3 scans, 5 event files</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">185</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">8</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">185</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> "\t"</span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): trial_type</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">dbl</span> (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> " "</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">184</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">8</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">184</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> "\t"</span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): trial_type</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">dbl</span> (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> " "</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">186</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">8</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">186</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> "\t"</span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): trial_type</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">dbl</span> (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> " "</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span>
 <span><span class="co">#&gt; Subject 02: 3 scans, 5 event files</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">150</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">8</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">150</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> "\t"</span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): trial_type</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">dbl</span> (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> " "</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">169</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">8</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">169</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> "\t"</span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): trial_type</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">dbl</span> (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> " "</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">175</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">8</span></span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">175</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> "\t"</span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): trial_type</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">dbl</span> (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...</span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Delimiter:</span> " "</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">chr</span> (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span></span>
@@ -620,9 +592,9 @@ queries:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Full paths to subject 01's functional scans:"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Full paths to subject 01's functional scans:"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">full_paths</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpDoEHJ9/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
-<span><span class="co">#&gt; [2] "/tmp/RtmpDoEHJ9/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
-<span><span class="co">#&gt; [3] "/tmp/RtmpDoEHJ9/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/Rtmp3gKvj2/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [2] "/tmp/Rtmp3gKvj2/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [3] "/tmp/Rtmp3gKvj2/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span>
 <span></span>
 <span><span class="co"># Check that files actually exist</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">full_paths</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
