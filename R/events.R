@@ -83,7 +83,7 @@ event_files.bids_project <- function(x, subid=".*", task=".*", run=".*", session
 #' @importFrom magrittr %>%
 #' @importFrom stringr str_detect
 #' @importFrom rlang .data
-#' @importFrom readr read_tsv
+#' @importFrom readr read_delim
 #' @examples
 #' \donttest{
 #' # Create a BIDS project object
@@ -218,7 +218,7 @@ read_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session
       event_data <- vector("list", length(evs))
       for (k in seq_along(evs)) {
         df <- tryCatch({
-          readr::read_tsv(evs[k], na = c("n/a", "NA", "N/A", ""))
+          readr::read_delim(evs[k], delim = " ", na = c("n/a", "NA", "N/A", ""))
         }, error = function(e) {
           warning("Failed to read event file: ", evs[k], " - ", e$message)
           NULL
