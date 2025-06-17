@@ -1153,7 +1153,7 @@ match_attribute <- function(x, ...) {
 #' @rdname load_all_events-method
 #' @importFrom dplyr bind_rows mutate
 #' @importFrom stringr str_match
-#' @importFrom readr read_tsv
+#' @importFrom readr read_delim
 #' @importFrom tibble tibble
 #' @export
 load_all_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session=".*", full_path=TRUE, ...) {
@@ -1192,7 +1192,7 @@ load_all_events.bids_project <- function(x, subid=".*", task=".*", run=".*", ses
   df_list <- lapply(event_files, function(fn) {
     meta <- parse_metadata(fn)
     dfx <- tryCatch({
-      readr::read_tsv(fn, na = c("n/a", "NA"))
+      readr::read_delim(fn, delim = " ", na = c("n/a", "NA"))
     }, error = function(e) {
       warning("Failed to read file: ", fn, " - ", e$message)
       return(NULL)
