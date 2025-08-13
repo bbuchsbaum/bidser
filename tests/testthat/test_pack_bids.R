@@ -394,6 +394,137 @@ test_that("pack_bids parallel processing works with downsampling", {
   unlink(temp_bids_dir, recursive = TRUE)
 })
 
+test_that("pack_bids respects max_file_size parameter", {
+  # Create a mock project
+  participants_df <- tibble::tibble(participant_id = "01")
+  file_structure_df <- tibble::tribble(
+    ~subid, ~datatype, ~suffix,       ~fmriprep,
+    "01",   "anat",    "T1w.nii.gz",  FALSE
+  )
+  
+  temp_bids_dir <- tempfile("mock_bids_")
+  
+  proj <- create_mock_bids(
+    project_name = "TestProject",
+    participants = participants_df,
+    file_structure = file_structure_df,
+    create_stub = TRUE,
+    stub_path = temp_bids_dir
+  )
+  
+  # Create a large file (simulated with a JSON file)
+  large_file <- file.path(temp_bids_dir, "sub-01", "large_data.json")
+  dir.create(dirname(large_file), recursive = TRUE, showWarnings = FALSE)
+  writeLines(rep("test data", 1000), large_file)
+  
+  # Pack with a very small size limit
+  output_file <- tempfile(fileext = ".tar.gz")
+  result <- pack_bids(proj, output_file = output_file, 
+                     max_file_size = "1KB",  # Very small limit
+                     verbose = FALSE)
+  
+  expect_true(file.exists(result))
+  
+  # Extract and check that large file was stubbed
+  temp_extract <- tempfile("extract_")
+  dir.create(temp_extract)
+  untar(output_file, exdir = temp_extract)
+  
+  extracted_file <- file.path(temp_extract, basename(temp_bids_dir), "sub-01", "large_data.json")
+  if (file.exists(extracted_file)) {
+    expect_equal(file.size(extracted_file), 0)  # Should be a stub
+  }
+  
+  # Clean up
+  unlink(output_file)
+  unlink(temp_extract, recursive = TRUE)
+  unlink(temp_bids_dir, recursive = TRUE)
+})
+
+test_that("pack_bids respects exclude parameter", {
+  # Create a mock project
+  participants_df <- tibble::tibble(participant_id = "01")
+  file_structure_df <- tibble::tribble(
+    ~subid, ~datatype, ~suffix,       ~fmriprep,
+    "01",   "anat",    "T1w.nii.gz",  FALSE
+  )
+  
+  temp_bids_dir <- tempfile("mock_bids_")
+  
+  proj <- create_mock_bids(
+    project_name = "TestProject",
+    participants = participants_df,
+    file_structure = file_structure_df,
+    create_stub = TRUE,
+    stub_path = temp_bids_dir
+  )
+  
+  # Create some h5 files
+  h5_file1 <- file.path(temp_bids_dir, "sub-01", "data.h5")
+  h5_file2 <- file.path(temp_bids_dir, "sub-01", "analysis.h5")
+  dir.create(dirname(h5_file1), recursive = TRUE, showWarnings = FALSE)
+  writeLines("h5 data", h5_file1)
+  writeLines("h5 analysis", h5_file2)
+  
+  # Also create a non-h5 file
+  json_file <- file.path(temp_bids_dir, "sub-01", "metadata.json")
+  writeLines("json data", json_file)
+  
+  # Pack with h5 exclusion
+  output_file <- tempfile(fileext = ".tar.gz")
+  result <- pack_bids(proj, output_file = output_file, 
+                     exclude = "\\.h5$",
+                     verbose = FALSE)
+  
+  expect_true(file.exists(result))
+  
+  # Extract and check
+  temp_extract <- tempfile("extract_")
+  dir.create(temp_extract)
+  untar(output_file, exdir = temp_extract)
+  
+  # H5 files should be stubs
+  for (h5_name in c("data.h5", "analysis.h5")) {
+    h5_path <- file.path(temp_extract, basename(temp_bids_dir), "sub-01", h5_name)
+    if (file.exists(h5_path)) {
+      expect_equal(file.size(h5_path), 0, info = paste("H5 file should be stub:", h5_name))
+    }
+  }
+  
+  # JSON file should have content
+  json_path <- file.path(temp_extract, basename(temp_bids_dir), "sub-01", "metadata.json")
+  if (file.exists(json_path)) {
+    expect_true(file.size(json_path) > 0, info = "JSON file should have content")
+  }
+  
+  # Clean up
+  unlink(output_file)
+  unlink(temp_extract, recursive = TRUE)
+  unlink(temp_bids_dir, recursive = TRUE)
+})
+
+test_that("parse_file_size handles various formats", {
+  # Test numeric input
+  expect_equal(bidser:::parse_file_size(1024), 1024)
+  
+  # Test various string formats
+  expect_equal(bidser:::parse_file_size("1KB"), 1024)
+  expect_equal(bidser:::parse_file_size("1MB"), 1024^2)
+  expect_equal(bidser:::parse_file_size("1GB"), 1024^3)
+  expect_equal(bidser:::parse_file_size("1.5MB"), 1.5 * 1024^2)
+  expect_equal(bidser:::parse_file_size("500KB"), 500 * 1024)
+  
+  # Test case insensitivity
+  expect_equal(bidser:::parse_file_size("1mb"), 1024^2)
+  expect_equal(bidser:::parse_file_size("1Mb"), 1024^2)
+  
+  # Test NULL input
+  expect_null(bidser:::parse_file_size(NULL))
+  
+  # Test invalid formats
+  expect_error(bidser:::parse_file_size("invalid"), "Invalid file size format")
+})
+
 test_that("resolution tag naming is correct for different factors", {
   skip_if_not_installed("neuroim2")
   

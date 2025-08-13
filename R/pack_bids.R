@@ -1,3 +1,46 @@
+#' Parse file size string to bytes
+#' @keywords internal
+#' @noRd
+parse_file_size <- function(size_str) {
+  if (is.null(size_str)) {
+    return(NULL)
+  }
+  
+  # If already numeric, assume it's in bytes
+  if (is.numeric(size_str)) {
+    return(size_str)
+  }
+  
+  # Convert to character and uppercase
+  size_str <- toupper(as.character(size_str))
+  
+  # Extract number and unit
+  matches <- regmatches(size_str, regexec("^([0-9.]+)\\s*([KMGT]?B?)$", size_str))[[1]]
+  
+  if (length(matches) < 2) {
+    stop("Invalid file size format. Use formats like '1MB', '500KB', '1.5GB' or numeric bytes")
+  }
+  
+  value <- as.numeric(matches[2])
+  unit <- matches[3]
+  
+  # Convert to bytes based on unit
+  multiplier <- switch(unit,
+    "B" = 1,
+    "KB" = 1024,
+    "K" = 1024,
+    "MB" = 1024^2,
+    "M" = 1024^2,
+    "GB" = 1024^3,
+    "G" = 1024^3,
+    "TB" = 1024^4,
+    "T" = 1024^4,
+    1  # Default to bytes if no unit
+  )
+  
+  return(value * multiplier)
+}
+
 #' Helper function to downsample a single neuroimaging file
 #' @keywords internal
 #' @noRd
@@ -120,6 +163,13 @@ add_resolution_tag <- function(filename, factor) {
 #' @param ncores Integer specifying the number of cores for parallel processing
 #'   during downsampling. Default is 1 (sequential). Values > 1 enable parallel
 #'   processing if the 'future' package is available.
+#' @param max_file_size Character string or numeric value specifying the maximum 
+#'   file size for non-imaging files to include. Files larger than this will be
+#'   replaced with stub files. Can be specified as "1MB", "500KB", "1.5GB" or 
+#'   as numeric bytes. Default is "10MB".
+#' @param exclude Character string with a regular expression pattern to exclude 
+#'   files. Files matching this pattern will be replaced with stub files.
+#'   For example, "\\.h5$" to exclude HDF5 files. Default is NULL (no exclusion).
 #' @param verbose Logical. Whether to print progress messages. Default is TRUE.
 #' @param temp_dir Character string specifying the temporary directory for
 #'   creating the archive. If NULL (default), uses tempdir().
@@ -156,6 +206,12 @@ add_resolution_tag <- function(filename, factor) {
 #'   # Pack with default settings (tar.gz with stub files)
 #'   archive_path <- pack_bids(proj)
 #'   
+#'   # Pack with size limit and exclusion pattern
+#'   archive_filtered <- pack_bids(proj,
+#'                                 max_file_size = "1MB",
+#'                                 exclude = "\\.h5$",
+#'                                 output_file = "ds001_filtered.tar.gz")
+#'   
 #'   # Pack with downsampling (4x reduction)
 #'   archive_downsampled <- pack_bids(proj, 
 #'                                    downsample_factor = 0.25,
@@ -176,7 +232,7 @@ add_resolution_tag <- function(filename, factor) {
 #'   archive_no_deriv <- pack_bids(proj, include_derivatives = FALSE)
 #'   
 #'   # Clean up
-#'   unlink(c(archive_path, archive_downsampled, zip_path, archive_no_deriv))
+#'   unlink(c(archive_path, archive_filtered, archive_downsampled, zip_path, archive_no_deriv))
 #'   if (exists("archive_parallel")) unlink(archive_parallel)
 #'   unlink(ds_path, recursive = TRUE)
 #' }, error = function(e) {
@@ -193,6 +249,8 @@ pack_bids <- function(x,
                       downsample_factor = NULL,
                       downsample_method = "box",
                       ncores = 1,
+                      max_file_size = "10MB",
+                      exclude = NULL,
                       verbose = TRUE,
                       temp_dir = NULL,
                       cleanup = TRUE) {
@@ -224,6 +282,25 @@ pack_bids <- function(x,
     stop("ncores must be a positive integer")
   }
   ncores <- as.integer(ncores)
+  
+  # Parse max_file_size
+  max_size_bytes <- parse_file_size(max_file_size)
+  if (!is.null(max_size_bytes) && verbose) {
+    size_mb <- max_size_bytes / (1024^2)
+    message(sprintf("Maximum file size for non-imaging files: %.2f MB", size_mb))
+  }
+  
+  # Validate exclude pattern
+  if (!is.null(exclude)) {
+    if (!is.character(exclude) || length(exclude) != 1) {
+      stop("exclude must be a single character string with a regex pattern")
+    }
+    # Test if it's a valid regex
+    tryCatch(
+      grep(exclude, "test"),
+      error = function(e) stop("Invalid regex pattern in exclude: ", e$message)
+    )
+  }
   
   # Check for parallel processing capability
   use_parallel <- FALSE
@@ -287,7 +364,13 @@ pack_bids <- function(x,
         message(sprintf("Parallel processing: %d cores", ncores))
       }
     } else {
-      message("Mode: Creating stub files")
+      message("Mode: Creating stub files for imaging data")
+    }
+    if (!is.null(max_size_bytes)) {
+      message(sprintf("Max file size: %.2f MB", max_size_bytes / (1024^2)))
+    }
+    if (!is.null(exclude)) {
+      message(sprintf("Exclude pattern: %s", exclude))
     }
     message("\nCreating temporary copy of BIDS project...")
     start_time <- Sys.time()
@@ -324,10 +407,14 @@ pack_bids <- function(x,
       message(sprintf("  - %d metadata/other files", length(non_imaging_files)))
     }
     
-    # Process non-imaging files (always copy)
+    # Process non-imaging files
     if (verbose && length(non_imaging_files) > 0) {
-      message("\nCopying metadata and supporting files...")
+      message("\nProcessing metadata and supporting files...")
     }
+    
+    n_copied <- 0
+    n_stubbed <- 0
+    n_excluded <- 0
     
     for (i in seq_along(non_imaging_files)) {
       rel_path <- non_imaging_files[i]
@@ -340,13 +427,46 @@ pack_bids <- function(x,
         dir.create(to_dir, recursive = TRUE, showWarnings = FALSE)
       }
       
-      # Copy the actual file
-      file.copy(from_file, to_file, overwrite = TRUE)
+      # Check if file should be excluded by pattern
+      should_exclude <- FALSE
+      if (!is.null(exclude) && grepl(exclude, rel_path)) {
+        should_exclude <- TRUE
+        n_excluded <- n_excluded + 1
+      }
+      
+      # Check file size (only if not already excluded)
+      if (!should_exclude && !is.null(max_size_bytes)) {
+        file_size <- file.size(from_file)
+        if (!is.na(file_size) && file_size > max_size_bytes) {
+          should_exclude <- TRUE
+          if (verbose && (n_stubbed == 0 || n_stubbed %% 10 == 0)) {
+            size_mb <- file_size / (1024^2)
+            message(sprintf("  File exceeds size limit (%.2f MB): %s", 
+                           size_mb, basename(rel_path)))
+          }
+          n_stubbed <- n_stubbed + 1
+        }
+      }
+      
+      if (should_exclude) {
+        # Create stub file
+        file.create(to_file)
+      } else {
+        # Copy the actual file
+        file.copy(from_file, to_file, overwrite = TRUE)
+        n_copied <- n_copied + 1
+      }
       
       # Progress indicator for every 50 files or at completion
       if (verbose && (i %% 50 == 0 || i == length(non_imaging_files))) {
-        message(sprintf("  Copied %d/%d metadata files", i, length(non_imaging_files)))
+        message(sprintf("  Processed %d/%d metadata files (copied: %d, stubbed: %d, excluded: %d)", 
+                       i, length(non_imaging_files), n_copied, n_stubbed, n_excluded))
       }
+    }
+    
+    if (verbose && length(non_imaging_files) > 0) {
+      message(sprintf("  Final: %d copied, %d stubbed (size), %d excluded (pattern)", 
+                     n_copied, n_stubbed, n_excluded))
     }
     
     # Process imaging files

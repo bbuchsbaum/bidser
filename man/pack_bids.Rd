@@ -12,6 +12,8 @@ pack_bids(
   downsample_factor = NULL,
   downsample_method = "box",
   ncores = 1,
+  max_file_size = "10MB",
+  exclude = NULL,
   verbose = TRUE,
   temp_dir = NULL,
   cleanup = TRUE
@@ -41,6 +43,15 @@ Currently only "box" (box averaging) is supported. Default is "box".}
 \item{ncores}{Integer specifying the number of cores for parallel processing
 during downsampling. Default is 1 (sequential). Values > 1 enable parallel
 processing if the 'future' package is available.}
+
+\item{max_file_size}{Character string or numeric value specifying the maximum
+file size for non-imaging files to include. Files larger than this will be
+replaced with stub files. Can be specified as "1MB", "500KB", "1.5GB" or
+as numeric bytes. Default is "10MB".}
+
+\item{exclude}{Character string with a regular expression pattern to exclude
+files. Files matching this pattern will be replaced with stub files.
+For example, "\\.h5$" to exclude HDF5 files. Default is NULL (no exclusion).}
 
 \item{verbose}{Logical. Whether to print progress messages. Default is TRUE.}
 
@@ -88,6 +99,12 @@ tryCatch({
   # Pack with default settings (tar.gz with stub files)
   archive_path <- pack_bids(proj)
   
+  # Pack with size limit and exclusion pattern
+  archive_filtered <- pack_bids(proj,
+                                max_file_size = "1MB",
+                                exclude = "\\\\.h5$",
+                                output_file = "ds001_filtered.tar.gz")
+  
   # Pack with downsampling (4x reduction)
   archive_downsampled <- pack_bids(proj, 
                                    downsample_factor = 0.25,
@@ -108,7 +125,7 @@ tryCatch({
   archive_no_deriv <- pack_bids(proj, include_derivatives = FALSE)
   
   # Clean up
-  unlink(c(archive_path, archive_downsampled, zip_path, archive_no_deriv))
+  unlink(c(archive_path, archive_filtered, archive_downsampled, zip_path, archive_no_deriv))
   if (exists("archive_parallel")) unlink(archive_parallel)
   unlink(ds_path, recursive = TRUE)
 }, error = function(e) {
