@@ -278,7 +278,19 @@ pack_bids <- function(x,
   temp_project_dir <- file.path(temp_dir, project_name)
   
   if (verbose) {
-    message("Creating temporary copy of BIDS project...")
+    message("\n=== Starting pack_bids ===")
+    message(sprintf("Project: %s", project_name))
+    message(sprintf("Output: %s", output_file))
+    if (!is.null(downsample_factor)) {
+      message(sprintf("Downsampling: %.2fx reduction", 1/downsample_factor))
+      if (use_parallel) {
+        message(sprintf("Parallel processing: %d cores", ncores))
+      }
+    } else {
+      message("Mode: Creating stub files")
+    }
+    message("\nCreating temporary copy of BIDS project...")
+    start_time <- Sys.time()
   }
   
   # Create the temporary directory
@@ -299,7 +311,7 @@ pack_bids <- function(x,
     
     total_files <- length(all_files)
     if (verbose && total_files > 0) {
-      message(sprintf("Processing %d files...", total_files))
+      message(sprintf("\nFound %d total files to process", total_files))
     }
     
     # Separate imaging and non-imaging files
@@ -307,8 +319,18 @@ pack_bids <- function(x,
     imaging_files <- all_files[is_imaging]
     non_imaging_files <- all_files[!is_imaging]
     
+    if (verbose) {
+      message(sprintf("  - %d imaging files (.nii/.nii.gz)", length(imaging_files)))
+      message(sprintf("  - %d metadata/other files", length(non_imaging_files)))
+    }
+    
     # Process non-imaging files (always copy)
-    for (rel_path in non_imaging_files) {
+    if (verbose && length(non_imaging_files) > 0) {
+      message("\nCopying metadata and supporting files...")
+    }
+    
+    for (i in seq_along(non_imaging_files)) {
+      rel_path <- non_imaging_files[i]
       from_file <- file.path(from_path, rel_path)
       to_file <- file.path(to_path, rel_path)
       
@@ -320,10 +342,11 @@ pack_bids <- function(x,
       
       # Copy the actual file
       file.copy(from_file, to_file, overwrite = TRUE)
-    }
-    
-    if (verbose && length(non_imaging_files) > 0) {
-      message(sprintf("  Copied %d non-imaging files", length(non_imaging_files)))
+      
+      # Progress indicator for every 50 files or at completion
+      if (verbose && (i %% 50 == 0 || i == length(non_imaging_files))) {
+        message(sprintf("  Copied %d/%d metadata files", i, length(non_imaging_files)))
+      }
     }
     
     # Process imaging files
@@ -331,18 +354,27 @@ pack_bids <- function(x,
       if (!is.null(downsample_factor)) {
         # Downsampling mode
         if (verbose) {
-          message(sprintf("  Downsampling %d imaging files (factor: %.2f)...", 
-                         length(imaging_files), downsample_factor))
+          message(sprintf("\nProcessing %d imaging files for downsampling...", length(imaging_files)))
+          message(sprintf("  Target reduction: %.2fx (factor: %.2f)", 1/downsample_factor, downsample_factor))
+          downsample_start <- Sys.time()
         }
         
         # Setup parallel processing if applicable
         if (use_parallel && length(imaging_files) > 1) {
+          if (verbose) {
+            message(sprintf("  Using parallel processing with %d workers", ncores))
+          }
           # Set up future plan
           old_plan <- future::plan()
           on.exit(future::plan(old_plan), add = TRUE)
           future::plan(future::multisession, workers = ncores)
           
           # Process files in parallel
+          if (verbose) {
+            message(sprintf("  Starting parallel processing of %d files...", length(imaging_files)))
+            message("  (Progress updates not available in parallel mode)")
+          }
+          
           results <- future.apply::future_lapply(imaging_files, function(rel_path) {
             from_file <- file.path(from_path, rel_path)
             # Add resolution tag to output filename
@@ -363,7 +395,18 @@ pack_bids <- function(x,
           
         } else {
           # Sequential processing
-          results <- lapply(imaging_files, function(rel_path) {
+          if (verbose) {
+            message("  Using sequential processing")
+          }
+          
+          results <- vector("list", length(imaging_files))
+          for (i in seq_along(imaging_files)) {
+            rel_path <- imaging_files[i]
+            
+            if (verbose && (i == 1 || i %% 10 == 0 || i == length(imaging_files))) {
+              message(sprintf("  Processing file %d/%d: %s", i, length(imaging_files), basename(rel_path)))
+            }
+            
             from_file <- file.path(from_path, rel_path)
             # Add resolution tag to output filename
             to_file_with_res <- add_resolution_tag(file.path(to_path, rel_path), downsample_factor)
@@ -375,26 +418,35 @@ pack_bids <- function(x,
             }
             
             # Downsample the file
-            downsample_single_file(from_file, to_file_with_res, 
-                                 factor = downsample_factor, 
-                                 method = downsample_method,
-                                 verbose = verbose)
-          })
+            results[[i]] <- downsample_single_file(from_file, to_file_with_res, 
+                                                  factor = downsample_factor, 
+                                                  method = downsample_method,
+                                                  verbose = FALSE)
+          }
         }
         
         # Summary of results
         if (verbose) {
+          downsample_time <- difftime(Sys.time(), downsample_start, units = "secs")
           n_downsampled <- sum(sapply(results, function(r) r$type == "downsampled"))
           n_stubs <- sum(sapply(results, function(r) r$type == "stub"))
+          
+          message("\nDownsampling complete:")
           message(sprintf("  Successfully downsampled: %d files", n_downsampled))
           if (n_stubs > 0) {
             message(sprintf("  Created stubs for %d files (downsampling failed)", n_stubs))
           }
+          message(sprintf("  Time taken: %.1f seconds", as.numeric(downsample_time)))
         }
         
       } else {
         # Stub file mode (original behavior)
-        for (rel_path in imaging_files) {
+        if (verbose && length(imaging_files) > 0) {
+          message(sprintf("\nCreating stub files for %d imaging files...", length(imaging_files)))
+        }
+        
+        for (i in seq_along(imaging_files)) {
+          rel_path <- imaging_files[i]
           to_file <- file.path(to_path, rel_path)
           
           # Create directory if needed
@@ -405,10 +457,11 @@ pack_bids <- function(x,
           
           # Create 0-byte stub file
           file.create(to_file)
-        }
-        
-        if (verbose) {
-          message(sprintf("  Created %d stub files for imaging data", length(imaging_files)))
+          
+          # Progress indicator
+          if (verbose && (i %% 50 == 0 || i == length(imaging_files))) {
+            message(sprintf("  Created %d/%d stub files", i, length(imaging_files)))
+          }
         }
       }
     }
@@ -419,7 +472,8 @@ pack_bids <- function(x,
     process_and_copy(project_path, temp_project_dir)
     
     if (verbose) {
-      message("Creating archive...")
+      message("\nCreating archive...")
+      archive_start <- Sys.time()
     }
     
     # Create archive based on format
@@ -469,14 +523,23 @@ pack_bids <- function(x,
     if (verbose) {
       # Get archive size
       size_mb <- file.size(output_path) / (1024^2)
-      message(sprintf("Archive created successfully: %s (%.2f MB)", 
-                     output_path, size_mb))
+      archive_time <- difftime(Sys.time(), archive_start, units = "secs")
+      total_time <- difftime(Sys.time(), start_time, units = "secs")
       
-      # Count files in archive
-      if (format == "tar.gz") {
-        # Note: Can't easily count files in tar.gz without external tools
-        message("Archive contains project structure with stub imaging files")
+      message("\n=== pack_bids Complete ===")
+      message(sprintf("Archive created: %s", basename(output_path)))
+      message(sprintf("Archive size: %.2f MB", size_mb))
+      
+      # Calculate compression ratio if downsampling was used
+      if (!is.null(downsample_factor)) {
+        expected_reduction <- (1 / downsample_factor)^3  # Approximate for 3D
+        message(sprintf("Expected size reduction: ~%.1fx for 3D, ~%.1fx for 4D", 
+                       expected_reduction, expected_reduction))
       }
+      
+      message(sprintf("\nTiming:"))
+      message(sprintf("  Archive creation: %.1f seconds", as.numeric(archive_time)))
+      message(sprintf("  Total time: %.1f seconds", as.numeric(total_time)))
     }
     
     # Cleanup if requested

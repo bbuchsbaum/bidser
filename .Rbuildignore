@@ -25,3 +25,7 @@ repomix-output.xml
 ^doc$
 ^Meta$
 ^pkgdown$
+^\.lintr$
+^CONTRIBUTING\.md$
+^README\.html$
+^codemeta\.json$

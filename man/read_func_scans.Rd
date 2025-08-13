@@ -38,3 +38,19 @@ An instance of type \code{NeuroVec}
 \description{
 Read in a set of four-dimensional functional scans
 }
+\examples{
+\donttest{
+tryCatch({
+  ds_path <- get_example_bids_dataset("ds000001-fmriprep")
+  proj <- bids_project(ds_path, fmriprep=TRUE)
+  mask <- brain_mask(proj, subid="01")
+  vec <- read_func_scans.bids_project(proj, mask,
+                                     subid="01",
+                                     task="balloonanalogrisktask",
+                                     run="01")
+  unlink(ds_path, recursive=TRUE)
+}, error = function(e) {
+  message("Example requires derivatives dataset: ", e$message)
+})
+}
+}
