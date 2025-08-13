@@ -4,12 +4,14 @@ optional key-value criteria. It can be used to find files in both raw data and p
 derivatives based on filename patterns and BIDS metadata.
 This function searches for files in a BIDS project that match a specified pattern
 and optional key-value criteria. It can search in both raw data and preprocessed
-derivatives (if available)."><meta property="og:description" content="This function searches for files in a BIDS project that match a specified pattern and
+derivatives (if available).
+Finds files in the mock BIDS tree by matching file names and BIDS entities."><meta property="og:description" content="This function searches for files in a BIDS project that match a specified pattern and
 optional key-value criteria. It can be used to find files in both raw data and preprocessed
 derivatives based on filename patterns and BIDS metadata.
 This function searches for files in a BIDS project that match a specified pattern
 and optional key-value criteria. It can search in both raw data and preprocessed
-derivatives (if available)."></head><body>
+derivatives (if available).
+Finds files in the mock BIDS tree by matching file names and BIDS entities."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -42,7 +44,7 @@ derivatives (if available)."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Search files in BIDS structure</h1>
-      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/bidser/blob/master/R/all_generic.R" class="external-link"><code>R/all_generic.R</code></a>, <a href="https://github.com/bbuchsbaum/bidser/blob/master/R/bids.R" class="external-link"><code>R/bids.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/bidser/blob/master/R/all_generic.R" class="external-link"><code>R/all_generic.R</code></a>, <a href="https://github.com/bbuchsbaum/bidser/blob/master/R/bids.R" class="external-link"><code>R/bids.R</code></a>, <a href="https://github.com/bbuchsbaum/bidser/blob/master/R/mock_bids.R" class="external-link"><code>R/mock_bids.R</code></a></small>
       <div class="d-none name"><code>search_files.Rd</code></div>
     </div>
 
@@ -53,6 +55,7 @@ derivatives based on filename patterns and BIDS metadata.</p>
 <p>This function searches for files in a BIDS project that match a specified pattern
 and optional key-value criteria. It can search in both raw data and preprocessed
 derivatives (if available).</p>
+<p>Finds files in the mock BIDS tree by matching file names and BIDS entities.</p>
     </div>
 
     <div class="section level2">
@@ -60,6 +63,9 @@ derivatives (if available).</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">search_files</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'bids_project'</span></span>
+<span><span class="fu">search_files</span><span class="op">(</span><span class="va">x</span>, regex <span class="op">=</span> <span class="st">".*"</span>, full_path <span class="op">=</span> <span class="cn">FALSE</span>, strict <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'mock_bids_project'</span></span>
 <span><span class="fu">search_files</span><span class="op">(</span><span class="va">x</span>, regex <span class="op">=</span> <span class="st">".*"</span>, full_path <span class="op">=</span> <span class="cn">FALSE</span>, strict <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -68,31 +74,35 @@ derivatives (if available).</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A <code>bids_project</code> object.</p></dd>
+<dd><p>A <code>mock_bids_project</code> object.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Additional key-value pairs to filter files (e.g., subid = "01", task = "wm").
-These are matched against the corresponding metadata in the BIDS files.</p></dd>
+<dd><p>Additional BIDS entities to match (e.g., <code>subid = "01"</code>, <code>task = "rest"</code>).
+Values are treated as regex patterns unless they are simple strings without regex characters.</p></dd>
 
 
 <dt id="arg-regex">regex<a class="anchor" aria-label="anchor" href="#arg-regex"></a></dt>
-<dd><p>A regular expression to match against filenames. Default is ".*" (all files).</p></dd>
+<dd><p>A regular expression to match filenames (node names). Default <code>".*"</code>.</p></dd>
 
 
 <dt id="arg-full-path">full_path<a class="anchor" aria-label="anchor" href="#arg-full-path"></a></dt>
-<dd><p>If TRUE, return full file paths. If FALSE, return paths relative to the project root.</p></dd>
+<dd><p>If <code>TRUE</code>, return full paths (prefixed with <code>x$path</code>).
+If <code>FALSE</code>, return relative paths within the BIDS structure. Default <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-strict">strict<a class="anchor" aria-label="anchor" href="#arg-strict"></a></dt>
-<dd><p>If TRUE, require that all queried keys must exist in matched files.
-If FALSE, allow matches for files missing queried keys.</p></dd>
+<dd><p>If <code>TRUE</code> (default), queries for a BIDS entity (e.g., <code>task="X"</code>)
+require the entity to exist on the file node and match the pattern.
+If <code>FALSE</code>, files lacking the queried entity are not automatically excluded
+(though they won't match if the pattern isn't <code>.*</code>).</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A character vector of file paths matching the criteria, or NULL if no matches found.</p>
 <p>A character vector of file paths matching the criteria, or NULL if no matches found.</p>
+<p>A character vector of matching file paths, or <code>NULL</code> if no matches.</p>
     </div>
 
     <div class="section level2">
