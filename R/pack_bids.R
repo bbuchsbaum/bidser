@@ -615,8 +615,11 @@ pack_bids <- function(x,
       tar(temp_archive, files = basename(temp_project_dir), 
           compression = "gzip", tar = "internal")
       
-      # Move to final location
-      file.rename(temp_archive, output_path)
+      # Move to final location (use copy+delete for cross-filesystem moves)
+      if (!file.copy(temp_archive, output_path, overwrite = TRUE)) {
+        stop("Failed to create archive at: ", output_path)
+      }
+      unlink(temp_archive)
       
     } else if (format == "zip") {
       # For zip, we need to get all files in the temp directory
@@ -641,14 +644,19 @@ pack_bids <- function(x,
     }
     
     if (verbose) {
-      # Get archive size
-      size_mb <- file.size(output_path) / (1024^2)
+      # Get archive size (check file exists first)
+      if (file.exists(output_path)) {
+        size_mb <- file.size(output_path) / (1024^2)
+        size_str <- sprintf("%.2f MB", size_mb)
+      } else {
+        size_str <- "File not found"
+      }
       archive_time <- difftime(Sys.time(), archive_start, units = "secs")
       total_time <- difftime(Sys.time(), start_time, units = "secs")
       
       message("\n=== pack_bids Complete ===")
       message(sprintf("Archive created: %s", basename(output_path)))
-      message(sprintf("Archive size: %.2f MB", size_mb))
+      message(sprintf("Archive size: %s", size_str))
       
       # Calculate compression ratio if downsampling was used
       if (!is.null(downsample_factor)) {
@@ -668,6 +676,12 @@ pack_bids <- function(x,
       if (verbose) {
         message("Temporary files cleaned up")
       }
+    }
+    
+    # Final check that archive was created
+    if (!file.exists(output_path)) {
+      warning("Archive file was not created successfully at: ", output_path)
+      return(NULL)
     }
     
     return(output_path)
