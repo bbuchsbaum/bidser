@@ -597,12 +597,15 @@ pack_bids <- function(x,
     }
     
     # Create archive based on format
-    # Ensure output_path is an absolute path
+    # Ensure output_path is an absolute path (BEFORE changing directories)
     if (!grepl("^/", output_file) && !grepl("^[A-Za-z]:", output_file)) {
       output_path <- file.path(getwd(), output_file)
     } else {
       output_path <- output_file
     }
+    
+    # Make sure output_path is normalized to absolute path
+    output_path <- normalizePath(output_path, mustWork = FALSE)
     
     if (format == "tar.gz") {
       # Change to parent directory for cleaner archive paths
