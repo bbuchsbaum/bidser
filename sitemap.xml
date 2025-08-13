@@ -44,7 +44,9 @@
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/get_example_bids_dataset.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/get_repetition_time.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/index.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/list_pack_bids.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/load_all_events-method.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/pack_bids.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/parse-method.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/parse_with_regex.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/participants-method.html</loc></url>
