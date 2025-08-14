@@ -525,6 +525,70 @@ test_that("parse_file_size handles various formats", {
   expect_error(bidser:::parse_file_size("invalid"), "Invalid file size format")
 })
 
+test_that("strict_bids mode filters non-BIDS files", {
+  # Create a mock project
+  participants_df <- tibble::tibble(participant_id = "01")
+  file_structure_df <- tibble::tribble(
+    ~subid, ~datatype, ~suffix,       ~fmriprep,
+    "01",   "anat",    "T1w.nii.gz",  FALSE,
+    "01",   "func",    "bold.nii.gz", FALSE
+  )
+  
+  temp_bids_dir <- tempfile("mock_bids_")
+  
+  proj <- create_mock_bids(
+    project_name = "TestProject",
+    participants = participants_df,
+    file_structure = file_structure_df,
+    create_stub = TRUE,
+    stub_path = temp_bids_dir
+  )
+  
+  # Create some non-BIDS files
+  non_bids_file1 <- file.path(temp_bids_dir, ".DS_Store")
+  non_bids_file2 <- file.path(temp_bids_dir, "random_file.txt")
+  non_bids_file3 <- file.path(temp_bids_dir, "sub-01", "temp_file.tmp")
+  
+  writeLines("mac file", non_bids_file1)
+  writeLines("random", non_bids_file2)
+  dir.create(dirname(non_bids_file3), recursive = TRUE, showWarnings = FALSE)
+  writeLines("temp", non_bids_file3)
+  
+  # Pack without strict mode (should include non-BIDS files)
+  output_file_normal <- tempfile(fileext = ".tar.gz")
+  result_normal <- pack_bids(proj, output_file = output_file_normal, 
+                             strict_bids = FALSE, verbose = FALSE)
+  
+  # Pack with strict mode (should exclude non-BIDS files)
+  output_file_strict <- tempfile(fileext = ".tar.gz")
+  result_strict <- pack_bids(proj, output_file = output_file_strict, 
+                             strict_bids = TRUE, verbose = FALSE)
+  
+  # Check contents
+  contents_normal <- list_pack_bids(result_normal, verbose = FALSE)
+  contents_strict <- list_pack_bids(result_strict, verbose = FALSE)
+  
+  # Normal mode should have non-BIDS files (at least some of them)
+  has_non_bids <- any(grepl("random_file\\.txt", contents_normal$file)) ||
+                   any(grepl("temp_file\\.tmp", contents_normal$file)) ||
+                   any(grepl("\\.DS_Store", contents_normal$file))
+  expect_true(has_non_bids)
+  
+  # Strict mode should NOT have non-BIDS files
+  expect_false(any(grepl("\\.DS_Store", contents_strict$file)))
+  expect_false(any(grepl("random_file\\.txt", contents_strict$file)))
+  expect_false(any(grepl("temp_file\\.tmp", contents_strict$file)))
+  
+  # But strict mode should still have BIDS files
+  expect_true(any(grepl("sub-01_T1w\\.nii\\.gz", contents_strict$file)))
+  expect_true(any(grepl("participants\\.tsv", contents_strict$file)))
+  
+  # Clean up
+  unlink(output_file_normal)
+  unlink(output_file_strict)
+  unlink(temp_bids_dir, recursive = TRUE)
+})
+
 test_that("resolution tag naming is correct for different factors", {
   skip_if_not_installed("neuroim2")
   

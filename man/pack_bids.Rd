@@ -14,6 +14,7 @@ pack_bids(
   ncores = 1,
   max_file_size = "10MB",
   exclude = NULL,
+  strict_bids = FALSE,
   verbose = TRUE,
   temp_dir = NULL,
   cleanup = TRUE
@@ -52,6 +53,11 @@ as numeric bytes. Default is "10MB".}
 \item{exclude}{Character string with a regular expression pattern to exclude
 files. Files matching this pattern will be replaced with stub files.
 For example, "\\.h5$" to exclude HDF5 files. Default is NULL (no exclusion).}
+
+\item{strict_bids}{Logical. If TRUE, only include files that match BIDS
+naming conventions and standard BIDS metadata files. Non-BIDS files like
+.DS_Store, temporary files, or other non-standard files will be excluded.
+Default is FALSE (include all files).}
 
 \item{verbose}{Logical. Whether to print progress messages. Default is TRUE.}
 
@@ -124,8 +130,13 @@ tryCatch({
   # Pack without derivatives
   archive_no_deriv <- pack_bids(proj, include_derivatives = FALSE)
   
+  # Pack with strict BIDS mode (exclude non-BIDS files)
+  archive_strict <- pack_bids(proj, strict_bids = TRUE,
+                              output_file = "ds001_strict.tar.gz")
+  
   # Clean up
-  unlink(c(archive_path, archive_filtered, archive_downsampled, zip_path, archive_no_deriv))
+  unlink(c(archive_path, archive_filtered, archive_downsampled, zip_path, 
+           archive_no_deriv, archive_strict))
   if (exists("archive_parallel")) unlink(archive_parallel)
   unlink(ds_path, recursive = TRUE)
 }, error = function(e) {

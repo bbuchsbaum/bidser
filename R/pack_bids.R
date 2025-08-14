@@ -1,3 +1,98 @@
+#' Check if a file is BIDS-compliant
+#' @keywords internal
+#' @noRd
+is_bids_compliant <- function(filepath) {
+  # Get just the filename without path
+  filename <- basename(filepath)
+  
+  # List of standard BIDS root files that should always be included
+  standard_files <- c(
+    "dataset_description.json",
+    "participants.tsv",
+    "participants.json",
+    "README",
+    "README.md",
+    "README.txt",
+    "CHANGES",
+    "LICENSE",
+    ".bidsignore"
+  )
+  
+  # Check if it's a standard BIDS file
+  if (filename %in% standard_files) {
+    return(TRUE)
+  }
+  
+  # List of common BIDS metadata suffixes
+  metadata_patterns <- c(
+    "_sessions\\.tsv$",
+    "_sessions\\.json$",
+    "_scans\\.tsv$",
+    "_scans\\.json$",
+    "_events\\.tsv$",
+    "_events\\.json$",
+    "_physio\\.tsv\\.gz$",
+    "_physio\\.json$",
+    "_stim\\.tsv\\.gz$",
+    "_stim\\.json$",
+    "_channels\\.tsv$",
+    "_channels\\.json$",
+    "_electrodes\\.tsv$",
+    "_electrodes\\.json$",
+    "_coordsystem\\.json$",
+    "_photo\\.jpg$",
+    "_headshape\\.",
+    "_markers\\."
+  )
+  
+  # Check metadata patterns
+  for (pattern in metadata_patterns) {
+    if (grepl(pattern, filename)) {
+      return(TRUE)
+    }
+  }
+  
+  # Check if it's in derivatives and has common derivative patterns
+  if (grepl("derivatives/", filepath)) {
+    derivative_patterns <- c(
+      "_confounds.*\\.tsv$",
+      "_regressors.*\\.tsv$",
+      "_timeseries.*\\.tsv$",
+      "_desc-.*\\.json$",
+      "_desc-.*\\.tsv$",
+      "_desc-.*\\.nii(\\.gz)?$",
+      "_mask\\.nii(\\.gz)?$",
+      "_probseg\\.nii(\\.gz)?$",
+      "_dseg\\.nii(\\.gz)?$"
+    )
+    
+    for (pattern in derivative_patterns) {
+      if (grepl(pattern, filename)) {
+        return(TRUE)
+      }
+    }
+  }
+  
+  # Try to parse with BIDS parser for imaging files
+  if (grepl("\\.nii(\\.gz)?$", filename)) {
+    parser <- bids_parser()
+    result <- parse(parser, filename)
+    return(!is.null(result))
+  }
+  
+  # Check for JSON sidecars (they mirror imaging file names)
+  if (grepl("\\.json$", filename)) {
+    # Remove .json and check if the base would be valid BIDS
+    base_name <- sub("\\.json$", ".nii.gz", filename)
+    parser <- bids_parser()
+    result <- parse(parser, base_name)
+    return(!is.null(result))
+  }
+  
+  # Default to FALSE for unrecognized files
+  return(FALSE)
+}
+
 #' Parse file size string to bytes
 #' @keywords internal
 #' @noRd
@@ -170,6 +265,10 @@ add_resolution_tag <- function(filename, factor) {
 #' @param exclude Character string with a regular expression pattern to exclude 
 #'   files. Files matching this pattern will be replaced with stub files.
 #'   For example, "\\.h5$" to exclude HDF5 files. Default is NULL (no exclusion).
+#' @param strict_bids Logical. If TRUE, only include files that match BIDS 
+#'   naming conventions and standard BIDS metadata files. Non-BIDS files like 
+#'   .DS_Store, temporary files, or other non-standard files will be excluded.
+#'   Default is FALSE (include all files).
 #' @param verbose Logical. Whether to print progress messages. Default is TRUE.
 #' @param temp_dir Character string specifying the temporary directory for
 #'   creating the archive. If NULL (default), uses tempdir().
@@ -231,8 +330,13 @@ add_resolution_tag <- function(filename, factor) {
 #'   # Pack without derivatives
 #'   archive_no_deriv <- pack_bids(proj, include_derivatives = FALSE)
 #'   
+#'   # Pack with strict BIDS mode (exclude non-BIDS files)
+#'   archive_strict <- pack_bids(proj, strict_bids = TRUE,
+#'                               output_file = "ds001_strict.tar.gz")
+#'   
 #'   # Clean up
-#'   unlink(c(archive_path, archive_filtered, archive_downsampled, zip_path, archive_no_deriv))
+#'   unlink(c(archive_path, archive_filtered, archive_downsampled, zip_path, 
+#'            archive_no_deriv, archive_strict))
 #'   if (exists("archive_parallel")) unlink(archive_parallel)
 #'   unlink(ds_path, recursive = TRUE)
 #' }, error = function(e) {
@@ -251,6 +355,7 @@ pack_bids <- function(x,
                       ncores = 1,
                       max_file_size = "10MB",
                       exclude = NULL,
+                      strict_bids = FALSE,
                       verbose = TRUE,
                       temp_dir = NULL,
                       cleanup = TRUE) {
@@ -366,6 +471,11 @@ pack_bids <- function(x,
     } else {
       message("Mode: Creating stub files for imaging data")
     }
+    if (strict_bids) {
+      message("BIDS validation: STRICT (only BIDS-compliant files)")
+    } else {
+      message("BIDS validation: OFF (all files included)")
+    }
     if (!is.null(max_size_bytes)) {
       message(sprintf("Max file size: %.2f MB", max_size_bytes / (1024^2)))
     }
@@ -390,6 +500,17 @@ pack_bids <- function(x,
       # Remove derivative files
       deriv_pattern <- paste0("^", x$prep_dir, "/")
       all_files <- all_files[!grepl(deriv_pattern, all_files)]
+    }
+    
+    # Apply strict BIDS filtering if requested
+    if (strict_bids) {
+      original_count <- length(all_files)
+      all_files <- all_files[sapply(all_files, is_bids_compliant)]
+      
+      if (verbose && original_count > length(all_files)) {
+        message(sprintf("\nFiltered out %d non-BIDS files (strict mode)", 
+                       original_count - length(all_files)))
+      }
     }
     
     total_files <- length(all_files)
