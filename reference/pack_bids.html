@@ -64,6 +64,7 @@ project structure and metadata without the large imaging data.</p>
 <span>  ncores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  max_file_size <span class="op">=</span> <span class="st">"10MB"</span>,</span>
 <span>  exclude <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  strict_bids <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  temp_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cleanup <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -123,6 +124,13 @@ as numeric bytes. Default is "10MB".</p></dd>
 <dd><p>Character string with a regular expression pattern to exclude
 files. Files matching this pattern will be replaced with stub files.
 For example, "\.h5$" to exclude HDF5 files. Default is NULL (no exclusion).</p></dd>
+
+
+<dt id="arg-strict-bids">strict_bids<a class="anchor" aria-label="anchor" href="#arg-strict-bids"></a></dt>
+<dd><p>Logical. If TRUE, only include files that match BIDS
+naming conventions and standard BIDS metadata files. Non-BIDS files like
+.DS_Store, temporary files, or other non-standard files will be excluded.
+Default is FALSE (include all files).</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
@@ -192,8 +200,13 @@ without the large imaging files, which is useful for:</p><ul><li><p>Sharing data
 <span class="r-in"><span>  <span class="co"># Pack without derivatives</span></span></span>
 <span class="r-in"><span>  <span class="va">archive_no_deriv</span> <span class="op">&lt;-</span> <span class="fu">pack_bids</span><span class="op">(</span><span class="va">proj</span>, include_derivatives <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># Pack with strict BIDS mode (exclude non-BIDS files)</span></span></span>
+<span class="r-in"><span>  <span class="va">archive_strict</span> <span class="op">&lt;-</span> <span class="fu">pack_bids</span><span class="op">(</span><span class="va">proj</span>, strict_bids <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>                              output_file <span class="op">=</span> <span class="st">"ds001_strict.tar.gz"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># Clean up</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">archive_path</span>, <span class="va">archive_filtered</span>, <span class="va">archive_downsampled</span>, <span class="va">zip_path</span>, <span class="va">archive_no_deriv</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">archive_path</span>, <span class="va">archive_filtered</span>, <span class="va">archive_downsampled</span>, <span class="va">zip_path</span>, </span></span>
+<span class="r-in"><span>           <span class="va">archive_no_deriv</span>, <span class="va">archive_strict</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/exists.html" class="external-link">exists</a></span><span class="op">(</span><span class="st">"archive_parallel"</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">archive_parallel</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">ds_path</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span>, error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -205,6 +218,7 @@ without the large imaging files, which is useful for:</p><ul><li><p>Sharing data
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Project: bids_example_ds001</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Output: bids_example_ds001_metadata.tar.gz</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Mode: Creating stub files for imaging data</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> BIDS validation: OFF (all files included)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Max file size: 10.00 MB</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Creating temporary copy of BIDS project...</span>
@@ -221,6 +235,7 @@ without the large imaging files, which is useful for:</p><ul><li><p>Sharing data
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Project: bids_example_ds001</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Output: ds001_filtered.tar.gz</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Mode: Creating stub files for imaging data</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> BIDS validation: OFF (all files included)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Max file size: 1.00 MB</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Exclude pattern: \.h5$</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
@@ -244,6 +259,7 @@ without the large imaging files, which is useful for:</p><ul><li><p>Sharing data
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Project: bids_example_ds001</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Output: ds001_low4x.tar.gz</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Downsampling: 4.00x reduction</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> BIDS validation: OFF (all files included)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Max file size: 10.00 MB</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Creating temporary copy of BIDS project...</span>
@@ -269,6 +285,7 @@ without the large imaging files, which is useful for:</p><ul><li><p>Sharing data
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Output: ds001_low2x.tar.gz</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Downsampling: 2.00x reduction</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Parallel processing: 2 cores</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> BIDS validation: OFF (all files included)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Max file size: 10.00 MB</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Creating temporary copy of BIDS project...</span>
@@ -292,6 +309,7 @@ without the large imaging files, which is useful for:</p><ul><li><p>Sharing data
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Project: bids_example_ds001</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Output: ds001_metadata.zip</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Mode: Creating stub files for imaging data</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> BIDS validation: OFF (all files included)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Max file size: 10.00 MB</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Creating temporary copy of BIDS project...</span>
@@ -306,6 +324,7 @@ without the large imaging files, which is useful for:</p><ul><li><p>Sharing data
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Project: bids_example_ds001</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Output: bids_example_ds001_metadata.tar.gz</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Mode: Creating stub files for imaging data</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> BIDS validation: OFF (all files included)</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Max file size: 10.00 MB</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Creating temporary copy of BIDS project...</span>
@@ -322,6 +341,17 @@ without the large imaging files, which is useful for:</p><ul><li><p>Sharing data
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   Archive creation: 0.0 seconds</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   Total time: 0.0 seconds</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Temporary files cleaned up</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Maximum file size for non-imaging files: 10.00 MB</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> === Starting pack_bids ===</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Project: bids_example_ds001</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Output: ds001_strict.tar.gz</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Mode: Creating stub files for imaging data</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> BIDS validation: STRICT (only BIDS-compliant files)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Max file size: 10.00 MB</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating temporary copy of BIDS project...</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Failed to create archive: invalid subscript type 'list'</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
