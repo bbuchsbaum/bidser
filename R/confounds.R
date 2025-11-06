@@ -30,7 +30,7 @@
 #'   above.
 #' - `"compcor"`: both anatomical and temporal CompCor (applies `n` to each
 #'   family if provided).
-#' - `"cosine"`: discrete cosine-basis regressors (`cosine_*`).
+#' - `"cosine"`: discrete cosine-basis regressors (matches both `cosine_*` and `cosine*`).
 #' - `"outliers"`: outlier/censoring covariates including
 #'   `framewise_displacement`, `rmsd` (if present), `motion_outlier_*`, and
 #'   `non_steady_state_outlier*`.
@@ -94,7 +94,8 @@ confound_set <- function(name, n = NULL) {
     acompcor  = acc_all,
     tcompcor  = tcc_all,
     compcor   = c(acc_all, tcc_all),
-    cosine    = "cosine_*",
+    # include underscore and no-underscore variants (cosine_00 vs cosine00)
+    cosine    = c("cosine_*", "cosine*"),
     outliers  = c("framewise_displacement", "rmsd", "motion_outlier_*", "non_steady_state_outlier*"),
     dvars     = dvars,
     fd        = "framewise_displacement"
