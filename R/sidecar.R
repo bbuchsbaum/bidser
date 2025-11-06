@@ -180,3 +180,192 @@ get_repetition_time <- function(x, subid, task, run=".*", session=".*", ...) {
     return(as.numeric(tr_val))
   }
 }
+
+
+#' Infer TR (Repetition Time) from a BOLD file or sidecar
+#'
+#' Given a path to a BOLD NIfTI file (`*.nii` or `*.nii.gz`) or its JSON
+#' sidecar (`*.json`), this function locates the appropriate sidecar JSON and
+#' returns the TR (in seconds). It prefers the JSON `RepetitionTime` field
+#' (BIDS-compliant). If that is not available, it falls back to computing TR as
+#' the median difference of `VolumeTiming` (if present). Optionally, when the
+#' sidecar cannot be found or is missing both fields, the function attempts to
+#' read TR from the NIfTI header (pixdim[4]) if an appropriate reader is
+#' installed.
+#'
+#' For NIfTI inputs, the JSON sidecar is resolved by replacing the
+#' `*.nii`/`*.nii.gz` suffix with `.json` in the same directory. If that file is
+#' not found, the function searches the directory for a `.json` file with the
+#' same stem (filename without the NIfTI extension).
+#'
+#' @param x A character path to a BOLD `.nii[.gz]` file or its `.json` sidecar.
+#' @param prefer Preferred source of TR: `"json"` (default) or `"nifti"`.
+#' @param fallback If TRUE (default), attempt NIfTI header fallback when JSON is
+#'   not available or incomplete.
+#' @param coerce_units Unit handling for non-compliant values. `"strict"`
+#'   (default) assumes seconds as per BIDS and returns values as-is. `"auto"`
+#'   will convert clearly millisecond-like values to seconds (divide by 1000)
+#'   and annotate the conversion in the return value's attributes.
+#' @param verbose If TRUE, print informative messages when falling back or when
+#'   encountering special cases (e.g., SBRef files).
+#' @return Numeric TR in seconds, or `NA_real_` if it cannot be determined. The
+#'   return value includes attributes: `source` (e.g., `json:RepetitionTime`,
+#'   `json:VolumeTiming`, `nifti:pixdim4`), `path` (the file used), and
+#'   optionally `variable = TRUE` if `VolumeTiming` indicates non-constant TR; a
+#'   `unit = "ms->s"` attribute is added if units were auto-converted.
+#' @examples
+#' # infer_tr("sub-01/func/sub-01_task-rest_bold.nii.gz")
+#' # infer_tr("sub-01/func/sub-01_task-rest_bold.json")
+#' @export
+infer_tr <- function(x, ...) {
+  UseMethod("infer_tr")
+}
+
+#' @export
+infer_tr.character <- function(x,
+                               prefer = c("json", "nifti"),
+                               fallback = TRUE,
+                               coerce_units = c("strict", "auto"),
+                               verbose = FALSE,
+                               ...) {
+  prefer <- match.arg(prefer)
+  coerce_units <- match.arg(coerce_units)
+
+  # normalize path
+  f <- as.character(x)
+  if (length(f) != 1L) {
+    stop("infer_tr() expects a single file path.")
+  }
+  if (!file.exists(f)) {
+    stop("File not found: ", f)
+  }
+
+  is_json <- grepl("\\.json$", f, ignore.case = TRUE)
+  is_nifti <- grepl("\\.nii(\\.gz)?$", f, ignore.case = TRUE)
+
+  # Warn and return NA for SBRef files unless user insists
+  if (is_nifti && grepl("_sbref", basename(f), ignore.case = TRUE)) {
+    if (verbose) message("SBRef file detected; TR is not applicable.")
+    return(NA_real_)
+  }
+
+  # Helper to read JSON and extract TR
+  read_tr_from_json <- function(jf) {
+    if (!file.exists(jf)) return(NA_real_)
+    j <- tryCatch(jsonlite::read_json(jf, simplifyVector = TRUE),
+                  error = function(e) NULL)
+    if (is.null(j)) return(NA_real_)
+    src_path <- jf
+    # Prefer RepetitionTime
+    if (!is.null(j$RepetitionTime) && is.numeric(j$RepetitionTime) && length(j$RepetitionTime) >= 1) {
+      tr <- as.numeric(j$RepetitionTime[1])
+      if (coerce_units == "auto" && is.finite(tr) && tr > 50 && tr < 10000) {
+        # likely milliseconds
+        tr <- tr/1000
+        attr(tr, "unit") <- "ms->s"
+      }
+      attr(tr, "source") <- "json:RepetitionTime"
+      attr(tr, "path") <- src_path
+      return(tr)
+    }
+    # Fallback: VolumeTiming -> median diff
+    if (!is.null(j$VolumeTiming) && is.numeric(j$VolumeTiming) && length(j$VolumeTiming) >= 2) {
+      vt <- as.numeric(j$VolumeTiming)
+      diffs <- diff(vt)
+      if (coerce_units == "auto" && median(diffs, na.rm = TRUE) > 50 && median(diffs, na.rm = TRUE) < 10000) {
+        diffs <- diffs/1000
+        attr_val <- "ms->s"
+      } else {
+        attr_val <- NULL
+      }
+      tr <- as.numeric(stats::median(diffs, na.rm = TRUE))
+      attr(tr, "source") <- "json:VolumeTiming"
+      attr(tr, "path") <- src_path
+      if (!is.null(attr_val)) attr(tr, "unit") <- attr_val
+      # flag variable TR if diffs are not constant
+      if (any(abs(diffs - tr) > 1e-6, na.rm = TRUE)) attr(tr, "variable") <- TRUE
+      return(tr)
+    }
+    NA_real_
+  }
+
+  # Helper to read TR from NIfTI header if RNifti is available
+  read_tr_from_nifti <- function(nf) {
+    if (!file.exists(nf)) return(NA_real_)
+    tr <- NA_real_
+    if (requireNamespace("RNifti", quietly = TRUE)) {
+      hdr <- tryCatch(RNifti::niftiHeader(nf), error = function(e) NULL)
+      if (!is.null(hdr) && !is.null(hdr$pixdim) && length(hdr$pixdim) >= 5) {
+        tr <- as.numeric(hdr$pixdim[5])
+      }
+    } else if (requireNamespace("neuroim2", quietly = TRUE)) {
+      # neuroim2 does not expose header directly; load and get TR via header if available
+      vol <- tryCatch(neuroim2::read_vol(nf), error = function(e) NULL)
+      if (!is.null(vol)) {
+        # neuroim2 stores metadata; attempt to find TR
+        tr_val <- tryCatch(neuroim2::tr(vol), error = function(e) NA_real_)
+        if (is.finite(tr_val)) tr <- as.numeric(tr_val)
+      }
+    }
+    if (is.finite(tr)) {
+      attr(tr, "source") <- "nifti:pixdim4"
+      attr(tr, "path") <- nf
+    }
+    tr
+  }
+
+  # Resolve sidecar if needed
+  json_path <- NA_character_
+  if (is_json) {
+    json_path <- f
+  } else if (is_nifti) {
+    # first attempt: swap extension
+    json_guess <- sub("\\.nii(\\.gz)?$", ".json", f, ignore.case = TRUE)
+    if (file.exists(json_guess)) {
+      json_path <- json_guess
+    } else {
+      # search directory for matching stem
+      dirp <- dirname(f)
+      stem <- sub("\\.nii(\\.gz)?$", "", basename(f), ignore.case = TRUE)
+      candidates <- list.files(dirp, pattern = "\\.json$", full.names = TRUE)
+      cand_base <- sub("\\.json$", "", basename(candidates), ignore.case = TRUE)
+      hit <- which(cand_base == stem)
+      if (length(hit) >= 1) {
+        json_path <- candidates[hit[1]]
+      }
+    }
+  }
+
+  # Prefer JSON
+  if (prefer == "json" && !is.na(json_path) && nzchar(json_path)) {
+    tr <- read_tr_from_json(json_path)
+    if (is.finite(tr)) return(tr)
+    if (!fallback) return(NA_real_)
+    if (is_nifti) {
+      if (verbose) message("Falling back to NIfTI header for TR.")
+      return(read_tr_from_nifti(f))
+    }
+    return(NA_real_)
+  }
+
+  # Otherwise prefer NIfTI or JSON not available
+  if (is_nifti && prefer == "nifti") {
+    tr <- read_tr_from_nifti(f)
+    if (is.finite(tr)) return(tr)
+    if (!fallback) return(NA_real_)
+    if (!is.na(json_path) && nzchar(json_path)) return(read_tr_from_json(json_path))
+    return(NA_real_)
+  }
+
+  # If input was JSON, use it directly
+  if (is_json) {
+    return(read_tr_from_json(json_path))
+  }
+
+  NA_real_
+}
+
+#' @export
+infer_tr.bids_project <- function(x, subid, task, run = ".*", session = ".*", ...) {
+  get_repetition_time(x, subid = subid, task = task, run = run, session = session, ...)
+}

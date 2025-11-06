@@ -822,7 +822,12 @@ str_detect_null <- function(x, pat, default=FALSE) {
 #' @param kind The kind of preprocessed data to return. Default is ".*" to match any kind.
 #' @param full_path If TRUE, return full file paths. Otherwise return relative paths.
 #'   Default is FALSE.
-#' @param ... Additional arguments passed to internal functions.
+#' @param ... Additional key-value filters for BIDS entities. These are matched
+#'   against parsed file entities in the derivatives tree. Common examples:
+#'   `space = "MNI152NLin2009cAsym"`, `res = "2"`, `acq = "ap"`, `echo = "1"`.
+#'   Values are treated as regex. Keys already covered by explicit arguments
+#'   (`subid`, `task`, `run`, `session`, `space`, `variant`, `modality`, `kind`)
+#'   are ignored in `...`.
 #'
 #' @return A character vector of file paths to preprocessed scans matching the criteria.
 #'   Returns NULL if:
@@ -861,6 +866,9 @@ str_detect_null <- function(x, pat, default=FALSE) {
 #'                                  run="01",
 #'                                  space="MNI152NLin2009cAsym")
 #'   
+#'   # Filter by resolution (BIDS entity 'res')
+#'   res2_scans <- preproc_scans(proj, res = "2")
+#'   
 #'   # Clean up
 #'   unlink(ds_path, recursive=TRUE)
 #' }, error = function(e) {
@@ -886,6 +894,14 @@ preproc_scans.bids_project <- function(x, subid=".*", task=".*", run=".*", sessi
   # If variant is NULL, treat it as ".*"
   var_pattern <- if (is.null(variant)) ".*" else variant
   
+  # Pull extra filters from ... (e.g., res = "2", acq = "ap") and drop ones we already handle
+  extra_filters <- list(...)
+  if (length(extra_filters) > 0) {
+    drop_keys <- c("subid","task","run","session","space","variant","modality","kind","desc")
+    extra_filters <- extra_filters[setdiff(names(extra_filters), drop_keys)]
+  }
+  extra_matcher <- if (length(extra_filters) > 0) do.call(key_match, c(list(default = FALSE), extra_filters)) else function(z) TRUE
+
   # Create a list of criteria to check
   criteria <- list(
     # Basic file criteria
@@ -919,7 +935,9 @@ preproc_scans.bids_project <- function(x, subid=".*", task=".*", run=".*", sessi
     is_preprocessed = function(z) {
       return(str_detect_null(z$desc, "preproc", default=FALSE) || 
              str_detect_null(z$kind, "preproc", default=FALSE))
-    }
+    },
+    # Additional entity filters passed via ... (strict: missing key fails)
+    matches_extra = function(z) extra_matcher(z)
   )
   
   # Get files matching all criteria
@@ -1497,4 +1515,3 @@ clear_example_bids_cache <- function() {
   }
   invisible(NULL)
 }
-
