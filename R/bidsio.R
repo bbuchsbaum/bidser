@@ -256,7 +256,9 @@ CVARS_ALIASES <- list(
   white_matter = c("WhiteMatter", "white_matter"),
   global_signal = c("GlobalSignal", "global_signal"),
   std_dvars = c("stdDVARS", "std_dvars"),
-  non_std_dvars = c("non.stdDVARS", "non_std_dvars"),
+  # fMRIPrep newer versions use `dvars`; older used non-stdDVARS variants
+  dvars = c("dvars", "non_std_dvars", "non.stdDVARS"),
+  non_std_dvars = c("non.stdDVARS", "non_std_dvars", "dvars"),
   vx_wisestd_dvars = c("vx.wisestdDVARS", "vx_wisestd_dvars"),
   framewise_displacement = c("FramewiseDisplacement", "framewise_displacement"),
   t_comp_cor_00 = c("tCompCor00", "t_comp_cor_00"),
@@ -297,26 +299,79 @@ DEFAULT_CVARS2 <- names(CVARS_ALIASES)
 #' @keywords internal
 resolve_cvars <- function(cvars, col_names, rename = FALSE) {
   res <- character()
+  # helper: select first n from a vector (n <= 0 => all)
+  take_n <- function(x, n) {
+    if (is.null(n) || is.na(n) || n <= 0) return(x)
+    head(x, n)
+  }
+
   for (cv in cvars) {
-    # find canonical entry containing this name
+    # 1) Wildcard support (with optional [N] limiter): prefix* or prefix*[N]
+    #    Examples: 'cosine_*', 'motion_outlier_*', 'a_comp_cor_*[6]'
+    if (grepl("\\*", cv)) {
+      # extract N in [N] if present
+      n_lim <- NA_integer_
+      if (grepl("\\[[0-9]+\\]$", cv)) {
+        n_lim <- as.integer(sub("^.*\\[([0-9]+)\\]$", "\\1", cv))
+      }
+      # remove optional [N]
+      cv_no_lim <- sub("\\[[0-9]+\\]$", "", cv)
+      # keep everything before the first '*'
+      prefix <- sub("\\*.*$", "", cv_no_lim)
+      matched <- col_names[startsWith(col_names, prefix)]
+      matched <- sort(unique(matched))
+      matched <- take_n(matched, n_lim)
+      res <- c(res, matched)
+      next
+    }
+
+    # 2) Handle suffix variants for derivative/square combos:
+    #    base, base_derivative1, base_power2, base_derivative1_power2
+    if (grepl("(_derivative1|_power2)$|_derivative1_power2$", cv)) {
+      # separate base and suffix part
+      base <- sub("(_derivative1)?(_power2)?$", "", cv)
+      suffix <- sub(paste0("^", base), "", cv)
+
+      # map base via aliases if available, else use as-is
+      canon <- names(CVARS_ALIASES)[sapply(CVARS_ALIASES, function(a) base %in% a)]
+      if (length(canon) == 0) {
+        alias_bases <- base
+      } else {
+        alias_bases <- CVARS_ALIASES[[canon[1]]]
+      }
+
+      # Build candidates for each alias form with the same suffix (e.g., X_derivative1)
+      candidates <- paste0(alias_bases, suffix)
+      found <- intersect(candidates, col_names)
+      if (length(found) > 0) {
+        # pick the first present (or all?) — choose first for consistency with prior behavior
+        res <- c(res, found[1])
+        next
+      }
+      # fall through to alias resolution on the whole token as a last resort
+    }
+
+    # 3) Standard alias resolution (single column variables)
     canon <- names(CVARS_ALIASES)[sapply(CVARS_ALIASES, function(a) cv %in% a)]
     if (length(canon) == 0) {
-      canon <- cv
-      aliases <- cv
+      # not in alias map — try exact match to columns
+      if (cv %in% col_names) {
+        res <- c(res, cv)
+      }
     } else {
       canon <- canon[1]
       aliases <- CVARS_ALIASES[[canon]]
-    }
-    found <- intersect(aliases, col_names)
-    if (length(found) > 0) {
-      if (rename) {
-        res <- c(res, setNames(found[1], canon))
-      } else {
-        res <- c(res, found[1])
+      found <- intersect(aliases, col_names)
+      if (length(found) > 0) {
+        if (rename) {
+          res <- c(res, setNames(found[1], canon))
+        } else {
+          res <- c(res, found[1])
+        }
       }
     }
   }
-  res
+  unique(res)
 }
 
 
@@ -424,6 +479,9 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #' @param cvars The names of the confound variables to select. Defaults to \code{DEFAULT_CVARS}.
 #'   Canonical names such as \code{"csf"} are automatically mapped to any
 #'   matching column names found in the dataset using \code{CVARS_ALIASES}.
+#'   You can also pass convenience sets from \code{confound_set()}, e.g.,
+#'   \code{confound_set("motion24")}, or wildcard patterns like
+#'   \code{"cosine_*"}, \code{"motion_outlier_*"}, or \code{"a_comp_cor_*[6]"}.
 #' @param npcs Perform PCA reduction on confounds and return \code{npcs} PCs.
 #' @param perc_var Perform PCA reduction to retain \code{perc_var}% variance.
 #' @param nest If TRUE, nests confound tables by subject/session/run.
@@ -442,6 +500,10 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #'   
 #'   # Read confounds with canonical names (automatically resolve to actual columns)
 #'   conf <- read_confounds(proj, cvars = c("csf", "framewise_displacement"))
+#'
+#'   # Use convenience sets
+#'   conf_36p <- read_confounds(proj, cvars = confound_set("36p"))
+#'   conf_compcor6 <- read_confounds(proj, cvars = confound_set("acompcor", n = 6))
 #'   
 #'   # Read confounds for specific subjects and tasks
 #'   conf_sub <- read_confounds(proj, subid="01", task="balloonanalogrisktask")
@@ -597,4 +659,3 @@ process_confounds <- function(dfx, center=TRUE, scale=TRUE, npcs=-1, perc_var=-1
   
   as.data.frame(sm)
 }
-
