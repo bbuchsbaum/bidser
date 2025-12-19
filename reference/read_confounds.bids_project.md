@@ -63,7 +63,7 @@ read_confounds(
 
 - nest:
 
-  If TRUE, nests confound tables by subject/session/run.
+  If TRUE, nests confound tables by subject/task/session/run.
 
 - ...:
 
@@ -72,7 +72,8 @@ read_confounds(
 ## Value
 
 A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of
-confounds.
+confounds, with identifier columns for participant_id, task, session,
+and run.
 
 ## Examples
 

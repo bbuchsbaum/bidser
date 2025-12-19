@@ -73,14 +73,14 @@ and return either nested or flat tibbles.</p>
 <li><p><code>cvars</code>: Character vector of confound variable names to select</p></li>
 <li><p><code>npcs</code>: Integer. Perform PCA reduction and return this many PCs</p></li>
 <li><p><code>perc_var</code>: Numeric. Perform PCA reduction to retain this percentage of variance</p></li>
-<li><p><code>nest</code>: Logical. If TRUE, nests confound tables by subject/session/run (default: TRUE)</p></li>
+<li><p><code>nest</code>: Logical. If TRUE, nests confound tables by subject/task/session/run (default: TRUE)</p></li>
 </ul></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble containing confound data. If <code>nest=TRUE</code> (default), returns a
-nested tibble with columns for subject, session, run, and a nested <code>data</code> column
+nested tibble with columns for subject, task, session, run, and a nested <code>data</code> column
 containing the confound variables. If <code>nest=FALSE</code>, returns a flat tibble with
 all confound variables. Returns NULL if no matching files are found.</p>
     </div>

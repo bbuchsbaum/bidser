@@ -56,7 +56,8 @@ read_confounds(
 
 - nest:
 
-  If `TRUE`, returns a nested tibble keyed by subject, session and run.
+  If `TRUE`, returns a nested tibble keyed by subject, task, session and
+  run.
 
 - ...:
 
