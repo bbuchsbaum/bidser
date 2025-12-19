@@ -88,7 +88,8 @@ imaging files, such as acquisition parameters, task descriptions, and other rele
 
 
 <dt id="arg-modality">modality<a class="anchor" aria-label="anchor" href="#arg-modality"></a></dt>
-<dd><p>A regex for matching modality (e.g. "bold"). Default is <code>"bold"</code>.</p></dd>
+<dd><p>A regex for matching modality/kind (e.g. "bold"). Default is <code>"bold"</code>.
+This is matched against the 'kind' field in parsed BIDS filenames.</p></dd>
 
 
 <dt id="arg-full-path">full_path<a class="anchor" aria-label="anchor" href="#arg-full-path"></a></dt>
@@ -150,7 +151,7 @@ If no files are found, returns an empty tibble.</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
