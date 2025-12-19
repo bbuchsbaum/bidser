@@ -180,7 +180,8 @@ anatprepspec <- function() {
     "mode",          "mode",    TRUE,     "[A-Za-z0-9]+",  11,
     "target",        "target",  TRUE,     "[A-Za-z0-9]+",  12,
     "class",         "class",   TRUE,     "[A-Za-z0-9]+",  13,
-    "mod",           "mod",     TRUE,     "[A-Za-z0-9]+",  14
+    "mod",           "mod",     TRUE,     "[A-Za-z0-9]+",  14,
+    "hemi",          "hemi",    TRUE,     "[LR]",          15
   )
   
   kinds <- tibble::tribble(
@@ -203,6 +204,12 @@ anatprepspec <- function() {
     "pial.R.surf", ".gii",
     "smoothwm.L.surf", ".gii",
     "smoothwm.R.surf", ".gii",
+    "white.L.surf",    ".gii",
+    "white.R.surf",    ".gii",
+    "sphere.L.surf",   ".gii",
+    "sphere.R.surf",   ".gii",
+    "spherereg.L.surf", ".gii",
+    "spherereg.R.surf", ".gii",
     "roi",         list(".nii.gz", ".nii", ".json"),
     "affine",      ".txt"
   )

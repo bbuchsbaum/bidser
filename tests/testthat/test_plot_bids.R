@@ -3,6 +3,13 @@ context("plot_bids and bids_heatmap")
 library(testthat)
 library(bidser)
 
+# Skip all tests if required plotting packages are not available
+skip_if_not_installed("ggplot2")
+skip_if_not_installed("plotly")
+skip_if_not_installed("viridis")
+skip_if_not_installed("scales")
+skip_if_not_installed("patchwork")
+
 # Load plotting packages required for tests
 library(ggplot2)
 library(plotly)

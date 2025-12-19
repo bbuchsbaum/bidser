@@ -738,12 +738,234 @@ anomalies <- function(x, ...) {
 }
 
 #' Get data matrix from dataset
-#' 
+#'
 #' Extract data matrix from various dataset types
-#' 
+#'
 #' @param x the dataset object
 #' @param ... extra args
 #' @noRd
 get_data_matrix <- function(x, ...) {
   UseMethod("get_data_matrix")
+}
+
+
+#' Query Transform Files from a BIDS Project
+#'
+#' Retrieves paths to transformation files (xfm, warp, affine) from a BIDS project,
+#' optionally filtered by source and target coordinate space. Transform files are
+#' typically found in fMRIPrep derivatives and encode spatial transformations
+#' between different coordinate spaces (e.g., T1w to MNI, boldref to T1w).
+#'
+#' @param x A `bids_project` or `mock_bids_project` object.
+#' @param subid Regex pattern to match subject IDs (without "sub-" prefix).
+#'   Default `".*"` matches all subjects.
+#' @param session Regex pattern to match session IDs (without "ses-" prefix).
+#'   Default `".*"` matches all sessions.
+#' @param from Regex pattern to match source space (the "from" BIDS entity).
+#'   Common values: "T1w", "boldref", "fsnative". Default `".*"` matches all.
+#' @param to Regex pattern to match target space (the "to" BIDS entity).
+#'   Common values: "MNI152NLin2009cAsym", "T1w", "fsnative". Default `".*"` matches all.
+#' @param mode Regex pattern to match transform mode entity. Default `".*"`.
+#' @param kind Transform type: `"xfm"`, `"warp"`, `"affine"`, or `".*"` for all types.
+#'   Default `".*"` matches all transform types.
+#' @param full_path Logical. If `TRUE` (default), return absolute file paths.
+#'   If `FALSE`, return paths relative to project root.
+#' @param ... Additional arguments passed to `search_files`.
+#'
+#' @return Character vector of file paths matching the criteria, or `NULL` if
+#'   no matching files are found.
+#'
+#' @export
+#' @rdname transform_files
+#' @examples
+#' \donttest{
+#' # Get all transform files
+#' tryCatch({
+#'   ds_path <- get_example_bids_dataset("ds000001-fmriprep")
+#'   proj <- bids_project(ds_path, fmriprep = TRUE)
+#'
+#'   # All transforms
+#'   all_xfms <- transform_files(proj)
+#'
+#'   # Transforms from T1w to MNI space
+#'   t1_to_mni <- transform_files(proj, from = "T1w", to = "MNI152")
+#'
+#'   # All transforms for a specific subject
+#'   sub01_xfms <- transform_files(proj, subid = "01")
+#'
+#'   # Clean up
+#'   unlink(ds_path, recursive = TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
+transform_files <- function(x, subid = ".*", session = ".*", from = ".*",
+                            to = ".*", mode = ".*", kind = ".*",
+                            full_path = TRUE, ...) {
+  UseMethod("transform_files")
+}
+
+
+#' Query Surface Files from a BIDS Project
+#'
+#' Retrieves paths to surface mesh files (GIFTI format, .gii) from a BIDS project,
+#' optionally filtered by hemisphere and surface type. Surface files are typically
+#' found in fMRIPrep derivatives and represent cortical surface reconstructions
+#' in various coordinate spaces.
+#'
+#' @param x A `bids_project` or `mock_bids_project` object.
+#' @param subid Regex pattern to match subject IDs (without "sub-" prefix).
+#'   Default `".*"` matches all subjects.
+#' @param session Regex pattern to match session IDs (without "ses-" prefix).
+#'   Default `".*"` matches all sessions.
+#' @param hemi Hemisphere filter: `"L"` for left, `"R"` for right, or `".*"` for both.
+#'   Default `".*"` matches both hemispheres.
+#' @param surf_type Surface type filter: `"pial"`, `"inflated"`, `"midthickness"`,
+#'   `"smoothwm"`, `"white"`, `"sphere"`, `"spherereg"`, or `".*"` for all types.
+#'   Default `".*"` matches all surface types.
+#' @param space Regex pattern to match coordinate space (e.g., `"fsnative"`, `"fsaverage"`).
+#'   Default `".*"` matches all spaces.
+#' @param full_path Logical. If `TRUE` (default), return absolute file paths.
+#'   If `FALSE`, return paths relative to project root.
+#' @param ... Additional arguments passed to `search_files`.
+#'
+#' @return Character vector of file paths matching the criteria, or `NULL` if
+#'   no matching files are found.
+#'
+#' @export
+#' @rdname surface_files
+#' @examples
+#' \donttest{
+#' # Get all surface files
+#' tryCatch({
+#'   ds_path <- get_example_bids_dataset("ds000001-fmriprep")
+#'   proj <- bids_project(ds_path, fmriprep = TRUE)
+#'
+#'   # All surfaces
+#'   all_surfs <- surface_files(proj)
+#'
+#'   # Left hemisphere pial surfaces only
+#'   left_pial <- surface_files(proj, hemi = "L", surf_type = "pial")
+#'
+#'   # All surfaces in fsnative space
+#'   fsnative_surfs <- surface_files(proj, space = "fsnative")
+#'
+#'   # Clean up
+#'   unlink(ds_path, recursive = TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
+surface_files <- function(x, subid = ".*", session = ".*", hemi = ".*",
+                          surf_type = ".*", space = ".*", full_path = TRUE, ...) {
+  UseMethod("surface_files")
+}
+
+
+#' Query Mask Files from a BIDS Project
+#'
+#' Retrieves paths to brain mask files from a BIDS project, optionally filtered
+#' by subject, session, and coordinate space. Mask files are typically found in
+#' fMRIPrep derivatives and include brain masks and tissue segmentation masks.
+#'
+#' @param x A `bids_project` or `mock_bids_project` object.
+#' @param subid Regex pattern to match subject IDs (without "sub-" prefix).
+#'   Default `".*"` matches all subjects.
+#' @param session Regex pattern to match session IDs (without "ses-" prefix).
+#'   Default `".*"` matches all sessions.
+#' @param space Regex pattern to match coordinate space (e.g., `"MNI152NLin2009cAsym"`, `"T1w"`).
+#'   Default `".*"` matches all spaces.
+#' @param full_path Logical. If `TRUE` (default), return absolute file paths.
+#'   If `FALSE`, return paths relative to project root.
+#' @param ... Additional arguments passed to `search_files`.
+#'
+#' @return Character vector of file paths matching the criteria, or `NULL` if
+#'   no matching files are found.
+#'
+#' @export
+#' @rdname mask_files
+#' @examples
+#' \donttest{
+#' # Get all mask files
+#' tryCatch({
+#'   ds_path <- get_example_bids_dataset("ds000001-fmriprep")
+#'   proj <- bids_project(ds_path, fmriprep = TRUE)
+#'
+#'   # All masks
+#'   all_masks <- mask_files(proj)
+#'
+#'   # Masks in MNI space
+#'   mni_masks <- mask_files(proj, space = "MNI152")
+#'
+#'   # Masks for specific subject
+#'   sub01_masks <- mask_files(proj, subid = "01")
+#'
+#'   # Clean up
+#'   unlink(ds_path, recursive = TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
+mask_files <- function(x, subid = ".*", session = ".*", space = ".*",
+                       full_path = TRUE, ...) {
+  UseMethod("mask_files")
+}
+
+
+#' Build Subject Graph Structure
+#'
+#' Creates a structured list or tibble containing all available data for a single
+#' subject, organized by data type. This provides a comprehensive view of all
+#' available files for a subject, useful for batch processing and pipeline ingestion.
+#'
+#' @param x A `bids_project` or `mock_bids_project` object.
+#' @param subid Subject identifier (with or without `sub-` prefix).
+#' @param session Optional session filter. Default `".*"` matches all sessions.
+#' @param flatten Logical. If `FALSE` (default), return a nested list structure.
+#'   If `TRUE`, return a flat tibble with columns for file_type and metadata.
+#' @param ... Additional arguments passed to underlying query functions.
+#'
+#' @return If `flatten = FALSE` (default), a named list with class `bids_subject_graph`:
+#'   \describe{
+#'     \item{subid}{Subject identifier (without "sub-" prefix)}
+#'     \item{sessions}{Character vector of available sessions}
+#'     \item{epi}{Named list of preprocessed EPI file paths, keyed by task.run}
+#'     \item{anat}{List with t1w and masks sublists}
+#'     \item{transforms}{Named list of transform files, keyed by from_to_to format}
+#'     \item{surfaces}{Nested list by space, then hemisphere (L/R)}
+#'     \item{confounds}{Character vector of confound file paths}
+#'   }
+#'
+#'   If `flatten = TRUE`, a tibble with columns:
+#'   \describe{
+#'     \item{file_type}{Type of file (epi, anat, transform, surface, confound)}
+#'     \item{path}{File path}
+#'     \item{subid, session, task, run, space, hemi, from, to}{BIDS metadata}
+#'   }
+#'
+#' @export
+#' @rdname build_subject_graph
+#' @examples
+#' \donttest{
+#' # Build subject graph
+#' tryCatch({
+#'   ds_path <- get_example_bids_dataset("ds000001-fmriprep")
+#'   proj <- bids_project(ds_path, fmriprep = TRUE)
+#'
+#'   # Get nested structure
+#'   graph <- build_subject_graph(proj, "01")
+#'   names(graph)
+#'
+#'   # Get flat tibble
+#'   flat <- build_subject_graph(proj, "01", flatten = TRUE)
+#'   head(flat)
+#'
+#'   # Clean up
+#'   unlink(ds_path, recursive = TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
+build_subject_graph <- function(x, subid, session = ".*", flatten = FALSE, ...) {
+  UseMethod("build_subject_graph")
 }

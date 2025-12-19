@@ -31,7 +31,10 @@ the filename, the run value defaults to "1".}
 
 \item{cvars}{The names of the confound variables to select. Defaults to \code{DEFAULT_CVARS}.
 Canonical names such as \code{"csf"} are automatically mapped to any
-matching column names found in the dataset using \code{CVARS_ALIASES}.}
+matching column names found in the dataset using \code{CVARS_ALIASES}.
+You can also pass convenience sets from \code{confound_set()}, e.g.,
+\code{confound_set("motion24")}, or wildcard patterns like
+\code{"cosine_*"}, \code{"motion_outlier_*"}, or \code{"a_comp_cor_*[6]"}.}
 
 \item{npcs}{Perform PCA reduction on confounds and return \code{npcs} PCs.}
 
@@ -56,6 +59,10 @@ tryCatch({
   
   # Read confounds with canonical names (automatically resolve to actual columns)
   conf <- read_confounds(proj, cvars = c("csf", "framewise_displacement"))
+
+  # Use convenience sets
+  conf_36p <- read_confounds(proj, cvars = confound_set("36p"))
+  conf_compcor6 <- read_confounds(proj, cvars = confound_set("acompcor", n = 6))
   
   # Read confounds for specific subjects and tasks
   conf_sub <- read_confounds(proj, subid="01", task="balloonanalogrisktask")

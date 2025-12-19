@@ -43,7 +43,12 @@ Set this to something else if you need a different modality.}
 \item{full_path}{If TRUE, return full file paths. Otherwise return relative paths.
 Default is FALSE.}
 
-\item{...}{Additional arguments passed to internal functions.}
+\item{...}{Additional key-value filters for BIDS entities. These are matched
+against parsed file entities in the derivatives tree. Common examples:
+\code{space = "MNI152NLin2009cAsym"}, \code{res = "2"}, \code{acq = "ap"}, \code{echo = "1"}.
+Values are treated as regex. Keys already covered by explicit arguments
+(\code{subid}, \code{task}, \code{run}, \code{session}, \code{space}, \code{variant}, \code{modality}, \code{kind})
+are ignored in \code{...}.}
 }
 \value{
 A character vector of file paths to preprocessed scans matching the criteria.
@@ -90,6 +95,9 @@ tryCatch({
                                  task="phoneme",
                                  run="01",
                                  space="MNI152NLin2009cAsym")
+  
+  # Filter by resolution (BIDS entity 'res')
+  res2_scans <- preproc_scans(proj, res = "2")
   
   # Clean up
   unlink(ds_path, recursive=TRUE)

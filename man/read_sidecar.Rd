@@ -26,7 +26,8 @@ read_sidecar(
 
 \item{session}{A regex for matching sessions. Default is \code{".*"}.}
 
-\item{modality}{A regex for matching modality (e.g. "bold"). Default is \code{"bold"}.}
+\item{modality}{A regex for matching modality/kind (e.g. "bold"). Default is \code{"bold"}.
+This is matched against the 'kind' field in parsed BIDS filenames.}
 
 \item{full_path}{If TRUE, return full file paths in the \code{file} column. Default is TRUE.}
 

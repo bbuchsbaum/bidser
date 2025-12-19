@@ -10,7 +10,8 @@
 #' @param task A regex for matching tasks. Default is `".*"`.
 #' @param run A regex for matching runs. Default is `".*"`.
 #' @param session A regex for matching sessions. Default is `".*"`.
-#' @param modality A regex for matching modality (e.g. "bold"). Default is `"bold"`.
+#' @param modality A regex for matching modality/kind (e.g. "bold"). Default is `"bold"`.
+#'   This is matched against the 'kind' field in parsed BIDS filenames.
 #' @param full_path If TRUE, return full file paths in the `file` column. Default is TRUE.
 #' @param ... Additional arguments passed to `search_files()`.
 #'
@@ -56,8 +57,11 @@
 read_sidecar <- function(x, subid=".*", task=".*", run=".*", session=".*", modality="bold", full_path=TRUE, ...) {
   # Find all JSON sidecar files (assumed to end with .json)
   # and match given criteria:
+  # Note: We use 'kind' instead of 'modality' because the BIDS parser stores
+
+  # the modality component (e.g. "bold") in the 'kind' field for JSON files
   json_files <- search_files(x, regex="\\.json$", full_path=full_path, strict=TRUE,
-                             subid=subid, task=task, run=run, session=session, modality=modality, ...)
+                             subid=subid, task=task, run=run, session=session, kind=modality, ...)
   
   if (is.null(json_files) || length(json_files) == 0) {
     message("No matching JSON sidecar files found.")
@@ -190,7 +194,7 @@ get_repetition_time <- function(x, subid, task, run=".*", session=".*", ...) {
 #' (BIDS-compliant). If that is not available, it falls back to computing TR as
 #' the median difference of `VolumeTiming` (if present). Optionally, when the
 #' sidecar cannot be found or is missing both fields, the function attempts to
-#' read TR from the NIfTI header (pixdim[4]) if an appropriate reader is
+#' read TR from the NIfTI header (pixdim\[4\]) if an appropriate reader is
 #' installed.
 #'
 #' For NIfTI inputs, the JSON sidecar is resolved by replacing the

@@ -1515,3 +1515,366 @@ clear_example_bids_cache <- function() {
   }
   invisible(NULL)
 }
+
+
+#' @export
+#' @rdname transform_files
+transform_files.bids_project <- function(x, subid = ".*", session = ".*",
+                                         from = ".*", to = ".*", mode = ".*",
+                                         kind = ".*", full_path = TRUE, ...) {
+  # Match transform file extensions
+
+  transform_regex <- "\\.(h5|txt)$"
+
+  # Build the search parameters
+  search_params <- list(
+    x = x,
+    regex = transform_regex,
+    subid = subid,
+    session = session,
+    full_path = full_path,
+    strict = FALSE
+  )
+
+
+  # Add optional entity filters if they are not wildcards
+  if (from != ".*") search_params$from <- from
+  if (to != ".*") search_params$to <- to
+  if (mode != ".*") search_params$mode <- mode
+
+  # Execute search
+  results <- do.call(search_files, c(search_params, list(...)))
+
+  # Post-filter by kind if specified (xfm, warp, affine)
+  if (!is.null(results) && kind != ".*") {
+    kind_pattern <- paste0("_", kind, "\\.(h5|txt)$")
+    results <- results[stringr::str_detect(basename(results), kind_pattern)]
+  }
+
+  if (length(results) == 0) NULL else results
+}
+
+
+#' @export
+#' @rdname surface_files
+surface_files.bids_project <- function(x, subid = ".*", session = ".*",
+                                       hemi = ".*", surf_type = ".*",
+                                       space = ".*", full_path = TRUE, ...) {
+  # Match GIFTI surface files
+  surface_regex <- "\\.surf\\.gii$"
+
+  # Build the search parameters
+  search_params <- list(
+    x = x,
+    regex = surface_regex,
+    subid = subid,
+    session = session,
+    full_path = full_path,
+    strict = FALSE
+  )
+
+  # Add space filter if not wildcard
+  if (space != ".*") search_params$space <- space
+
+  # Add hemi entity filter if not wildcard (for files with hemi-L/R entity)
+  if (hemi != ".*") search_params$hemi <- toupper(hemi)
+
+  # Execute search
+  results <- do.call(search_files, c(search_params, list(...)))
+
+  # Post-filter by surf_type and hemi in filename (for legacy files without hemi entity)
+  if (!is.null(results) && (surf_type != ".*" || hemi != ".*")) {
+    hemi_pattern <- if (hemi == ".*") "[LR]" else toupper(hemi)
+    surf_pattern <- if (surf_type == ".*") "[a-zA-Z]+" else surf_type
+
+    # Pattern matches _surftype.H.surf.gii format
+    pattern <- paste0("_", surf_pattern, "\\.", hemi_pattern, "\\.surf\\.gii$")
+    results <- results[stringr::str_detect(basename(results), pattern)]
+  }
+
+  if (length(results) == 0) NULL else results
+}
+
+
+#' @export
+#' @rdname mask_files
+mask_files.bids_project <- function(x, subid = ".*", session = ".*",
+                                    space = ".*", full_path = TRUE, ...) {
+  # Match NIfTI mask files
+  mask_regex <- "\\.nii(\\.gz)?$"
+
+  # Build the search parameters
+  search_params <- list(
+    x = x,
+    regex = mask_regex,
+    subid = subid,
+    session = session,
+    full_path = full_path,
+    strict = FALSE
+  )
+
+  # Add space filter if not wildcard
+  if (space != ".*") search_params$space <- space
+
+  # Execute search with kind filter for masks
+  results <- do.call(search_files, c(search_params, list(...)))
+
+  # Post-filter for mask/brainmask kinds
+  if (!is.null(results)) {
+    mask_pattern <- "_(mask|brainmask)\\."
+    results <- results[stringr::str_detect(basename(results), mask_pattern)]
+  }
+
+  if (length(results) == 0) NULL else results
+}
+
+
+#' @export
+#' @rdname build_subject_graph
+build_subject_graph.bids_project <- function(x, subid, session = ".*",
+                                             flatten = FALSE, ...) {
+  # Normalize subject ID (remove sub- prefix if present)
+  plain_subid <- stringr::str_remove(as.character(subid), "^sub-")
+
+  # Validate subject exists
+  if (!(plain_subid %in% participants(x))) {
+    stop("Subject not found: ", plain_subid)
+  }
+
+  # Get sessions for this subject
+  subj_sessions <- character()
+  if (x$has_sessions) {
+    all_files <- search_files(x, subid = plain_subid, full_path = FALSE)
+    if (!is.null(all_files)) {
+      ses_matches <- stringr::str_extract(all_files, "ses-[A-Za-z0-9]+")
+      subj_sessions <- unique(stats::na.omit(stringr::str_remove(ses_matches, "^ses-")))
+    }
+  }
+
+  # Get EPI files organized by task.run
+  epi_files <- preproc_scans(x, subid = plain_subid, session = session,
+                             full_path = TRUE, ...)
+  epi_list <- list()
+  if (!is.null(epi_files) && length(epi_files) > 0) {
+    epi_df <- tibble::tibble(path = epi_files)
+    epi_df$task <- stringr::str_extract(basename(epi_files), "(?<=task-)[A-Za-z0-9]+")
+    epi_df$run <- stringr::str_extract(basename(epi_files), "(?<=run-)[0-9]+")
+    epi_df$run[is.na(epi_df$run)] <- "01"
+    epi_df$key <- paste(epi_df$task, epi_df$run, sep = ".")
+    epi_list <- split(epi_df$path, epi_df$key)
+    epi_list <- lapply(epi_list, unlist, use.names = FALSE)
+  }
+
+  # Get T1w files
+  t1w_files <- search_files(x, subid = plain_subid, kind = "T1w",
+                            regex = "\\.nii(\\.gz)?$", full_path = TRUE, ...)
+  if (is.null(t1w_files)) t1w_files <- character()
+
+  # Get mask files
+  mask_list <- mask_files(x, subid = plain_subid, session = session,
+                          full_path = TRUE, ...)
+  if (is.null(mask_list)) mask_list <- character()
+
+  # Get transform files organized by from_to key
+  xfm_files <- transform_files(x, subid = plain_subid, session = session,
+                               full_path = TRUE, ...)
+  transforms_list <- list()
+  if (!is.null(xfm_files) && length(xfm_files) > 0) {
+    xfm_df <- tibble::tibble(path = xfm_files)
+    xfm_df$from <- stringr::str_extract(basename(xfm_files), "(?<=from-)[A-Za-z0-9]+")
+    xfm_df$to <- stringr::str_extract(basename(xfm_files), "(?<=to-)[A-Za-z0-9]+")
+    xfm_df$key <- paste(xfm_df$from, "to", xfm_df$to, sep = "_")
+    xfm_df$key[is.na(xfm_df$from) | is.na(xfm_df$to)] <- "unknown"
+    transforms_list <- split(xfm_df$path, xfm_df$key)
+    transforms_list <- lapply(transforms_list, unlist, use.names = FALSE)
+  }
+
+  # Get surface files organized by space then hemisphere
+  surf_files <- surface_files(x, subid = plain_subid, session = session,
+                              full_path = TRUE, ...)
+  surfaces_list <- list()
+  if (!is.null(surf_files) && length(surf_files) > 0) {
+    surf_df <- tibble::tibble(path = surf_files)
+    surf_df$space <- stringr::str_extract(basename(surf_files), "(?<=space-)[A-Za-z0-9]+")
+    surf_df$space[is.na(surf_df$space)] <- "unknown"
+    # Extract hemisphere from filename (e.g., pial.L.surf.gii -> L)
+    surf_df$hemi <- stringr::str_extract(basename(surf_files), "\\.[LR]\\.surf\\.gii$")
+    surf_df$hemi <- stringr::str_extract(surf_df$hemi, "[LR]")
+    surf_df$hemi[is.na(surf_df$hemi)] <- "unknown"
+
+    by_space <- split(surf_df, surf_df$space)
+    surfaces_list <- lapply(by_space, function(sp_df) {
+      by_hemi <- split(sp_df$path, sp_df$hemi)
+      lapply(by_hemi, unlist, use.names = FALSE)
+    })
+  }
+
+  # Get confound files
+  conf_files <- confound_files(x, subid = plain_subid, session = session,
+                               full_path = TRUE, ...)
+  if (is.null(conf_files)) conf_files <- character()
+
+  # Build the nested structure
+  graph <- structure(
+    list(
+      subid = plain_subid,
+      sessions = subj_sessions,
+      epi = epi_list,
+      anat = list(t1w = t1w_files, masks = mask_list),
+      transforms = transforms_list,
+      surfaces = surfaces_list,
+      confounds = conf_files
+    ),
+    class = c("bids_subject_graph", "list")
+  )
+
+  # Return flat tibble if requested
+  if (flatten) {
+    return(.flatten_subject_graph(graph))
+  }
+
+  graph
+}
+
+
+#' Flatten a bids_subject_graph to a tibble
+#' @param graph A bids_subject_graph object
+#' @return A tibble with file_type, path, and metadata columns
+#' @keywords internal
+#' @noRd
+.flatten_subject_graph <- function(graph) {
+  rows <- list()
+
+  # Add EPI files
+  if (length(graph$epi) > 0) {
+    for (key in names(graph$epi)) {
+      parts <- strsplit(key, "\\.")[[1]]
+      task <- parts[1]
+      run <- if (length(parts) > 1) parts[2] else NA_character_
+      for (path in graph$epi[[key]]) {
+        rows <- c(rows, list(tibble::tibble(
+          file_type = "epi",
+          path = path,
+          subid = graph$subid,
+          session = NA_character_,
+          task = task,
+          run = run,
+          space = stringr::str_extract(basename(path), "(?<=space-)[A-Za-z0-9]+"),
+          hemi = NA_character_,
+          from = NA_character_,
+          to = NA_character_
+        )))
+      }
+    }
+  }
+
+  # Add T1w files
+  for (path in graph$anat$t1w) {
+    rows <- c(rows, list(tibble::tibble(
+      file_type = "anat",
+      path = path,
+      subid = graph$subid,
+      session = NA_character_,
+      task = NA_character_,
+      run = NA_character_,
+      space = stringr::str_extract(basename(path), "(?<=space-)[A-Za-z0-9]+"),
+      hemi = NA_character_,
+      from = NA_character_,
+      to = NA_character_
+    )))
+  }
+
+  # Add mask files
+  for (path in graph$anat$masks) {
+    rows <- c(rows, list(tibble::tibble(
+      file_type = "mask",
+      path = path,
+      subid = graph$subid,
+      session = NA_character_,
+      task = NA_character_,
+      run = NA_character_,
+      space = stringr::str_extract(basename(path), "(?<=space-)[A-Za-z0-9]+"),
+      hemi = NA_character_,
+      from = NA_character_,
+      to = NA_character_
+    )))
+  }
+
+  # Add transform files
+  if (length(graph$transforms) > 0) {
+    for (key in names(graph$transforms)) {
+      parts <- strsplit(key, "_to_")[[1]]
+      from_space <- parts[1]
+      to_space <- if (length(parts) > 1) parts[2] else NA_character_
+      for (path in graph$transforms[[key]]) {
+        rows <- c(rows, list(tibble::tibble(
+          file_type = "transform",
+          path = path,
+          subid = graph$subid,
+          session = NA_character_,
+          task = NA_character_,
+          run = NA_character_,
+          space = NA_character_,
+          hemi = NA_character_,
+          from = from_space,
+          to = to_space
+        )))
+      }
+    }
+  }
+
+  # Add surface files
+  if (length(graph$surfaces) > 0) {
+    for (space in names(graph$surfaces)) {
+      for (hemi in names(graph$surfaces[[space]])) {
+        for (path in graph$surfaces[[space]][[hemi]]) {
+          rows <- c(rows, list(tibble::tibble(
+            file_type = "surface",
+            path = path,
+            subid = graph$subid,
+            session = NA_character_,
+            task = NA_character_,
+            run = NA_character_,
+            space = space,
+            hemi = hemi,
+            from = NA_character_,
+            to = NA_character_
+          )))
+        }
+      }
+    }
+  }
+
+  # Add confound files
+  for (path in graph$confounds) {
+    rows <- c(rows, list(tibble::tibble(
+      file_type = "confound",
+      path = path,
+      subid = graph$subid,
+      session = NA_character_,
+      task = stringr::str_extract(basename(path), "(?<=task-)[A-Za-z0-9]+"),
+      run = stringr::str_extract(basename(path), "(?<=run-)[0-9]+"),
+      space = NA_character_,
+      hemi = NA_character_,
+      from = NA_character_,
+      to = NA_character_
+    )))
+  }
+
+  if (length(rows) == 0) {
+    return(tibble::tibble(
+      file_type = character(),
+      path = character(),
+      subid = character(),
+      session = character(),
+      task = character(),
+      run = character(),
+      space = character(),
+      hemi = character(),
+      from = character(),
+      to = character()
+    ))
+  }
+
+  dplyr::bind_rows(rows)
+}
