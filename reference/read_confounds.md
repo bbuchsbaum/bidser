@@ -43,11 +43,13 @@ read_confounds(x, ...)
 
 ## Value
 
-A tibble containing confound data. If `nest=TRUE` (default), returns a
-nested tibble with columns for subject, task, session, run, and a nested
-`data` column containing the confound variables. If `nest=FALSE`,
-returns a flat tibble with all confound variables. Returns NULL if no
-matching files are found.
+A `bids_confounds` tibble containing confound data. If `nest=TRUE`
+(default), returns a nested tibble with columns for subject, task,
+session, run, and a nested `data` column containing the confound
+variables. If `nest=FALSE`, returns a flat tibble with all confound
+variables. When PCA is requested, the object includes a `pca` attribute
+with loadings/variance for plotting. Returns NULL if no matching files
+are found.
 
 ## Examples
 

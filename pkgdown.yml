@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   quickstart: quickstart.html
-last_built: 2025-12-19T18:02Z
+last_built: 2025-12-19T19:33Z
 urls:
   reference: https://bbuchsbaum.github.io/bidser/reference
   article: https://bbuchsbaum.github.io/bidser/articles

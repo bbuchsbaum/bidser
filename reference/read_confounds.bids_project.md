@@ -71,9 +71,10 @@ read_confounds(
 
 ## Value
 
-A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of
-confounds, with identifier columns for participant_id, task, session,
-and run.
+A `bids_confounds` tibble (nested if nest=TRUE) with identifier columns
+for participant_id, task, session, and run. When PCA is requested, the
+object includes a `pca` attribute with per-run loadings and variance
+used for plotting.
 
 ## Examples
 

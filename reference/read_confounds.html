@@ -79,10 +79,12 @@ and return either nested or flat tibbles.</p>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble containing confound data. If <code>nest=TRUE</code> (default), returns a
-nested tibble with columns for subject, task, session, run, and a nested <code>data</code> column
-containing the confound variables. If <code>nest=FALSE</code>, returns a flat tibble with
-all confound variables. Returns NULL if no matching files are found.</p>
+    <p>A <code>bids_confounds</code> tibble containing confound data. If <code>nest=TRUE</code>
+(default), returns a nested tibble with columns for subject, task, session,
+run, and a nested <code>data</code> column containing the confound variables. If
+<code>nest=FALSE</code>, returns a flat tibble with all confound variables. When
+PCA is requested, the object includes a <code>pca</code> attribute with
+loadings/variance for plotting. Returns NULL if no matching files are found.</p>
     </div>
 
     <div class="section level2">

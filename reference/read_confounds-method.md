@@ -48,11 +48,11 @@ read_confounds(
 
 - npcs:
 
-  PCA components (ignored in mock).
+  PCA components (applied when requested).
 
 - perc_var:
 
-  PCA variance (ignored in mock).
+  PCA variance (applied when requested).
 
 - nest:
 
@@ -65,4 +65,4 @@ read_confounds(
 
 ## Value
 
-A tibble of confound data (nested if `nest = TRUE`).
+A `bids_confounds` tibble of confound data (nested if `nest = TRUE`).

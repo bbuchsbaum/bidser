@@ -107,6 +107,8 @@ See <https://bbuchsbaum.github.io/bidser/articles/quickstart.html>
   : Get participants from a BIDS project
 - [`participants(`*`<mock_bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/participants.mock_bids_project.md)
   : Get Participants from Mock BIDS Project
+- [`plot(`*`<bids_confounds>`*`)`](https://bbuchsbaum.github.io/bidser/reference/plot.bids_confounds.md)
+  : Plot PCA confounds
 - [`plot(`*`<bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/plot.bids_project.md)
   [`plot(`*`<mock_bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/plot.bids_project.md)
   : Plot a BIDS project as a dendrogram

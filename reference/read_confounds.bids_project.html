@@ -109,8 +109,10 @@ You can also pass convenience sets from <code><a href="confound_set.html">confou
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds, with
-identifier columns for participant_id, task, session, and run.</p>
+    <p>A <code>bids_confounds</code> tibble (nested if nest=TRUE) with identifier columns
+for participant_id, task, session, and run. When PCA is requested, the
+object includes a <code>pca</code> attribute with per-run loadings and variance
+used for plotting.</p>
     </div>
 
     <div class="section level2">
