@@ -1498,11 +1498,11 @@ confound_files.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 #' @param session Regex pattern for session IDs. Default `".*"`.
 #' @param run Regex pattern for run indices. Default `".*"`.
 #' @param cvars Variables to select (ignored in mock).
-#' @param npcs PCA components (ignored in mock).
-#' @param perc_var PCA variance (ignored in mock).
+#' @param npcs PCA components (applied when requested).
+#' @param perc_var PCA variance (applied when requested).
 #' @param nest If `TRUE`, returns a nested tibble keyed by subject, task, session and run.
 #' @param ... Additional BIDS entities (passed to `search_files`).
-#' @return A tibble of confound data (nested if `nest = TRUE`).
+#' @return A `bids_confounds` tibble of confound data (nested if `nest = TRUE`).
 #' @rdname read_confounds-method
 #' @export
 read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", session = ".*", run = ".*",
@@ -1513,13 +1513,17 @@ read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
                                                  full_path = FALSE, ...)
 
   if (is.null(conf_paths) || length(conf_paths) == 0) {
-    return(tibble::tibble(
+    out <- tibble::tibble(
       .subid = character(), .task = character(), .run = character(),
       .session = character(), data = list()
-    ))
+    )
+    class(out) <- c("bids_confounds", class(out))
+    attr(out, "pca") <- NULL
+    return(out)
   }
 
   all_conf <- list()
+  all_pca <- list()
   for (rel_path in conf_paths) {
     if (rel_path %in% names(x$confound_data_store)) {
       conf_df <- x$confound_data_store[[rel_path]]
@@ -1550,18 +1554,43 @@ read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
                    .desc = NA_character_)
     }
 
+    pca_row <- NULL
+    if ((npcs > 0 || perc_var > 0) && ncol(conf_df) > 1) {
+      proc <- process_confounds(conf_df, npcs=npcs, perc_var=perc_var, return_pca=TRUE)
+      conf_df <- proc$scores
+      if (!is.null(proc$pca)) {
+        pca_row <- tibble::tibble(
+          .subid = meta$.subid,
+          .task = meta$.task,
+          .run = meta$.run,
+          .session = meta$.session,
+          .desc = meta$.desc,
+          pca = list(proc$pca)
+        )
+      }
+    }
+
     combined_df <- dplyr::bind_cols(tibble::as_tibble(meta), tibble::as_tibble(conf_df))
     all_conf[[rel_path]] <- combined_df
+    if (!is.null(pca_row)) {
+      all_pca[[rel_path]] <- pca_row
+    }
   }
 
   final_df <- dplyr::bind_rows(all_conf)
+  pca_meta <- if (length(all_pca) > 0) dplyr::bind_rows(all_pca) else NULL
 
   if (!nest) {
+    class(final_df) <- c("bids_confounds", class(final_df))
+    attr(final_df, "pca") <- pca_meta
     return(final_df)
   }
 
   grouping_vars <- intersect(c(".subid", ".task", ".run", ".session", ".desc"), names(final_df))
-  final_df %>% dplyr::group_by(!!!rlang::syms(grouping_vars)) %>% tidyr::nest()
+  out <- final_df %>% dplyr::group_by(!!!rlang::syms(grouping_vars)) %>% tidyr::nest()
+  class(out) <- c("bids_confounds", class(out))
+  attr(out, "pca") <- pca_meta
+  out
 }
 
 

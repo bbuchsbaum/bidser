@@ -34,9 +34,10 @@ test_that("valid confound file is read and nested", {
   setup <- create_confounds_proj()
   on.exit(unlink(setup$path, recursive = TRUE, force = TRUE), add = TRUE)
   conf <- read_confounds(setup$proj)
+  expect_s3_class(conf, "bids_confounds")
   expect_s3_class(conf, "tbl_df")
   expect_equal(nrow(conf), 1)
-  expect_equal(names(conf), c("participant_id", "run", "session", "data"))
+  expect_true(all(c("participant_id", "task", "run", "session", "data") %in% names(conf)))
   expect_equal(nrow(conf$data[[1]]), 3)
 })
 
@@ -55,6 +56,7 @@ test_that("PCA reduction works and flat output returned", {
   flat <- read_confounds(setup$proj, npcs = 2, nest = FALSE)
   expect_true(all(c("PC1", "PC2") %in% names(flat)))
   expect_equal(nrow(flat), 3)
+  expect_false(is.null(attr(flat, "pca")))
 })
 
 
@@ -63,7 +65,7 @@ test_that("nest=FALSE returns flat tibble", {
   on.exit(unlink(setup$path, recursive = TRUE, force = TRUE), add = TRUE)
   flat <- read_confounds(setup$proj, nest = FALSE)
   expect_equal(nrow(flat), 3)
-  expect_true(all(c("participant_id", "run", "session") %in% names(flat)))
+  expect_true(all(c("participant_id", "task", "run", "session") %in% names(flat)))
 })
 
 test_that("canonical names resolve to dataset columns", {

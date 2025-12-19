@@ -490,8 +490,10 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #' @importFrom readr read_tsv
 #' @importFrom tidyr nest
 #' @importFrom tidyselect any_of
-#' @return A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds,
-#'   with identifier columns for participant_id, task, session, and run.
+#' @return A `bids_confounds` tibble (nested if nest=TRUE) with identifier columns
+#'   for participant_id, task, session, and run. When PCA is requested, the
+#'   object includes a `pca` attribute with per-run loadings and variance used
+#'   by `plot()`.
 #' @examples
 #' \donttest{
 #' # Try to load a BIDS project with fMRIPrep derivatives
@@ -556,7 +558,7 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
     
     if (length(fnames) == 0) {
       # No confound files for this participant; return empty frame
-      return(data.frame())
+      return(list(data = data.frame(), pca = NULL))
     }
     
     # Process each confound file
@@ -597,40 +599,68 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
       dfx <- dfx %>% dplyr::select(any_of(sel_cvars))
       
       # Process confounds if PCA requested
+      pca_row <- NULL
       if ((npcs > 0 || perc_var > 0) && ncol(dfx) > 1) {
-        dfx <- process_confounds(dfx, npcs=npcs, perc_var=perc_var)
+        proc <- process_confounds(dfx, npcs=npcs, perc_var=perc_var, return_pca=TRUE)
+        dfx <- proc$scores
+        if (!is.null(proc$pca)) {
+          pca_row <- tibble::tibble(
+            participant_id = s,
+            task = task_val,
+            run = run_val,
+            session = sess_val,
+            pca = list(proc$pca)
+          )
+        }
       }
       
       # Add identifying columns
-      dfx %>%
-        mutate(participant_id=s, task=task_val, run=run_val, session=sess_val)
+      list(
+        data = dfx %>%
+          mutate(participant_id=s, task=task_val, run=run_val, session=sess_val),
+        pca = pca_row
+      )
     })
     
     # Filter out any NULL returns
     dflist <- dflist[!sapply(dflist, is.null)]
-    if (length(dflist) == 0) return(data.frame())
-    
-    dplyr::bind_rows(dflist)
+    if (length(dflist) == 0) return(list(data = data.frame(), pca = NULL))
+
+    data_list <- lapply(dflist, `[[`, "data")
+    pca_list <- lapply(dflist, `[[`, "pca")
+    data_list <- data_list[!sapply(data_list, is.null)]
+    pca_list <- pca_list[!sapply(pca_list, is.null)]
+
+    data_out <- dplyr::bind_rows(data_list)
+    pca_out <- if (length(pca_list) > 0) dplyr::bind_rows(pca_list) else NULL
+
+    list(data = data_out, pca = pca_out)
   })
   
-  ret <- ret[!sapply(ret, function(z) nrow(z)==0)]
+  ret <- ret[!sapply(ret, function(z) nrow(z$data)==0)]
   if (length(ret) == 0) {
     message("No confound data found for the given selection.")
     return(NULL)
   }
   
-  ret <- dplyr::bind_rows(ret)
-  
+  ret_data <- dplyr::bind_rows(lapply(ret, `[[`, "data"))
+  pca_list <- lapply(ret, `[[`, "pca")
+  pca_list <- pca_list[!sapply(pca_list, is.null)]
+  pca_meta <- if (length(pca_list) > 0) dplyr::bind_rows(pca_list) else NULL
+
   if (nest) {
-    ret %>% dplyr::group_by(participant_id, task, run, session) %>% tidyr::nest()
-  } else {
-    ret
+    ret_data <- ret_data %>% dplyr::group_by(participant_id, task, run, session) %>% tidyr::nest()
   }
+
+  class(ret_data) <- c("bids_confounds", class(ret_data))
+  attr(ret_data, "pca") <- pca_meta
+
+  ret_data
 }
 
 
 #' @keywords internal
-process_confounds <- function(dfx, center=TRUE, scale=TRUE, npcs=-1, perc_var=-1) {
+process_confounds <- function(dfx, center=TRUE, scale=TRUE, npcs=-1, perc_var=-1, return_pca=FALSE) {
   m <- as.matrix(dfx)
   # Impute NAs
   if (anyNA(m)) {
@@ -642,10 +672,12 @@ process_confounds <- function(dfx, center=TRUE, scale=TRUE, npcs=-1, perc_var=-1
   }
   
   sm <- scale(m, center=center, scale=scale)
+  pca <- NULL
   # If PCA requested
   if ((npcs > 0 || perc_var > 0) && ncol(sm) > 1) {
     pres <- prcomp(sm, scale.=FALSE)
-    varexp <- cumsum(pres$sdev^2)/sum(pres$sdev^2) * 100
+    var_pct <- pres$sdev^2 / sum(pres$sdev^2) * 100
+    varexp <- cumsum(var_pct)
     
     # Determine how many PCs to keep
     if (npcs > 0 && perc_var <= 0) {
@@ -663,9 +695,26 @@ process_confounds <- function(dfx, center=TRUE, scale=TRUE, npcs=-1, perc_var=-1
       keep_npcs <- max(1, keep_npcs) # at least 1 PC
     }
     
+    pc_names <- paste0("PC", seq_len(keep_npcs))
     sm <- pres$x[, 1:keep_npcs, drop=FALSE]
-    colnames(sm) <- paste0("PC", seq_len(ncol(sm)))
+    colnames(sm) <- pc_names
+    rotation <- pres$rotation[, 1:keep_npcs, drop=FALSE]
+    colnames(rotation) <- pc_names
+    variance <- var_pct[1:keep_npcs]
+    names(variance) <- pc_names
+
+    if (return_pca) {
+      pca <- list(
+        rotation = rotation,
+        variance = variance,
+        variance_cum = cumsum(variance)
+      )
+    }
   }
   
-  as.data.frame(sm)
+  sm <- as.data.frame(sm)
+  if (return_pca) {
+    return(list(scores = sm, pca = pca))
+  }
+  sm
 }

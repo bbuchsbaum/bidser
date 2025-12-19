@@ -347,10 +347,12 @@ read_events <- function(x, ...) {
 #'   - `perc_var`: Numeric. Perform PCA reduction to retain this percentage of variance
 #'   - `nest`: Logical. If TRUE, nests confound tables by subject/task/session/run (default: TRUE)
 #'
-#' @return A tibble containing confound data. If `nest=TRUE` (default), returns a
-#'   nested tibble with columns for subject, task, session, run, and a nested `data` column
-#'   containing the confound variables. If `nest=FALSE`, returns a flat tibble with
-#'   all confound variables. Returns NULL if no matching files are found.
+#' @return A `bids_confounds` tibble containing confound data. If `nest=TRUE`
+#'   (default), returns a nested tibble with columns for subject, task, session,
+#'   run, and a nested `data` column containing the confound variables. If
+#'   `nest=FALSE`, returns a flat tibble with all confound variables. When PCA is
+#'   requested, the object includes a `pca` attribute with loadings/variance for
+#'   plotting. Returns NULL if no matching files are found.
 #'
 #' @examples
 #' \donttest{

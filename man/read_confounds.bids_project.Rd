@@ -45,8 +45,10 @@ You can also pass convenience sets from \code{confound_set()}, e.g.,
 \item{...}{Additional arguments (not currently used)}
 }
 \value{
-A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds, with
-identifier columns for participant_id, task, session, and run.
+A \code{bids_confounds} tibble (nested if nest=TRUE) with identifier columns
+for participant_id, task, session, and run. When PCA is requested, the
+object includes a \code{pca} attribute with per-run loadings and variance
+used for plotting.
 }
 \description{
 Reads in fmriprep confound tables for one or more subjects.
