@@ -34,7 +34,7 @@
 
 \item{perc_var}{PCA variance (ignored in mock).}
 
-\item{nest}{If \code{TRUE}, returns a nested tibble keyed by subject, session and run.}
+\item{nest}{If \code{TRUE}, returns a nested tibble keyed by subject, task, session and run.}
 
 \item{...}{Additional BIDS entities (passed to \code{search_files}).}
 }

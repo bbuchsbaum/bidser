@@ -18,12 +18,12 @@ read_confounds(x, ...)
 \item \code{cvars}: Character vector of confound variable names to select
 \item \code{npcs}: Integer. Perform PCA reduction and return this many PCs
 \item \code{perc_var}: Numeric. Perform PCA reduction to retain this percentage of variance
-\item \code{nest}: Logical. If TRUE, nests confound tables by subject/session/run (default: TRUE)
+\item \code{nest}: Logical. If TRUE, nests confound tables by subject/task/session/run (default: TRUE)
 }}
 }
 \value{
 A tibble containing confound data. If \code{nest=TRUE} (default), returns a
-nested tibble with columns for subject, session, run, and a nested \code{data} column
+nested tibble with columns for subject, task, session, run, and a nested \code{data} column
 containing the confound variables. If \code{nest=FALSE}, returns a flat tibble with
 all confound variables. Returns NULL if no matching files are found.
 }

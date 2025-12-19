@@ -1500,7 +1500,7 @@ confound_files.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 #' @param cvars Variables to select (ignored in mock).
 #' @param npcs PCA components (ignored in mock).
 #' @param perc_var PCA variance (ignored in mock).
-#' @param nest If `TRUE`, returns a nested tibble keyed by subject, session and run.
+#' @param nest If `TRUE`, returns a nested tibble keyed by subject, task, session and run.
 #' @param ... Additional BIDS entities (passed to `search_files`).
 #' @return A tibble of confound data (nested if `nest = TRUE`).
 #' @rdname read_confounds-method

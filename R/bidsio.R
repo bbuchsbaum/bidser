@@ -484,13 +484,14 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #'   \code{"cosine_*"}, \code{"motion_outlier_*"}, or \code{"a_comp_cor_*[6]"}.
 #' @param npcs Perform PCA reduction on confounds and return \code{npcs} PCs.
 #' @param perc_var Perform PCA reduction to retain \code{perc_var}% variance.
-#' @param nest If TRUE, nests confound tables by subject/session/run.
+#' @param nest If TRUE, nests confound tables by subject/task/session/run.
 #' @param ... Additional arguments (not currently used)
 #' @import dplyr
 #' @importFrom readr read_tsv
 #' @importFrom tidyr nest
 #' @importFrom tidyselect any_of
-#' @return A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds.
+#' @return A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds,
+#'   with identifier columns for participant_id, task, session, and run.
 #' @examples
 #' \donttest{
 #' # Try to load a BIDS project with fMRIPrep derivatives
@@ -540,6 +541,13 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
   ret <- lapply(sids, function(s) {
     # Use confound_files to get all possible confound files
     fnames <- confound_files(x, subid=paste0("^", as.character(s), "$"), task=task, session=session)
+
+    # Fallback task filter based on filename in case tree metadata is missing
+    if (!is.null(fnames) && length(fnames) > 0 && task != ".*") {
+      task_vals <- stringr::str_match(basename(fnames), "_task-([^_]+)")[, 2]
+      keep <- !is.na(task_vals) & stringr::str_detect(task_vals, task)
+      fnames <- fnames[keep]
+    }
     
     # Filter by run if specified
     if (run != ".*") {
@@ -554,8 +562,10 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
     # Process each confound file
     dflist <- lapply(fnames, function(fn) {
       # Extract run and session from filename
-      run_val <- stringr::str_match(fn, "_run-([0-9]+)")[1,2]
-      sess_val <- stringr::str_match(fn, "_ses-([A-Za-z0-9]+)")[1,2]
+      fname <- basename(fn)
+      task_val <- stringr::str_match(fname, "_task-([^_]+)")[1, 2]
+      run_val <- stringr::str_match(fname, "_run-([^_]+)")[1, 2]
+      sess_val <- stringr::str_match(fname, "_ses-([^_]+)")[1, 2]
 
       if (is.na(run_val)) {
         run_val <- "1"
@@ -593,7 +603,7 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
       
       # Add identifying columns
       dfx %>%
-        mutate(participant_id=s, run=run_val, session=sess_val)
+        mutate(participant_id=s, task=task_val, run=run_val, session=sess_val)
     })
     
     # Filter out any NULL returns
@@ -612,7 +622,7 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
   ret <- dplyr::bind_rows(ret)
   
   if (nest) {
-    ret %>% dplyr::group_by(participant_id, run, session) %>% tidyr::nest()
+    ret %>% dplyr::group_by(participant_id, task, run, session) %>% tidyr::nest()
   } else {
     ret
   }

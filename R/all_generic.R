@@ -345,10 +345,10 @@ read_events <- function(x, ...) {
 #'   - `cvars`: Character vector of confound variable names to select
 #'   - `npcs`: Integer. Perform PCA reduction and return this many PCs
 #'   - `perc_var`: Numeric. Perform PCA reduction to retain this percentage of variance
-#'   - `nest`: Logical. If TRUE, nests confound tables by subject/session/run (default: TRUE)
+#'   - `nest`: Logical. If TRUE, nests confound tables by subject/task/session/run (default: TRUE)
 #'
 #' @return A tibble containing confound data. If `nest=TRUE` (default), returns a
-#'   nested tibble with columns for subject, session, run, and a nested `data` column
+#'   nested tibble with columns for subject, task, session, run, and a nested `data` column
 #'   containing the confound variables. If `nest=FALSE`, returns a flat tibble with
 #'   all confound variables. Returns NULL if no matching files are found.
 #'

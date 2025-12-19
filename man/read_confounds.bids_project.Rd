@@ -40,12 +40,13 @@ You can also pass convenience sets from \code{confound_set()}, e.g.,
 
 \item{perc_var}{Perform PCA reduction to retain \code{perc_var}\% variance.}
 
-\item{nest}{If TRUE, nests confound tables by subject/session/run.}
+\item{nest}{If TRUE, nests confound tables by subject/task/session/run.}
 
 \item{...}{Additional arguments (not currently used)}
 }
 \value{
-A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds.
+A nested tibble (if nest=TRUE) or a flat tibble (if nest=FALSE) of confounds, with
+identifier columns for participant_id, task, session, and run.
 }
 \description{
 Reads in fmriprep confound tables for one or more subjects.
