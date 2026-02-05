@@ -25,6 +25,7 @@
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/clear_example_bids_cache.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/confound_files-method.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/confound_set.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/confound_strategy.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/create_mock_bids.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/create_preproc_mask-method.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/create_preproc_mask.bids_project.html</loc></url>
@@ -50,6 +51,7 @@
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/index.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/infer_tr.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/list_confound_sets.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/list_confound_strategies.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/list_pack_bids.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/load_all_events-method.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/mask_files.html</loc></url>

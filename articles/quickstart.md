@@ -526,9 +526,9 @@ full_paths <- func_scans(proj, subid = "01", full_path = TRUE)
 print("Full paths to subject 01's functional scans:")
 #> [1] "Full paths to subject 01's functional scans:"
 print(full_paths)
-#> [1] "/tmp/RtmpFuFpx2/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
-#> [2] "/tmp/RtmpFuFpx2/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
-#> [3] "/tmp/RtmpFuFpx2/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
+#> [1] "/tmp/Rtmpk3HtqF/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
+#> [2] "/tmp/Rtmpk3HtqF/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
+#> [3] "/tmp/Rtmpk3HtqF/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
 
 # Check that files actually exist
 if (length(full_paths) > 0) {

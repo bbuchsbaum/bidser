@@ -88,6 +88,7 @@ resolver:</p><ul><li><p><code>prefix*</code> selects all columns that start with
 <li><p><code>"motion24"</code>: <code>motion12</code> + quadratic terms of base and derivatives (adds
 <code>*_power2</code> and <code>*_derivative1_power2</code>).</p></li>
 <li><p><code>"global3"</code>: global signals: <code>csf</code>, <code>white_matter</code>, <code>global_signal</code>.</p></li>
+<li><p><code>"9p"</code>: <code>motion6</code> + <code>global3</code> (9 parameters total).</p></li>
 <li><p><code>"36p"</code>: <code>motion24</code> + <code>global3</code> plus their derivatives and quadratics
 (i.e., the canonical 36-parameter set).</p></li>
 <li><p><code>"acompcor"</code>: anatomical CompCor components (<code>a_comp_cor_*</code>). Use <code>n</code> to

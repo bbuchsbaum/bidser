@@ -55,6 +55,8 @@ Available sets (case-insensitive):
 
 - `"global3"`: global signals: `csf`, `white_matter`, `global_signal`.
 
+- `"9p"`: `motion6` + `global3` (9 parameters total).
+
 - `"36p"`: `motion24` + `global3` plus their derivatives and quadratics
   (i.e., the canonical 36-parameter set).
 

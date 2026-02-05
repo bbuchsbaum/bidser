@@ -23,12 +23,13 @@ list_confound_sets()
 #> 2  motion12                                    Motion + first derivatives (12)
 #> 3  motion24                             Friston 24-parameter motion model (24)
 #> 4   global3                                    CSF, WM, and global signals (3)
-#> 5       36p 36-parameter model: motion24 + globals with derivs/quadratics (36)
-#> 6  acompcor                     Anatomical CompCor components (use n to limit)
-#> 7  tcompcor                       Temporal CompCor components (use n to limit)
-#> 8   compcor              Both anatomical and temporal CompCor (use n to limit)
-#> 9    cosine                                   Discrete cosine basis regressors
-#> 10 outliers     FD/RMSD, motion spike regressors, and nonsteady-state outliers
-#> 11    dvars   DVARS family (dvars, std_dvars, non_std_dvars, vx_wisestd_dvars)
-#> 12       fd                                        Framewise displacement only
+#> 5        9p           9-parameter model: motion6 + CSF + WM + GlobalSignal (9)
+#> 6       36p 36-parameter model: motion24 + globals with derivs/quadratics (36)
+#> 7  acompcor                     Anatomical CompCor components (use n to limit)
+#> 8  tcompcor                       Temporal CompCor components (use n to limit)
+#> 9   compcor              Both anatomical and temporal CompCor (use n to limit)
+#> 10   cosine                                   Discrete cosine basis regressors
+#> 11 outliers     FD/RMSD, motion spike regressors, and nonsteady-state outliers
+#> 12    dvars   DVARS family (dvars, std_dvars, non_std_dvars, vx_wisestd_dvars)
+#> 13       fd                                        Framewise displacement only
 ```

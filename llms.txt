@@ -53,6 +53,8 @@ See <https://bbuchsbaum.github.io/bidser/articles/quickstart.html>
   : Get confound files from a BIDS project
 - [`confound_set()`](https://bbuchsbaum.github.io/bidser/reference/confound_set.md)
   : Convenience confound sets for fMRIPrep
+- [`confound_strategy()`](https://bbuchsbaum.github.io/bidser/reference/confound_strategy.md)
+  : Confound denoising strategies
 - [`create_mock_bids()`](https://bbuchsbaum.github.io/bidser/reference/create_mock_bids.md)
   : Create a Mock BIDS Project Object
 - [`create_preproc_mask(`*`<mock_bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/create_preproc_mask-method.md)
@@ -93,6 +95,8 @@ See <https://bbuchsbaum.github.io/bidser/articles/quickstart.html>
   : Infer TR (Repetition Time) from a BOLD file or sidecar
 - [`list_confound_sets()`](https://bbuchsbaum.github.io/bidser/reference/list_confound_sets.md)
   : List available confound sets
+- [`list_confound_strategies()`](https://bbuchsbaum.github.io/bidser/reference/list_confound_strategies.md)
+  : List available confound strategies
 - [`list_pack_bids()`](https://bbuchsbaum.github.io/bidser/reference/list_pack_bids.md)
   : List Contents of Packed BIDS Archive
 - [`load_all_events()`](https://bbuchsbaum.github.io/bidser/reference/load_all_events-method.md)
