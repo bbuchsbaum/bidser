@@ -979,11 +979,15 @@ key_match <- function(default=FALSE, ...) {
         return(TRUE)
       }
       
-      # Case 3: Wildcard pattern ".*" - always match
+      # Case 3: Wildcard pattern ".*" - always match (even missing keys).
+      # NOTE: this means ".*" behaves as "don't filter on this key" rather
+      # than "require key to exist, match any value".  Callers that need to
+      # require a key's existence should post-filter by filename pattern
+      # (e.g. grepl("_task-", ...)).
       if (identical(keyvals[[k]], ".*")) {
         return(TRUE)
       }
-      
+
       # Convert value to character when not NULL/NA before pattern matching
       node_val <- x[[k]]
       if (!is.null(node_val) && !is.na(node_val)) {

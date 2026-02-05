@@ -43,6 +43,7 @@ Available sets (case-insensitive):
 \item \code{"motion24"}: \code{motion12} + quadratic terms of base and derivatives (adds
 \verb{*_power2} and \verb{*_derivative1_power2}).
 \item \code{"global3"}: global signals: \code{csf}, \code{white_matter}, \code{global_signal}.
+\item \code{"9p"}: \code{motion6} + \code{global3} (9 parameters total).
 \item \code{"36p"}: \code{motion24} + \code{global3} plus their derivatives and quadratics
 (i.e., the canonical 36-parameter set).
 \item \code{"acompcor"}: anatomical CompCor components (\verb{a_comp_cor_*}). Use \code{n} to

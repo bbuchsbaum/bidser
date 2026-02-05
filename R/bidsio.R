@@ -144,53 +144,60 @@ read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bi
 
 #' Create a binary brain mask from preprocessed scans
 #'
-#' This function creates a binary brain mask from preprocessed functional scans in a BIDS project.
-#' It searches for brainmask files in the fMRIPrep derivatives directory, reads them using the 
-#' neuroim2 package, and averages them to create a single mask. The resulting mask can be used
-#' for subsequent analyses with preprocessed functional data.
+#' This function creates a binary brain mask from preprocessed functional scans
+#' in a BIDS project. It searches for BOLD brain mask files in the fMRIPrep
+#' derivatives directory (i.e., files in the \code{func/} folder matching the
+#' pattern \code{*_desc-brain_mask.nii.gz} or the older \code{*_brainmask.nii.gz}),
+#' reads them with neuroim2, averages them, and thresholds the result to produce
+#' a consensus binary mask.
 #'
-#' @param x A \code{bids_project} object with fMRIPrep derivatives
-#' @param subid Regular expression to match subject IDs (e.g., "01" for subject 01, ".*" for all subjects)
-#' @param thresh Threshold value between 0 and 1 (default 0.99). Values outside
-#'   this range will trigger an error. Voxels with values below the threshold are
-#'   excluded from the mask.
-#' @param mask_kinds Character vector of BIDS file types to search when locating
-#'   mask files. Defaults to both "brainmask" (older fMRIPrep versions) and
-#'   "mask" with \code{desc="brain"} (BIDS 1.6+).
-#' @param ... Additional arguments passed to \code{search_files} for finding mask files
+#' @param x A \code{bids_project} object with fMRIPrep derivatives.
+#' @param subid Regular expression to match subject IDs (e.g., \code{"01"} for
+#'   subject 01, \code{".*"} for all subjects).
+#' @param thresh Threshold value between 0 and 1 (default 0.99). Voxels below
+#'   this value in the averaged mask are excluded. Higher values produce more
+#'   conservative masks.
+#' @param task Regular expression for task filtering. Defaults to \code{".*"}
+#'   (any task). Because functional masks always carry a \code{task} entity,
+#'   this also implicitly excludes anatomical masks which lack it.
+#' @param space Regular expression for output-space filtering (e.g.,
+#'   \code{"MNI152NLin2009cAsym"}). Defaults to \code{".*"} (all spaces).
+#'   When masks from multiple spaces are found the function stops with an error
+#'   because their dimensions are incompatible.
+#' @param mask_kinds Character vector of BIDS suffixes to search. Defaults to
+#'   both \code{"brainmask"} (older fMRIPrep) and \code{"mask"} with
+#'   \code{desc="brain"} (fMRIPrep >= 21).
+#' @param ... Additional arguments passed to \code{search_files} for finding
+#'   mask files (e.g., \code{session}, \code{run}).
 #'
-#' @return A logical mask volume (\code{LogicalNeuroVol}) that can be used for subsequent analyses with preprocessed functional data.
+#' @return A logical mask volume (\code{LogicalNeuroVol}) suitable for use with
+#'   preprocessed functional data.
 #'
 #' @details
-#' The function works by finding all brainmask files that match the subject ID pattern,
-#' reading them into memory, averaging them, and then thresholding the result to create
-#' a binary mask. This is useful when you want to analyze multiple runs or subjects together
-#' and need a common mask that covers the brain areas present in all scans.
-#' 
-#' The threshold parameter controls how conservative the mask is. Higher values (closer to 1)
-#' result in a more conservative mask that includes only voxels that are consistently marked
-#' as brain across all subjects/runs. Lower values create a more inclusive mask.
+#' The search is restricted to **functional** brain masks by requiring the
+#' \code{task} BIDS entity (anatomical masks do not carry \code{task}).
+#' When masks from multiple output spaces are discovered the function raises an
+#' error; pass a specific \code{space} value to disambiguate.
 #'
 #' @examples
 #' \donttest{
-#' # Load a BIDS project with fMRIPrep derivatives
 #' tryCatch({
 #'   ds_path <- get_example_bids_dataset("ds000001-fmriprep")
 #'   proj <- bids_project(ds_path, fmriprep=TRUE)
-#'   
-#'   # Create a mask for all subjects (conservative threshold)
-#'   all_subj_mask <- create_preproc_mask(proj, subid=".*")
-#'   
-#'   # Create a mask for a specific subject
-#'   sub01_mask <- create_preproc_mask(proj, subid="01")
-#'   
-#'   # Create a more inclusive mask with a lower threshold
-#'   inclusive_mask <- create_preproc_mask(proj, subid=".*", thresh=0.8)
-#'   
-#'   # Use additional search criteria
-#'   task_mask <- create_preproc_mask(proj, subid=".*", task="balloonanalogrisktask")
-#'   
-#'   # Clean up
+#'
+#'   # Mask for one subject in a specific space
+#'   mask <- create_preproc_mask(proj, subid="01",
+#'                               space="MNI152NLin2009cAsym")
+#'
+#'   # Consensus mask across all subjects / runs
+#'   all_mask <- create_preproc_mask(proj, subid=".*",
+#'                                   space="MNI152NLin2009cAsym")
+#'
+#'   # Restrict to a single task
+#'   task_mask <- create_preproc_mask(proj, subid=".*",
+#'                                   task="balloonanalogrisktask",
+#'                                   space="MNI152NLin2009cAsym")
+#'
 #'   unlink(ds_path, recursive=TRUE)
 #' }, error = function(e) {
 #'   message("Example requires derivatives dataset: ", e$message)
@@ -198,7 +205,9 @@ read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bi
 #' }
 #'
 #' @export
-create_preproc_mask.bids_project <- function(x, subid, thresh=.99, mask_kinds = c("brainmask", "mask"), ...) {
+create_preproc_mask.bids_project <- function(x, subid, thresh=.99,
+                                             task = ".*", space = ".*",
+                                             mask_kinds = c("brainmask", "mask"), ...) {
   if (!inherits(x, "bids_project")) {
     stop("`x` must be a `bids_project` object.")
   }
@@ -206,33 +215,57 @@ create_preproc_mask.bids_project <- function(x, subid, thresh=.99, mask_kinds = 
   if (!is.numeric(thresh) || length(thresh) != 1 || thresh < 0 || thresh > 1) {
     stop("`thresh` must be between 0 and 1.")
   }
-  
+
   if (!x$has_fmriprep) {
     stop("No fmriprep data available. Cannot create preproc mask.")
   }
-  
+
   maskfiles <- c()
   if ("brainmask" %in% mask_kinds) {
-    maskfiles <- c(maskfiles, search_files(x, subid = subid, kind = "brainmask", full_path = TRUE, ...))
+    maskfiles <- c(maskfiles,
+                   search_files(x, subid = subid, kind = "brainmask",
+                                task = task, space = space,
+                                full_path = TRUE, ...))
   }
   if ("mask" %in% mask_kinds) {
-    maskfiles <- c(maskfiles, search_files(x, subid = subid, kind = "mask", desc = "brain", full_path = TRUE, ...))
+    maskfiles <- c(maskfiles,
+                   search_files(x, subid = subid, kind = "mask",
+                                desc = "brain", task = task, space = space,
+                                full_path = TRUE, ...))
   }
   maskfiles <- unique(maskfiles)
+
+  # Restrict to functional (BOLD) masks: require `_task-` in the filename.
+  # Anatomical brain masks (anat/) lack a task entity, so this reliably
+
+  # separates func masks from anat masks even though search_files treats
+  # ".*" as "don't filter" rather than "require key to exist".
+  func_pattern <- "_task-[A-Za-z0-9]+"
+  maskfiles <- maskfiles[grepl(func_pattern, basename(maskfiles))]
+
   if (length(maskfiles) == 0) {
-    stop("No brainmask files found matching the specified subject.")
+    stop("No BOLD brain mask files found matching the specified criteria.")
   }
-  
-  if (!requireNamespace("neuroim2", quietly=TRUE)) {
+
+  # Error when masks span multiple output spaces (incompatible dimensions)
+  spaces_found <- unique(na.omit(stringr::str_match(basename(maskfiles),
+                                                     "_space-([A-Za-z0-9]+)")[, 2]))
+  if (length(spaces_found) > 1) {
+    stop("Mask files span multiple output spaces (",
+         paste(spaces_found, collapse = ", "),
+         "). Pass an explicit `space` to select one.")
+  }
+
+  if (!requireNamespace("neuroim2", quietly = TRUE)) {
     stop("Package `neuroim2` is required for `create_preproc_mask`.")
   }
-  
+
   vols <- lapply(maskfiles, neuroim2::read_vol)
   if (length(vols) == 0) {
     stop("Could not read any mask volumes.")
   }
-  
-  avg <- Reduce("+", vols)/length(vols)
+
+  avg <- Reduce("+", vols) / length(vols)
   avg[avg < thresh] <- 0
   as.logical(avg)
 }
@@ -526,7 +559,10 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
   if (!inherits(x, "bids_project")) {
     stop("`x` must be a `bids_project` object.")
   }
-  
+
+  # Detect confound_strategy objects
+  use_strategy <- inherits(cvars, "confound_strategy")
+
   # Check participants
   sids <- participants(x)
   if (length(sids) == 0) {
@@ -539,7 +575,7 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
     return(NULL)
   }
   sids <- sids[gidx]
-  
+
   ret <- lapply(sids, function(s) {
     # Use confound_files to get all possible confound files
     fnames <- confound_files(x, subid=paste0("^", as.character(s), "$"), task=task, session=session)
@@ -550,17 +586,17 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
       keep <- !is.na(task_vals) & stringr::str_detect(task_vals, task)
       fnames <- fnames[keep]
     }
-    
+
     # Filter by run if specified
     if (run != ".*") {
       fnames <- fnames[grepl(paste0("_run-", run), fnames)]
     }
-    
+
     if (length(fnames) == 0) {
       # No confound files for this participant; return empty frame
       return(list(data = data.frame(), pca = NULL))
     }
-    
+
     # Process each confound file
     dflist <- lapply(fnames, function(fn) {
       # Extract run and session from filename
@@ -576,7 +612,7 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
       if (is.na(sess_val)) {
         sess_val <- "1"
       }
-      
+
       # Read table
       dfx <- tryCatch({
         readr::read_tsv(fn, na=c("n/a", "NA"))
@@ -584,36 +620,74 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
         warning("Unable to read file: ", fn, " Error: ", e$message)
         return(NULL)
       })
-      
+
       if (is.null(dfx)) return(NULL)
 
-      # Resolve canonical confound names to available columns
-      sel_cvars <- resolve_cvars(cvars, colnames(dfx))
-
-      if (length(sel_cvars) == 0) {
-        warning("No requested confounds were found for file: ", fn)
-        return(NULL)
-      }
-
-      # Select requested confound columns
-      dfx <- dfx %>% dplyr::select(any_of(sel_cvars))
-      
-      # Process confounds if PCA requested
       pca_row <- NULL
-      if ((npcs > 0 || perc_var > 0) && ncol(dfx) > 1) {
-        proc <- process_confounds(dfx, npcs=npcs, perc_var=perc_var, return_pca=TRUE)
-        dfx <- proc$scores
-        if (!is.null(proc$pca)) {
-          pca_row <- tibble::tibble(
-            participant_id = s,
-            task = task_val,
-            run = run_val,
-            session = sess_val,
-            pca = list(proc$pca)
-          )
+
+      if (use_strategy) {
+        # Strategy mode: PCA a subset, keep the rest raw
+        strat <- cvars
+        pca_cols <- resolve_cvars(strat$pca_vars, colnames(dfx))
+        raw_cols <- resolve_cvars(strat$raw_vars, colnames(dfx))
+        # Remove any overlap (pca_vars take precedence)
+        raw_cols <- setdiff(raw_cols, pca_cols)
+
+        if (length(pca_cols) == 0) {
+          warning("No PCA confounds were found for file: ", fn)
+          return(NULL)
+        }
+
+        dfx_pca <- dfx %>% dplyr::select(any_of(pca_cols))
+        s_npcs <- strat$npcs
+        s_pv   <- strat$perc_var
+        if ((s_npcs > 0 || s_pv > 0) && ncol(dfx_pca) > 1) {
+          proc <- process_confounds(dfx_pca, npcs = s_npcs, perc_var = s_pv, return_pca = TRUE)
+          dfx_pca <- proc$scores
+          if (!is.null(proc$pca)) {
+            pca_row <- tibble::tibble(
+              participant_id = s,
+              task = task_val,
+              run = run_val,
+              session = sess_val,
+              pca = list(proc$pca)
+            )
+          }
+        }
+
+        if (length(raw_cols) > 0) {
+          dfx_raw <- dfx %>% dplyr::select(any_of(raw_cols))
+          dfx <- dplyr::bind_cols(tibble::as_tibble(dfx_pca), dfx_raw)
+        } else {
+          dfx <- tibble::as_tibble(dfx_pca)
+        }
+      } else {
+        # Standard mode: resolve and select
+        sel_cvars <- resolve_cvars(cvars, colnames(dfx))
+
+        if (length(sel_cvars) == 0) {
+          warning("No requested confounds were found for file: ", fn)
+          return(NULL)
+        }
+
+        dfx <- dfx %>% dplyr::select(any_of(sel_cvars))
+
+        # Process confounds if PCA requested
+        if ((npcs > 0 || perc_var > 0) && ncol(dfx) > 1) {
+          proc <- process_confounds(dfx, npcs=npcs, perc_var=perc_var, return_pca=TRUE)
+          dfx <- proc$scores
+          if (!is.null(proc$pca)) {
+            pca_row <- tibble::tibble(
+              participant_id = s,
+              task = task_val,
+              run = run_val,
+              session = sess_val,
+              pca = list(proc$pca)
+            )
+          }
         }
       }
-      
+
       # Add identifying columns
       list(
         data = dfx %>%
@@ -621,7 +695,7 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
         pca = pca_row
       )
     })
-    
+
     # Filter out any NULL returns
     dflist <- dflist[!sapply(dflist, is.null)]
     if (length(dflist) == 0) return(list(data = data.frame(), pca = NULL))
@@ -636,13 +710,13 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 
     list(data = data_out, pca = pca_out)
   })
-  
+
   ret <- ret[!sapply(ret, function(z) nrow(z$data)==0)]
   if (length(ret) == 0) {
     message("No confound data found for the given selection.")
     return(NULL)
   }
-  
+
   ret_data <- dplyr::bind_rows(lapply(ret, `[[`, "data"))
   pca_list <- lapply(ret, `[[`, "pca")
   pca_list <- pca_list[!sapply(pca_list, is.null)]

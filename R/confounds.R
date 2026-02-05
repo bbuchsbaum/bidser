@@ -22,6 +22,7 @@
 #' - `"motion24"`: `motion12` + quadratic terms of base and derivatives (adds
 #'   `*_power2` and `*_derivative1_power2`).
 #' - `"global3"`: global signals: `csf`, `white_matter`, `global_signal`.
+#' - `"9p"`: `motion6` + `global3` (9 parameters total).
 #' - `"36p"`: `motion24` + `global3` plus their derivatives and quadratics
 #'   (i.e., the canonical 36-parameter set).
 #' - `"acompcor"`: anatomical CompCor components (`a_comp_cor_*`). Use `n` to
@@ -88,6 +89,7 @@ confound_set <- function(name, n = NULL) {
     motion12 = c(base_motion, deriv),
     motion24 = c(base_motion, deriv, quad_base, quad_deriv),
     global3  = global3,
+    `9p`      = c(base_motion, global3),
     `36p`     = c(base_motion, deriv, quad_base, quad_deriv,
                   global3, global_deriv, global_quad_base, global_quad_deriv),
     acomppcor = acc_all,   # accept typo alias just in case
@@ -124,7 +126,7 @@ list_confound_sets <- function() {
   data.frame(
     set = c(
       "motion6", "motion12", "motion24",
-      "global3", "36p", "acompcor", "tcompcor", "compcor",
+      "global3", "9p", "36p", "acompcor", "tcompcor", "compcor",
       "cosine", "outliers", "dvars", "fd"
     ),
     description = c(
@@ -132,6 +134,7 @@ list_confound_sets <- function() {
       "Motion + first derivatives (12)",
       "Friston 24-parameter motion model (24)",
       "CSF, WM, and global signals (3)",
+      "9-parameter model: motion6 + CSF + WM + GlobalSignal (9)",
       "36-parameter model: motion24 + globals with derivs/quadratics (36)",
       "Anatomical CompCor components (use n to limit)",
       "Temporal CompCor components (use n to limit)",
@@ -140,6 +143,108 @@ list_confound_sets <- function() {
       "FD/RMSD, motion spike regressors, and nonsteady-state outliers",
       "DVARS family (dvars, std_dvars, non_std_dvars, vx_wisestd_dvars)",
       "Framewise displacement only"
+    ),
+    stringsAsFactors = FALSE
+  )
+}
+
+
+#' Confound denoising strategies
+#'
+#' Creates a structured confound strategy object that specifies which variables
+#' to reduce via PCA and which to keep as-is. Pass the result directly to
+#' \code{read_confounds(..., cvars = confound_strategy(...))}.
+#'
+#' When a strategy is passed to \code{read_confounds}, the function:
+#' \enumerate{
+#'   \item Selects the \code{pca_vars} columns and reduces them via PCA
+#'         (retaining \code{perc_var}\% of variance or \code{npcs} components).
+#'   \item Selects the \code{raw_vars} columns and keeps them unchanged.
+#'   \item Column-binds the PCA scores with the raw columns.
+#' }
+#'
+#' Available named strategies:
+#' \describe{
+#'   \item{\code{"pcabasic80"}}{PCA over motion24 + aCompCor + tCompCor + CSF +
+#'     white matter, retaining 80\% variance.
+#'     Discrete cosine regressors are appended un-reduced.}
+#' }
+#'
+#' @param name Character. Name of a predefined strategy (see above), or
+#'   \code{NULL} for a custom strategy.
+#' @param pca_vars Character vector of confound names/wildcards to include in
+#'   PCA reduction. Ignored when \code{name} is specified.
+#' @param raw_vars Character vector of confound names/wildcards to keep without
+#'   reduction. Ignored when \code{name} is specified.
+#' @param perc_var Numeric. Percentage of variance to retain from PCA (default
+#'   -1, meaning use \code{npcs} instead).
+#' @param npcs Integer. Number of PCs to retain (default -1, meaning use
+#'   \code{perc_var} instead).
+#' @return A \code{confound_strategy} object (S3 class) that can be passed as
+#'   the \code{cvars} argument to \code{read_confounds()}.
+#' @export
+#' @examples
+#' # Named strategy
+#' confound_strategy("pcabasic80")
+#'
+#' # Custom strategy: PCA motion + compcor to 5 PCs, keep cosine regressors
+#' confound_strategy(
+#'   pca_vars = c(confound_set("motion24"), confound_set("compcor")),
+#'   raw_vars = confound_set("cosine"),
+#'   npcs = 5
+#' )
+confound_strategy <- function(name = NULL, pca_vars = NULL, raw_vars = NULL,
+                              perc_var = -1, npcs = -1) {
+  if (!is.null(name)) {
+    nm <- tolower(as.character(name))
+    strategies <- list(
+      pcabasic80 = list(
+        pca_vars = c(confound_set("motion24"), "csf", "white_matter",
+                     confound_set("acompcor"), confound_set("tcompcor")),
+        raw_vars = confound_set("cosine"),
+        perc_var = 80,
+        npcs = -1
+      )
+    )
+    if (!nm %in% names(strategies)) {
+      stop("Unknown confound strategy: ", name,
+           ". Use list_confound_strategies() to see available options.")
+    }
+    spec <- strategies[[nm]]
+    pca_vars <- spec$pca_vars
+    raw_vars <- spec$raw_vars
+    perc_var <- spec$perc_var
+    npcs <- spec$npcs
+  }
+
+  if (is.null(pca_vars) || length(pca_vars) == 0) {
+    stop("pca_vars must be specified (either via `name` or directly).")
+  }
+
+  structure(list(
+    name = name %||% "custom",
+    pca_vars = pca_vars,
+    raw_vars = raw_vars %||% character(0),
+    perc_var = perc_var,
+    npcs = npcs
+  ), class = "confound_strategy")
+}
+
+
+#' List available confound strategies
+#'
+#' Returns the names and short descriptions of the predefined confound
+#' strategies usable with \code{confound_strategy()}.
+#'
+#' @return A data.frame with columns \code{strategy} and \code{description}.
+#' @export
+#' @examples
+#' list_confound_strategies()
+list_confound_strategies <- function() {
+  data.frame(
+    strategy = c("pcabasic80"),
+    description = c(
+      "PCA(motion24 + aCompCor + tCompCor + CSF + WM, 80% var) + cosine"
     ),
     stringsAsFactors = FALSE
   )
