@@ -244,7 +244,7 @@ add_resolution_tag <- function(filename, factor) {
 #' @param x A `bids_project` object created by \code{\link{bids_project}}.
 #' @param output_file Character string specifying the output archive filename.
 #'   Should end with ".tar.gz" or ".zip". If not specified, defaults to
-#'   "{project_name}_metadata.tar.gz" in the current directory.
+#'   `"{project_name}_metadata.tar.gz"` in the current directory.
 #' @param format Character string specifying the archive format. Can be "tar.gz"
 #'   (default) or "zip". If not specified, inferred from output_file extension.
 #' @param include_derivatives Logical. Whether to include fMRIPrep derivatives
@@ -615,21 +615,25 @@ pack_bids <- function(x,
             message(sprintf("  Starting parallel processing of %d files...", length(imaging_files)))
             message("  (Progress updates not available in parallel mode)")
           }
-          
+
+          # Capture internal functions as local variables for parallel workers
+          .add_resolution_tag <- add_resolution_tag
+          .downsample_single_file <- downsample_single_file
+
           results <- future.apply::future_lapply(imaging_files, function(rel_path) {
             from_file <- file.path(from_path, rel_path)
             # Add resolution tag to output filename
-            to_file_with_res <- bidser:::add_resolution_tag(file.path(to_path, rel_path), downsample_factor)
-            
+            to_file_with_res <- .add_resolution_tag(file.path(to_path, rel_path), downsample_factor)
+
             # Create directory if needed
             to_dir <- dirname(to_file_with_res)
             if (!dir.exists(to_dir)) {
               dir.create(to_dir, recursive = TRUE, showWarnings = FALSE)
             }
-            
+
             # Downsample the file
-            bidser:::downsample_single_file(from_file, to_file_with_res, 
-                                 factor = downsample_factor, 
+            .downsample_single_file(from_file, to_file_with_res,
+                                 factor = downsample_factor,
                                  method = downsample_method,
                                  verbose = FALSE)
           }, future.seed = TRUE)

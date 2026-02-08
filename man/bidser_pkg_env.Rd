@@ -10,6 +10,9 @@ An object of class \code{environment} of length 0.
 \usage{
 bidser_pkg_env
 }
+\value{
+An environment used for internal package state.
+}
 \description{
 This environment is used to store session level objects such as the
 example dataset cache without assigning them to the global environment.

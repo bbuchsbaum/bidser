@@ -329,6 +329,7 @@ DEFAULT_CVARS2 <- names(CVARS_ALIASES)
 #'   variables and values are the matching column names. When FALSE the result is
 #'   an unnamed vector of column names to select.
 #' @return Character vector of resolved column names.
+#' @importFrom utils head
 #' @keywords internal
 resolve_cvars <- function(cvars, col_names, rename = FALSE) {
   res <- character()

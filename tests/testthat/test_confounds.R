@@ -188,6 +188,6 @@ test_that("read_confounds with confound_set still works", {
   expect_s3_class(conf, "tbl_df")
   expect_equal(nrow(conf), setup$n)
   # Should have 6 motion columns plus metadata
-  data_cols <- setdiff(names(conf), c("participant_id", "run", "session"))
+  data_cols <- setdiff(names(conf), c("participant_id", "task", "run", "session"))
   expect_equal(length(data_cols), 6)
 })

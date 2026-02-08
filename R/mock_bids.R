@@ -1294,6 +1294,20 @@ preproc_scans.mock_bids_project <- function(x, subid = ".*", task = ".*", run = 
 #' @param ... Additional arguments passed to `event_files`.
 #' @return A nested tibble with columns `.subid`, `.task`, `.run`, `.session` (if applicable),
 #'   and `data` (containing the event tibbles), or an empty tibble if no matching data.
+#' @examples
+#' parts <- c("01")
+#' fs <- tibble::tibble(
+#'   subid = "01", datatype = "func",
+#'   suffix = c("bold.nii.gz", "events.tsv"),
+#'   task = "rest", run = "01", fmriprep = FALSE
+#' )
+#' evt_data <- list()
+#' evt_data[["sub-01/func/sub-01_task-rest_run-01_events.tsv"]] <-
+#'   tibble::tibble(onset = c(1, 5, 10), duration = c(0.5, 0.5, 0.5),
+#'                  trial_type = c("go", "stop", "go"))
+#' mock <- create_mock_bids("EventTest", parts, fs, event_data = evt_data)
+#' events <- read_events(mock)
+#' print(events)
 #' @rdname read_events-method
 #' @export
 read_events.mock_bids_project <- function(x, subid = ".*", task = ".*", run = ".*", session = ".*", ...) {
@@ -1503,6 +1517,22 @@ confound_files.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 #' @param nest If `TRUE`, returns a nested tibble keyed by subject, task, session and run.
 #' @param ... Additional BIDS entities (passed to `search_files`).
 #' @return A `bids_confounds` tibble of confound data (nested if `nest = TRUE`).
+#' @examples
+#' parts <- c("01")
+#' fs <- tibble::tibble(
+#'   subid = "01", datatype = "func",
+#'   suffix = c("bold.nii.gz", "desc-confounds_timeseries.tsv"),
+#'   task = "rest", fmriprep = c(TRUE, TRUE)
+#' )
+#' conf_data <- list()
+#' key <- "derivatives/fmriprep/sub-01/func/sub-01_task-rest_desc-confounds_timeseries.tsv"
+#' conf_data[[key]] <- data.frame(
+#'   csf = rnorm(50), white_matter = rnorm(50),
+#'   trans_x = rnorm(50), trans_y = rnorm(50)
+#' )
+#' mock <- create_mock_bids("ConfTest", parts, fs, confound_data = conf_data)
+#' conf <- read_confounds(mock)
+#' print(conf)
 #' @rdname read_confounds-method
 #' @export
 read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", session = ".*", run = ".*",
@@ -1602,6 +1632,16 @@ read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 #' @param x A `mock_bids_project` object.
 #' @param ... Arguments (ignored).
 #' @return Throws an error indicating the function is not applicable to mock objects.
+#' @examples
+#' \dontrun{
+#' # create_preproc_mask is not available for mock projects
+#' # (requires actual neuroimaging data)
+#' mock <- create_mock_bids("Test", c("01"), tibble::tibble(
+#'   subid = "01", datatype = "func",
+#'   suffix = "bold.nii.gz", fmriprep = FALSE
+#' ))
+#' create_preproc_mask(mock)  # Throws an error
+#' }
 #' @export
 #' @rdname create_preproc_mask-method
 create_preproc_mask.mock_bids_project <- function(x, ...) {

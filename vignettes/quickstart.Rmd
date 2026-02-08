@@ -1,10 +1,21 @@
 ---
-title: "Getting Started with bidser"
+title: Getting Started with bidser
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Getting Started with bidser}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+params:
+  family: red
+css: albers.css
+resource_files:
+- albers.css
+- albers.js
+includes:
+  in_header: |-
+    <script src="albers.js"></script>
+    <script>document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('palette-red');});</script>
+
 ---
 
 ```{r, include = FALSE}
@@ -14,6 +25,15 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r theme-setup, include = FALSE}
+suppressPackageStartupMessages({
+  library(bidser)
+  library(tibble)
+  library(dplyr)
+  library(tidyr)
+  library(gluedown)
+})
+```
 
 ## Introduction to bidser
 
@@ -43,27 +63,13 @@ Let's explore these capabilities using a real BIDS dataset.
 
 We'll use the `ds001` dataset from the BIDS examples, which contains data from a "Balloon Analog Risk Task" experiment with 16 subjects.
 
-```{r echo=FALSE}
-library(bidser)
+```{r setup, include = FALSE}
+ds001_path <- get_example_bids_dataset("ds001")
+proj <- bids_project(ds001_path)
 ```
 
-```{r setup}
-library(bidser)
-library(tibble)
-library(dplyr)
-library(gluedown)
-
-# Download example BIDS dataset
-tryCatch({
-  ds001_path <- get_example_bids_dataset("ds001")
-  proj <- bids_project(ds001_path)
-  
-  print(proj)
-}, error = function(e) {
-  message("This vignette requires an internet connection to download example data.")
-  message("Error: ", e$message)
-  knitr::knit_exit()
-})
+```{r}
+proj
 ```
 
 The `bids_project` object provides a high-level interface to the dataset. We can see it contains 16 subjects with both anatomical and functional data.
@@ -157,8 +163,6 @@ Let's explore the event data structure:
 
 ```{r}
 # Look at events for the first subject
-library(tidyr)
-
 first_subject_events <- suppressMessages(
   events_data %>% 
     filter(.subid == "01") %>% 
@@ -328,36 +332,22 @@ This quickstart covered the basic functionality of bidser for querying BIDS data
 
 If you have processed a dataset with FMRIPrep, `bidser` can be used to read in many of the resultant derivative files. If a project has an FMRIPrep derivatives folder, then we can read in the BIDS hierarchy plus derivatives as follows:
 
-```{r}
-# Try to get a derivatives dataset - note this may not be available
-tryCatch({
-  # Some BIDS examples may have derivatives, or we can demonstrate with empty structure
-  deriv_path <- get_example_bids_dataset("ds000001-fmriprep")
-  proj_deriv <- bids_project(deriv_path, fmriprep=TRUE)
-  
-  print(proj_deriv)
-  
-  # Now we can access various derivative files with convenience functions.
-  # For example, to read in "preproc" scans we can use the `preproc_scans` function.
-  pscans <- preproc_scans(proj_deriv)
-  if (!is.null(pscans) && length(pscans) > 0) {
-    print(head(as.character(pscans)))
-  } else {
-    message("No preprocessed scans found in this example dataset")
-  }
-  
-  # Clean up derivatives dataset
-  unlink(deriv_path, recursive=TRUE)
-  
-}, error = function(e) {
-  message("Derivatives example not available: ", e$message)
-  message("This is normal - not all BIDS examples include fMRIPrep derivatives.")
-})
+```{r derivatives, eval = FALSE}
+# Download an fMRIPrep example dataset
+deriv_path <- get_example_bids_dataset("ds000001-fmriprep")
+proj_deriv <- bids_project(deriv_path, fmriprep = TRUE)
+
+proj_deriv
+
+# Convenience functions for derivative files, e.g. preprocessed scans:
+pscans <- preproc_scans(proj_deriv)
+head(as.character(pscans))
+
+# Read confound files
+conf <- read_confounds(proj_deriv, subid = "01")
 ```
 
 ```{r cleanup, include=FALSE}
-# Clean up the downloaded dataset
-if (exists("ds001_path")) {
-  unlink(ds001_path, recursive=TRUE)
-}
+if (exists("ds001_path")) unlink(ds001_path, recursive = TRUE)
+if (exists("deriv_path")) unlink(deriv_path, recursive = TRUE)
 ```

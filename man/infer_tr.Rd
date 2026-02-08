@@ -2,12 +2,25 @@
 % Please edit documentation in R/sidecar.R
 \name{infer_tr}
 \alias{infer_tr}
+\alias{infer_tr.character}
 \title{Infer TR (Repetition Time) from a BOLD file or sidecar}
 \usage{
 infer_tr(x, ...)
+
+\method{infer_tr}{character}(
+  x,
+  prefer = c("json", "nifti"),
+  fallback = TRUE,
+  coerce_units = c("strict", "auto"),
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
-\item{x}{A character path to a BOLD \code{.nii[.gz]} file or its \code{.json} sidecar.}
+\item{x}{A character path to a BOLD \code{.nii[.gz]} file or its \code{.json} sidecar,
+or a \code{bids_project} object.}
+
+\item{...}{Additional arguments passed to methods.}
 
 \item{prefer}{Preferred source of TR: \code{"json"} (default) or \code{"nifti"}.}
 

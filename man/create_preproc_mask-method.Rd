@@ -18,3 +18,14 @@ Throws an error indicating the function is not applicable to mock objects.
 This function is not implemented for \code{mock_bids_project} objects as they do not
 contain actual image data required to create a mask.
 }
+\examples{
+\dontrun{
+# create_preproc_mask is not available for mock projects
+# (requires actual neuroimaging data)
+mock <- create_mock_bids("Test", c("01"), tibble::tibble(
+  subid = "01", datatype = "func",
+  suffix = "bold.nii.gz", fmriprep = FALSE
+))
+create_preproc_mask(mock)  # Throws an error
+}
+}

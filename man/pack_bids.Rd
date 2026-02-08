@@ -25,7 +25,7 @@ pack_bids(
 
 \item{output_file}{Character string specifying the output archive filename.
 Should end with ".tar.gz" or ".zip". If not specified, defaults to
-"{project_name}_metadata.tar.gz" in the current directory.}
+\code{"{project_name}_metadata.tar.gz"} in the current directory.}
 
 \item{format}{Character string specifying the archive format. Can be "tar.gz"
 (default) or "zip". If not specified, inferred from output_file extension.}

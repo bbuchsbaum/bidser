@@ -202,16 +202,9 @@ get_repetition_time <- function(x, subid, task, run=".*", session=".*", ...) {
 #' not found, the function searches the directory for a `.json` file with the
 #' same stem (filename without the NIfTI extension).
 #'
-#' @param x A character path to a BOLD `.nii[.gz]` file or its `.json` sidecar.
-#' @param prefer Preferred source of TR: `"json"` (default) or `"nifti"`.
-#' @param fallback If TRUE (default), attempt NIfTI header fallback when JSON is
-#'   not available or incomplete.
-#' @param coerce_units Unit handling for non-compliant values. `"strict"`
-#'   (default) assumes seconds as per BIDS and returns values as-is. `"auto"`
-#'   will convert clearly millisecond-like values to seconds (divide by 1000)
-#'   and annotate the conversion in the return value's attributes.
-#' @param verbose If TRUE, print informative messages when falling back or when
-#'   encountering special cases (e.g., SBRef files).
+#' @param x A character path to a BOLD `.nii[.gz]` file or its `.json` sidecar,
+#'   or a `bids_project` object.
+#' @param ... Additional arguments passed to methods.
 #' @return Numeric TR in seconds, or `NA_real_` if it cannot be determined. The
 #'   return value includes attributes: `source` (e.g., `json:RepetitionTime`,
 #'   `json:VolumeTiming`, `nifti:pixdim4`), `path` (the file used), and
@@ -225,6 +218,16 @@ infer_tr <- function(x, ...) {
   UseMethod("infer_tr")
 }
 
+#' @rdname infer_tr
+#' @param prefer Preferred source of TR: `"json"` (default) or `"nifti"`.
+#' @param fallback If TRUE (default), attempt NIfTI header fallback when JSON is
+#'   not available or incomplete.
+#' @param coerce_units Unit handling for non-compliant values. `"strict"`
+#'   (default) assumes seconds as per BIDS and returns values as-is. `"auto"`
+#'   will convert clearly millisecond-like values to seconds (divide by 1000)
+#'   and annotate the conversion in the return value's attributes.
+#' @param verbose If TRUE, print informative messages when falling back or when
+#'   encountering special cases (e.g., SBRef files).
 #' @export
 infer_tr.character <- function(x,
                                prefer = c("json", "nifti"),
@@ -301,14 +304,6 @@ infer_tr.character <- function(x,
       hdr <- tryCatch(RNifti::niftiHeader(nf), error = function(e) NULL)
       if (!is.null(hdr) && !is.null(hdr$pixdim) && length(hdr$pixdim) >= 5) {
         tr <- as.numeric(hdr$pixdim[5])
-      }
-    } else if (requireNamespace("neuroim2", quietly = TRUE)) {
-      # neuroim2 does not expose header directly; load and get TR via header if available
-      vol <- tryCatch(neuroim2::read_vol(nf), error = function(e) NULL)
-      if (!is.null(vol)) {
-        # neuroim2 stores metadata; attempt to find TR
-        tr_val <- tryCatch(neuroim2::tr(vol), error = function(e) NA_real_)
-        if (is.finite(tr_val)) tr <- as.numeric(tr_val)
       }
     }
     if (is.finite(tr)) {

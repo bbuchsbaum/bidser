@@ -44,3 +44,20 @@ A \code{bids_confounds} tibble of confound data (nested if \code{nest = TRUE}).
 \description{
 Read Confound Files (Mock Implementation)
 }
+\examples{
+parts <- c("01")
+fs <- tibble::tibble(
+  subid = "01", datatype = "func",
+  suffix = c("bold.nii.gz", "desc-confounds_timeseries.tsv"),
+  task = "rest", fmriprep = c(TRUE, TRUE)
+)
+conf_data <- list()
+key <- "derivatives/fmriprep/sub-01/func/sub-01_task-rest_desc-confounds_timeseries.tsv"
+conf_data[[key]] <- data.frame(
+  csf = rnorm(50), white_matter = rnorm(50),
+  trans_x = rnorm(50), trans_y = rnorm(50)
+)
+mock <- create_mock_bids("ConfTest", parts, fs, confound_data = conf_data)
+conf <- read_confounds(mock)
+print(conf)
+}

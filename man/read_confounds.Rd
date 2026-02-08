@@ -25,9 +25,9 @@ read_confounds(x, ...)
 A \code{bids_confounds} tibble containing confound data. If \code{nest=TRUE}
 (default), returns a nested tibble with columns for subject, task, session,
 run, and a nested \code{data} column containing the confound variables. If
-\code{nest=FALSE}, returns a flat tibble with all confound variables. When
-PCA is requested, the object includes a \code{pca} attribute with
-loadings/variance for plotting. Returns NULL if no matching files are found.
+\code{nest=FALSE}, returns a flat tibble with all confound variables. When PCA is
+requested, the object includes a \code{pca} attribute with loadings/variance for
+plotting. Returns NULL if no matching files are found.
 }
 \description{
 This function reads in fMRIPrep confound tables for one or more subjects from a

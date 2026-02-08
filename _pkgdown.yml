@@ -1,4 +1,4 @@
 url: https://bbuchsbaum.github.io/bidser/
 template:
   bootstrap: 5
-
+  package: albersdown

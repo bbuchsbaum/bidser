@@ -1,15 +1,15 @@
 Package: bidser
-Version: 0.0.0.9000
-Title: Work with BIDS Projects
+Version: 0.1.0
+Title: Work with Brain Imaging Data Structure (BIDS) Projects
 Description: Tools for working with Brain Imaging Data Structure (BIDS) formatted neuroimaging datasets.
-    The package provides functionality for reading, validating, and querying BIDS-compliant 
-    projects, creating mock BIDS datasets for testing, and extracting preprocessed data from 
+    The package provides functionality for reading, validating, and querying BIDS-compliant
+    projects, creating mock BIDS datasets for testing, and extracting preprocessed data from
     BIDS derivatives. It supports searching and filtering BIDS files by various entities
     such as subject, session, task, and run to streamline neuroimaging data workflow.
-Authors@R: person("Bradley", "Buchsbaum", , "brad.buchsbaum@gmail.com", c("aut", "cre"))
+    See Gorgolewski et al. (2016) <doi:10.1038/sdata.2016.44> for the BIDS specification.
+Authors@R: person("Bradley", "Buchsbaum", , "brad.buchsbaum@gmail.com", c("aut", "cre"), comment = c(ORCID = "0000-0002-1108-4866"))
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 ByteCompile: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
@@ -32,7 +32,7 @@ Imports:
   tidyr,
   httr,
   rio
-Suggests: 
+Suggests:
     ggplot2,
     plotly,
     patchwork,
@@ -43,7 +43,11 @@ Suggests:
     testthat,
     covr,
     lintr,
-    gluedown
+    gluedown,
+    RNifti,
+    future,
+    future.apply
 VignetteBuilder: knitr
-URL: https://bbuchsbaum.github.io/bidser/
+URL: https://github.com/bbuchsbaum/bidser, https://bbuchsbaum.github.io/bidser/
 BugReports: https://github.com/bbuchsbaum/bidser/issues
+Config/Needs/website: albersdown

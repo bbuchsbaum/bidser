@@ -17,6 +17,32 @@
 #' @param ... Unused.
 #' @return A ggplot object, or a list of ggplot objects when patchwork is not
 #'   available.
+#' @examples
+#' \donttest{
+#' parts <- c("01", "02")
+#' fs <- tibble::tibble(
+#'   subid = rep(c("01", "02"), each = 2),
+#'   datatype = "func",
+#'   suffix = rep(c("bold.nii.gz", "desc-confounds_timeseries.tsv"), 2),
+#'   task = "rest", fmriprep = TRUE
+#' )
+#' conf_data <- list()
+#' for (p in parts) {
+#'   key <- paste0("derivatives/fmriprep/sub-", p,
+#'                 "/func/sub-", p, "_task-rest_desc-confounds_timeseries.tsv")
+#'   conf_data[[key]] <- data.frame(
+#'     csf = rnorm(100), white_matter = rnorm(100),
+#'     global_signal = rnorm(100), framewise_displacement = abs(rnorm(100)),
+#'     trans_x = rnorm(100), trans_y = rnorm(100), trans_z = rnorm(100),
+#'     rot_x = rnorm(100), rot_y = rnorm(100), rot_z = rnorm(100)
+#'   )
+#' }
+#' mock <- create_mock_bids("ConfPlot", parts, fs, confound_data = conf_data)
+#' conf <- read_confounds(mock, npcs = 3)
+#' if (requireNamespace("ggplot2", quietly = TRUE)) {
+#'   plot(conf)
+#' }
+#' }
 #' @export
 plot.bids_confounds <- function(x, view = c("auto", "run", "aggregate"),
                                 pcs = NULL, top_n = 8, max_panels = 6, ...) {
@@ -200,7 +226,7 @@ plot.bids_confounds <- function(x, view = c("auto", "run", "aggregate"),
     rot <- rot[, keep_pcs, drop = FALSE]
     tibble::tibble(
       panel = panel,
-      variable = rownames(rot),
+      variable = rep(rownames(rot), times = ncol(rot)),
       pc = rep(colnames(rot), each = nrow(rot)),
       loading = as.vector(rot)
     )
