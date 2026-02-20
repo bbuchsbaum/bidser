@@ -18,6 +18,9 @@ const OUT_DIR  = process.env.ECO_ATLAS_OUT || "atlas";
 const MODEL    = process.env.ECO_ATLAS_MODEL || "gpt-4o-mini";
 const MAX_REQ  = parseInt(process.env.ECO_ATLAS_REQUESTS_PER_RUN || "60", 10);
 const MAX_CARDS = parseInt(process.env.ECO_ATLAS_MAX_CARDS_PER_SNIPPET || "2", 10);
+const INCLUDE_TEST_CARDS = ["1", "true", "yes"].includes(
+  String(process.env.ECO_ATLAS_INCLUDE_TEST_CARDS || "0").toLowerCase()
+);
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 if (!OPENAI_API_KEY) { console.error("Missing OPENAI_API_KEY."); process.exit(1); }
@@ -81,6 +84,11 @@ function hasSymbolMention(recipe, symbols) {
     if (code.includes(sym) || code.includes(`${fn}(`)) return true;
   }
   return false;
+}
+
+function looksLikeTestRecipe(recipe) {
+  const code = recipe || "";
+  return /(test_that\\s*\\(|expect_[a-z_]+\\s*\\(|stopifnot\\s*\\(|snapshot_)/i.test(code);
 }
 
 const symbols  = readJsonl(SYMBOLS_PATH);
@@ -159,6 +167,9 @@ function normalizeAllowedSymbols(snippet) {
 let requests = 0;
 
 for (const snip of snippets) {
+  if (!INCLUDE_TEST_CARDS && snip.kind === "testthat") {
+    continue;
+  }
   if (cache[snip.hash]) continue;
   if (requests >= MAX_REQ) break;
 
@@ -175,6 +186,7 @@ Rules:
 - Answer should mention the primary function and expected output.
 - Recipe must include at least one concrete function call from the selected symbols.
 - Use explicit package namespace where possible (pkg::fn).
+- Avoid test-only instructions (expect_*, test_that, snapshots) unless unavoidable.
 - Prefer a single best card. Return 0 cards if the snippet is not actionable.
 - Focus on canonical workflow and intent; minimize detail.`;
 
@@ -208,6 +220,7 @@ ${snip.code}`;
       const recipe = clampLines((c.recipe || "").trim(), 15);
       if (!q || !a || !recipe) return null;
       if ((a.split(/\s+/).filter(Boolean).length || 0) < 10) return null;
+      if (looksLikeTestRecipe(recipe)) return null;
       if (!hasSymbolMention(recipe, syms)) return null;
 
       const tags = [...new Set((c.tags || []).map((t) => String(t).trim().toLowerCase()).filter(Boolean))];

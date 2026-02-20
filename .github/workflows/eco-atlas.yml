@@ -28,6 +28,7 @@ jobs:
         env:
           ECO_ATLAS_OUT: atlas
           ECO_ATLAS_MAX_SNIPPETS: "200"
+          ECO_ATLAS_INCLUDE_TESTS: "0"
         run: Rscript tools/eco_atlas_extract.R
 
       - uses: actions/setup-node@v4
@@ -41,6 +42,7 @@ jobs:
           ECO_ATLAS_OUT: atlas
           ECO_ATLAS_MAX_CARDS_PER_SNIPPET: "2"
           ECO_ATLAS_REQUESTS_PER_RUN: "60"
+          ECO_ATLAS_INCLUDE_TEST_CARDS: "0"
         run: node tools/eco_atlas_distill.mjs
 
       - name: Pack

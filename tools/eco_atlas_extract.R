@@ -268,6 +268,7 @@ extract_pkg_calls <- function(code) {
 
 out_dir <- Sys.getenv("ECO_ATLAS_OUT", "atlas")
 max_snips <- as.integer(Sys.getenv("ECO_ATLAS_MAX_SNIPPETS", "200"))
+include_tests <- tolower(Sys.getenv("ECO_ATLAS_INCLUDE_TESTS", "0")) %in% c("1", "true", "yes")
 
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
@@ -334,10 +335,12 @@ for (vf in v_files) {
   }
 }
 
-t_files <- list.files("tests/testthat", pattern = "\\.R$", full.names = TRUE)
-for (tf in t_files) {
-  chunks <- extract_test_that_blocks(tf)
-  if (length(chunks) > 0) snippets <- c(snippets, chunks)
+if (include_tests) {
+  t_files <- list.files("tests/testthat", pattern = "\\.R$", full.names = TRUE)
+  for (tf in t_files) {
+    chunks <- extract_test_that_blocks(tf)
+    if (length(chunks) > 0) snippets <- c(snippets, chunks)
+  }
 }
 
 kind_rank <- function(kind) {
