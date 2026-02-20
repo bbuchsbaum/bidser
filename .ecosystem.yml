@@ -1,0 +1,15 @@
+ecosystem: true
+package: bidser
+language: R
+role: ingest
+tags:
+  - bids
+  - neuroimaging
+  - fmri
+entrypoints:
+  - bidser::bids_project
+  - bidser::func_scans
+  - bidser::read_events
+  - bidser::read_confounds
+release_tag: eco-atlas
+asset: atlas-pack.tgz

@@ -2,6 +2,17 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## EcoOracle Rule (Oracle-First)
+
+This package is part of the EcoOracle ecosystem.
+
+Before broad code search across related package repos:
+
+1. Ask ecosystem questions with `eco_howto(query)`.
+2. Inspect specific APIs with `eco_symbol("pkg::fn")`.
+3. Use `eco_packages()` and `eco_where_used()` for discovery and usage context.
+4. Only fall back to source exploration if retrieval is missing or ambiguous.
+
 ## Development Commands
 
 ### Building and Installation
