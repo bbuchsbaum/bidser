@@ -43,6 +43,10 @@ jobs:
           ECO_ATLAS_MAX_CARDS_PER_SNIPPET: "2"
           ECO_ATLAS_REQUESTS_PER_RUN: "60"
           ECO_ATLAS_INCLUDE_TEST_CARDS: "0"
+          ECO_ATLAS_MIN_SYMBOLS: "1"
+          ECO_ATLAS_MIN_CARDS: "1"
+          ECO_ATLAS_ENFORCE_EXPORT_SYMBOLS: "1"
+          ECO_ATLAS_ENFORCE_ENTRYPOINTS: "1"
         run: node tools/eco_atlas_distill.mjs
 
       - name: Pack

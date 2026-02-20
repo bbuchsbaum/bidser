@@ -497,3 +497,4 @@ try {
 console.error(
   `Wrote ${mergedCards.length} total microcards to ${CARDS_PATH} (${manualCards.length} manual)`
 );
+

@@ -100,9 +100,7 @@ collect_r_defs <- function(r_files) {
       if (!is.symbol(lhs)) next
       nm <- as.character(lhs)
 
-      if (!is.call(rhs)) next
-      fn_head <- tryCatch(as.character(rhs[[1]])[[1]], error = function(e) "")
-      if (!identical(fn_head, "function")) next
+      if (!is.call(rhs) || as.character(rhs[[1]]) != "function") next
 
       sr <- attr(ex, "srcref")
       start_line <- NA_integer_
@@ -405,3 +403,4 @@ for (idx in seq_along(snippets)) {
 write_jsonl(file.path(out_dir, "snippets.jsonl"), snip_records)
 write_jsonl(file.path(out_dir, "edges.jsonl"), edge_records)
 cat(sprintf("EcoAtlas extract complete: %s symbols, %s snippets\n", length(symbols), length(snip_records)))
+
