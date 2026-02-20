@@ -211,8 +211,15 @@ get_repetition_time <- function(x, subid, task, run=".*", session=".*", ...) {
 #'   optionally `variable = TRUE` if `VolumeTiming` indicates non-constant TR; a
 #'   `unit = "ms->s"` attribute is added if units were auto-converted.
 #' @examples
-#' # infer_tr("sub-01/func/sub-01_task-rest_bold.nii.gz")
-#' # infer_tr("sub-01/func/sub-01_task-rest_bold.json")
+#' tmp_json <- tempfile(fileext = ".json")
+#' writeLines('{"RepetitionTime": 2}', tmp_json)
+#' infer_tr(tmp_json)
+#' unlink(tmp_json)
+#'
+#' tmp_json2 <- tempfile(fileext = ".json")
+#' writeLines('{"VolumeTiming": [0, 2, 4, 6]}', tmp_json2)
+#' infer_tr(tmp_json2)
+#' unlink(tmp_json2)
 #' @export
 infer_tr <- function(x, ...) {
   UseMethod("infer_tr")

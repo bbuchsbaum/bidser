@@ -1,6 +1,7 @@
 test_that("pack_bids creates tar.gz archive with stub files", {
+  skip_on_cran()
   skip_if_offline()
-  
+
   # Create a test BIDS project
   proj <- tryCatch({
     ds_path <- get_example_bids_dataset("ds001")
@@ -39,8 +40,9 @@ test_that("pack_bids creates tar.gz archive with stub files", {
 })
 
 test_that("pack_bids creates zip archive", {
+  skip_on_cran()
   skip_if_offline()
-  
+
   # Create a test BIDS project
   proj <- tryCatch({
     ds_path <- get_example_bids_dataset("ds001")
@@ -170,8 +172,9 @@ test_that("pack_bids handles cleanup option", {
 })
 
 test_that("list_pack_bids provides accurate summary", {
+  skip_on_cran()
   skip_if_offline()
-  
+
   proj <- tryCatch({
     ds_path <- get_example_bids_dataset("ds001")
     bids_project(ds_path)

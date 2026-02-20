@@ -31,8 +31,7 @@ tryCatch({
   proj <- bids_project(ds_path)
   print(participants(proj))
   
-  # Note: Don't unlink the path - it's cached for performance
-  # unlink(ds_path, recursive=TRUE)  # DON'T DO THIS
+  # Dataset cache is intentionally retained for performance.
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })

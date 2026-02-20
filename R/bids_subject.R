@@ -71,8 +71,7 @@
 #'   # For example, get only specific tasks:
 #'   task_scans <- subj$scans(task = "balloonanalogrisktask")
 #'   
-#'   # Note: Don't unlink - cached for performance
-#'   # unlink(ds001_path, recursive=TRUE)
+#'   # Dataset cache is intentionally retained for performance.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -134,8 +133,7 @@ bids_subject.bids_project <- function(x, subid, ...) {
 #'   events <- subj$event_files()
 #'   print(paste("Subject 01:", length(scans), "scans,", length(events), "events"))
 #'   
-#'   # Note: Don't unlink - cached for performance
-#'   # unlink(ds001_path, recursive=TRUE)  
+#'   # Dataset cache is intentionally retained for performance.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })

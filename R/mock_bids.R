@@ -371,13 +371,16 @@ reconstruct_node_path <- function(node, prep_dir = "derivatives/fmriprep") {
 #' print(search_files(mock_proj, suffix = "preproc_bold.nii.gz"))
 #'
 #' # Check stub directory (if created)
-#' # list.files(mock_proj_stub$path, recursive = TRUE)
-#' # if (file.exists(file.path(mock_proj_stub$path, names(event_data_list)[1]))) {
-#' #   print(readLines(file.path(mock_proj_stub$path, names(event_data_list)[1])))
-#' # }
+#' stub_files <- list.files(mock_proj_stub$path, recursive = TRUE)
+#' print(head(stub_files))
 #'
-#' # Clean up stub directory if created in temp
-#' # unlink(mock_proj_stub$path, recursive = TRUE)
+#' # Read one injected stub event file if present
+#' stub_event_path <- file.path(mock_proj_stub$path, names(event_data_list)[1])
+#' if (file.exists(stub_event_path)) {
+#'   print(readLines(stub_event_path, n = 1))
+#' }
+#'
+#' # Cleanup is intentionally omitted in this example.
 #' }
 create_mock_bids <- function(project_name,
                              participants,
@@ -1633,15 +1636,11 @@ read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 #' @param ... Arguments (ignored).
 #' @return Throws an error indicating the function is not applicable to mock objects.
 #' @examples
-#' \dontrun{
-#' # create_preproc_mask is not available for mock projects
-#' # (requires actual neuroimaging data)
 #' mock <- create_mock_bids("Test", c("01"), tibble::tibble(
 #'   subid = "01", datatype = "func",
 #'   suffix = "bold.nii.gz", fmriprep = FALSE
 #' ))
-#' create_preproc_mask(mock)  # Throws an error
-#' }
+#' try(create_preproc_mask(mock))
 #' @export
 #' @rdname create_preproc_mask-method
 create_preproc_mask.mock_bids_project <- function(x, ...) {

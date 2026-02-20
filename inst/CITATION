@@ -1,0 +1,47 @@
+bibentry(
+  bibtype  = "Manual",
+  title    = "bidser: Work with Brain Imaging Data Structure (BIDS) Projects",
+  author   = person("Bradley", "Buchsbaum"),
+  year     = "2026",
+  note     = "R package version 0.2.0",
+  url      = "https://github.com/bbuchsbaum/bidser"
+)
+
+bibentry(
+  bibtype  = "Article",
+  title    = "The brain imaging data structure, a format for organizing and describing outputs of neuroimaging experiments",
+  author   = c(
+    person("Krzysztof J.", "Gorgolewski"),
+    person("Tibor", "Auer"),
+    person("Vince D.", "Calhoun"),
+    person("R. Cameron", "Craddock"),
+    person("Samir", "Das"),
+    person("Eugene P.", "Duff"),
+    person("Guillaume", "Flandin"),
+    person("Satrajit S.", "Ghosh"),
+    person("Tristan", "Glatard"),
+    person("Yaroslav O.", "Halchenko"),
+    person("Daniel A.", "Handwerker"),
+    person("Michael", "Hanke"),
+    person("David", "Keator"),
+    person("Xiangrui", "Li"),
+    person("Zachary", "Michael"),
+    person("Camille", "Maumet"),
+    person("B. Nolan", "Nichols"),
+    person("Thomas E.", "Nichols"),
+    person("John", "Pellman"),
+    person("Jean-Baptiste", "Poline"),
+    person("Ariel", "Rokem"),
+    person("Gunnar", "Schaefer"),
+    person("Vanessa", "Sochat"),
+    person("William", "Triplett"),
+    person("Jessica A.", "Turner"),
+    person("Ga\\u00ebl", "Varoquaux"),
+    person("Russell A.", "Poldrack")
+  ),
+  journal  = "Scientific Data",
+  year     = "2016",
+  volume   = "3",
+  pages    = "160044",
+  doi      = "10.1038/sdata.2016.44"
+)

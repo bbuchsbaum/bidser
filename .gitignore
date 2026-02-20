@@ -12,3 +12,10 @@ bidser_cheatsheat.md
 /doc/
 /Meta/
 docs
+
+.Rcheck/
+..Rcheck/
+.albersdown.bak/
+.omc/
+pkgdown/
+CRAN-SUBMISSION

@@ -1,3 +1,7 @@
+# bidser 0.2.0
+
+* TBD.
+
 # bidser 0.1.0
 
 * Initial CRAN release.

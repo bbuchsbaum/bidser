@@ -205,11 +205,15 @@ decode_bids_entities <- function(entities) {
 #' # Create a smoothing transformer
 #' smooth_6mm <- create_smooth_transformer(6)
 #' 
-#' # Use with bids_transform (example)
-#' # ds_path <- get_example_bids_dataset("ds001")
-#' # proj <- bids_project(ds_path)
-#' # new_files <- bids_transform(proj, smooth_6mm, "smoothed", 
-#' #                             subid = "01", suffix = "bold.nii.gz")
+#' # Apply it to a toy BIDS-like file path
+#' in_dir <- tempdir()
+#' out_dir <- tempdir()
+#' infile <- file.path(in_dir, "sub-01_task-rest_bold.nii.gz")
+#' file.create(infile)
+#' new_file <- smooth_6mm(infile, out_dir)
+#' basename(new_file)
+#' unlink(infile)
+#' unlink(new_file)
 #' }
 create_smooth_transformer <- function(fwhm, suffix_pattern = "bold\\.nii") {
   function(infile, outdir) {
@@ -1411,8 +1415,7 @@ bids_check_compliance <- function(x) {
 #'   proj <- bids_project(ds_path)
 #'   print(participants(proj))
 #'   
-#'   # Note: Don't unlink the path - it's cached for performance
-#'   # unlink(ds_path, recursive=TRUE)  # DON'T DO THIS
+#'   # Dataset cache is intentionally retained for performance.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })

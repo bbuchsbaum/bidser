@@ -21,7 +21,9 @@ includes:
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
 )
 ```
 
@@ -64,7 +66,13 @@ Let's explore these capabilities using a real BIDS dataset.
 We'll use the `ds001` dataset from the BIDS examples, which contains data from a "Balloon Analog Risk Task" experiment with 16 subjects.
 
 ```{r setup, include = FALSE}
-ds001_path <- get_example_bids_dataset("ds001")
+ds001_path <- tryCatch(
+  get_example_bids_dataset("ds001"),
+  error = function(e) NULL
+)
+if (is.null(ds001_path)) {
+  knitr::knit_exit("Example dataset not available.")
+}
 proj <- bids_project(ds001_path)
 ```
 
@@ -101,12 +109,10 @@ bidser provides several ways to find files. Let's start with the most common neu
 ```{r}
 # Find all anatomical T1-weighted images
 t1w_files <- search_files(proj, regex = "T1w\\.nii", full_path = FALSE)
-print(paste("Found", length(t1w_files), "T1w images"))
 head(t1w_files)
 
 # Find all functional BOLD scans
 bold_files <- func_scans(proj, full_path = FALSE)
-print(paste("Found", length(bold_files), "functional scans"))
 head(bold_files)
 ```
 
@@ -119,16 +125,16 @@ One of bidser's key strengths is filtering data by BIDS metadata:
 sub01_scans <- func_scans(proj, subid = "01")
 sub02_scans <- func_scans(proj, subid = "02")
 
-print(paste("Subject 01 has", length(sub01_scans), "scans"))
-print(paste("Subject 02 has", length(sub02_scans), "scans"))
+cat("Subject 01:", length(sub01_scans), "scans\n")
+cat("Subject 02:", length(sub02_scans), "scans\n")
 
 # Filter by task (ds001 only has one task, but this shows the syntax)
 task_scans <- func_scans(proj, task = "balloonanalogrisktask")
-print(paste("Found", length(task_scans), "scans for the balloon task"))
+cat("Balloon task:", length(task_scans), "scans total\n")
 
 # Combine filters: specific subject AND task
 sub01_task_scans <- func_scans(proj, subid = "01", task = "balloonanalogrisktask")
-print(paste("Subject 01 has", length(sub01_task_scans), "balloon task scans"))
+cat("Subject 01, balloon task:", length(sub01_task_scans), "scans\n")
 ```
 
 ### Working with Multiple Subjects
@@ -138,11 +144,11 @@ You can use regular expressions to select multiple subjects at once:
 ```{r}
 # Get scans for subjects 01, 02, and 03
 first_three_scans <- func_scans(proj, subid = "0[123]")
-print(paste("First 3 subjects have", length(first_three_scans), "scans total"))
+cat("First 3 subjects:", length(first_three_scans), "scans total\n")
 
 # Get scans for all subjects (equivalent to default)
 all_scans <- func_scans(proj, subid = ".*")
-print(paste("All subjects have", length(all_scans), "scans total"))
+cat("All subjects:", length(all_scans), "scans total\n")
 ```
 
 ## Working with Event Files
@@ -152,29 +158,23 @@ Event files describe the experimental paradigm - when stimuli were presented, wh
 ```{r}
 # Find all event files
 event_file_paths <- event_files(proj)
-print(paste("Found", length(event_file_paths), "event files"))
+cat("Found", length(event_file_paths), "event files\n")
 
 # Read event data into a nested data frame
-events_data <- suppressMessages(read_events(proj))
-head(events_data)
+events_data <- read_events(proj)
+events_data
 ```
 
 Let's explore the event data structure:
 
 ```{r}
-# Look at events for the first subject
-first_subject_events <- suppressMessages(
-  events_data %>% 
-    filter(.subid == "01") %>% 
-    unnest(cols = c(data))
-)
+# Unnest events for subject 01
+first_subject_events <- events_data %>%
+  filter(.subid == "01") %>%
+  unnest(cols = c(data))
 
-print("Event structure for subject 01:")
-print(head(first_subject_events))
-
-# What columns are in the event data?
-print("Event file columns:")
-print(names(first_subject_events))
+head(first_subject_events)
+names(first_subject_events)
 ```
 
 ### Analyzing Event Data
@@ -183,23 +183,12 @@ Let's do some basic exploration of the experimental design:
 
 ```{r}
 # How many trials per subject?
-trial_counts <- suppressMessages(
-  events_data %>%
-    unnest(cols = c(data)) %>%
-    group_by(.subid) %>%
-    summarise(n_trials = n(), .groups = "drop")
-)
+trial_counts <- events_data %>%
+  unnest(cols = c(data)) %>%
+  group_by(.subid) %>%
+  summarise(n_trials = n(), .groups = "drop")
 
-print("Trials per subject:")
-print(trial_counts)
-
-# What trial types are there?
-if ("trial_type" %in% names(first_subject_events)) {
-  trial_types <- first_subject_events %>%
-    count(trial_type, name = "frequency")
-  print("Trial types in the experiment:")
-  print(trial_types)
-}
+trial_counts
 ```
 
 ## Working with Individual Subjects
@@ -210,36 +199,29 @@ The `bids_subject()` function provides a convenient interface for working with d
 # Create a subject-specific interface for subject 01
 subject_01 <- bids_subject(proj, "01")
 
-# The subject object provides several helper functions:
 # Get all functional scans for this subject
 sub01_scans <- subject_01$scans()
-print(paste("Subject 01 has", length(sub01_scans), "functional scans"))
+cat("Subject 01:", length(sub01_scans), "functional scans\n")
 
 # Get event files for this subject
 sub01_events <- subject_01$events()
-print(paste("Subject 01 has", length(sub01_events), "event files"))
+cat("Subject 01:", length(sub01_events), "event files\n")
 
 # Read event data for this subject
-sub01_event_data <- suppressMessages(subject_01$events())
-print("Event data structure for subject 01:")
-print(sub01_event_data)
+sub01_event_data <- subject_01$events()
+sub01_event_data
 ```
 
 This approach is particularly useful when you're doing subject-level analyses:
 
 ```{r}
-# Example: Analyze data for multiple subjects using the subject interface
 subjects_to_analyze <- c("01", "02", "03")
 
 for (subj_id in subjects_to_analyze) {
-  # Create subject interface
   subj <- bids_subject(proj, subj_id)
-  
-  # Get subject-specific data
   scans <- subj$scans()
   events <- subj$events()
-  
-  cat(sprintf("Subject %s: %d scans, %d event files\n", 
+  cat(sprintf("Subject %s: %d scans, %d event files\n",
               subj_id, length(scans), length(events)))
 }
 ```
@@ -247,38 +229,18 @@ for (subj_id in subjects_to_analyze) {
 The subject interface makes it easy to write analysis pipelines that iterate over subjects without manually constructing filters:
 
 ```{r}
-# Compare trial counts across subjects using the subject interface
-subject_trial_summary <- tibble(
-  subject = character(),
-  n_trials = numeric(),
-  n_scans = numeric()
-)
-
-for (subj_id in participants(proj)[1:3]) {  # Just first 3 subjects for demo
+subject_trial_summary <- lapply(participants(proj)[1:3], function(subj_id) {
   subj <- bids_subject(proj, subj_id)
-  
-  # Count trials
-  event_data <- suppressMessages(subj$events())
+  event_data <- subj$events()
   n_trials <- if (nrow(event_data) > 0) {
-    event_data %>% 
-      unnest(cols = c(data)) %>% 
-      nrow()
+    event_data %>% unnest(cols = c(data)) %>% nrow()
   } else {
     0
   }
-  
-  # Count scans
-  n_scans <- length(subj$scans())
-  
-  # Add to summary
-  subject_trial_summary <- bind_rows(
-    subject_trial_summary,
-    tibble(subject = subj_id, n_trials = n_trials, n_scans = n_scans)
-  )
-}
+  tibble(subject = subj_id, n_trials = n_trials, n_scans = length(subj$scans()))
+}) %>% bind_rows()
 
-print("Trial and scan summary by subject:")
-print(subject_trial_summary)
+subject_trial_summary
 ```
 
 ## Advanced Querying
@@ -290,16 +252,15 @@ The `search_files()` function is very flexible for custom queries:
 ```{r}
 # Find all JSON sidecar files
 json_files <- search_files(proj, regex = "\\.json$")
-print(paste("Found", length(json_files), "JSON files"))
+cat("Found", length(json_files), "JSON files\n")
 
 # Find files for specific runs
 run1_files <- search_files(proj, regex = "bold", run = "01")
-print(paste("Found", length(run1_files), "files from run 01"))
+cat("Found", length(run1_files), "files from run 01\n")
 
-# Complex pattern matching
-# Find T1w files for subjects 01-05
+# Complex pattern matching: T1w files for subjects 01-05
 t1w_subset <- search_files(proj, regex = "T1w", subid = "0[1-5]")
-print(paste("Found", length(t1w_subset), "T1w files for subjects 01-05"))
+cat("Found", length(t1w_subset), "T1w files for subjects 01-05\n")
 ```
 
 ### Getting Full File Paths
@@ -309,14 +270,10 @@ Sometimes you need the complete file paths for analysis:
 ```{r}
 # Get full paths to functional scans for analysis
 full_paths <- func_scans(proj, subid = "01", full_path = TRUE)
-print("Full paths to subject 01's functional scans:")
-print(full_paths)
+full_paths
 
 # Check that files actually exist
-if (length(full_paths) > 0) {
-  files_exist <- file.exists(full_paths)
-  print(paste("All files exist:", all(files_exist)))
-}
+all(file.exists(full_paths))
 ```
 
 ## Next Steps

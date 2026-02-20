@@ -32,8 +32,7 @@ tryCatch({
   proj <- bids_project(ds007_path)
   sessions(proj)
   
-  # Clean up (disabled for performance - cached dataset)
-  # unlink(ds007_path, recursive=TRUE)
+  # Dataset cache is intentionally retained for performance.
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })
