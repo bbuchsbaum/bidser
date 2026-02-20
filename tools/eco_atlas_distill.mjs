@@ -88,7 +88,7 @@ function hasSymbolMention(recipe, symbols) {
 
 function looksLikeTestRecipe(recipe) {
   const code = recipe || "";
-  return /(test_that\\s*\\(|expect_[a-z_]+\\s*\\(|stopifnot\\s*\\(|snapshot_)/i.test(code);
+  return /(test_that\s*\(|expect_[a-z_]+\s*\(|stopifnot\s*\(|snapshot_)/i.test(code);
 }
 
 const symbols  = readJsonl(SYMBOLS_PATH);
