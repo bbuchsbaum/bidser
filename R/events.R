@@ -218,7 +218,7 @@ read_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session
       event_data <- vector("list", length(evs))
       for (k in seq_along(evs)) {
         df <- tryCatch({
-          readr::read_delim(evs[k], delim = " ", na = c("n/a", "NA", "N/A", ""))
+          readr::read_delim(evs[k], delim = "\t", na = c("n/a", "NA", "N/A", ""))
         }, error = function(e) {
           warning("Failed to read event file: ", evs[k], " - ", e$message)
           NULL

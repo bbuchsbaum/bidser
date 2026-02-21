@@ -1,5 +1,5 @@
 Package: bidser
-Version: 0.2.0
+Version: 0.3.0
 Title: Work with 'BIDS' (Brain Imaging Data Structure) Projects
 Description: Tools for working with 'BIDS' (Brain Imaging Data Structure)
     formatted neuroimaging datasets. The package provides functionality for

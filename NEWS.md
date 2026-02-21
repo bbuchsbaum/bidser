@@ -1,3 +1,11 @@
+# bidser 0.3.0
+
+* Fix `load_all_events()` and `read_events()` to use tab delimiter for BIDS TSV
+  event files instead of space delimiter.
+* Fix `read_sidecar()` to handle JSON sidecars containing vector-valued fields
+  (e.g. `SliceTiming`) by storing them as list-columns instead of failing with
+  a "differing number of rows" error.
+
 # bidser 0.2.0
 
 * TBD.

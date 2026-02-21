@@ -85,13 +85,16 @@ read_sidecar <- function(x, subid=".*", task=".*", run=".*", session=".*", modal
     })
     if (is.null(jdata)) return(NULL)
     
-    # Convert JSON named list into a one-row tibble
-    meta_tibble <- as.data.frame(jdata, stringsAsFactors = FALSE)
-    if (nrow(meta_tibble) == 0) {
-      # If empty, just return a row of NAs
-      meta_tibble <- tibble::tibble()
+    # Convert JSON named list into a one-row tibble.
+    # Keep only scalar (length-1) fields as columns; store vector-valued
+    # fields (e.g. SliceTiming) as list-columns to avoid differing-row errors.
+    scalar <- vapply(jdata, function(v) length(v) == 1L && is.atomic(v), logical(1))
+    row <- jdata[scalar]
+    vec_fields <- jdata[!scalar]
+    meta_tibble <- tibble::as_tibble(row)
+    for (nm in names(vec_fields)) {
+      meta_tibble[[nm]] <- list(vec_fields[[nm]])
     }
-    meta_tibble <- tibble::as_tibble(meta_tibble)
     
     # Add identifying columns
     meta_tibble <- meta_tibble %>%

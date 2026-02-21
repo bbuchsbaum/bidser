@@ -1218,7 +1218,7 @@ load_all_events.bids_project <- function(x, subid=".*", task=".*", run=".*", ses
   df_list <- lapply(event_files, function(fn) {
     meta <- parse_metadata(fn)
     dfx <- tryCatch({
-      readr::read_delim(fn, delim = " ", na = c("n/a", "NA"))
+      readr::read_delim(fn, delim = "\t", na = c("n/a", "NA"))
     }, error = function(e) {
       warning("Failed to read file: ", fn, " - ", e$message)
       return(NULL)
