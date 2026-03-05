@@ -12,6 +12,8 @@ read_sidecar(
   session = ".*",
   modality = "bold",
   full_path = TRUE,
+  inherit = FALSE,
+  inherit_scope = c("auto", "raw", "derivatives", "all"),
   ...
 )
 }
@@ -30,6 +32,15 @@ read_sidecar(
 This is matched against the 'kind' field in parsed BIDS filenames.}
 
 \item{full_path}{If TRUE, return full file paths in the \code{file} column. Default is TRUE.}
+
+\item{inherit}{If TRUE, resolve metadata using BIDS inheritance across parent
+sidecars. If FALSE (default), read each JSON sidecar directly.}
+
+\item{inherit_scope}{Scope used when \code{inherit = TRUE}:
+\itemize{
+\item \code{"auto"} (default) infers raw/derivatives from file location
+\item \code{"raw"}, \code{"derivatives"}, or \code{"all"} override scope explicitly
+}}
 
 \item{...}{Additional arguments passed to \code{search_files()}.}
 }

@@ -2,7 +2,6 @@ context("Sidecar utilities")
 
 library(testthat)
 library(bidser)
-library(tibble)
 
 # create small mock dataset with JSON sidecar
 
@@ -10,7 +9,7 @@ test_that("read_sidecar and get_repetition_time work", {
   tmpdir <- tempfile("sidecar_proj_")
   on.exit(unlink(tmpdir, recursive = TRUE, force = TRUE), add = TRUE)
 
-  parts <- tibble(participant_id = "01")
+  parts <- tibble::tibble(participant_id = "01")
 
   fs <- tibble::tribble(
     ~subid, ~datatype, ~task, ~run, ~suffix,       ~fmriprep,
@@ -41,4 +40,3 @@ test_that("read_sidecar and get_repetition_time work", {
   tr <- get_repetition_time(proj, subid="01", task="rest", run="01")
   expect_equal(tr, 2.0)
 })
-

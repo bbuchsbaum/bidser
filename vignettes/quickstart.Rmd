@@ -245,9 +245,67 @@ subject_trial_summary
 
 ## Advanced Querying
 
-### Custom File Searches
+### Preferred Queries for New Code
 
-The `search_files()` function is very flexible for custom queries:
+For new workflows, prefer `query_files()`. It keeps the same general idea as
+`search_files()`, but makes match semantics explicit and lets you control
+whether entities must actually be present and whether to search raw data,
+derivatives, or both.
+
+```{r}
+# Exact entity matching for reproducible filters
+exact_bold <- query_files(
+  proj,
+  regex = "bold\\.nii\\.gz$",
+  subid = "01",
+  task = "balloonanalogrisktask",
+  match_mode = "exact"
+)
+cat("Exact-match BOLD files:", length(exact_bold), "\n")
+
+# Regex entity matching when selecting multiple values
+regex_bold <- query_files(
+  proj,
+  regex = "bold\\.nii\\.gz$",
+  subid = "0[1-3]",
+  task = "balloon.*|mixedgamblestask",
+  match_mode = "regex"
+)
+cat("Regex-match BOLD files:", length(regex_bold), "\n")
+
+# Require the queried entity to be present on returned files
+task_annotated <- query_files(
+  proj,
+  regex = "\\.nii\\.gz$",
+  task = ".*",
+  require_entity = TRUE,
+  scope = "raw"
+)
+cat("Files with an explicit task entity:", length(task_annotated), "\n")
+```
+
+If you have derivatives indexed, `scope` lets you be explicit about where to
+search:
+
+```{r derivatives-query, eval = FALSE}
+prep_bold <- query_files(
+  proj_deriv,
+  regex = "bold\\.nii\\.gz$",
+  desc = "preproc",
+  scope = "derivatives",
+  match_mode = "exact"
+)
+
+all_bold <- query_files(
+  proj_deriv,
+  regex = "bold\\.nii\\.gz$",
+  scope = "all"
+)
+```
+
+### search_files() Still Works
+
+`search_files()` stays available for compatibility and ad hoc flexible queries:
 
 ```{r}
 # Find all JSON sidecar files

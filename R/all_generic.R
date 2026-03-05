@@ -579,6 +579,11 @@ brain_mask <- function(x, subid, ...) {
 #' This function searches for files in a BIDS project that match a specified pattern and
 #' optional key-value criteria. It can be used to find files in both raw data and preprocessed
 #' derivatives based on filename patterns and BIDS metadata.
+#'
+#' `search_files()` remains available as the compatibility interface for
+#' existing code and ad hoc regex-heavy searches. For new code, prefer
+#' [query_files()], which provides explicit matching mode, entity-existence
+#' semantics, and scope controls without changing `search_files()` behavior.
 #' 
 #' @param x A \code{bids_project} object created by \code{bids_project()}.
 #' @param regex A regular expression to match against filenames. Default is ".*" (all files).
@@ -617,6 +622,124 @@ brain_mask <- function(x, subid, ...) {
 #' }
 search_files <- function(x, ...) {
   UseMethod("search_files", x)
+}
+
+#' Query files in BIDS structure with explicit semantics
+#'
+#' This function provides a stricter, more explicit querying interface than
+#' [search_files()], with support for exact-vs-regex entity matching, optional
+#' entity-existence requirements, and raw/derivatives scope selection.
+#'
+#' @param x A `bids_project` or `mock_bids_project` object.
+#' @param regex A regular expression applied to filenames. Default is `".*"`.
+#' @param full_path If `TRUE`, return full paths. If `FALSE`, return paths
+#'   relative to the dataset root.
+#' @param match_mode Matching mode for entity filters in `...`:
+#'   - `"regex"`: values are treated as regex patterns (default)
+#'   - `"exact"`: values are treated as exact string matches
+#' @param require_entity If `TRUE`, queried entity keys must be present on a
+#'   file for it to match. If `FALSE`, wildcard patterns can match files where
+#'   that entity is missing.
+#' @param scope Which dataset scope to query:
+#'   - `"all"`: raw + derivatives
+#'   - `"raw"`: raw data only
+#'   - `"derivatives"`: derivatives only
+#' @param strict Passed through to search methods. If `TRUE`, missing queried
+#'   entities typically fail matching (except wildcard behavior in legacy paths).
+#' @param ... Additional entity filters (e.g., `subid = "01"`, `task = "rest"`).
+#' @return A character vector of matching files, or `NULL` if no matches.
+#' @export
+#' @rdname query_files
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path, fmriprep = FALSE)
+#'
+#'   # Exact entity matching for reproducible filters in new workflows
+#'   exact_bold <- query_files(
+#'     proj,
+#'     regex = "bold\\.nii\\.gz$",
+#'     subid = "01",
+#'     task = "balloonanalogrisktask",
+#'     match_mode = "exact"
+#'   )
+#'
+#'   # Regex entity matching when selecting multiple runs or tasks
+#'   regex_bold <- query_files(
+#'     proj,
+#'     regex = "bold\\.nii\\.gz$",
+#'     subid = "0[12]",
+#'     task = "balloon.*|mixedgamblestask",
+#'     match_mode = "regex"
+#'   )
+#'
+#'   # Require task labels to actually exist on the matched files
+#'   task_annotated <- query_files(
+#'     proj,
+#'     regex = "\\.nii\\.gz$",
+#'     task = ".*",
+#'     require_entity = TRUE,
+#'     scope = "raw"
+#'   )
+#'
+#'   unlink(ds001_path, recursive = TRUE)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
+#' \donttest{
+#' tryCatch({
+#'   deriv_path <- get_example_bids_dataset("ds000001-fmriprep")
+#'   proj_deriv <- bids_project(deriv_path, fmriprep = TRUE)
+#'
+#'   deriv_only <- query_files(
+#'     proj_deriv,
+#'     regex = "bold\\.nii\\.gz$",
+#'     desc = "preproc",
+#'     scope = "derivatives",
+#'     match_mode = "exact"
+#'   )
+#'
+#'   all_scopes <- query_files(
+#'     proj_deriv,
+#'     regex = "bold\\.nii\\.gz$",
+#'     scope = "all"
+#'   )
+#'
+#'   unlink(deriv_path, recursive = TRUE)
+#' }, error = function(e) {
+#'   message("Example requires derivatives dataset: ", e$message)
+#' })
+#' }
+query_files <- function(x, ...) {
+  UseMethod("query_files", x)
+}
+
+#' Resolve metadata for a BIDS file
+#'
+#' Retrieves JSON metadata for a target BIDS file. When `inherit = TRUE`, this
+#' method applies BIDS-style inheritance by merging matching sidecars from less
+#' specific to more specific locations.
+#'
+#' If multiple sidecars are equally specific at the same directory depth, they
+#' are merged in deterministic path order after less specific ancestors, so the
+#' final values are reproducible.
+#'
+#' @param x A `bids_project` object.
+#' @param file Target file path (relative to project root or absolute path).
+#' @param inherit If `TRUE`, merge inherited metadata from parent sidecars.
+#' @param scope Scope used when applying inheritance:
+#'   - `"auto"`: infer from file location
+#'   - `"raw"`: raw data inheritance
+#'   - `"derivatives"`: derivatives inheritance
+#'   - `"all"`: allow full project ancestry
+#' @param ... Additional arguments for methods.
+#' @return A named list of metadata fields.
+#' @export
+#' @rdname get_metadata
+get_metadata <- function(x, file, inherit = TRUE, scope = c("auto", "raw", "derivatives", "all"), ...) {
+  UseMethod("get_metadata", x)
 }
 
 #' Load All Event Files

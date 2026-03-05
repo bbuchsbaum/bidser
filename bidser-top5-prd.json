@@ -1,0 +1,188 @@
+{
+  "document_type": "product_requirements_document",
+  "product": "bidser",
+  "title": "Top 5 Priority Additions for bidser",
+  "version": "1.0.0",
+  "status": "draft",
+  "owner": "bidser core team",
+  "created_date": "2026-03-05",
+  "updated_date": "2026-03-05",
+  "context": {
+    "summary": "bidser is strong for R-native BIDS workflows, especially confounds and subject-level convenience, but needs targeted additions to exceed pybids-level breadth while preserving R ergonomics.",
+    "problem_statement": "Current functionality is strong in core MRI/fMRIPrep workflows but lacks full metadata inheritance semantics, broader query semantics, persistent indexing, generalized derivatives handling, and higher-level variables/model workflows."
+  },
+  "goals": [
+    "Close critical correctness gaps around metadata retrieval.",
+    "Make querying explicit, predictable, and scalable.",
+    "Expand derivatives support beyond a single pipeline pattern.",
+    "Add higher-level analysis primitives that are immediately useful in R.",
+    "Maintain backward compatibility for existing user workflows."
+  ],
+  "non_goals": [
+    "Full parity with every pybids feature in a single release.",
+    "Rewriting the existing tree/parsing architecture from scratch.",
+    "Breaking existing APIs without a migration path."
+  ],
+  "priorities": [
+    {
+      "rank": 1,
+      "id": "P1_METADATA_INHERITANCE",
+      "name": "Inheritance-Correct Metadata Retrieval",
+      "description": "Implement metadata resolution consistent with the BIDS inheritance principle, with nearest-file override behavior and deterministic conflict handling.",
+      "user_value": "Prevents incorrect metadata reads and makes downstream analysis reproducible.",
+      "deliverables": [
+        "New metadata resolver API (e.g., get_metadata) with explicit inheritance behavior.",
+        "Update read_sidecar to support inherited resolution mode.",
+        "Documentation and examples showing override precedence."
+      ],
+      "acceptance_criteria": [
+        "Given a fixture with project-level, subject-level, and run-level JSON keys, metadata retrieval returns merged values with nearest-file precedence.",
+        "Conflicting keys are resolved deterministically and documented.",
+        "read_sidecar exposes an inheritance mode and returns resolved fields in output.",
+        "At least 10 new tests validate inheritance, conflict resolution, missing keys, and no-sidecar cases.",
+        "No regressions in existing sidecar/TR tests."
+      ],
+      "dependencies": [
+        "Existing parser/search APIs",
+        "jsonlite"
+      ]
+    },
+    {
+      "rank": 2,
+      "id": "P2_QUERY_API_V2",
+      "name": "Explicit Query Semantics API",
+      "description": "Add a new query interface that separates exact match vs regex match, controls entity existence requirements, and supports clear raw/derivatives scoping.",
+      "user_value": "Reduces query ambiguity and improves trust in returned files.",
+      "deliverables": [
+        "query_files API with parameters for match_mode, require_entity, and scope.",
+        "Entity validation with helpful errors for unknown filters.",
+        "Compatibility wrapper so existing search_files behavior remains available."
+      ],
+      "acceptance_criteria": [
+        "query_files supports exact and regex matching modes and returns expected files on canonical fixtures.",
+        "When require_entity is true, files lacking queried entities are excluded.",
+        "Unknown entity filters return informative errors listing valid entity names.",
+        "Raw-only, derivatives-only, and combined scope queries are all supported.",
+        "Existing search_files tests remain green with no behavior-breaking changes."
+      ],
+      "dependencies": [
+        "Current key_match and search internals",
+        "Entity dictionary from parser specs"
+      ]
+    },
+    {
+      "rank": 3,
+      "id": "P3_PERSISTENT_INDEX",
+      "name": "Persistent Index Backend",
+      "description": "Introduce optional persistent indexing (SQLite or DuckDB) to avoid repeated full scans and improve large-dataset performance.",
+      "user_value": "Faster startup and queries on large BIDS datasets across sessions.",
+      "deliverables": [
+        "Optional index path in project initialization.",
+        "Index build, load, and refresh operations.",
+        "Integrity checks to invalidate stale indexes."
+      ],
+      "acceptance_criteria": [
+        "Initializing with persistent index creates an index file and loads from it on subsequent sessions.",
+        "Index refresh updates changed files without full rebuild when possible.",
+        "Query results from indexed and non-indexed modes are identical on test fixtures.",
+        "Benchmark on fixture >= 10k files shows at least 2x faster cold start after index creation.",
+        "If index is stale/corrupt, system falls back safely with actionable warning."
+      ],
+      "dependencies": [
+        "DB backend package selection",
+        "File mtime/hash tracking"
+      ]
+    },
+    {
+      "rank": 4,
+      "id": "P4_DERIVATIVES_GENERALIZATION",
+      "name": "Generalized Derivatives Support",
+      "description": "Generalize derivatives handling to multiple pipelines with explicit pipeline selection and discovery, instead of fMRIPrep-only assumptions.",
+      "user_value": "Supports broader real-world BIDS derivative ecosystems.",
+      "deliverables": [
+        "Derivative pipeline discovery from derivatives/* and dataset_description metadata.",
+        "Pipeline selector in query API.",
+        "Refactor preproc/confound/mask/surface/transform helpers to use pipeline-aware internals."
+      ],
+      "acceptance_criteria": [
+        "System discovers available derivative pipelines and exposes them programmatically.",
+        "Users can filter derivative queries by pipeline name.",
+        "Existing fMRIPrep workflows remain fully functional.",
+        "At least one non-fMRIPrep derivative fixture is supported in tests.",
+        "Documentation includes migration notes and examples for multi-pipeline usage."
+      ],
+      "dependencies": [
+        "Pipeline metadata parser",
+        "Updated query scope logic"
+      ]
+    },
+    {
+      "rank": 5,
+      "id": "P5_VARIABLES_AND_MODELS",
+      "name": "Variables and Stats-Model Workflow Layer",
+      "description": "Add high-level APIs to load BIDS variables and map them into model-ready run/session tables for downstream R analysis.",
+      "user_value": "Moves bidser from file access into end-to-end analysis workflow power.",
+      "deliverables": [
+        "Variable loading API that combines events/confounds into tidy model-ready tables.",
+        "Minimal stats-model JSON ingestion and run-level design table generation.",
+        "Vignette demonstrating end-to-end workflow."
+      ],
+      "acceptance_criteria": [
+        "Given events + confounds fixtures, variable loader returns tidy run-level tables with stable identifiers.",
+        "Model JSON parser ingests valid model spec and emits expected table schema.",
+        "At least one end-to-end example runs in CI and produces deterministic output.",
+        "APIs expose explicit errors for unsupported model constructs.",
+        "Documentation includes at least one real dataset workflow example."
+      ],
+      "dependencies": [
+        "read_events/read_confounds outputs",
+        "Model schema contract"
+      ]
+    }
+  ],
+  "success_metrics": [
+    {
+      "name": "Metadata Correctness",
+      "target": "100% pass rate for new inheritance test suite"
+    },
+    {
+      "name": "Query Reliability",
+      "target": "No unresolved bug reports for ambiguous query behavior across two minor releases"
+    },
+    {
+      "name": "Performance",
+      "target": ">=2x faster re-open/query startup on large fixture with persistent index"
+    },
+    {
+      "name": "Workflow Adoption",
+      "target": "At least 3 package vignettes or downstream examples using new variable/model APIs"
+    }
+  ],
+  "release_plan": {
+    "phase_1": [
+      "P1_METADATA_INHERITANCE",
+      "P2_QUERY_API_V2"
+    ],
+    "phase_2": [
+      "P3_PERSISTENT_INDEX",
+      "P4_DERIVATIVES_GENERALIZATION"
+    ],
+    "phase_3": [
+      "P5_VARIABLES_AND_MODELS"
+    ]
+  },
+  "risks": [
+    {
+      "risk": "Backward compatibility break in search behavior",
+      "mitigation": "Ship new query API alongside legacy search_files; deprecate gradually."
+    },
+    {
+      "risk": "Index complexity increases maintenance burden",
+      "mitigation": "Keep index backend optional and use clear fallback paths."
+    },
+    {
+      "risk": "Spec drift in derivatives and model formats",
+      "mitigation": "Pin fixture versions and validate against explicit schema contracts."
+    }
+  ]
+}

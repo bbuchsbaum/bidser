@@ -31,3 +31,4 @@ repomix-output.xml
 ^CONTRIBUTING\.md$
 ^README\.html$
 ^codemeta\.json$
+^pybids($|/)

@@ -13,6 +13,11 @@
 #' @param modality A regex for matching modality/kind (e.g. "bold"). Default is `"bold"`.
 #'   This is matched against the 'kind' field in parsed BIDS filenames.
 #' @param full_path If TRUE, return full file paths in the `file` column. Default is TRUE.
+#' @param inherit If TRUE, resolve metadata using BIDS inheritance across parent
+#'   sidecars. If FALSE (default), read each JSON sidecar directly.
+#' @param inherit_scope Scope used when `inherit = TRUE`:
+#'   - `"auto"` (default) infers raw/derivatives from file location
+#'   - `"raw"`, `"derivatives"`, or `"all"` override scope explicitly
 #' @param ... Additional arguments passed to `search_files()`.
 #'
 #' @return A tibble with one row per JSON file. Columns include:
@@ -54,7 +59,13 @@
 #' @importFrom jsonlite read_json
 #' @importFrom stringr str_match
 #' @export
-read_sidecar <- function(x, subid=".*", task=".*", run=".*", session=".*", modality="bold", full_path=TRUE, ...) {
+read_sidecar <- function(x, subid=".*", task=".*", run=".*", session=".*",
+                         modality="bold", full_path=TRUE,
+                         inherit = FALSE,
+                         inherit_scope = c("auto", "raw", "derivatives", "all"),
+                         ...) {
+  inherit_scope <- match.arg(inherit_scope)
+
   # Find all JSON sidecar files (assumed to end with .json)
   # and match given criteria:
   # Note: We use 'kind' instead of 'modality' because the BIDS parser stores
@@ -76,9 +87,13 @@ read_sidecar <- function(x, subid=".*", task=".*", run=".*", session=".*", modal
     task_val <- stringr::str_match(bname, "task-([A-Za-z0-9]+)")[,2]
     run_val <- stringr::str_match(bname, "run-([0-9]+)")[,2]
     
-    # Read the JSON
+    # Read JSON directly or via inheritance-aware resolver
     jdata <- tryCatch({
-      jsonlite::read_json(fn, simplifyVector = TRUE)
+      if (isTRUE(inherit)) {
+        get_metadata(x, fn, inherit = TRUE, scope = inherit_scope)
+      } else {
+        jsonlite::read_json(fn, simplifyVector = TRUE)
+      }
     }, error=function(e) {
       warning("Failed to read JSON: ", fn, " - ", e$message)
       return(NULL)

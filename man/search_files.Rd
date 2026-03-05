@@ -46,6 +46,16 @@ derivatives (if available).
 
 Finds files in the mock BIDS tree by matching file names and BIDS entities.
 }
+\details{
+\code{search_files()} remains available as the compatibility interface for
+existing code and ad hoc regex-heavy searches. For new code, prefer
+\code{\link[=query_files]{query_files()}}, which provides explicit matching mode, entity-existence
+semantics, and scope controls without changing \code{search_files()} behavior.
+
+This method remains available for backward compatibility and flexible
+regex-driven searches. Prefer \code{\link[=query_files]{query_files()}} for explicit query semantics
+in new code.
+}
 \examples{
 \donttest{
 # Search for event files in a BIDS dataset  

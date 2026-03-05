@@ -1011,6 +1011,10 @@ key_match <- function(default=FALSE, ...) {
 #' and optional key-value criteria. It can search in both raw data and preprocessed 
 #' derivatives (if available).
 #'
+#' This method remains available for backward compatibility and flexible
+#' regex-driven searches. Prefer [query_files()] for explicit query semantics
+#' in new code.
+#'
 #' @param x A \code{bids_project} object.
 #' @param regex A regular expression to match against filenames. Default is ".*" (all files).
 #' @param full_path If TRUE, return full file paths. If FALSE, return paths relative to the project root.
