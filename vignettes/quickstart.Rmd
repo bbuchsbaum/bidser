@@ -191,6 +191,55 @@ trial_counts <- events_data %>%
 trial_counts
 ```
 
+## Working with Metadata Sidecars
+
+BIDS stores acquisition metadata in JSON sidecars. `bidser` now supports both
+direct sidecar reads and inheritance-aware resolution following the BIDS
+inheritance principle.
+
+```{r}
+# Read sidecar rows directly
+direct_sidecars <- read_sidecar(
+  proj,
+  subid = "01",
+  task = "balloonanalogrisktask",
+  inherit = FALSE
+)
+
+nrow(direct_sidecars)
+names(direct_sidecars)
+```
+
+If you want the effective metadata for a scan after applying inherited
+sidecars from parent locations, use `get_metadata()` or set `inherit = TRUE`
+in `read_sidecar()`:
+
+```{r}
+# Resolve metadata for a specific BOLD file with inheritance
+resolved_meta <- get_metadata(proj, bold_files[[1]], inherit = TRUE)
+
+sort(names(resolved_meta))[1:8]
+resolved_meta$RepetitionTime
+
+# Inheritance-aware sidecar table
+inherited_sidecars <- read_sidecar(
+  proj,
+  subid = "01",
+  task = "balloonanalogrisktask",
+  inherit = TRUE
+)
+
+if (nrow(inherited_sidecars) > 0) {
+  inherited_sidecars %>%
+    select(any_of(c("file", "RepetitionTime")))
+} else {
+  inherited_sidecars
+}
+```
+
+This is useful when the metadata you need lives in a task- or dataset-level
+JSON sidecar instead of the most specific file-level sidecar.
+
 ## Working with Individual Subjects
 
 The `bids_subject()` function provides a convenient interface for working with data from a single subject. It returns a lightweight object with helper functions that automatically filter data for that subject.
