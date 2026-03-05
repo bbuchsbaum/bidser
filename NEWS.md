@@ -1,3 +1,16 @@
+# bidser 0.4.0
+
+* Add `query_files()` as the recommended explicit query API for new workflows,
+  with `match_mode`, `require_entity`, and raw/derivatives `scope` controls.
+* Add `get_metadata()` for inheritance-aware BIDS metadata resolution with
+  deterministic nearest-sidecar precedence.
+* Extend `read_sidecar()` with inheritance-aware resolution via `inherit` and
+  `inherit_scope`.
+* Expand acceptance coverage for metadata inheritance, missing-sidecar cases,
+  conflict handling, and derivative-scope behavior.
+* Keep `search_files()` available for backward compatibility while steering new
+  examples and docs toward `query_files()`.
+
 # bidser 0.3.0
 
 * Fix `load_all_events()` and `read_events()` to use tab delimiter for BIDS TSV
