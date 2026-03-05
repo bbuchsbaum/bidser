@@ -1,12 +1,11 @@
 ---
 title: Getting Started with bidser
 output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Getting Started with bidser}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+vignette: |
+  %\VignetteIndexEntry{Getting Started with bidser} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
 params:
   family: red
+  preset: homage
 css: albers.css
 resource_files:
 - albers.css
@@ -28,6 +27,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r theme-setup, include = FALSE}
+if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(params$family))
 suppressPackageStartupMessages({
   library(bidser)
   library(tibble)
