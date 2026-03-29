@@ -12,9 +12,12 @@ query_files(x, ...)
   x,
   regex = ".*",
   full_path = FALSE,
-  match_mode = c("regex", "exact"),
+  match_mode = c("regex", "exact", "glob"),
   require_entity = FALSE,
   scope = c("all", "raw", "derivatives"),
+  pipeline = NULL,
+  return = c("paths", "tibble"),
+  use_index = c("auto", "never"),
   strict = TRUE,
   ...
 )
@@ -23,9 +26,12 @@ query_files(x, ...)
   x,
   regex = ".*",
   full_path = FALSE,
-  match_mode = c("regex", "exact"),
+  match_mode = c("regex", "exact", "glob"),
   require_entity = FALSE,
   scope = c("all", "raw", "derivatives"),
+  pipeline = NULL,
+  return = c("paths", "tibble"),
+  use_index = c("auto", "never"),
   strict = TRUE,
   ...
 )
@@ -33,7 +39,10 @@ query_files(x, ...)
 \arguments{
 \item{x}{A \code{bids_project} or \code{mock_bids_project} object.}
 
-\item{...}{Additional entity filters (e.g., \code{subid = "01"}, \code{task = "rest"}).}
+\item{...}{Additional entity filters (e.g., \code{subid = "01"}, \code{task = "rest"},
+\code{extension = ".nii.gz"}, \code{datatype = "func"}).  The special filters
+\code{extension} and \code{datatype} are handled post-hoc and support the same
+matching modes as other entities.}
 
 \item{regex}{A regular expression applied to filenames. Default is \code{".*"}.}
 
@@ -44,6 +53,7 @@ relative to the dataset root.}
 \itemize{
 \item \code{"regex"}: values are treated as regex patterns (default)
 \item \code{"exact"}: values are treated as exact string matches
+\item \code{"glob"}: values are shell-style globs (e.g., \code{"sub-0*"})
 }}
 
 \item{require_entity}{If \code{TRUE}, queried entity keys must be present on a
@@ -57,11 +67,25 @@ that entity is missing.}
 \item \code{"derivatives"}: derivatives only
 }}
 
+\item{pipeline}{Optional derivative pipeline name(s) used when
+\code{scope = "derivatives"} or \code{scope = "all"}.}
+
+\item{return}{Whether to return matching file paths (\code{"paths"}) or a tibble
+with parsed entities (\code{"tibble"}).}
+
+\item{use_index}{Whether to use a persisted file index when available:
+\itemize{
+\item \code{"auto"}: use a cached index if present
+\item \code{"never"}: always query the in-memory tree
+}}
+
 \item{strict}{Passed through to search methods. If \code{TRUE}, missing queried
 entities typically fail matching (except wildcard behavior in legacy paths).}
 }
 \value{
-A character vector of matching files, or \code{NULL} if no matches.
+A character vector of matching files, a tibble of indexed rows
+(sorted by subid, session, task, run, path), or \code{NULL} if no matches
+are found.
 }
 \description{
 This function provides a stricter, more explicit querying interface than
@@ -116,13 +140,15 @@ tryCatch({
     regex = "bold\\\\.nii\\\\.gz$",
     desc = "preproc",
     scope = "derivatives",
+    pipeline = "fmriprep",
     match_mode = "exact"
   )
 
   all_scopes <- query_files(
     proj_deriv,
     regex = "bold\\\\.nii\\\\.gz$",
-    scope = "all"
+    scope = "all",
+    return = "tibble"
   )
 
   unlink(deriv_path, recursive = TRUE)

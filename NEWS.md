@@ -6,6 +6,16 @@
   deterministic nearest-sidecar precedence.
 * Extend `read_sidecar()` with inheritance-aware resolution via `inherit` and
   `inherit_scope`.
+* Add permissive `bids_project(..., strict_participants = FALSE)` loading for
+  datasets that omit `participants.tsv`, while keeping compliance reporting
+  explicit.
+* Add derivative discovery via `bids_project(..., derivatives = "auto")` and
+  `derivative_pipelines()`, while preserving legacy `fmriprep` helpers when an
+  fMRIPrep pipeline is present.
+* Add persistent file indexing with `bids_index()` and indexed `query_files()`
+  lookups.
+* Add `variables_table()` and `bids_report_data()` / `bids_report()` for tidy
+  run-level inventory and lightweight dataset reporting.
 * Expand acceptance coverage for metadata inheritance, missing-sidecar cases,
   conflict handling, and derivative-scope behavior.
 * Keep `search_files()` available for backward compatibility while steering new

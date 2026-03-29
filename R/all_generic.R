@@ -156,27 +156,38 @@ flat_list <- function(x, ...) {
 }
 
 #' Get participants from a BIDS project
-#' 
-#' This function retrieves a vector of unique participant IDs from a BIDS project.
-#' It extracts the subject identifiers from the project's data table, filtering out
-#' any NA values. Participant IDs in BIDS typically follow the format 'sub-XX'.
-#' 
+#'
+#' Retrieves participant information from a BIDS project.  By default returns
+#' a sorted character vector of unique participant IDs (without the `"sub-"`
+#' prefix).
+#'
+#' When `as_tibble = TRUE`, a tibble is returned instead containing the full
+#' `participants.tsv` data (or inferred IDs when the file is missing) plus a
+#' `source` column indicating whether each ID came from the `"table"` or the
+#' `"filesystem"`.
+#'
 #' @param x the `bids_project` object
+#' @param as_tibble Logical.
+#'   If `FALSE` (default), return a character vector of participant IDs.
+#'   If `TRUE`, return a tibble with all `participants.tsv` columns plus a
+#'   `source` column (`"table"` or `"filesystem"`).
 #' @param ... extra args passed to methods
-#' 
-#' @return A character vector of unique participant IDs found in the BIDS project.
-#'   If no participants are found or the 'subid' column doesn't exist in the project's
-#'   data table, returns an empty character vector.
+#'
+#' @return A character vector of unique participant IDs, or a tibble when
+#'   `as_tibble = TRUE`.
 #' @export
 #' @rdname participants-method
-#' @examples 
+#' @examples
 #' \donttest{
 #' # Get participants from a BIDS project
 #' tryCatch({
 #'   ds001_path <- get_example_bids_dataset("ds001")
 #'   proj <- bids_project(ds001_path)
 #'   participants(proj)
-#'   
+#'
+#'   # Get full tibble with provenance
+#'   participants(proj, as_tibble = TRUE)
+#'
 #'   # Clean up
 #'   unlink(ds001_path, recursive=TRUE)
 #' }, error = function(e) {
@@ -637,6 +648,7 @@ search_files <- function(x, ...) {
 #' @param match_mode Matching mode for entity filters in `...`:
 #'   - `"regex"`: values are treated as regex patterns (default)
 #'   - `"exact"`: values are treated as exact string matches
+#'   - `"glob"`: values are shell-style globs (e.g., `"sub-0*"`)
 #' @param require_entity If `TRUE`, queried entity keys must be present on a
 #'   file for it to match. If `FALSE`, wildcard patterns can match files where
 #'   that entity is missing.
@@ -644,10 +656,22 @@ search_files <- function(x, ...) {
 #'   - `"all"`: raw + derivatives
 #'   - `"raw"`: raw data only
 #'   - `"derivatives"`: derivatives only
+#' @param pipeline Optional derivative pipeline name(s) used when
+#'   `scope = "derivatives"` or `scope = "all"`.
+#' @param return Whether to return matching file paths (`"paths"`) or a tibble
+#'   with parsed entities (`"tibble"`).
+#' @param use_index Whether to use a persisted file index when available:
+#'   - `"auto"`: use a cached index if present
+#'   - `"never"`: always query the in-memory tree
 #' @param strict Passed through to search methods. If `TRUE`, missing queried
 #'   entities typically fail matching (except wildcard behavior in legacy paths).
-#' @param ... Additional entity filters (e.g., `subid = "01"`, `task = "rest"`).
-#' @return A character vector of matching files, or `NULL` if no matches.
+#' @param ... Additional entity filters (e.g., `subid = "01"`, `task = "rest"`,
+#'   `extension = ".nii.gz"`, `datatype = "func"`).  The special filters
+#'   `extension` and `datatype` are handled post-hoc and support the same
+#'   matching modes as other entities.
+#' @return A character vector of matching files, a tibble of indexed rows
+#'   (sorted by subid, session, task, run, path), or `NULL` if no matches
+#'   are found.
 #' @export
 #' @rdname query_files
 #' @examples
@@ -698,13 +722,15 @@ search_files <- function(x, ...) {
 #'     regex = "bold\\.nii\\.gz$",
 #'     desc = "preproc",
 #'     scope = "derivatives",
+#'     pipeline = "fmriprep",
 #'     match_mode = "exact"
 #'   )
 #'
 #'   all_scopes <- query_files(
 #'     proj_deriv,
 #'     regex = "bold\\.nii\\.gz$",
-#'     scope = "all"
+#'     scope = "all",
+#'     return = "tibble"
 #'   )
 #'
 #'   unlink(deriv_path, recursive = TRUE)

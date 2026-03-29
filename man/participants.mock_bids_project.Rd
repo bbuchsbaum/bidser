@@ -4,15 +4,19 @@
 \alias{participants.mock_bids_project}
 \title{Get Participants from Mock BIDS Project}
 \usage{
-\method{participants}{mock_bids_project}(x, ...)
+\method{participants}{mock_bids_project}(x, as_tibble = FALSE, ...)
 }
 \arguments{
 \item{x}{A \code{mock_bids_project} object.}
+
+\item{as_tibble}{If \code{TRUE}, return a tibble with participant metadata instead
+of a character vector.}
 
 \item{...}{Extra arguments (ignored).}
 }
 \value{
 Character vector of unique participant IDs (e.g., c("01", "02")), sorted.
+If \code{as_tibble = TRUE}, a tibble with participant metadata.
 }
 \description{
 Extracts the unique participant IDs from the mock project definition.

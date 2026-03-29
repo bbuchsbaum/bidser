@@ -958,8 +958,11 @@ print.mock_bids_project <- function(x, ...) {
 #' Note: Returns IDs *without* the "sub-" prefix for consistency with `bids_project` methods.
 #'
 #' @param x A `mock_bids_project` object.
+#' @param as_tibble If `TRUE`, return a tibble with participant metadata instead
+#'   of a character vector.
 #' @param ... Extra arguments (ignored).
 #' @return Character vector of unique participant IDs (e.g., c("01", "02")), sorted.
+#'   If `as_tibble = TRUE`, a tibble with participant metadata.
 #' @export
 #' @examples
 #' # Create a mock project
@@ -969,12 +972,18 @@ print.mock_bids_project <- function(x, ...) {
 #'
 #' # Get participant IDs
 #' participants(mock_proj)
-participants.mock_bids_project <- function(x, ...) {
-  # Ensure participant_id is character, remove "sub-" prefix if present for consistency
+participants.mock_bids_project <- function(x, as_tibble = FALSE, ...) {
   ids <- as.character(x$part_df$participant_id)
   ids <- stringr::str_remove(ids, "^sub-")
-  # Return sorted unique IDs
-  return(sort(unique(ids)))
+
+  if (isTRUE(as_tibble)) {
+    tbl <- tibble::as_tibble(x$part_df)
+    tbl$participant_id <- ids
+    tbl$source <- "table"
+    return(dplyr::arrange(tbl, participant_id))
+  }
+
+  sort(unique(ids))
 }
 
 

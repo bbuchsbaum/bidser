@@ -84,7 +84,8 @@ test_that("bids_check_compliance detects missing files", {
 
   chk <- bids_check_compliance(bp)
   expect_false(chk$passed)
-  expect_true(any(grepl("participants.tsv", chk$issues)))
+  # participants.tsv is now a warning (recommended, not required)
+  expect_true(any(grepl("participants.tsv", chk$warnings)))
   expect_true(any(grepl("dataset_description.json", chk$issues)))
   expect_true(any(grepl("Subject directory not found", chk$issues)))
 })

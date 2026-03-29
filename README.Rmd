@@ -24,8 +24,10 @@ knitr::opts_chunk$set(
 
 [BIDS](https://bids.neuroimaging.io/) in R -- (it's a start!)
 
-The goal of bidser is to make working with the BIDS neuroimaging format convenient in R. 
-Currently there is support for MRI data and some support for some [fmriprep](https://fmriprep.org/en/stable/) derivatives.
+The goal of bidser is to make working with the BIDS neuroimaging format convenient in R.
+Current support is strongest for MRI datasets, with explicit query helpers,
+metadata inheritance, derivative pipeline discovery, and compatibility-oriented
+support for [fmriprep](https://fmriprep.org/en/stable/) workflows.
 
 
 ## Installation
@@ -40,7 +42,6 @@ devtools::install_github("bbuchsbaum/bidser")
 ## Example
 
 See https://bbuchsbaum.github.io/bidser/articles/quickstart.html
-
 
 
 

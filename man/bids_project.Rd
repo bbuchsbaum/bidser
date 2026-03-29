@@ -4,17 +4,52 @@
 \alias{bids_project}
 \title{Create a BIDS Project Object}
 \usage{
-bids_project(path = ".", fmriprep = FALSE, prep_dir = "derivatives/fmriprep")
+bids_project(
+  path = ".",
+  fmriprep = FALSE,
+  prep_dir = "derivatives/fmriprep",
+  strict_participants = TRUE,
+  derivatives = c("auto", "legacy", "none"),
+  pipelines = NULL,
+  index = c("auto", "none"),
+  index_path = NULL
+)
 }
 \arguments{
 \item{path}{Character string. The file path to the root of the BIDS project.
 Defaults to the current directory (".").}
 
 \item{fmriprep}{Logical. Whether to load the fMRIPrep derivatives folder hierarchy.
-Defaults to FALSE.}
+Defaults to FALSE. This remains available as a legacy compatibility switch
+for existing fMRIPrep-oriented workflows.}
 
 \item{prep_dir}{Character string. The location of the fMRIPrep subfolder relative
-to the derivatives directory. Defaults to "derivatives/fmriprep".}
+to the derivatives directory. Defaults to "derivatives/fmriprep". New code
+should prefer \code{derivatives = "auto"} plus \code{\link[=derivative_pipelines]{derivative_pipelines()}}.}
+
+\item{strict_participants}{Logical. If TRUE (default), require \code{participants.tsv}.
+If FALSE, infer participants from \verb{sub-*} directories when the file is
+missing or incomplete.}
+
+\item{derivatives}{Derivatives loading mode:
+\itemize{
+\item \code{"auto"} discovers available pipelines under \verb{derivatives/} (default)
+\item \code{"legacy"} keeps the older \code{fmriprep}/\code{prep_dir} behavior
+\item \code{"none"} disables derivative discovery
+}}
+
+\item{pipelines}{Optional character vector of derivative pipeline names (or
+relative roots) to include when \code{derivatives = "auto"}.}
+
+\item{index}{Whether to use an on-disk file index:
+\itemize{
+\item \code{"auto"} loads an existing index or creates one on first load (default).
+The index is automatically rebuilt when the dataset directory mtime changes.
+\item \code{"none"} disables indexing
+}}
+
+\item{index_path}{Optional path for the persisted index file. Defaults to
+\code{file.path(path, ".bidser_index.rds")}.}
 }
 \value{
 A \code{bids_project} object representing the BIDS project structure. The object

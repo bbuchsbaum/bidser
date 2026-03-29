@@ -36,12 +36,137 @@
 
 #' @keywords internal
 #' @noRd
+.bidser_derivative_registry <- function(x) {
+  if (!is.null(x$derivatives) && nrow(x$derivatives) > 0) {
+    return(x$derivatives)
+  }
+
+  if (isTRUE(x$has_fmriprep) && nzchar(x$prep_dir)) {
+    return(tibble::tibble(
+      pipeline = "fmriprep",
+      root = x$prep_dir,
+      description = list(list()),
+      source = "legacy"
+    ))
+  }
+
+  tibble::tibble(
+    pipeline = character(0),
+    root = character(0),
+    description = list(),
+    source = character(0)
+  )
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_load_cached_index <- function(x) {
+  if (isTRUE(x$has_index) && !is.null(x$index)) {
+    return(tibble::as_tibble(x$index))
+  }
+
+  if (!is.null(x$index_path) && nzchar(x$index_path) && file.exists(x$index_path)) {
+    obj <- tryCatch(readRDS(x$index_path), error = function(e) NULL)
+    if (is.null(obj)) return(NULL)
+
+    # Support both old (bare tibble) and new (list with mtime) formats
+    if (is.data.frame(obj)) {
+      return(tibble::as_tibble(obj))
+    }
+    if (is.list(obj) && is.data.frame(obj$index)) {
+      # Check staleness via mtime
+      if (!is.null(obj$mtime)) {
+        current_mtime <- .bidser_dir_mtime(x$path)
+        if (!identical(as.numeric(current_mtime), as.numeric(obj$mtime))) {
+          return(NULL)
+        }
+      }
+      return(tibble::as_tibble(obj$index))
+    }
+  }
+
+  NULL
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_dir_mtime <- function(path) {
+  info <- file.info(path)
+  if (is.na(info$mtime)) return(Sys.time())
+  info$mtime
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_derivative_roots <- function(x) {
+  reg <- .bidser_derivative_registry(x)
+  if (nrow(reg) == 0) {
+    return(character(0))
+  }
+  reg$root
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_path_pipeline <- function(x, rel_path) {
+  reg <- .bidser_derivative_registry(x)
+  if (nrow(reg) == 0 || !nzchar(rel_path)) {
+    return(NA_character_)
+  }
+
+  for (i in seq_len(nrow(reg))) {
+    root <- reg$root[[i]]
+    prefix <- paste0(root, "/")
+    if (identical(rel_path, root) || startsWith(rel_path, prefix)) {
+      return(reg$pipeline[[i]])
+    }
+  }
+
+  NA_character_
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_filter_pipeline_paths <- function(x, paths, pipeline) {
+  if (is.null(paths) || length(paths) == 0 || is.null(pipeline)) {
+    return(paths)
+  }
+
+  rel_paths <- vapply(paths, function(p) .bidser_to_relative_path(x$path, p), character(1))
+  keep <- vapply(rel_paths, function(p) {
+    pipe <- .bidser_path_pipeline(x, p)
+    !is.na(pipe) && pipe %in% pipeline
+  }, logical(1))
+
+  out <- paths[keep]
+  if (length(out) == 0) {
+    return(NULL)
+  }
+  out
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_is_derivative_path <- function(x, rel_path, pipeline = NULL) {
+  pipe <- .bidser_path_pipeline(x, rel_path)
+  if (is.na(pipe)) {
+    return(FALSE)
+  }
+  if (is.null(pipeline)) {
+    return(TRUE)
+  }
+  pipe %in% pipeline
+}
+
+#' @keywords internal
+#' @noRd
 .bidser_valid_query_entities <- function() {
   sort(unique(c(
     "subid", "session", "task", "run", "kind", "suffix", "type", "modality",
     "acq", "ce", "dir", "rec", "echo", "space", "res", "desc", "label", "variant",
     "from", "to", "target", "class", "mod", "hemi", "mode", "fmriprep",
-    "sub", "ses"
+    "sub", "ses",
+    "extension", "datatype"
   )))
 }
 
@@ -95,6 +220,20 @@
         paste0("^(?:", paste(escaped, collapse = "|"), ")$")
       }
     })
+  } else if (identical(match_mode, "glob")) {
+    filters <- lapply(filters, function(v) {
+      if (is.null(v)) {
+        return(v)
+      }
+      vals <- as.character(v)
+      # Convert each glob to regex using utils::glob2rx, strip anchors added
+      # by glob2rx so they integrate with existing matching logic
+      rxs <- vapply(vals, function(g) {
+        rx <- utils::glob2rx(g)
+        sub("\\$$", "", sub("^\\^", "", rx))
+      }, character(1))
+      rxs
+    })
   } else {
     filters <- lapply(filters, function(v) if (is.null(v)) v else as.character(v))
   }
@@ -109,16 +248,18 @@
     return(paths)
   }
 
-  if (!x$has_fmriprep || !nzchar(x$prep_dir)) {
+  roots <- .bidser_derivative_roots(x)
+  if (length(roots) == 0) {
     if (identical(scope, "derivatives")) {
       return(NULL)
     }
     return(paths)
   }
 
-  rel_paths <- vapply(paths, function(p) .bidser_to_relative_path(x$path, p), character(1))
-  prep_prefix <- paste0(x$prep_dir, "/")
-  is_derivative <- rel_paths == x$prep_dir | startsWith(rel_paths, prep_prefix)
+  is_derivative <- vapply(paths, function(p) {
+    rel <- .bidser_to_relative_path(x$path, p)
+    .bidser_is_derivative_path(x, rel)
+  }, logical(1))
 
   keep <- if (identical(scope, "derivatives")) is_derivative else !is_derivative
   out <- paths[keep]
@@ -189,6 +330,66 @@
 
 #' @keywords internal
 #' @noRd
+.bidser_extract_extension <- function(path) {
+  fname <- basename(path)
+  if (grepl("\\.nii\\.gz$", fname, ignore.case = TRUE)) return(".nii.gz")
+  if (grepl("\\.tsv\\.gz$", fname, ignore.case = TRUE)) return(".tsv.gz")
+  m <- regmatches(fname, regexpr("\\.[^.]+$", fname))
+  if (length(m) == 1L) m else ""
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_extract_datatype <- function(path) {
+  pieces <- strsplit(gsub("\\\\", "/", as.character(path)), "/", fixed = TRUE)[[1]]
+  known <- c("anat", "func", "fmap", "dwi", "perf", "meg", "eeg", "ieeg", "beh", "pet", "micr")
+  found <- intersect(pieces, known)
+  if (length(found) > 0) found[[length(found)]] else NA_character_
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_filter_extension <- function(paths, ext_pattern) {
+  if (is.null(ext_pattern) || is.null(paths) || length(paths) == 0) {
+    return(paths)
+  }
+  keep <- vapply(paths, function(p) {
+    ext <- .bidser_extract_extension(p)
+    any(stringr::str_detect(ext, ext_pattern))
+  }, logical(1))
+  out <- paths[keep]
+  if (length(out) == 0) NULL else out
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_filter_datatype <- function(paths, dt_pattern) {
+  if (is.null(dt_pattern) || is.null(paths) || length(paths) == 0) {
+    return(paths)
+  }
+  keep <- vapply(paths, function(p) {
+    dt <- .bidser_extract_datatype(p)
+    !is.na(dt) && any(stringr::str_detect(dt, dt_pattern))
+  }, logical(1))
+  out <- paths[keep]
+  if (length(out) == 0) NULL else out
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_sort_query_tibble <- function(tbl) {
+  if (is.null(tbl) || nrow(tbl) == 0) {
+    return(tbl)
+  }
+  sort_cols <- intersect(c("subid", "session", "task", "run", "path"), names(tbl))
+  if (length(sort_cols) > 0) {
+    tbl <- dplyr::arrange(tbl, dplyr::across(dplyr::all_of(sort_cols)))
+  }
+  tbl
+}
+
+#' @keywords internal
+#' @noRd
 .bidser_require_entity_keys <- function(paths, required_keys, project_path) {
   if (is.null(paths) || length(paths) == 0 || length(required_keys) == 0) {
     return(paths)
@@ -210,15 +411,132 @@
   out
 }
 
+#' @keywords internal
+#' @noRd
+.bidser_index_row_from_path <- function(x, rel_path) {
+  rel_path <- .bidser_to_relative_path(x$path, rel_path)
+  encoded <- tryCatch(encode(basename(rel_path)), error = function(e) NULL)
+  parsed <- .bidser_parse_entities_from_path(rel_path)
+
+  if (is.null(encoded)) {
+    encoded <- list()
+  }
+
+  info <- utils::modifyList(parsed, encoded, keep.null = TRUE)
+  fields <- c(
+    "subid", "session", "task", "run", "kind", "suffix", "type", "modality",
+    "acq", "ce", "dir", "rec", "echo", "space", "res", "desc", "label",
+    "variant", "from", "to", "target", "class", "mod", "hemi", "mode"
+  )
+
+  row <- c(
+    list(
+      path = rel_path,
+      file = basename(rel_path),
+      scope = if (.bidser_is_derivative_path(x, rel_path)) "derivatives" else "raw",
+      pipeline = .bidser_path_pipeline(x, rel_path),
+      extension = .bidser_extract_extension(rel_path),
+      datatype = .bidser_extract_datatype(rel_path)
+    ),
+    setNames(lapply(fields, function(k) {
+      val <- info[[k]]
+      if (is.null(val) || length(val) == 0) NA_character_ else as.character(val[[1]])
+    }), fields)
+  )
+
+  tibble::as_tibble(row)
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_build_index_df <- function(x) {
+  rel_paths <- search_files(x, regex = ".*", full_path = FALSE, strict = FALSE)
+  if (is.null(rel_paths) || length(rel_paths) == 0) {
+    return(tibble::tibble(
+      path = character(0),
+      file = character(0),
+      scope = character(0),
+      pipeline = character(0)
+    ))
+  }
+
+  dplyr::bind_rows(lapply(rel_paths, function(p) .bidser_index_row_from_path(x, p)))
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_query_rows_from_index <- function(x, rows, regex, filters,
+                                          require_entity = FALSE,
+                                          scope = "all",
+                                          pipeline = NULL,
+                                          full_path = FALSE) {
+  if (nrow(rows) == 0) {
+    return(rows)
+  }
+
+  rows <- rows[stringr::str_detect(rows$file, regex), , drop = FALSE]
+  if (nrow(rows) == 0) {
+    return(rows)
+  }
+
+  if (!identical(scope, "all")) {
+    rows <- rows[rows$scope == scope, , drop = FALSE]
+  }
+  if (!is.null(pipeline)) {
+    rows <- rows[!is.na(rows$pipeline) & rows$pipeline %in% pipeline, , drop = FALSE]
+  }
+  if (nrow(rows) == 0) {
+    return(rows)
+  }
+
+  for (nm in names(filters)) {
+    if (!nm %in% names(rows)) {
+      rows <- rows[0, , drop = FALSE]
+      break
+    }
+
+    vals <- rows[[nm]]
+    pattern <- filters[[nm]]
+    present <- !is.na(vals) & nzchar(as.character(vals))
+    matches <- present & stringr::str_detect(as.character(vals), pattern)
+
+    if (isTRUE(require_entity)) {
+      keep <- matches
+    } else {
+      keep <- matches | !present
+    }
+
+    rows <- rows[keep, , drop = FALSE]
+    if (nrow(rows) == 0) {
+      break
+    }
+  }
+
+  if (nrow(rows) == 0) {
+    return(rows)
+  }
+
+  if (isTRUE(full_path)) {
+    rows$path <- file.path(x$path, rows$path)
+  }
+
+  rows
+}
+
 #' @export
 #' @rdname query_files
 query_files.bids_project <- function(x, regex = ".*", full_path = FALSE,
-                                     match_mode = c("regex", "exact"),
+                                     match_mode = c("regex", "exact", "glob"),
                                      require_entity = FALSE,
                                      scope = c("all", "raw", "derivatives"),
+                                     pipeline = NULL,
+                                     return = c("paths", "tibble"),
+                                     use_index = c("auto", "never"),
                                      strict = TRUE, ...) {
   match_mode <- match.arg(match_mode)
   scope <- match.arg(scope)
+  return <- match.arg(return)
+  use_index <- match.arg(use_index)
 
   filters_raw <- list(...)
   filters <- .bidser_prepare_query_filters(filters_raw, match_mode = match_mode)
@@ -232,19 +550,61 @@ query_files.bids_project <- function(x, regex = ".*", full_path = FALSE,
     )
   }
 
+  # Extract extension/datatype filters -- these are handled post-hoc, not by search_files
+  ext_filter <- filters[["extension"]]
+  dt_filter <- filters[["datatype"]]
+  search_filters <- filters[setdiff(names(filters), c("extension", "datatype"))]
+
+  pipeline <- if (is.null(pipeline)) NULL else as.character(pipeline)
+
+  cached_index <- if (identical(use_index, "auto")) .bidser_load_cached_index(x) else NULL
+  if (!is.null(cached_index)) {
+    rows <- .bidser_query_rows_from_index(
+      x = x,
+      rows = cached_index,
+      regex = regex,
+      filters = filters,
+      require_entity = require_entity,
+      scope = scope,
+      pipeline = pipeline,
+      full_path = full_path
+    )
+    if (identical(return, "tibble")) {
+      return(.bidser_sort_query_tibble(rows))
+    }
+    if (nrow(rows) == 0) {
+      return(NULL)
+    }
+    return(rows$path)
+  }
+
   results <- do.call(search_files, c(
     list(x = x, regex = regex, full_path = full_path, strict = strict),
-    filters
+    search_filters
   ))
 
   results <- .bidser_filter_scope_paths(x, results, scope = scope)
+  results <- .bidser_filter_pipeline_paths(x, results, pipeline = pipeline)
+  results <- .bidser_filter_extension(results, ext_filter)
+  results <- .bidser_filter_datatype(results, dt_filter)
 
   if (isTRUE(require_entity) && !is.null(results) && length(results) > 0) {
     results <- .bidser_require_entity_keys(
       paths = results,
-      required_keys = names(filters),
+      required_keys = names(search_filters),
       project_path = x$path
     )
+  }
+
+  if (identical(return, "tibble")) {
+    if (is.null(results) || length(results) == 0) {
+      return(tibble::tibble(
+        path = character(0), file = character(0),
+        scope = character(0), pipeline = character(0)
+      ))
+    }
+    rows <- dplyr::bind_rows(lapply(results, function(p) .bidser_index_row_from_path(x, p)))
+    return(.bidser_sort_query_tibble(rows))
   }
 
   results
@@ -253,12 +613,17 @@ query_files.bids_project <- function(x, regex = ".*", full_path = FALSE,
 #' @export
 #' @rdname query_files
 query_files.mock_bids_project <- function(x, regex = ".*", full_path = FALSE,
-                                          match_mode = c("regex", "exact"),
+                                          match_mode = c("regex", "exact", "glob"),
                                           require_entity = FALSE,
                                           scope = c("all", "raw", "derivatives"),
+                                          pipeline = NULL,
+                                          return = c("paths", "tibble"),
+                                          use_index = c("auto", "never"),
                                           strict = TRUE, ...) {
   match_mode <- match.arg(match_mode)
   scope <- match.arg(scope)
+  return <- match.arg(return)
+  use_index <- match.arg(use_index)
 
   filters_raw <- list(...)
   filters <- .bidser_prepare_query_filters(filters_raw, match_mode = match_mode)
@@ -301,6 +666,33 @@ query_files.mock_bids_project <- function(x, regex = ".*", full_path = FALSE,
     )
   }
 
+  if (!is.null(pipeline) && !is.null(results) && length(results) > 0) {
+    pipeline <- as.character(pipeline)
+    results <- results[vapply(results, function(p) {
+      rel <- .bidser_to_relative_path(x$path, p)
+      pipe <- if (startsWith(rel, paste0(x$prep_dir, "/")) || identical(rel, x$prep_dir)) basename(x$prep_dir) else NA_character_
+      !is.na(pipe) && pipe %in% pipeline
+    }, logical(1))]
+    if (length(results) == 0) {
+      results <- NULL
+    }
+  }
+
+  if (identical(return, "tibble")) {
+    if (is.null(results) || length(results) == 0) {
+      return(tibble::tibble(path = character(0), file = character(0), scope = character(0), pipeline = character(0)))
+    }
+    rows <- lapply(results, function(p) {
+      rel <- .bidser_to_relative_path(x$path, p)
+      row <- .bidser_index_row_from_path(x, rel)
+      if (isTRUE(full_path)) {
+        row$path <- p
+      }
+      row
+    })
+    return(dplyr::bind_rows(rows))
+  }
+
   results
 }
 
@@ -313,11 +705,8 @@ query_files.mock_bids_project <- function(x, regex = ".*", full_path = FALSE,
     return(scope)
   }
 
-  if (x$has_fmriprep && nzchar(x$prep_dir)) {
-    prep_prefix <- paste0(x$prep_dir, "/")
-    if (file_rel == x$prep_dir || startsWith(file_rel, prep_prefix)) {
-      return("derivatives")
-    }
+  if (.bidser_is_derivative_path(x, file_rel)) {
+    return("derivatives")
   }
 
   "raw"
@@ -330,10 +719,17 @@ query_files.mock_bids_project <- function(x, regex = ".*", full_path = FALSE,
     return(normalizePath(x$path, winslash = "/", mustWork = TRUE))
   }
   if (identical(resolved_scope, "derivatives")) {
-    if (!x$has_fmriprep || !nzchar(x$prep_dir)) {
+    default_pipeline <- if (!is.null(x$default_pipeline) && !is.na(x$default_pipeline)) {
+      x$default_pipeline
+    } else {
+      .bidser_default_pipeline(.bidser_derivative_registry(x))
+    }
+    reg <- .bidser_derivative_registry(x)
+    if (is.na(default_pipeline) || nrow(reg) == 0) {
       stop("Derivatives scope requested, but this project has no derivatives index.")
     }
-    return(normalizePath(file.path(x$path, x$prep_dir), winslash = "/", mustWork = TRUE))
+    root <- reg$root[match(default_pipeline, reg$pipeline)]
+    return(normalizePath(file.path(x$path, root), winslash = "/", mustWork = TRUE))
   }
   normalizePath(x$path, winslash = "/", mustWork = TRUE)
 }
