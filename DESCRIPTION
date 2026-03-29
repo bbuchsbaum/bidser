@@ -48,7 +48,8 @@ Suggests:
     gluedown,
     RNifti,
     future,
-    future.apply
+    future.apply,
+    pkgdown
 VignetteBuilder: knitr
 URL: https://github.com/bbuchsbaum/bidser, https://bbuchsbaum.github.io/bidser/
 BugReports: https://github.com/bbuchsbaum/bidser/issues

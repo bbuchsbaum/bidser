@@ -6,6 +6,7 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/bbuchsbaum/bidser/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/bbuchsbaum/bidser/actions/workflows/R-CMD-check.yaml)
+[![pkgdown](https://github.com/bbuchsbaum/bidser/actions/workflows/pkgdown.yaml/badge.svg)](https://bbuchsbaum.github.io/bidser/)
 [![Codecov test
 coverage](https://codecov.io/gh/bbuchsbaum/bidser/branch/master/graph/badge.svg)](https://app.codecov.io/gh/bbuchsbaum/bidser?branch=master)
 [![Lifecycle:
