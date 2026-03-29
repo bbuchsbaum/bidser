@@ -1,0 +1,230 @@
+---
+title: Create Mock BIDS Projects for Tests and Examples
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Create Mock BIDS Projects for Tests and Examples}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+params:
+  family: red
+  preset: homage
+css: albers.css
+resource_files:
+- albers.css
+- albers.js
+includes:
+  in_header: |-
+    <script src="albers.js"></script>
+    <script>document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('palette-red');});</script>
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r theme-setup, include = FALSE}
+if (requireNamespace("ggplot2", quietly = TRUE) &&
+    requireNamespace("albersdown", quietly = TRUE)) {
+  ggplot2::theme_set(albersdown::theme_albers(params$family))
+}
+
+suppressPackageStartupMessages({
+  library(bidser)
+  library(dplyr)
+  library(tidyr)
+  library(tibble)
+})
+```
+
+If you are writing tests, teaching examples, or demonstrating archive
+workflows, you usually do not want a downloaded dataset. You want a tiny BIDS
+project that lives on disk, has predictable contents, and can include both raw
+and derivative files.
+
+`create_mock_bids()` is the entry point for that job.
+
+## What does a small mock project look like?
+
+Start by defining participants and a file inventory.
+
+```{r define-layout}
+participants <- tibble(
+  participant_id = c("01", "02")
+)
+
+file_structure <- tribble(
+  ~subid, ~datatype, ~task, ~run, ~suffix, ~fmriprep,
+  "01", "func", "rest", "01", "bold.nii.gz", FALSE,
+  "01", "func", "rest", "01", "events.tsv", FALSE,
+  "01", "func", "rest", "01", "bold.nii.gz", TRUE,
+  "01", "func", "rest", "01", "desc-confounds_timeseries.tsv", TRUE,
+  "02", "func", "rest", "01", "bold.nii.gz", FALSE,
+  "02", "func", "rest", "01", "events.tsv", FALSE
+)
+```
+
+Now add the tabular payloads you want written into event and confound files.
+
+```{r define-payloads}
+event_data <- list(
+  "sub-01/func/sub-01_task-rest_run-01_events.tsv" = tibble(
+    onset = c(0, 12),
+    duration = c(1, 1),
+    trial_type = c("cue", "target")
+  ),
+  "sub-02/func/sub-02_task-rest_run-01_events.tsv" = tibble(
+    onset = c(0, 10),
+    duration = c(1, 1),
+    trial_type = c("cue", "target")
+  )
+)
+
+confound_data <- list(
+  "derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_desc-confounds_timeseries.tsv" = tibble(
+    CSF = c(0.10, 0.20, 0.30, 0.20),
+    WhiteMatter = c(0.30, 0.40, 0.50, 0.40),
+    GlobalSignal = c(1.00, 1.10, 1.20, 1.10),
+    FramewiseDisplacement = c(0.01, 0.02, 0.03, 0.02)
+  )
+)
+```
+
+Create the project on disk so you can query it and archive it later.
+
+```{r create-project}
+mock_dir <- tempfile("bidser-mock-")
+
+mock_proj <- create_mock_bids(
+  project_name = "RestMock",
+  participants = participants,
+  file_structure = file_structure,
+  event_data = event_data,
+  confound_data = confound_data,
+  create_stub = TRUE,
+  stub_path = mock_dir,
+  prep_dir = "derivatives/mockprep"
+)
+
+mock_proj
+
+stopifnot(file.exists(file.path(mock_dir, "participants.tsv")))
+```
+
+You can inspect the resulting layout immediately with `plot_bids()`.
+
+```{r plot-project}
+plot_bids(mock_proj, interactive = FALSE)
+```
+
+## How do you query raw and derivative files?
+
+Because `query_files()` works on mock projects too, you can test selection logic
+before you point the same code at a real dataset.
+
+```{r query-scope}
+raw_runs <- query_files(
+  mock_proj,
+  regex = "bold\\.nii\\.gz$",
+  scope = "raw",
+  return = "tibble"
+)
+
+derivative_runs <- query_files(
+  mock_proj,
+  regex = "bold\\.nii\\.gz$",
+  scope = "derivatives",
+  return = "tibble"
+)
+
+raw_runs[, c("path", "scope")]
+derivative_runs[, c("path", "scope", "pipeline")]
+
+stopifnot(
+  nrow(raw_runs) == 2L,
+  nrow(derivative_runs) == 1L
+)
+```
+
+## How do you inspect injected events and confounds?
+
+The mock project stores real tabular data, so the higher-level readers work the
+same way they do on a real project.
+
+```{r inspect-events}
+subject_events <- read_events(mock_proj, subid = "01") %>%
+  unnest(cols = data)
+
+subject_events
+
+stopifnot(
+  nrow(subject_events) == 2L,
+  all(subject_events$duration > 0)
+)
+```
+
+```{r inspect-confounds}
+mock_confounds <- read_confounds(
+  mock_proj,
+  subid = "01",
+  nest = FALSE
+)
+
+mock_confounds
+
+stopifnot(
+  nrow(mock_confounds) == 4L,
+  all(is.finite(mock_confounds$GlobalSignal)),
+  max(mock_confounds$FramewiseDisplacement) < 0.05
+)
+```
+
+That makes mock projects useful for both file-level tests and downstream table
+checks.
+
+## How do you pack the project for sharing?
+
+`pack_bids()` creates an archive while replacing imaging files with zero-byte
+stubs. That keeps the layout and tabular metadata intact without shipping full
+images.
+
+```{r pack-project}
+archive_file <- tempfile(fileext = ".tar.gz")
+packed <- pack_bids(mock_proj, output_file = archive_file, verbose = FALSE)
+archive_contents <- list_pack_bids(packed, verbose = FALSE)
+
+archive_contents %>%
+  select(file, type, is_stub) %>%
+  head()
+
+archive_contents %>%
+  summarise(
+    n_files = n(),
+    n_stubs = sum(is_stub),
+    n_tsv = sum(type == "tsv")
+  )
+
+stopifnot(
+  file.exists(packed),
+  any(archive_contents$is_stub)
+)
+```
+
+## Next Steps
+
+Use `vignette("quickstart")` for reader-facing BIDS discovery and
+`vignette("derivatives")` when you want to move from file inventories to
+pipeline-aware derivative summaries.
+
+```{r cleanup, include = FALSE}
+if (exists("archive_file")) {
+  unlink(archive_file, force = TRUE)
+}
+if (exists("mock_dir")) {
+  unlink(mock_dir, recursive = TRUE, force = TRUE)
+}
+```

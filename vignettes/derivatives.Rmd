@@ -1,0 +1,252 @@
+---
+title: Work With Derivatives and Confounds
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Work With Derivatives and Confounds}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+params:
+  family: red
+  preset: homage
+css: albers.css
+resource_files:
+- albers.css
+- albers.js
+includes:
+  in_header: |-
+    <script src="albers.js"></script>
+    <script>document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('palette-red');});</script>
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r theme-setup, include = FALSE}
+if (requireNamespace("ggplot2", quietly = TRUE) &&
+    requireNamespace("albersdown", quietly = TRUE)) {
+  ggplot2::theme_set(albersdown::theme_albers(params$family))
+}
+
+suppressPackageStartupMessages({
+  library(bidser)
+  library(dplyr)
+  library(tidyr)
+})
+```
+
+```{r build-fixture, include = FALSE}
+deriv_fixture <- tempfile("bidser-deriv-")
+dir.create(deriv_fixture, recursive = TRUE)
+
+readr::write_tsv(
+  tibble::tibble(participant_id = "sub-01"),
+  file.path(deriv_fixture, "participants.tsv")
+)
+
+jsonlite::write_json(
+  list(Name = "DerivativeFixture", BIDSVersion = "1.8.0"),
+  file.path(deriv_fixture, "dataset_description.json"),
+  auto_unbox = TRUE
+)
+
+dir.create(file.path(deriv_fixture, "sub-01", "func"), recursive = TRUE)
+file.create(file.path(
+  deriv_fixture, "sub-01", "func", "sub-01_task-rest_run-01_bold.nii.gz"
+))
+readr::write_tsv(
+  tibble::tibble(onset = 0, duration = 1, trial_type = "go"),
+  file.path(
+    deriv_fixture, "sub-01", "func", "sub-01_task-rest_run-01_events.tsv"
+  )
+)
+
+fmriprep_root <- file.path(deriv_fixture, "derivatives", "fmriprep")
+dir.create(file.path(fmriprep_root, "sub-01", "func"), recursive = TRUE)
+jsonlite::write_json(
+  list(Name = "fmriprep", BIDSVersion = "1.8.0", DatasetType = "derivative"),
+  file.path(fmriprep_root, "dataset_description.json"),
+  auto_unbox = TRUE
+)
+file.create(file.path(
+  fmriprep_root,
+  "sub-01", "func",
+  "sub-01_task-rest_run-01_space-MNI_desc-preproc_bold.nii.gz"
+))
+readr::write_tsv(
+  tibble::tibble(
+    CSF = c(0.10, 0.20, 0.30, 0.20),
+    WhiteMatter = c(0.40, 0.50, 0.60, 0.50),
+    GlobalSignal = c(1.00, 1.10, 1.20, 1.10),
+    FramewiseDisplacement = c(0.01, 0.02, 0.03, 0.02)
+  ),
+  file.path(
+    fmriprep_root,
+    "sub-01", "func",
+    "sub-01_task-rest_run-01_desc-confounds_timeseries.tsv"
+  )
+)
+
+qsiprep_root <- file.path(deriv_fixture, "derivatives", "qsiprep")
+dir.create(file.path(qsiprep_root, "sub-01", "anat"), recursive = TRUE)
+jsonlite::write_json(
+  list(Name = "qsiprep", BIDSVersion = "1.8.0", DatasetType = "derivative"),
+  file.path(qsiprep_root, "dataset_description.json"),
+  auto_unbox = TRUE
+)
+file.create(file.path(
+  qsiprep_root, "sub-01", "anat", "sub-01_space-MNI_desc-preproc_T1w.nii.gz"
+))
+
+proj <- bids_project(deriv_fixture, derivatives = "auto")
+```
+
+When a BIDS project already has derivatives, the first job is usually not data
+loading. It is figuring out which pipeline produced which files, whether the
+expected confounds are present, and whether each run is analysis-ready.
+
+This vignette uses a tiny local project so the full workflow is runnable
+without downloading example data. For raw-project discovery, start with
+`vignette("quickstart")`.
+
+## Where are the derivatives?
+
+Use `plot_bids()` to get a fast overview of the raw project plus attached
+derivative folders.
+
+```{r overview-plot}
+plot_bids(proj, interactive = FALSE)
+```
+
+For code, `derivative_pipelines()` is the clearest inspection entry point.
+
+```{r list-pipelines}
+pipes <- derivative_pipelines(proj)
+pipes
+
+stopifnot(
+  nrow(pipes) == 2L,
+  all(c("fmriprep", "qsiprep") %in% pipes$pipeline)
+)
+```
+
+The fixture has two derivative roots, but only one of them contains functional
+preprocessed BOLD data. That is the pipeline you want to target in the next
+query.
+
+## How do you pull one derivative run?
+
+Use `query_files()` when you want explicit scope and pipeline control.
+
+```{r query-preproc-run}
+prep_bold <- query_files(
+  proj,
+  regex = "bold\\.nii\\.gz$",
+  scope = "derivatives",
+  pipeline = "fmriprep",
+  desc = "preproc",
+  return = "tibble"
+)
+
+prep_bold[, c("path", "scope", "pipeline")]
+
+stopifnot(
+  nrow(prep_bold) == 1L,
+  identical(prep_bold$scope[[1]], "derivatives"),
+  identical(prep_bold$pipeline[[1]], "fmriprep")
+)
+```
+
+That query stays readable because each filter answers one question: which file
+suffix, which scope, and which pipeline.
+
+## How do you read and check confounds?
+
+`read_confounds()` reads the derivative table and returns a tibble that stays
+indexed by subject, task, run, and session.
+
+```{r read-confounds}
+confounds_flat <- read_confounds(
+  proj,
+  subid = "01",
+  task = "rest",
+  nest = FALSE
+)
+
+confounds_flat
+
+stopifnot(
+  nrow(confounds_flat) == 4L,
+  all(is.finite(confounds_flat$FramewiseDisplacement)),
+  max(confounds_flat$FramewiseDisplacement) < 0.05
+)
+```
+
+If you want a compact diagnostic view, ask for principal components and plot
+them.
+
+```{r plot-confounds}
+confounds_pca <- read_confounds(
+  proj,
+  subid = "01",
+  task = "rest",
+  npcs = 2
+)
+
+plot(confounds_pca, view = "aggregate")
+```
+
+The plot is most useful as a quick failure check: if the confounds are missing,
+degenerate, or wildly scaled, the PCA summary becomes obviously suspicious.
+
+## How do you verify run-level coverage?
+
+`variables_table()` pulls scans, events, and confounds into one run-level tibble
+without forcing you to manage separate joins.
+
+```{r variables-coverage}
+run_variables <- variables_table(
+  proj,
+  scope = "all",
+  pipeline = "fmriprep"
+)
+
+run_variables[, c(".subid", ".task", ".run", "n_scans", "n_events", "n_confound_rows")]
+
+stopifnot(
+  run_variables$n_scans[[1]] == 1L,
+  run_variables$n_events[[1]] == 1L,
+  run_variables$n_confound_rows[[1]] == 4L
+)
+```
+
+That table is a practical checkpoint before model fitting because it shows
+whether each run has the pieces you expect.
+
+## How do you turn that into a report?
+
+`bids_report()` wraps the same run-level coverage into a compact text report.
+
+```{r print-report}
+report <- bids_report(
+  proj,
+  scope = "all",
+  pipeline = "fmriprep"
+)
+
+report
+```
+
+## Next Steps
+
+Use `vignette("quickstart")` for raw BIDS inspection and `vignette("mock-bids")`
+when you need a fully local project for tests, demos, or packaging workflows.
+
+```{r cleanup, include = FALSE}
+unlink(deriv_fixture, recursive = TRUE, force = TRUE)
+```
