@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bidser</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,7 +34,9 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
+<li><a class="dropdown-item" href="../articles/derivatives.html">Work With Derivatives and Confounds</a></li>
+    <li><a class="dropdown-item" href="../articles/mock-bids.html">Create Mock BIDS Projects for Tests and Examples</a></li>
+    <li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -129,7 +131,9 @@ subjects.</p>
 <span><span class="co">#&gt; <span style="font-weight: bold;">BIDS Project Summary</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Project Name: </span> <span style="color: #00BBBB; font-weight: bold;">bids_example_ds001</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Participants (n): </span> <span style="color: #00BB00; font-weight: bold;">16</span> </span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Participants Source: </span> <span style="color: #BBBB00;">file</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Tasks: </span> <span style="color: #BBBB00;">balloonanalogrisktask</span> </span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Index: </span> <span style="color: #00BB00;">enabled</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Image Types: </span> <span style="color: #00BB00;">anat, func</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Modalities: </span> <span style="color: #00BB00;">(none)</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Keys: </span> <span style="color: #BBBB00;">folder, kind, relative_path, subid, suffix, type, run, task</span></span></span></code></pre></div>
@@ -178,11 +182,10 @@ and functional data.</p>
 <div class="section level3">
 <h3 id="finding-files-by-type">Finding Files by Type<a class="anchor" aria-label="anchor" href="#finding-files-by-type"></a>
 </h3>
-<p>bidser provides several ways to find files. Let’s start with the most
-common neuroimaging file types:</p>
+<p>Let’s start with the most common neuroimaging file types:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Find all anatomical T1-weighted images</span></span>
-<span><span class="va">t1w_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/search_files.html">search_files</a></span><span class="op">(</span><span class="va">proj</span>, regex <span class="op">=</span> <span class="st">"T1w\\.nii"</span>, full_path <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">t1w_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span><span class="va">proj</span>, regex <span class="op">=</span> <span class="st">"T1w\\.nii"</span>, full_path <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">t1w_files</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "sub-01/anat/sub-01_T1w.nii.gz" "sub-02/anat/sub-02_T1w.nii.gz"</span></span>
 <span><span class="co">#&gt; [3] "sub-03/anat/sub-03_T1w.nii.gz" "sub-04/anat/sub-04_T1w.nii.gz"</span></span>
@@ -258,16 +261,16 @@ fMRI analysis.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># Groups:   .task, .session, .run, .subid [48]</span></span></span>
 <span><span class="co">#&gt;    .subid .session .run  .task                 data              </span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>            </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [158 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 01     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [156 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 01     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [149 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 02     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [185 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 02     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [184 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 02     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [186 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 03     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [150 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 03     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [169 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 03     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [175 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 04     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [166 × 2]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [158 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 01     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [156 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 01     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [149 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 02     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [185 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 02     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [184 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 02     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [186 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 03     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [150 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 03     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [169 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 03     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [175 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 04     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [166 × 9]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 38 more rows</span></span></span></code></pre></div>
 <p>Let’s explore the event data structure:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -277,25 +280,24 @@ fMRI analysis.</p>
 <span>  <span class="fu">unnest</span><span class="op">(</span>cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">first_subject_events</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 13</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Groups:   .task, .session, .run, .subid [1]</span></span></span>
-<span><span class="co">#&gt;   .subid .session .run  .task                 onset\tduration\ttrial_typ…¹ .file</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">"</span>0.061\t0.772\tpumps_demean… /pri…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">"</span>4.958\t0.772\tpumps_demean… /pri…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">"</span>7.179\t0.772\tpumps_demean… /pri…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">"</span>10.416\t0.772\tpumps_demea… /pri…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">"</span>13.419\t0.772\tpumps_demea… /pri…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">"</span>16.754\t0.772\texplode_dem… /pri…</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   ¹​`onset\tduration\ttrial_type\tcash_demean\tcontrol_pumps_demean\texplode_demean\tpumps_demean\tresponse_time`</span></span></span>
+<span><span class="co">#&gt;   .subid .session .run  .task              onset duration trial_type cash_demean</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris…  0.061    0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris…  4.96     0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris…  7.18     0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris… 10.4      0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris… 13.4      0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris… 16.8      0.772 explode_d…          <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5 more variables: control_pumps_demean &lt;dbl&gt;, explode_demean &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   pumps_demean &lt;dbl&gt;, response_time &lt;dbl&gt;, .file &lt;chr&gt;</span></span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">first_subject_events</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] ".subid"                                                                                                     </span></span>
-<span><span class="co">#&gt; [2] ".session"                                                                                                   </span></span>
-<span><span class="co">#&gt; [3] ".run"                                                                                                       </span></span>
-<span><span class="co">#&gt; [4] ".task"                                                                                                      </span></span>
-<span><span class="co">#&gt; [5] "onset\tduration\ttrial_type\tcash_demean\tcontrol_pumps_demean\texplode_demean\tpumps_demean\tresponse_time"</span></span>
-<span><span class="co">#&gt; [6] ".file"</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] ".subid"               ".session"             ".run"                </span></span>
+<span><span class="co">#&gt;  [4] ".task"                "onset"                "duration"            </span></span>
+<span><span class="co">#&gt;  [7] "trial_type"           "cash_demean"          "control_pumps_demean"</span></span>
+<span><span class="co">#&gt; [10] "explode_demean"       "pumps_demean"         "response_time"       </span></span>
+<span><span class="co">#&gt; [13] ".file"</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="analyzing-event-data">Analyzing Event Data<a class="anchor" aria-label="anchor" href="#analyzing-event-data"></a>
 </h3>
@@ -330,13 +332,66 @@ fMRI analysis.</p>
 </div>
 </div>
 <div class="section level2">
+<h2 id="working-with-metadata-sidecars">Working with Metadata Sidecars<a class="anchor" aria-label="anchor" href="#working-with-metadata-sidecars"></a>
+</h2>
+<p>BIDS stores acquisition metadata in JSON sidecars.
+<code>bidser</code> now supports both direct sidecar reads and
+inheritance-aware resolution following the BIDS inheritance
+principle.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Read sidecar rows directly</span></span>
+<span><span class="va">direct_sidecars</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_sidecar.html">read_sidecar</a></span><span class="op">(</span></span>
+<span>  <span class="va">proj</span>,</span>
+<span>  subid <span class="op">=</span> <span class="st">"01"</span>,</span>
+<span>  task <span class="op">=</span> <span class="st">"balloonanalogrisktask"</span>,</span>
+<span>  inherit <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">direct_sidecars</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">direct_sidecars</span><span class="op">)</span></span>
+<span><span class="co">#&gt; character(0)</span></span></code></pre></div>
+<p>If you want the effective metadata for a scan after applying
+inherited sidecars from parent locations, use
+<code><a href="../reference/get_metadata.html">get_metadata()</a></code> or set <code>inherit = TRUE</code> in
+<code><a href="../reference/read_sidecar.html">read_sidecar()</a></code>:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Resolve metadata for a specific BOLD file with inheritance</span></span>
+<span><span class="va">resolved_meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">proj</span>, <span class="va">bold_files</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, inherit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">resolved_meta</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span></span>
+<span><span class="co">#&gt; [1] "RepetitionTime" "TaskName"       NA               NA              </span></span>
+<span><span class="co">#&gt; [5] NA               NA               NA               NA</span></span>
+<span><span class="va">resolved_meta</span><span class="op">$</span><span class="va">RepetitionTime</span></span>
+<span><span class="co">#&gt; [1] 2</span></span>
+<span></span>
+<span><span class="co"># Inheritance-aware sidecar table</span></span>
+<span><span class="va">inherited_sidecars</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_sidecar.html">read_sidecar</a></span><span class="op">(</span></span>
+<span>  <span class="va">proj</span>,</span>
+<span>  subid <span class="op">=</span> <span class="st">"01"</span>,</span>
+<span>  task <span class="op">=</span> <span class="st">"balloonanalogrisktask"</span>,</span>
+<span>  inherit <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">inherited_sidecars</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">inherited_sidecars</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">select</span><span class="op">(</span><span class="fu">any_of</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"file"</span>, <span class="st">"RepetitionTime"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>  <span class="va">inherited_sidecars</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 0 × 0</span></span></span></code></pre></div>
+<p>This is useful when the metadata you need lives in a task- or
+dataset-level JSON sidecar instead of the most specific file-level
+sidecar.</p>
+</div>
+<div class="section level2">
 <h2 id="working-with-individual-subjects">Working with Individual Subjects<a class="anchor" aria-label="anchor" href="#working-with-individual-subjects"></a>
 </h2>
 <p>The <code><a href="../reference/bids_subject.html">bids_subject()</a></code> function provides a convenient
 interface for working with data from a single subject. It returns a
 lightweight object with helper functions that automatically filter data
 for that subject.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a subject-specific interface for subject 01</span></span>
 <span><span class="va">subject_01</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_subject.html">bids_subject</a></span><span class="op">(</span><span class="va">proj</span>, <span class="st">"01"</span><span class="op">)</span></span>
 <span></span>
@@ -357,12 +412,12 @@ for that subject.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># Groups:   .task, .session, .run, .subid [3]</span></span></span>
 <span><span class="co">#&gt;   .subid .session .run  .task                 data              </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>            </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [158 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 01     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [156 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 01     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [149 × 2]&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [158 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 01     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [156 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 01     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [149 × 9]&gt;</span></span></span></code></pre></div>
 <p>This approach is particularly useful when you’re doing subject-level
 analyses:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">subjects_to_analyze</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"01"</span>, <span class="st">"02"</span>, <span class="st">"03"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">subj_id</span> <span class="kw">in</span> <span class="va">subjects_to_analyze</span><span class="op">)</span> <span class="op">{</span></span>
@@ -377,7 +432,7 @@ analyses:</p>
 <span><span class="co">#&gt; Subject 03: 3 scans, 5 event files</span></span></code></pre></div>
 <p>The subject interface makes it easy to write analysis pipelines that
 iterate over subjects without manually constructing filters:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">subject_trial_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="../reference/participants-method.html">participants</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>, <span class="kw">function</span><span class="op">(</span><span class="va">subj_id</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">subj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_subject.html">bids_subject</a></span><span class="op">(</span><span class="va">proj</span>, <span class="va">subj_id</span><span class="op">)</span></span>
 <span>  <span class="va">event_data</span> <span class="op">&lt;-</span> <span class="va">subj</span><span class="op">$</span><span class="fu">events</span><span class="op">(</span><span class="op">)</span></span>
@@ -398,42 +453,179 @@ iterate over subjects without manually constructing filters:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 03           494       3</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="advanced-querying">Advanced Querying<a class="anchor" aria-label="anchor" href="#advanced-querying"></a>
+<h2 id="advanced-querying-with-query_files">Advanced Querying with <code>query_files()</code><a class="anchor" aria-label="anchor" href="#advanced-querying-with-query_files"></a>
 </h2>
+<p><code><a href="../reference/query_files.html">query_files()</a></code> is the primary file-finding API in bidser.
+It supports exact, regex, and glob matching modes, scoped searches
+across raw data and derivatives, and can return either paths or a tibble
+with parsed entities.</p>
 <div class="section level3">
-<h3 id="custom-file-searches">Custom File Searches<a class="anchor" aria-label="anchor" href="#custom-file-searches"></a>
+<h3 id="match-modes">Match Modes<a class="anchor" aria-label="anchor" href="#match-modes"></a>
 </h3>
-<p>The <code><a href="../reference/search_files.html">search_files()</a></code> function is very flexible for custom
-queries:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Find all JSON sidecar files</span></span>
-<span><span class="va">json_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/search_files.html">search_files</a></span><span class="op">(</span><span class="va">proj</span>, regex <span class="op">=</span> <span class="st">"\\.json$"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Found"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">json_files</span><span class="op">)</span>, <span class="st">"JSON files\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Found 0 JSON files</span></span>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Exact entity matching -- reproducible, no regex surprises</span></span>
+<span><span class="va">exact_bold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span></span>
+<span>  <span class="va">proj</span>,</span>
+<span>  regex <span class="op">=</span> <span class="st">"bold\\.nii\\.gz$"</span>,</span>
+<span>  subid <span class="op">=</span> <span class="st">"01"</span>,</span>
+<span>  task <span class="op">=</span> <span class="st">"balloonanalogrisktask"</span>,</span>
+<span>  match_mode <span class="op">=</span> <span class="st">"exact"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Exact-match BOLD files:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">exact_bold</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Exact-match BOLD files: 3</span></span>
 <span></span>
-<span><span class="co"># Find files for specific runs</span></span>
-<span><span class="va">run1_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/search_files.html">search_files</a></span><span class="op">(</span><span class="va">proj</span>, regex <span class="op">=</span> <span class="st">"bold"</span>, run <span class="op">=</span> <span class="st">"01"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Found"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">run1_files</span><span class="op">)</span>, <span class="st">"files from run 01\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Found 16 files from run 01</span></span>
+<span><span class="co"># Regex entity matching -- select multiple values with patterns</span></span>
+<span><span class="va">regex_bold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span></span>
+<span>  <span class="va">proj</span>,</span>
+<span>  regex <span class="op">=</span> <span class="st">"bold\\.nii\\.gz$"</span>,</span>
+<span>  subid <span class="op">=</span> <span class="st">"0[1-3]"</span>,</span>
+<span>  task <span class="op">=</span> <span class="st">"balloon.*"</span>,</span>
+<span>  match_mode <span class="op">=</span> <span class="st">"regex"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Regex-match BOLD files:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">regex_bold</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Regex-match BOLD files: 9</span></span>
 <span></span>
-<span><span class="co"># Complex pattern matching: T1w files for subjects 01-05</span></span>
-<span><span class="va">t1w_subset</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/search_files.html">search_files</a></span><span class="op">(</span><span class="va">proj</span>, regex <span class="op">=</span> <span class="st">"T1w"</span>, subid <span class="op">=</span> <span class="st">"0[1-5]"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Found"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">t1w_subset</span><span class="op">)</span>, <span class="st">"T1w files for subjects 01-05\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Found 5 T1w files for subjects 01-05</span></span></code></pre></div>
+<span><span class="co"># Glob matching -- shell-style wildcards</span></span>
+<span><span class="va">glob_bold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span></span>
+<span>  <span class="va">proj</span>,</span>
+<span>  regex <span class="op">=</span> <span class="st">"bold\\.nii\\.gz$"</span>,</span>
+<span>  subid <span class="op">=</span> <span class="st">"0*"</span>,</span>
+<span>  match_mode <span class="op">=</span> <span class="st">"glob"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Glob-match BOLD files:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">glob_bold</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Glob-match BOLD files: 30</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="getting-full-file-paths">Getting Full File Paths<a class="anchor" aria-label="anchor" href="#getting-full-file-paths"></a>
+<h3 id="entity-presence-extension-and-datatype-filters">Entity Presence, Extension, and Datatype Filters<a class="anchor" aria-label="anchor" href="#entity-presence-extension-and-datatype-filters"></a>
 </h3>
-<p>Sometimes you need the complete file paths for analysis:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Get full paths to functional scans for analysis</span></span>
-<span><span class="va">full_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">"01"</span>, full_path <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="va">full_paths</span></span>
-<span><span class="co">#&gt; [1] "/private/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/RtmpmDQVRP/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
-<span><span class="co">#&gt; [2] "/private/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/RtmpmDQVRP/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
-<span><span class="co">#&gt; [3] "/private/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/RtmpmDQVRP/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Require the queried entity to actually exist on returned files</span></span>
+<span><span class="va">task_annotated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span></span>
+<span>  <span class="va">proj</span>,</span>
+<span>  regex <span class="op">=</span> <span class="st">"\\.nii\\.gz$"</span>,</span>
+<span>  task <span class="op">=</span> <span class="st">".*"</span>,</span>
+<span>  require_entity <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  scope <span class="op">=</span> <span class="st">"raw"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Files with an explicit task entity:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">task_annotated</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Files with an explicit task entity: 48</span></span>
 <span></span>
-<span><span class="co"># Check that files actually exist</span></span>
+<span><span class="co"># Filter by extension and datatype directly</span></span>
+<span><span class="va">json_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span><span class="va">proj</span>, extension <span class="op">=</span> <span class="st">"\\.json$"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"JSON files:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">json_files</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; JSON files: 0</span></span>
+<span></span>
+<span><span class="va">func_niftis</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span><span class="va">proj</span>, datatype <span class="op">=</span> <span class="st">"func"</span>, extension <span class="op">=</span> <span class="st">"\\.nii\\.gz$"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Functional NIfTIs:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">func_niftis</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Functional NIfTIs: 48</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="tibble-output-with-parsed-entities">Tibble Output with Parsed Entities<a class="anchor" aria-label="anchor" href="#tibble-output-with-parsed-entities"></a>
+</h3>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Return a tibble instead of paths -- includes all parsed BIDS entities</span></span>
+<span><span class="va">bold_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span></span>
+<span>  <span class="va">proj</span>,</span>
+<span>  regex <span class="op">=</span> <span class="st">"bold\\.nii\\.gz$"</span>,</span>
+<span>  subid <span class="op">=</span> <span class="st">"0[1-3]"</span>,</span>
+<span>  return <span class="op">=</span> <span class="st">"tibble"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">bold_tbl</span> <span class="op">|&gt;</span> <span class="fu">select</span><span class="op">(</span><span class="va">path</span>, <span class="va">subid</span>, <span class="va">task</span>, <span class="va">run</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 9 × 4</span></span></span>
+<span><span class="co">#&gt;   path                                                         subid task  run  </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                                        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.n… 01    ball… 01   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.n… 01    ball… 02   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.n… 01    ball… 03   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> sub-02/func/sub-02_task-balloonanalogrisktask_run-01_bold.n… 02    ball… 01   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> sub-02/func/sub-02_task-balloonanalogrisktask_run-02_bold.n… 02    ball… 02   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> sub-02/func/sub-02_task-balloonanalogrisktask_run-03_bold.n… 02    ball… 03   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> sub-03/func/sub-03_task-balloonanalogrisktask_run-01_bold.n… 03    ball… 01   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> sub-03/func/sub-03_task-balloonanalogrisktask_run-02_bold.n… 03    ball… 02   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">9</span> sub-03/func/sub-03_task-balloonanalogrisktask_run-03_bold.n… 03    ball… 03</span></span></code></pre></div>
+<p>The tibble is sorted deterministically by subject, session, task,
+run, and path.</p>
+</div>
+<div class="section level3">
+<h3 id="scoped-queries-and-derivatives">Scoped Queries and Derivatives<a class="anchor" aria-label="anchor" href="#scoped-queries-and-derivatives"></a>
+</h3>
+<p>When derivatives are present, <code>scope</code> controls where to
+search and <code>pipeline</code> selects specific derivative
+pipelines:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">deriv_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_example_bids_dataset.html">get_example_bids_dataset</a></span><span class="op">(</span><span class="st">"ds000001-fmriprep"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">proj_deriv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">deriv_path</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Search only derivatives from a specific pipeline</span></span>
+<span><span class="va">prep_bold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span></span>
+<span>  <span class="va">proj_deriv</span>,</span>
+<span>  regex <span class="op">=</span> <span class="st">"bold\\.nii\\.gz$"</span>,</span>
+<span>  desc <span class="op">=</span> <span class="st">"preproc"</span>,</span>
+<span>  scope <span class="op">=</span> <span class="st">"derivatives"</span>,</span>
+<span>  pipeline <span class="op">=</span> <span class="st">"fmriprep"</span>,</span>
+<span>  match_mode <span class="op">=</span> <span class="st">"exact"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Or use the convenience wrapper</span></span>
+<span><span class="va">deriv_bold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/derivative_files.html">derivative_files</a></span><span class="op">(</span><span class="va">proj_deriv</span>, pipeline <span class="op">=</span> <span class="st">"fmriprep"</span>,</span>
+<span>                               regex <span class="op">=</span> <span class="st">"bold\\.nii\\.gz$"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Search everywhere and get a tibble with scope/pipeline columns</span></span>
+<span><span class="va">all_bold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span></span>
+<span>  <span class="va">proj_deriv</span>,</span>
+<span>  regex <span class="op">=</span> <span class="st">"bold\\.nii\\.gz$"</span>,</span>
+<span>  scope <span class="op">=</span> <span class="st">"all"</span>,</span>
+<span>  return <span class="op">=</span> <span class="st">"tibble"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="permissive-loading">Permissive Loading<a class="anchor" aria-label="anchor" href="#permissive-loading"></a>
+</h3>
+<p><code><a href="../reference/bids_project.html">bids_project()</a></code> can handle real-world datasets that are
+missing <code>participants.tsv</code> – subjects are inferred from the
+directory tree:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">proj_relaxed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_project.html">bids_project</a></span><span class="op">(</span></span>
+<span>  <span class="st">"/path/to/bids"</span>,</span>
+<span>  strict_participants <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Check where participant IDs came from</span></span>
+<span><span class="fu"><a href="../reference/participants-method.html">participants</a></span><span class="op">(</span><span class="va">proj_relaxed</span>, as_tibble <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># See which derivative pipelines were discovered</span></span>
+<span><span class="fu"><a href="../reference/derivative_pipelines.html">derivative_pipelines</a></span><span class="op">(</span><span class="va">proj_relaxed</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="run-level-variables-and-report-data">Run-Level Variables and Report Data<a class="anchor" aria-label="anchor" href="#run-level-variables-and-report-data"></a>
+</h3>
+<p><code><a href="../reference/variables_table.html">variables_table()</a></code> gives you a run-level tibble that
+nests scan inventory, events, and confounds – ready for downstream R
+workflows:</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/variables_table.html">variables_table</a></span><span class="op">(</span></span>
+<span>  <span class="va">proj_deriv</span>,</span>
+<span>  scope <span class="op">=</span> <span class="st">"all"</span>,</span>
+<span>  pipeline <span class="op">=</span> <span class="st">"fmriprep"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">vars</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">".subid"</span>, <span class="st">".task"</span>, <span class="st">".run"</span>, <span class="st">"n_scans"</span>, <span class="st">"n_events"</span>, <span class="st">"n_confound_rows"</span><span class="op">)</span><span class="op">]</span></span>
+<span></span>
+<span><span class="va">report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_report.html">bids_report</a></span><span class="op">(</span><span class="va">proj_deriv</span>, scope <span class="op">=</span> <span class="st">"all"</span>, pipeline <span class="op">=</span> <span class="st">"fmriprep"</span><span class="op">)</span></span>
+<span><span class="va">report</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="full-file-paths">Full File Paths<a class="anchor" aria-label="anchor" href="#full-file-paths"></a>
+</h3>
+<p>When you need absolute paths for analysis tools:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">full_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">"01"</span>, full_path <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">full_paths</span></span>
+<span><span class="co">#&gt; [1] "/private/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/RtmpZvHjDE/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [2] "/private/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/RtmpZvHjDE/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [3] "/private/var/folders/9h/nkjq6vss7mqdl4ck7q1hd8ph0000gp/T/RtmpZvHjDE/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span>
+<span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">full_paths</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
@@ -460,24 +652,32 @@ efficiently</li>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="reading-files-produced-by-fmriprep">Reading files produced by FMRIPrep<a class="anchor" aria-label="anchor" href="#reading-files-produced-by-fmriprep"></a>
+<h2 id="working-with-fmriprep-derivatives">Working with fMRIPrep Derivatives<a class="anchor" aria-label="anchor" href="#working-with-fmriprep-derivatives"></a>
 </h2>
-<p>If you have processed a dataset with FMRIPrep, <code>bidser</code>
-can be used to read in many of the resultant derivative files. If a
-project has an FMRIPrep derivatives folder, then we can read in the BIDS
-hierarchy plus derivatives as follows:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Download an fMRIPrep example dataset</span></span>
-<span><span class="va">deriv_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_example_bids_dataset.html">get_example_bids_dataset</a></span><span class="op">(</span><span class="st">"ds000001-fmriprep"</span><span class="op">)</span></span>
-<span><span class="va">proj_deriv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">deriv_path</span>, fmriprep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<p>If you have processed a dataset with fMRIPrep, <code>bidser</code>
+automatically discovers derivative pipelines under
+<code>derivatives/</code>. You can then query preprocessed scans,
+confounds, and masks through the same <code><a href="../reference/query_files.html">query_files()</a></code>
+API:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">deriv_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_example_bids_dataset.html">get_example_bids_dataset</a></span><span class="op">(</span><span class="st">"ds000001-fmriprep"</span><span class="op">)</span></span>
+<span><span class="va">proj_deriv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">deriv_path</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">proj_deriv</span></span>
+<span><span class="co"># See which pipelines were discovered</span></span>
+<span><span class="fu"><a href="../reference/derivative_pipelines.html">derivative_pipelines</a></span><span class="op">(</span><span class="va">proj_deriv</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Convenience functions for derivative files, e.g. preprocessed scans:</span></span>
-<span><span class="va">pscans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preproc_scans-method.html">preproc_scans</a></span><span class="op">(</span><span class="va">proj_deriv</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">pscans</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># Query preprocessed BOLD scans</span></span>
+<span><span class="va">preproc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span></span>
+<span>  <span class="va">proj_deriv</span>,</span>
+<span>  regex <span class="op">=</span> <span class="st">"bold\\.nii\\.gz$"</span>,</span>
+<span>  desc <span class="op">=</span> <span class="st">"preproc"</span>,</span>
+<span>  scope <span class="op">=</span> <span class="st">"derivatives"</span>,</span>
+<span>  pipeline <span class="op">=</span> <span class="st">"fmriprep"</span>,</span>
+<span>  return <span class="op">=</span> <span class="st">"tibble"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">preproc</span><span class="op">$</span><span class="va">path</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Read confound files</span></span>
+<span><span class="co"># Read confound regressors</span></span>
 <span><span class="va">conf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_confounds.html">read_confounds</a></span><span class="op">(</span><span class="va">proj_deriv</span>, subid <span class="op">=</span> <span class="st">"01"</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
