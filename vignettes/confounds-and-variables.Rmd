@@ -1,0 +1,403 @@
+---
+title: "Working with Confounds and Variables"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Working with Confounds and Variables}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+```{r load-packages}
+library(bidser)
+library(dplyr)
+library(tidyr)
+library(tibble)
+```
+
+After loading a BIDS dataset and finding your scans, the next step in most
+fMRI workflows is extracting **confound regressors** and **event tables** for
+modeling. bidser gives you tidy tibbles at every level -- per-run, per-subject,
+or dataset-wide -- so you can go straight from BIDS into `lm()`, `lme4`, or
+whatever modeling framework you prefer.
+
+## Building a test dataset
+
+We'll create a small mock dataset with two subjects, two tasks, and realistic
+fMRIPrep-style confound files so that every code chunk in this vignette runs
+without network access.
+
+```{r build-mock, include = FALSE}
+temp_dir <- tempfile("bids_confounds_vignette_")
+dir.create(temp_dir)
+
+# participants.tsv
+readr::write_tsv(
+  tibble(participant_id = c("sub-01", "sub-02"), age = c(25L, 30L), sex = c("M", "F")),
+  file.path(temp_dir, "participants.tsv")
+)
+
+# dataset_description.json
+jsonlite::write_json(
+  list(Name = "ConfoundDemo", BIDSVersion = "1.7.0"),
+  file.path(temp_dir, "dataset_description.json"),
+  auto_unbox = TRUE
+)
+
+# Create raw + derivative structure
+set.seed(42)
+n_vols <- 100
+
+for (sub in c("01", "02")) {
+  for (task in c("rest", "nback")) {
+    # --- raw ---
+    func_dir <- file.path(temp_dir, paste0("sub-", sub), "func")
+    dir.create(func_dir, recursive = TRUE, showWarnings = FALSE)
+
+    bold_name <- sprintf("sub-%s_task-%s_run-01_bold.nii.gz", sub, task)
+    file.create(file.path(func_dir, bold_name))
+
+    events_name <- sprintf("sub-%s_task-%s_run-01_events.tsv", sub, task)
+    n_trials <- if (task == "nback") 40 else 0
+    if (n_trials > 0) {
+      ev <- tibble(
+        onset = sort(runif(n_trials, 0, 290)),
+        duration = rep(2, n_trials),
+        trial_type = sample(c("0back", "2back"), n_trials, replace = TRUE),
+        response_time = round(rnorm(n_trials, 0.8, 0.15), 3)
+      )
+      readr::write_tsv(ev, file.path(func_dir, events_name))
+    } else {
+      readr::write_tsv(
+        tibble(onset = numeric(0), duration = numeric(0), trial_type = character(0)),
+        file.path(func_dir, events_name)
+      )
+    }
+
+    # --- derivatives/fmriprep ---
+    deriv_func <- file.path(temp_dir, "derivatives", "fmriprep",
+                            paste0("sub-", sub), "func")
+    dir.create(deriv_func, recursive = TRUE, showWarnings = FALSE)
+
+    preproc_name <- sprintf(
+      "sub-%s_task-%s_run-01_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz",
+      sub, task
+    )
+    file.create(file.path(deriv_func, preproc_name))
+
+    conf_name <- sprintf(
+      "sub-%s_task-%s_run-01_desc-confounds_timeseries.tsv",
+      sub, task
+    )
+    conf <- tibble(
+      csf = rnorm(n_vols), white_matter = rnorm(n_vols), global_signal = rnorm(n_vols),
+      framewise_displacement = abs(rnorm(n_vols, 0.2, 0.1)),
+      trans_x = cumsum(rnorm(n_vols, 0, 0.02)),
+      trans_y = cumsum(rnorm(n_vols, 0, 0.02)),
+      trans_z = cumsum(rnorm(n_vols, 0, 0.02)),
+      rot_x   = cumsum(rnorm(n_vols, 0, 0.001)),
+      rot_y   = cumsum(rnorm(n_vols, 0, 0.001)),
+      rot_z   = cumsum(rnorm(n_vols, 0, 0.001)),
+      trans_x_derivative1 = c(NA, diff(cumsum(rnorm(n_vols, 0, 0.02)))),
+      trans_y_derivative1 = c(NA, diff(cumsum(rnorm(n_vols, 0, 0.02)))),
+      trans_z_derivative1 = c(NA, diff(cumsum(rnorm(n_vols, 0, 0.02)))),
+      rot_x_derivative1   = c(NA, diff(cumsum(rnorm(n_vols, 0, 0.001)))),
+      rot_y_derivative1   = c(NA, diff(cumsum(rnorm(n_vols, 0, 0.001)))),
+      rot_z_derivative1   = c(NA, diff(cumsum(rnorm(n_vols, 0, 0.001)))),
+      trans_x_power2 = trans_x^2, trans_y_power2 = trans_y^2, trans_z_power2 = trans_z^2,
+      rot_x_power2 = rot_x^2, rot_y_power2 = rot_y^2, rot_z_power2 = rot_z^2,
+      trans_x_derivative1_power2 = trans_x_derivative1^2,
+      trans_y_derivative1_power2 = trans_y_derivative1^2,
+      trans_z_derivative1_power2 = trans_z_derivative1^2,
+      rot_x_derivative1_power2 = rot_x_derivative1^2,
+      rot_y_derivative1_power2 = rot_y_derivative1^2,
+      rot_z_derivative1_power2 = rot_z_derivative1^2,
+      a_comp_cor_00 = rnorm(n_vols), a_comp_cor_01 = rnorm(n_vols),
+      a_comp_cor_02 = rnorm(n_vols), a_comp_cor_03 = rnorm(n_vols),
+      a_comp_cor_04 = rnorm(n_vols), a_comp_cor_05 = rnorm(n_vols),
+      t_comp_cor_00 = rnorm(n_vols), t_comp_cor_01 = rnorm(n_vols),
+      t_comp_cor_02 = rnorm(n_vols),
+      cosine_00 = cos(seq(0, pi, length.out = n_vols)),
+      cosine_01 = cos(seq(0, 2 * pi, length.out = n_vols)),
+      cosine_02 = cos(seq(0, 3 * pi, length.out = n_vols))
+    )
+    readr::write_tsv(conf, file.path(deriv_func, conf_name))
+  }
+}
+
+# Also write dataset_description.json for fmriprep derivative
+deriv_root <- file.path(temp_dir, "derivatives", "fmriprep")
+jsonlite::write_json(
+  list(Name = "fMRIPrep", BIDSVersion = "1.7.0",
+       GeneratedBy = list(list(Name = "fMRIPrep", Version = "21.0.0"))),
+  file.path(deriv_root, "dataset_description.json"),
+  auto_unbox = TRUE
+)
+```
+
+```{r load-project}
+proj <- bids_project(temp_dir, fmriprep = TRUE)
+proj
+```
+
+Our demo has `r length(participants(proj))` subjects, each with a resting-state
+and an n-back task run, plus fMRIPrep derivatives containing confound
+timeseries.
+
+## Confound sets: predefined recipes
+
+Before reading any files, it helps to know what confound sets bidser ships
+with. These are curated variable lists that match common denoising strategies
+from the fMRI literature.
+
+```{r list-sets}
+list_confound_sets()
+```
+
+Each set is a named collection of confound variable names. You can inspect
+what a set contains:
+
+```{r show-motion-sets}
+# 6 rigid-body motion parameters
+confound_set("motion6")
+
+# Friston 24-parameter expansion (motion + derivatives + squares)
+length(confound_set("motion24"))
+```
+
+The sets compose naturally -- `"36p"` is `motion24` plus tissue signals and
+their expansions, while `"9p"` is `motion6` plus the three global signals.
+
+## Reading confounds
+
+`read_confounds()` reads fMRIPrep confound TSV files and returns tidy tibbles.
+Pass a confound set name to select variables:
+
+```{r read-motion6}
+conf_nested <- read_confounds(proj, cvars = confound_set("motion6"))
+conf_nested
+```
+
+The result is a nested tibble -- one row per run, with the actual timeseries
+tucked inside the `data` list column. This structure makes it easy to
+iterate over runs in a modeling pipeline:
+
+```{r unnest-motion}
+conf_nested |>
+  unnest(data) |>
+  select(participant_id, task, run, trans_x, rot_x) |>
+  head()
+```
+
+### Selecting variables by name or wildcard
+
+You can also pass a character vector of specific variable names, or use
+wildcards to match patterns:
+
+```{r wildcard-confounds}
+# All CompCor components
+compcor_conf <- read_confounds(
+  proj,
+  subid = "01", task = "rest",
+  cvars = c("a_comp_cor_*", "t_comp_cor_*")
+)
+names(compcor_conf$data[[1]])
+```
+
+### Flat output for quick modeling
+
+When you just want a single table for modeling, use `nest = FALSE`:
+
+```{r flat-confounds}
+conf_flat <- read_confounds(
+  proj,
+  cvars = confound_set("motion6"),
+  nest = FALSE
+)
+dim(conf_flat)
+head(conf_flat)
+```
+
+Each row is one volume, with subject/task/run identifiers alongside the
+confound values -- ready to join with your design matrix.
+
+## Confound strategies: PCA reduction
+
+For high-dimensional confound sets, you often want to reduce the
+dimensionality rather than include all regressors directly. A
+`confound_strategy()` splits variables into two groups: those reduced via PCA
+and those kept as-is.
+
+```{r show-strategies}
+list_confound_strategies()
+```
+
+The built-in `"pcabasic80"` strategy applies PCA to motion and CompCor
+variables (retaining 80% of variance) while keeping cosine regressors
+unchanged:
+
+```{r pca-strategy}
+strat <- confound_strategy("pcabasic80")
+conf_pca <- read_confounds(proj, subid = "01", task = "rest", cvars = strat)
+names(conf_pca$data[[1]])
+```
+
+The motion and CompCor variables have been replaced by a handful of principal
+components, while the cosine regressors pass through untouched.
+
+### Custom strategies
+
+You can build your own strategy by specifying which variables get PCA-reduced
+and which are kept raw:
+
+```{r custom-strategy}
+my_strat <- confound_strategy(
+  pca_vars = c(confound_set("motion24"), confound_set("acompcor")),
+  raw_vars = c("framewise_displacement", confound_set("cosine")),
+  npcs = 5
+)
+
+conf_custom <- read_confounds(proj, subid = "01", task = "nback", cvars = my_strat)
+names(conf_custom$data[[1]])
+```
+
+Five PCs from the motion + aCompCor space, plus FD and cosine regressors kept
+in their original form.
+
+## Reading event files
+
+Event files describe the experimental design -- trial onsets, durations, and
+conditions. `read_events()` returns them as nested tibbles:
+
+```{r read-events}
+events <- read_events(proj, task = "nback")
+events
+```
+
+Unnest to get a flat trial table:
+
+```{r unnest-events}
+trials <- events |>
+  unnest(data) |>
+  select(.subid, .task, .run, onset, duration, trial_type, response_time)
+
+head(trials)
+```
+
+```{r trial-summary}
+trials |>
+  group_by(.subid, trial_type) |>
+  summarise(
+    n_trials = n(),
+    mean_rt = mean(response_time, na.rm = TRUE),
+    .groups = "drop"
+  )
+```
+
+If you want everything in one flat table directly, use `load_all_events()`:
+
+```{r load-all-events}
+all_events <- load_all_events(proj, task = "nback")
+nrow(all_events)
+```
+
+## The variables table: one tibble per run
+
+`variables_table()` pulls together scans, events, and confounds into a single
+run-level tibble. This is the tidy bridge between BIDS and your analysis code:
+
+```{r variables-table}
+vars <- variables_table(proj)
+vars |> select(.subid, .task, .run, any_of(c("n_scans", "n_events", "n_confound_rows")))
+```
+
+Each row is one run. The `scans`, `events`, and `confounds` list columns hold
+the nested data. You can selectively include only events or only confounds:
+
+```{r variables-events-only}
+vars_events <- variables_table(proj, task = "nback", include = "events")
+vars_events |> select(.subid, .task, .run, n_events)
+```
+
+This structure makes it straightforward to write a per-run analysis loop:
+
+```{r per-run-loop}
+# Use the nback-only table which has both events and confounds columns
+vars_nback <- variables_table(proj, task = "nback")
+
+vars_nback |>
+  filter(n_events > 0, n_confound_rows > 0) |>
+  rowwise() |>
+  mutate(
+    n_conditions = length(unique(events$trial_type)),
+    mean_fd = mean(confounds$framewise_displacement, na.rm = TRUE)
+  ) |>
+  ungroup() |>
+  select(.subid, .task, n_conditions, mean_fd)
+```
+
+## Dataset QA with bids_report()
+
+`bids_report()` assembles a lightweight QA summary covering project metadata,
+compliance checks, pipeline discovery, and run-level coverage:
+
+```{r bids-report}
+report <- bids_report(proj)
+report
+```
+
+The underlying data is fully accessible for custom reporting:
+
+```{r report-data}
+rdata <- bids_report_data(proj)
+rdata$summary
+rdata$run_coverage
+```
+
+You can use the coverage table to spot missing data at a glance:
+
+```{r coverage-check}
+rdata$run_coverage |>
+  mutate(
+    has_scans = n_scans > 0,
+    has_events = if ("n_events" %in% names(rdata$run_coverage)) n_events > 0 else FALSE,
+    has_confounds = n_confound_rows > 0
+  )
+```
+
+## Putting it together
+
+A typical analysis script combines these pieces into a pipeline. Here is a
+sketch that extracts design-ready data for each run:
+
+```{r full-pipeline}
+analysis_data <- variables_table(proj, task = "nback") |>
+  filter(n_events > 0, n_confound_rows > 0) |>
+  rowwise() |>
+  mutate(
+    n_trials = nrow(events),
+    n_vols = nrow(confounds)
+  ) |>
+  ungroup() |>
+  select(.subid, .task, .run, n_trials, n_vols)
+
+analysis_data
+```
+
+From here you would unnest the events and confounds columns, build your design
+matrix with `model.matrix()`, and fit your model -- all in native R tibbles
+with no intermediate file-path bookkeeping.
+
+```{r cleanup, include = FALSE}
+unlink(temp_dir, recursive = TRUE)
+```

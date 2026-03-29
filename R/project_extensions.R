@@ -341,16 +341,25 @@ bids_report_data <- function(x, ...) {
     pipelines = derivative_pipelines(x),
     variables = vars,
     run_coverage = if (nrow(vars) > 0) {
-      vars |>
+      cov <- vars |>
         dplyr::transmute(
           .subid,
           .session,
           .task,
           .run,
-          n_scans = dplyr::coalesce(n_scans, 0L),
-          n_events = dplyr::coalesce(n_events, 0L),
-          n_confound_rows = dplyr::coalesce(n_confound_rows, 0L)
+          n_scans = dplyr::coalesce(n_scans, 0L)
         )
+      cov$n_events <- if ("n_events" %in% names(vars)) {
+        dplyr::coalesce(vars$n_events, 0L)
+      } else {
+        0L
+      }
+      cov$n_confound_rows <- if ("n_confound_rows" %in% names(vars)) {
+        dplyr::coalesce(vars$n_confound_rows, 0L)
+      } else {
+        0L
+      }
+      cov
     } else {
       tibble::tibble(
         .subid = character(0),
