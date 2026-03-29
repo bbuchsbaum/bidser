@@ -32,3 +32,8 @@ repomix-output.xml
 ^README\.html$
 ^codemeta\.json$
 ^pybids($|/)
+^\.beads$
+^\.beads/
+^\.ecosystem\.yml$
+^AGENTS\.md$
+^bidser-top5-prd\.json$

@@ -1,8 +1,10 @@
 ---
 title: Getting Started with bidser
 output: rmarkdown::html_vignette
-vignette: |
-  %\VignetteIndexEntry{Getting Started with bidser} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
+vignette: >
+  %\VignetteIndexEntry{Getting Started with bidser}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 params:
   family: red
   preset: homage
@@ -27,7 +29,11 @@ knitr::opts_chunk$set(
 ```
 
 ```{r theme-setup, include = FALSE}
-if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(params$family))
+albers_pkg <- "albersdown"
+if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace(albers_pkg, quietly = TRUE)) {
+  theme_fn <- get("theme_albers", envir = asNamespace(albers_pkg))
+  ggplot2::theme_set(theme_fn(params$family))
+}
 suppressPackageStartupMessages({
   library(bidser)
   library(tibble)
@@ -337,19 +343,62 @@ If you have derivatives indexed, `scope` lets you be explicit about where to
 search:
 
 ```{r derivatives-query, eval = FALSE}
+deriv_path <- get_example_bids_dataset("ds000001-fmriprep")
+
+proj_deriv <- bids_project(
+  deriv_path,
+  derivatives = "auto",
+  index = "auto"
+)
+
 prep_bold <- query_files(
   proj_deriv,
   regex = "bold\\.nii\\.gz$",
   desc = "preproc",
   scope = "derivatives",
+  pipeline = "fmriprep",
   match_mode = "exact"
 )
 
 all_bold <- query_files(
   proj_deriv,
   regex = "bold\\.nii\\.gz$",
-  scope = "all"
+  scope = "all",
+  return = "tibble"
 )
+```
+
+`bids_project()` can also be more forgiving with real-world datasets that are
+missing `participants.tsv`:
+
+```{r permissive-project, eval = FALSE}
+proj_relaxed <- bids_project(
+  "/path/to/bids",
+  strict_participants = FALSE,
+  derivatives = "auto",
+  index = "auto"
+)
+
+derivative_pipelines(proj_relaxed)
+```
+
+### Run-Level Variables and Report Data
+
+For downstream analysis in R, `variables_table()` gives you a run-level tibble
+that nests scan inventory, events, and confounds without changing the existing
+subject or file APIs:
+
+```{r variables-report, eval = FALSE}
+vars <- variables_table(
+  proj_deriv,
+  scope = "all",
+  pipeline = "fmriprep"
+)
+
+vars[, c(".subid", ".task", ".run", "n_scans", "n_events", "n_confound_rows")]
+
+report <- bids_report(proj_deriv, scope = "all", pipeline = "fmriprep")
+report
 ```
 
 ### search_files() Still Works
