@@ -20,3 +20,4 @@ docs
 pkgdown/
 CRAN-SUBMISSION
 pybids/
+.covr_result.rds

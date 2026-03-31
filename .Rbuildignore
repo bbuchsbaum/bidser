@@ -37,3 +37,4 @@ repomix-output.xml
 ^\.ecosystem\.yml$
 ^AGENTS\.md$
 ^bidser-top5-prd\.json$
+^\.covr_result\.rds$
