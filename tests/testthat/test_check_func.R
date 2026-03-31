@@ -133,21 +133,9 @@ test_that("file_pairs matches bold and events files", {
 
   proj <- bids_project(tmp)
 
-  # file_pairs requires x$tbl; skip if not available
-  skip_if(is.null(proj$tbl), "bids_project$tbl not available")
-
-  # file_pairs can fail with NA task values in tbl (known issue with
-
-  # str_detect when the tbl contains rows with NA task, e.g. from events files)
-  pairs <- tryCatch(
-    file_pairs(proj, pair = "bold-events"),
-    error = function(e) {
-      skip(paste("file_pairs error (known NA task issue):", conditionMessage(e)))
-    }
-  )
+  pairs <- file_pairs(proj, pair = "bold-events")
 
   expect_s3_class(pairs, "tbl_df")
-  # Should have columns for subid, task, bold, events
   expect_true("subid" %in% names(pairs))
   expect_true("bold" %in% names(pairs))
   expect_true("events" %in% names(pairs))
@@ -165,21 +153,13 @@ test_that("file_pairs respects task filter", {
   on.exit(unlink(tmp, recursive = TRUE, force = TRUE), add = TRUE)
 
   proj <- bids_project(tmp)
-  skip_if(is.null(proj$tbl), "bids_project$tbl not available")
 
-  # file_pairs can fail with NA task values in tbl (known issue)
-  pairs <- tryCatch(
-    file_pairs(proj, pair = "bold-events", task = "rest"),
-    error = function(e) {
-      skip(paste("file_pairs error (known NA task issue):", conditionMessage(e)))
-    }
-  )
+  pairs <- file_pairs(proj, pair = "bold-events", task = "rest")
 
   expect_s3_class(pairs, "tbl_df")
-  # Only rest task should appear
-  if (nrow(pairs) > 0 && "task" %in% names(pairs)) {
-    expect_true(all(pairs$task == "rest", na.rm = TRUE))
-  }
+  # Only rest task should appear (2 subjects x 1 task = 2 rows)
+  expect_equal(nrow(pairs), 2)
+  expect_true(all(pairs$task == "rest"))
 })
 
 # ---------- file_pairs: non-bids_project errors ----------

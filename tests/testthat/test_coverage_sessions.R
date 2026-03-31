@@ -388,20 +388,11 @@ test_that("file_pairs bold-events with sessions", {
 
   proj <- bids_project(tmp)
 
-  # file_pairs has a known upstream bug: str_detect(task, task) fails when
-  # rows with NA task (e.g. anat) are present. We exercise the code path
-  # and accept either a valid result or the known error.
-  result <- tryCatch({
-    pairs <- file_pairs(proj, pair = "bold-events")
-    expect_true(nrow(pairs) > 0)
-    expect_true("bold" %in% names(pairs) || "subid" %in% names(pairs))
-    TRUE
-  }, error = function(e) {
-    # Known issue: str_detect fails on NA task values
-    expect_true(grepl("str_detect", e$message))
-    TRUE
-  })
-  expect_true(result)
+  pairs <- file_pairs(proj, pair = "bold-events")
+  expect_s3_class(pairs, "tbl_df")
+  expect_true(nrow(pairs) > 0)
+  expect_true("bold" %in% names(pairs))
+  expect_true("events" %in% names(pairs))
 })
 
 # ###########################################################################

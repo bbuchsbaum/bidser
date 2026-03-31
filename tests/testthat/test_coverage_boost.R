@@ -240,14 +240,8 @@ test_that("file_pairs returns a tibble for bold-events", {
   on.exit(unlink(tmp, recursive = TRUE, force = TRUE), add = TRUE)
 
   proj <- bids_project(tmp)
-  skip_if(is.null(proj$tbl), "bids_project$tbl not available")
 
-  pairs <- tryCatch(
-    file_pairs(proj, pair = "bold-events"),
-    error = function(e) {
-      skip(paste("file_pairs error:", conditionMessage(e)))
-    }
-  )
+  pairs <- file_pairs(proj, pair = "bold-events")
 
   expect_s3_class(pairs, "tbl_df")
   expect_true("subid" %in% names(pairs))

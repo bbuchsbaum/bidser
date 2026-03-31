@@ -202,20 +202,20 @@ file_pairs <- function(x, pair=c("bold-events", "preproc-events"), task=".*", ma
     stop("Unsupported pair: ", pair)
   }
   
+  task_pattern <- task
   results <- lapply(sids, function(s) {
-    # Filter for type1 files
-    df1 <- dplyr::filter(x$tbl,
-                         subid == s,
-                         modality == type1,
-                         stringr::str_detect(task, task))
-    df1 <- df1[grep(regex_mod1, df1$name), , drop=FALSE]
-    
-    # Filter for type2 files
-    df2 <- dplyr::filter(x$tbl,
-                         subid == s,
-                         modality == type2,
-                         stringr::str_detect(task, task))
-    df2 <- df2[grep(regex_mod2, df2$name), , drop=FALSE]
+    # Filter rows for this subject with a valid task, then separate bold vs
+    # events via the filename regex (regex_mod1 / regex_mod2).
+    # Note: the `modality` column in x$tbl is always NA (the tree attribute is
+    # never set), so we cannot filter on it. The `type` column holds the folder
+    # name ("func"/"anat") rather than file kind ("bold"/"events").
+    base_df <- dplyr::filter(x$tbl,
+                             .data$subid == s,
+                             !is.na(.data$task),
+                             stringr::str_detect(.data$task, task_pattern))
+
+    df1 <- base_df[grep(regex_mod1, base_df$name), , drop=FALSE]
+    df2 <- base_df[grep(regex_mod2, base_df$name), , drop=FALSE]
     
     # If no type2 matches
     if (nrow(df1) > 0 && nrow(df2) == 0) {
