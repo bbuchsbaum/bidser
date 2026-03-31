@@ -28,7 +28,7 @@ mock_proj <- create_mock_bids(
   prep_dir = "derivatives/mockprep"
 )
 
-expected_fn <- generate_bids_filename(
+expected_fn <- bidser:::generate_bids_filename(
   subid = "01", session = "pre", task = "taskA", run = "02",
   desc = "preproc", space = "MNI", suffix = "bold.nii.gz"
 )

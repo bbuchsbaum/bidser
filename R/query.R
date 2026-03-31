@@ -61,31 +61,8 @@
 #' @keywords internal
 #' @noRd
 .bidser_load_cached_index <- function(x) {
-  if (isTRUE(x$has_index) && !is.null(x$index)) {
-    return(tibble::as_tibble(x$index))
-  }
-
-  if (!is.null(x$index_path) && nzchar(x$index_path) && file.exists(x$index_path)) {
-    obj <- tryCatch(readRDS(x$index_path), error = function(e) NULL)
-    if (is.null(obj)) return(NULL)
-
-    # Support both old (bare tibble) and new (list with mtime) formats
-    if (is.data.frame(obj)) {
-      return(tibble::as_tibble(obj))
-    }
-    if (is.list(obj) && is.data.frame(obj$index)) {
-      # Check staleness via mtime
-      if (!is.null(obj$mtime)) {
-        current_mtime <- .bidser_dir_mtime(x$path)
-        if (!identical(as.numeric(current_mtime), as.numeric(obj$mtime))) {
-          return(NULL)
-        }
-      }
-      return(tibble::as_tibble(obj$index))
-    }
-  }
-
-  NULL
+  state <- .bidser_load_cached_index_state(x, refresh = FALSE, persist = FALSE)
+  if (is.null(state)) NULL else .bidser_index_state_manifest_tibble(state)
 }
 
 #' @keywords internal
@@ -415,6 +392,7 @@
 #' @noRd
 .bidser_index_row_from_path <- function(x, rel_path) {
   rel_path <- .bidser_to_relative_path(x$path, rel_path)
+  file_info <- file.info(file.path(x$path, rel_path))
   encoded <- tryCatch(encode(basename(rel_path)), error = function(e) NULL)
   parsed <- .bidser_parse_entities_from_path(rel_path)
 
@@ -422,7 +400,7 @@
     encoded <- list()
   }
 
-  info <- utils::modifyList(parsed, encoded, keep.null = TRUE)
+  entity_info <- utils::modifyList(parsed, encoded, keep.null = TRUE)
   fields <- c(
     "subid", "session", "task", "run", "kind", "suffix", "type", "modality",
     "acq", "ce", "dir", "rec", "echo", "space", "res", "desc", "label",
@@ -436,10 +414,12 @@
       scope = if (.bidser_is_derivative_path(x, rel_path)) "derivatives" else "raw",
       pipeline = .bidser_path_pipeline(x, rel_path),
       extension = .bidser_extract_extension(rel_path),
-      datatype = .bidser_extract_datatype(rel_path)
+      datatype = .bidser_extract_datatype(rel_path),
+      size = as.numeric(file_info$size),
+      file_mtime = as.numeric(file_info$mtime)
     ),
     setNames(lapply(fields, function(k) {
-      val <- info[[k]]
+      val <- entity_info[[k]]
       if (is.null(val) || length(val) == 0) NA_character_ else as.character(val[[1]])
     }), fields)
   )
@@ -450,17 +430,7 @@
 #' @keywords internal
 #' @noRd
 .bidser_build_index_df <- function(x) {
-  rel_paths <- search_files(x, regex = ".*", full_path = FALSE, strict = FALSE)
-  if (is.null(rel_paths) || length(rel_paths) == 0) {
-    return(tibble::tibble(
-      path = character(0),
-      file = character(0),
-      scope = character(0),
-      pipeline = character(0)
-    ))
-  }
-
-  dplyr::bind_rows(lapply(rel_paths, function(p) .bidser_index_row_from_path(x, p)))
+  .bidser_index_state_manifest_tibble(.bidser_build_index_state(x))
 }
 
 #' @keywords internal
@@ -469,21 +439,26 @@
                                           require_entity = FALSE,
                                           scope = "all",
                                           pipeline = NULL,
-                                          full_path = FALSE) {
+                                          full_path = FALSE,
+                                          match_mode = c("regex", "exact", "glob"),
+                                          raw_filters = list()) {
+  match_mode <- match.arg(match_mode)
+  rows <- .bidser_finalize_manifest_dt(rows)
   if (nrow(rows) == 0) {
     return(rows)
   }
 
-  rows <- rows[stringr::str_detect(rows$file, regex), , drop = FALSE]
+  rows <- rows[stringr::str_detect(rows$file, regex), ]
   if (nrow(rows) == 0) {
     return(rows)
   }
 
   if (!identical(scope, "all")) {
-    rows <- rows[rows$scope == scope, , drop = FALSE]
+    rows <- rows[rows$scope == scope, ]
   }
   if (!is.null(pipeline)) {
-    rows <- rows[!is.na(rows$pipeline) & rows$pipeline %in% pipeline, , drop = FALSE]
+    pipeline_vals <- as.character(pipeline)
+    rows <- rows[!is.na(rows$pipeline) & rows$pipeline %in% pipeline_vals, ]
   }
   if (nrow(rows) == 0) {
     return(rows)
@@ -491,14 +466,19 @@
 
   for (nm in names(filters)) {
     if (!nm %in% names(rows)) {
-      rows <- rows[0, , drop = FALSE]
+      rows <- rows[0]
       break
     }
 
     vals <- rows[[nm]]
-    pattern <- filters[[nm]]
     present <- !is.na(vals) & nzchar(as.character(vals))
-    matches <- present & stringr::str_detect(as.character(vals), pattern)
+
+    matches <- if (identical(match_mode, "exact") && nm %in% names(raw_filters)) {
+      present & as.character(vals) %in% as.character(raw_filters[[nm]])
+    } else {
+      pattern <- filters[[nm]]
+      present & stringr::str_detect(as.character(vals), pattern)
+    }
 
     if (isTRUE(require_entity)) {
       keep <- matches
@@ -506,7 +486,7 @@
       keep <- matches | !present
     }
 
-    rows <- rows[keep, , drop = FALSE]
+    rows <- rows[keep, ]
     if (nrow(rows) == 0) {
       break
     }
@@ -539,6 +519,7 @@ query_files.bids_project <- function(x, regex = ".*", full_path = FALSE,
   use_index <- match.arg(use_index)
 
   filters_raw <- list(...)
+  raw_filters <- .bidser_normalize_filter_names(filters_raw)
   filters <- .bidser_prepare_query_filters(filters_raw, match_mode = match_mode)
 
   valid_entities <- .bidser_valid_query_entities()
@@ -557,20 +538,27 @@ query_files.bids_project <- function(x, regex = ".*", full_path = FALSE,
 
   pipeline <- if (is.null(pipeline)) NULL else as.character(pipeline)
 
-  cached_index <- if (identical(use_index, "auto")) .bidser_load_cached_index(x) else NULL
-  if (!is.null(cached_index)) {
+  cached_state <- if (identical(use_index, "auto")) {
+    .bidser_load_cached_index_state(x, refresh = TRUE, persist = TRUE)
+  } else {
+    NULL
+  }
+
+  if (!is.null(cached_state)) {
     rows <- .bidser_query_rows_from_index(
       x = x,
-      rows = cached_index,
+      rows = cached_state$manifest,
       regex = regex,
       filters = filters,
       require_entity = require_entity,
       scope = scope,
       pipeline = pipeline,
-      full_path = full_path
+      full_path = full_path,
+      match_mode = match_mode,
+      raw_filters = raw_filters
     )
     if (identical(return, "tibble")) {
-      return(.bidser_sort_query_tibble(rows))
+      return(.bidser_sort_query_tibble(tibble::as_tibble(rows)))
     }
     if (nrow(rows) == 0) {
       return(NULL)
@@ -812,6 +800,13 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
     stop("Could not determine BIDS suffix/kind for file: ", file)
   }
 
+  use_cached_index <- !identical(x$index_mode %||% "auto", "none")
+  index_state <- if (use_cached_index) {
+    .bidser_load_cached_index_state(x, refresh = TRUE, persist = TRUE)
+  } else {
+    NULL
+  }
+
   if (!isTRUE(inherit)) {
     json_path <- if (grepl("\\.json$", file_abs, ignore.case = TRUE)) {
       file_abs
@@ -826,13 +821,23 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
       return(list())
     }
 
-    direct_meta <- tryCatch(
-      jsonlite::read_json(json_path, simplifyVector = TRUE),
-      error = function(e) {
-        warning("Failed to read JSON sidecar: ", json_path, " (", e$message, ")")
-        list()
+    direct_meta <- NULL
+    if (!is.null(index_state)) {
+      json_rel <- .bidser_to_relative_path(x$path, json_path)
+      hit <- index_state$sidecars[index_state$sidecars$path == json_rel, ]
+      if (nrow(hit) > 0) {
+        direct_meta <- hit$data[[1]]
       }
-    )
+    }
+    if (is.null(direct_meta)) {
+      direct_meta <- tryCatch(
+        jsonlite::read_json(json_path, simplifyVector = TRUE),
+        error = function(e) {
+          warning("Failed to read JSON sidecar: ", json_path, " (", e$message, ")")
+          list()
+        }
+      )
+    }
 
     if (is.null(direct_meta) || !is.list(direct_meta)) {
       return(list())
@@ -844,12 +849,62 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
   scope_root <- .bidser_metadata_scope_root(x, resolved_scope)
   target_dir <- dirname(file_abs)
 
+  if (!is.null(index_state)) {
+    cached <- .bidser_lookup_resolved_meta(index_state, file_rel, resolved_scope)
+    if (!is.null(cached)) {
+      return(cached)
+    }
+  }
+
   ancestry <- .bidser_ancestor_chain(target_dir, scope_root)
   if (length(ancestry) == 0) {
     return(list())
   }
 
   candidates <- list()
+  ancestry_rel <- vapply(ancestry, function(dir_path) .bidser_to_relative_path(x$path, dir_path), character(1))
+
+  if (!is.null(index_state)) {
+    sidecars <- index_state$sidecars
+    candidate_idx <- which(as.character(sidecars$directory) %in% ancestry_rel)
+    if (length(candidate_idx) > 0) {
+      keep <- vapply(
+        as.character(sidecars$path[candidate_idx]),
+        function(rel) .bidser_candidate_applies(rel, target_entities = target_entities, target_kind = target_kind),
+        logical(1)
+      )
+      candidate_idx <- candidate_idx[keep]
+    }
+
+    if (length(candidate_idx) > 0) {
+      candidate_paths <- as.character(sidecars$path[candidate_idx])
+      candidate_depth <- match(as.character(sidecars$directory[candidate_idx]), ancestry_rel)
+      candidate_specificity <- as.integer(sidecars$specificity[candidate_idx])
+      ord <- order(candidate_depth, candidate_specificity, candidate_paths)
+      deps <- character(0)
+      merged <- list()
+      for (i in ord) {
+        idx <- candidate_idx[[i]]
+        candidate_meta <- sidecars$data[[idx]]
+        if (is.null(candidate_meta) || !is.list(candidate_meta)) {
+          next
+        }
+        merged <- utils::modifyList(merged, candidate_meta, keep.null = TRUE)
+        deps <- c(deps, sidecars$path[[idx]])
+      }
+
+      index_state <- .bidser_store_resolved_meta(
+        index_state,
+        path = file_rel,
+        scope = resolved_scope,
+        data = merged,
+        deps = unique(deps)
+      )
+      .bidser_set_session_index_state(x, index_state)
+      return(merged)
+    }
+  }
+
   for (depth in seq_along(ancestry)) {
     sidecars <- sort(list.files(ancestry[[depth]], pattern = "\\.json$", full.names = TRUE, recursive = FALSE))
     if (length(sidecars) == 0) {
@@ -863,6 +918,7 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
         specificity <- length(setdiff(names(cand_entities), "kind"))
         candidates[[length(candidates) + 1L]] <- list(
           path = sidecar,
+          rel_path = rel,
           depth = depth,
           specificity = specificity
         )
@@ -882,6 +938,7 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
   candidates <- candidates[ord]
 
   merged <- list()
+  deps <- character(0)
   for (cand in candidates) {
     candidate_meta <- tryCatch(
       jsonlite::read_json(cand$path, simplifyVector = TRUE),
@@ -895,6 +952,18 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
       next
     }
     merged <- utils::modifyList(merged, candidate_meta, keep.null = TRUE)
+    deps <- c(deps, cand$rel_path)
+  }
+
+  if (!is.null(index_state)) {
+    index_state <- .bidser_store_resolved_meta(
+      index_state,
+      path = file_rel,
+      scope = resolved_scope,
+      data = merged,
+      deps = unique(deps)
+    )
+    .bidser_set_session_index_state(x, index_state)
   }
 
   merged

@@ -52,19 +52,20 @@ bids_index <- function(x, rebuild = FALSE, persist = TRUE) {
   }
 
   if (!isTRUE(rebuild)) {
-    cached <- .bidser_load_cached_index(x)
-    if (!is.null(cached)) {
-      return(cached)
+    state <- .bidser_load_cached_index_state(x, refresh = TRUE, persist = persist)
+    if (!is.null(state)) {
+      return(.bidser_index_state_manifest_tibble(state))
     }
   }
 
-  idx <- .bidser_build_index_df(x)
-  if (isTRUE(persist) && !is.null(x$index_path) && nzchar(x$index_path)) {
-    mtime <- .bidser_dir_mtime(x$path)
-    saveRDS(list(index = idx, mtime = mtime), x$index_path)
+  state <- .bidser_build_index_state(x)
+  if (isTRUE(persist)) {
+    .bidser_persist_index_state(x, state)
+  } else {
+    .bidser_set_session_index_state(x, state)
   }
 
-  idx
+  .bidser_index_state_manifest_tibble(state)
 }
 
 #' @keywords internal

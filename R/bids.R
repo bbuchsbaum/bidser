@@ -772,39 +772,27 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmripre
               requested_fmriprep = isTRUE(fmriprep),
               index_path = .bidser_project_index_path(path, index_path),
               index = NULL,
+              index_state = NULL,
               has_index = FALSE,
               index_mode = index,
               has_sessions=has_sessions)
 
+  class(ret) <- "bids_project"
+
   if (identical(index, "auto")) {
-    idx_path <- ret$index_path
-    if (file.exists(idx_path)) {
-      obj <- tryCatch(readRDS(idx_path), error = function(e) NULL)
-      # Support both old (bare tibble) and new (list with mtime) formats
-      idx <- NULL
-      stale <- FALSE
-      if (is.data.frame(obj)) {
-        idx <- obj
-      } else if (is.list(obj) && is.data.frame(obj$index)) {
-        if (!is.null(obj$mtime)) {
-          current_mtime <- .bidser_dir_mtime(path)
-          stale <- !identical(as.numeric(current_mtime), as.numeric(obj$mtime))
-        }
-        if (!stale) idx <- obj$index
-      }
-      if (!is.null(idx) && !stale) {
-        ret$index <- tibble::as_tibble(idx)
-        ret$has_index <- TRUE
-      }
+    state <- .bidser_load_cached_index_state(ret, refresh = TRUE, persist = TRUE)
+    if (!is.null(state)) {
+      ret$index_state <- state
+      ret$index <- .bidser_index_state_manifest_tibble(state)
+      ret$has_index <- TRUE
     }
   }
-
-  class(ret) <- "bids_project"
 
   if (identical(index, "auto") && !isTRUE(ret$has_index)) {
     idx <- tryCatch(bids_index(ret, rebuild = TRUE, persist = TRUE), error = function(e) NULL)
     if (is.data.frame(idx)) {
       ret$index <- tibble::as_tibble(idx)
+      ret$index_state <- .bidser_load_cached_index_state(ret, refresh = FALSE, persist = FALSE)
       ret$has_index <- TRUE
     }
   }
