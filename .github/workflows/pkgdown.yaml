@@ -32,13 +32,32 @@ jobs:
         with:
           use-public-rspm: true
 
+      - name: Set site library path
+        run: |
+          site_library="${RUNNER_TEMP}/R/site-library"
+          mkdir -p "${site_library}"
+          echo "R_LIBS_SITE=${site_library}" >> "$GITHUB_ENV"
+        shell: bash
+
+      - name: Install albersdown from CRAN
+        run: |
+          install.packages(
+            "albersdown",
+            repos = "https://cran.r-project.org",
+            lib = Sys.getenv("R_LIBS_SITE")
+          )
+        shell: Rscript {0}
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::pkgdown, local::.
+          lockfile-create-lib: Sys.getenv("R_LIBS_SITE")
           needs: website
 
       - name: Build site
-        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
+        run: |
+          .libPaths(c(Sys.getenv("R_LIBS_SITE"), .libPaths()))
+          pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
 
       - name: Enable GitHub Pages
