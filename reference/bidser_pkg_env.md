@@ -12,3 +12,7 @@ bidser_pkg_env
 ## Format
 
 An object of class `environment` of length 0.
+
+## Value
+
+An environment used for internal package state.

@@ -8,7 +8,7 @@ Note: Returns IDs *without* the "sub-" prefix for consistency with
 
 ``` r
 # S3 method for class 'mock_bids_project'
-participants(x, ...)
+participants(x, as_tibble = FALSE, ...)
 ```
 
 ## Arguments
@@ -17,6 +17,11 @@ participants(x, ...)
 
   A `mock_bids_project` object.
 
+- as_tibble:
+
+  If `TRUE`, return a tibble with participant metadata instead of a
+  character vector.
+
 - ...:
 
   Extra arguments (ignored).
@@ -24,7 +29,7 @@ participants(x, ...)
 ## Value
 
 Character vector of unique participant IDs (e.g., c("01", "02")),
-sorted.
+sorted. If `as_tibble = TRUE`, a tibble with participant metadata.
 
 ## Examples
 

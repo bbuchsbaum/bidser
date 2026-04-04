@@ -1,4 +1,4 @@
 # License
 
-    YEAR: 2023-2024
+    YEAR: 2023-2026
     COPYRIGHT HOLDER: Bradley Buchsbaum

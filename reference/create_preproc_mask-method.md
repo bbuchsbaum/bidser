@@ -24,3 +24,16 @@ create_preproc_mask(x, ...)
 
 Throws an error indicating the function is not applicable to mock
 objects.
+
+## Examples
+
+``` r
+mock <- create_mock_bids("Test", c("01"), tibble::tibble(
+  subid = "01", datatype = "func",
+  suffix = "bold.nii.gz", fmriprep = FALSE
+))
+#> Warning: Encoding failed for: sub-01_bold.nii.gz - skipping this file in mock tree.
+try(create_preproc_mask(mock))
+#> Error in create_preproc_mask(mock) : 
+#>   `create_preproc_mask` requires actual image data and cannot be used with `mock_bids_project` objects.
+```

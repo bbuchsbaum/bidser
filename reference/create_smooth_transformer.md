@@ -32,10 +32,17 @@ A transformer function for use with
 # Create a smoothing transformer
 smooth_6mm <- create_smooth_transformer(6)
 
-# Use with bids_transform (example)
-# ds_path <- get_example_bids_dataset("ds001")
-# proj <- bids_project(ds_path)
-# new_files <- bids_transform(proj, smooth_6mm, "smoothed", 
-#                             subid = "01", suffix = "bold.nii.gz")
+# Apply it to a toy BIDS-like file path
+in_dir <- tempdir()
+out_dir <- tempdir()
+infile <- file.path(in_dir, "sub-01_task-rest_bold.nii.gz")
+file.create(infile)
+#> [1] TRUE
+new_file <- smooth_6mm(infile, out_dir)
+#> Processing: sub-01_task-rest_bold.nii.gz -> sub-01_task-rest_desc-smooth6mm_bold_nii.gz
+basename(new_file)
+#> [1] "sub-01_task-rest_desc-smooth6mm_bold_nii.gz"
+unlink(infile)
+unlink(new_file)
 # }
 ```

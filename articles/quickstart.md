@@ -38,41 +38,14 @@ Let’s explore these capabilities using a real BIDS dataset.
 We’ll use the `ds001` dataset from the BIDS examples, which contains
 data from a “Balloon Analog Risk Task” experiment with 16 subjects.
 
-    #> 
-    #> Attaching package: 'bidser'
-    #> The following object is masked from 'package:base':
-    #> 
-    #>     parse
-
 ``` r
-library(bidser)
-library(tibble)
-library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
-library(gluedown)
-
-# Download example BIDS dataset
-tryCatch({
-  ds001_path <- get_example_bids_dataset("ds001")
-  proj <- bids_project(ds001_path)
-  
-  print(proj)
-}, error = function(e) {
-  message("This vignette requires an internet connection to download example data.")
-  message("Error: ", e$message)
-  knitr::knit_exit()
-})
+proj
 #> BIDS Project Summary 
 #> Project Name:  bids_example_ds001 
 #> Participants (n):  16 
+#> Participants Source:  file 
 #> Tasks:  balloonanalogrisktask 
+#> Index:  enabled 
 #> Image Types:  anat, func 
 #> Modalities:  (none) 
 #> Keys:  folder, kind, relative_path, subid, suffix, type, run, task
@@ -122,14 +95,11 @@ bids_summary(proj)
 
 ### Finding Files by Type
 
-bidser provides several ways to find files. Let’s start with the most
-common neuroimaging file types:
+Let’s find the most common neuroimaging file types:
 
 ``` r
 # Find all anatomical T1-weighted images
-t1w_files <- search_files(proj, regex = "T1w\\.nii", full_path = FALSE)
-print(paste("Found", length(t1w_files), "T1w images"))
-#> [1] "Found 16 T1w images"
+t1w_files <- query_files(proj, regex = "T1w\\.nii", full_path = FALSE)
 head(t1w_files)
 #> [1] "sub-01/anat/sub-01_T1w.nii.gz" "sub-02/anat/sub-02_T1w.nii.gz"
 #> [3] "sub-03/anat/sub-03_T1w.nii.gz" "sub-04/anat/sub-04_T1w.nii.gz"
@@ -137,8 +107,6 @@ head(t1w_files)
 
 # Find all functional BOLD scans
 bold_files <- func_scans(proj, full_path = FALSE)
-print(paste("Found", length(bold_files), "functional scans"))
-#> [1] "Found 48 functional scans"
 head(bold_files)
 #> [1] "sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
 #> [2] "sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
@@ -157,20 +125,20 @@ One of bidser’s key strengths is filtering data by BIDS metadata:
 sub01_scans <- func_scans(proj, subid = "01")
 sub02_scans <- func_scans(proj, subid = "02")
 
-print(paste("Subject 01 has", length(sub01_scans), "scans"))
-#> [1] "Subject 01 has 3 scans"
-print(paste("Subject 02 has", length(sub02_scans), "scans"))
-#> [1] "Subject 02 has 3 scans"
+cat("Subject 01:", length(sub01_scans), "scans\n")
+#> Subject 01: 3 scans
+cat("Subject 02:", length(sub02_scans), "scans\n")
+#> Subject 02: 3 scans
 
 # Filter by task (ds001 only has one task, but this shows the syntax)
 task_scans <- func_scans(proj, task = "balloonanalogrisktask")
-print(paste("Found", length(task_scans), "scans for the balloon task"))
-#> [1] "Found 48 scans for the balloon task"
+cat("Balloon task:", length(task_scans), "scans total\n")
+#> Balloon task: 48 scans total
 
 # Combine filters: specific subject AND task
 sub01_task_scans <- func_scans(proj, subid = "01", task = "balloonanalogrisktask")
-print(paste("Subject 01 has", length(sub01_task_scans), "balloon task scans"))
-#> [1] "Subject 01 has 3 balloon task scans"
+cat("Subject 01, balloon task:", length(sub01_task_scans), "scans\n")
+#> Subject 01, balloon task: 3 scans
 ```
 
 ### Working with Multiple Subjects
@@ -180,13 +148,13 @@ You can use regular expressions to select multiple subjects at once:
 ``` r
 # Get scans for subjects 01, 02, and 03
 first_three_scans <- func_scans(proj, subid = "0[123]")
-print(paste("First 3 subjects have", length(first_three_scans), "scans total"))
-#> [1] "First 3 subjects have 9 scans total"
+cat("First 3 subjects:", length(first_three_scans), "scans total\n")
+#> First 3 subjects: 9 scans total
 
 # Get scans for all subjects (equivalent to default)
 all_scans <- func_scans(proj, subid = ".*")
-print(paste("All subjects have", length(all_scans), "scans total"))
-#> [1] "All subjects have 48 scans total"
+cat("All subjects:", length(all_scans), "scans total\n")
+#> All subjects: 48 scans total
 ```
 
 ## Working with Event Files
@@ -198,62 +166,56 @@ fMRI analysis.
 ``` r
 # Find all event files
 event_file_paths <- event_files(proj)
-print(paste("Found", length(event_file_paths), "event files"))
-#> [1] "Found 48 event files"
+cat("Found", length(event_file_paths), "event files\n")
+#> Found 48 event files
 
 # Read event data into a nested data frame
-events_data <- suppressMessages(read_events(proj))
-head(events_data)
-#> # A tibble: 6 × 5
-#> # Groups:   .task, .session, .run, .subid [6]
-#>   .subid .session .run  .task                 data              
-#>   <chr>  <chr>    <chr> <chr>                 <list>            
-#> 1 01     NA       01    balloonanalogrisktask <tibble [158 × 2]>
-#> 2 01     NA       02    balloonanalogrisktask <tibble [156 × 2]>
-#> 3 01     NA       03    balloonanalogrisktask <tibble [149 × 2]>
-#> 4 02     NA       01    balloonanalogrisktask <tibble [185 × 2]>
-#> 5 02     NA       02    balloonanalogrisktask <tibble [184 × 2]>
-#> 6 02     NA       03    balloonanalogrisktask <tibble [186 × 2]>
+events_data <- read_events(proj)
+events_data
+#> # A tibble: 48 × 5
+#> # Groups:   .task, .session, .run, .subid [48]
+#>    .subid .session .run  .task                 data              
+#>    <chr>  <chr>    <chr> <chr>                 <list>            
+#>  1 01     NA       01    balloonanalogrisktask <tibble [158 × 9]>
+#>  2 01     NA       02    balloonanalogrisktask <tibble [156 × 9]>
+#>  3 01     NA       03    balloonanalogrisktask <tibble [149 × 9]>
+#>  4 02     NA       01    balloonanalogrisktask <tibble [185 × 9]>
+#>  5 02     NA       02    balloonanalogrisktask <tibble [184 × 9]>
+#>  6 02     NA       03    balloonanalogrisktask <tibble [186 × 9]>
+#>  7 03     NA       01    balloonanalogrisktask <tibble [150 × 9]>
+#>  8 03     NA       02    balloonanalogrisktask <tibble [169 × 9]>
+#>  9 03     NA       03    balloonanalogrisktask <tibble [175 × 9]>
+#> 10 04     NA       01    balloonanalogrisktask <tibble [166 × 9]>
+#> # ℹ 38 more rows
 ```
 
 Let’s explore the event data structure:
 
 ``` r
-# Look at events for the first subject
-library(tidyr)
+# Unnest events for subject 01
+first_subject_events <- events_data %>%
+  filter(.subid == "01") %>%
+  unnest(cols = c(data))
 
-first_subject_events <- suppressMessages(
-  events_data %>% 
-    filter(.subid == "01") %>% 
-    unnest(cols = c(data))
-)
-
-print("Event structure for subject 01:")
-#> [1] "Event structure for subject 01:"
-print(head(first_subject_events))
-#> # A tibble: 6 × 6
+head(first_subject_events)
+#> # A tibble: 6 × 13
 #> # Groups:   .task, .session, .run, .subid [1]
-#>   .subid .session .run  .task                 onset\tduration\ttrial_typ…¹ .file
-#>   <chr>  <chr>    <chr> <chr>                 <chr>                        <chr>
-#> 1 01     NA       01    balloonanalogrisktask "0.061\t0.772\tpumps_demean… /tmp…
-#> 2 01     NA       01    balloonanalogrisktask "4.958\t0.772\tpumps_demean… /tmp…
-#> 3 01     NA       01    balloonanalogrisktask "7.179\t0.772\tpumps_demean… /tmp…
-#> 4 01     NA       01    balloonanalogrisktask "10.416\t0.772\tpumps_demea… /tmp…
-#> 5 01     NA       01    balloonanalogrisktask "13.419\t0.772\tpumps_demea… /tmp…
-#> 6 01     NA       01    balloonanalogrisktask "16.754\t0.772\texplode_dem… /tmp…
-#> # ℹ abbreviated name:
-#> #   ¹​`onset\tduration\ttrial_type\tcash_demean\tcontrol_pumps_demean\texplode_demean\tpumps_demean\tresponse_time`
-
-# What columns are in the event data?
-print("Event file columns:")
-#> [1] "Event file columns:"
-print(names(first_subject_events))
-#> [1] ".subid"                                                                                                     
-#> [2] ".session"                                                                                                   
-#> [3] ".run"                                                                                                       
-#> [4] ".task"                                                                                                      
-#> [5] "onset\tduration\ttrial_type\tcash_demean\tcontrol_pumps_demean\texplode_demean\tpumps_demean\tresponse_time"
-#> [6] ".file"
+#>   .subid .session .run  .task              onset duration trial_type cash_demean
+#>   <chr>  <chr>    <chr> <chr>              <dbl>    <dbl> <chr>            <dbl>
+#> 1 01     NA       01    balloonanalogris…  0.061    0.772 pumps_dem…          NA
+#> 2 01     NA       01    balloonanalogris…  4.96     0.772 pumps_dem…          NA
+#> 3 01     NA       01    balloonanalogris…  7.18     0.772 pumps_dem…          NA
+#> 4 01     NA       01    balloonanalogris… 10.4      0.772 pumps_dem…          NA
+#> 5 01     NA       01    balloonanalogris… 13.4      0.772 pumps_dem…          NA
+#> 6 01     NA       01    balloonanalogris… 16.8      0.772 explode_d…          NA
+#> # ℹ 5 more variables: control_pumps_demean <dbl>, explode_demean <dbl>,
+#> #   pumps_demean <dbl>, response_time <dbl>, .file <chr>
+names(first_subject_events)
+#>  [1] ".subid"               ".session"             ".run"                
+#>  [4] ".task"                "onset"                "duration"            
+#>  [7] "trial_type"           "cash_demean"          "control_pumps_demean"
+#> [10] "explode_demean"       "pumps_demean"         "response_time"       
+#> [13] ".file"
 ```
 
 ### Analyzing Event Data
@@ -262,16 +224,12 @@ Let’s do some basic exploration of the experimental design:
 
 ``` r
 # How many trials per subject?
-trial_counts <- suppressMessages(
-  events_data %>%
-    unnest(cols = c(data)) %>%
-    group_by(.subid) %>%
-    summarise(n_trials = n(), .groups = "drop")
-)
+trial_counts <- events_data %>%
+  unnest(cols = c(data)) %>%
+  group_by(.subid) %>%
+  summarise(n_trials = n(), .groups = "drop")
 
-print("Trials per subject:")
-#> [1] "Trials per subject:"
-print(trial_counts)
+trial_counts
 #> # A tibble: 16 × 2
 #>    .subid n_trials
 #>    <chr>     <int>
@@ -291,15 +249,65 @@ print(trial_counts)
 #> 14 14          503
 #> 15 15          411
 #> 16 16          419
-
-# What trial types are there?
-if ("trial_type" %in% names(first_subject_events)) {
-  trial_types <- first_subject_events %>%
-    count(trial_type, name = "frequency")
-  print("Trial types in the experiment:")
-  print(trial_types)
-}
 ```
+
+## Working with Metadata Sidecars
+
+BIDS stores acquisition metadata in JSON sidecars. `bidser` now supports
+both direct sidecar reads and inheritance-aware resolution following the
+BIDS inheritance principle.
+
+``` r
+# Read sidecar rows directly
+direct_sidecars <- read_sidecar(
+  proj,
+  subid = "01",
+  task = "balloonanalogrisktask",
+  inherit = FALSE
+)
+
+nrow(direct_sidecars)
+#> [1] 0
+names(direct_sidecars)
+#> character(0)
+```
+
+If you want the effective metadata for a scan after applying inherited
+sidecars from parent locations, use
+[`get_metadata()`](https://bbuchsbaum.github.io/bidser/reference/get_metadata.md)
+or set `inherit = TRUE` in
+[`read_sidecar()`](https://bbuchsbaum.github.io/bidser/reference/read_sidecar.md):
+
+``` r
+# Resolve metadata for a specific BOLD file with inheritance
+resolved_meta <- get_metadata(proj, bold_files[[1]], inherit = TRUE)
+
+sort(names(resolved_meta))[1:8]
+#> [1] "RepetitionTime" "TaskName"       NA               NA              
+#> [5] NA               NA               NA               NA
+resolved_meta$RepetitionTime
+#> [1] 2
+
+# Inheritance-aware sidecar table
+inherited_sidecars <- read_sidecar(
+  proj,
+  subid = "01",
+  task = "balloonanalogrisktask",
+  inherit = TRUE
+)
+
+if (nrow(inherited_sidecars) > 0) {
+  inherited_sidecars %>%
+    select(any_of(c("file", "RepetitionTime")))
+} else {
+  inherited_sidecars
+}
+#> # A tibble: 0 × 0
+```
+
+This is useful when the metadata you need lives in a task- or
+dataset-level JSON sidecar instead of the most specific file-level
+sidecar.
 
 ## Working with Individual Subjects
 
@@ -313,135 +321,43 @@ that automatically filter data for that subject.
 # Create a subject-specific interface for subject 01
 subject_01 <- bids_subject(proj, "01")
 
-# The subject object provides several helper functions:
 # Get all functional scans for this subject
 sub01_scans <- subject_01$scans()
-print(paste("Subject 01 has", length(sub01_scans), "functional scans"))
-#> [1] "Subject 01 has 3 functional scans"
+cat("Subject 01:", length(sub01_scans), "functional scans\n")
+#> Subject 01: 3 functional scans
 
 # Get event files for this subject
 sub01_events <- subject_01$events()
-#> Rows: 158 Columns: 1
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 156 Columns: 1
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 149 Columns: 1
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-print(paste("Subject 01 has", length(sub01_events), "event files"))
-#> [1] "Subject 01 has 5 event files"
+cat("Subject 01:", length(sub01_events), "event files\n")
+#> Subject 01: 5 event files
 
 # Read event data for this subject
-sub01_event_data <- suppressMessages(subject_01$events())
-print("Event data structure for subject 01:")
-#> [1] "Event data structure for subject 01:"
-print(sub01_event_data)
+sub01_event_data <- subject_01$events()
+sub01_event_data
 #> # A tibble: 3 × 5
 #> # Groups:   .task, .session, .run, .subid [3]
 #>   .subid .session .run  .task                 data              
 #>   <chr>  <chr>    <chr> <chr>                 <list>            
-#> 1 01     NA       01    balloonanalogrisktask <tibble [158 × 2]>
-#> 2 01     NA       02    balloonanalogrisktask <tibble [156 × 2]>
-#> 3 01     NA       03    balloonanalogrisktask <tibble [149 × 2]>
+#> 1 01     NA       01    balloonanalogrisktask <tibble [158 × 9]>
+#> 2 01     NA       02    balloonanalogrisktask <tibble [156 × 9]>
+#> 3 01     NA       03    balloonanalogrisktask <tibble [149 × 9]>
 ```
 
 This approach is particularly useful when you’re doing subject-level
 analyses:
 
 ``` r
-# Example: Analyze data for multiple subjects using the subject interface
 subjects_to_analyze <- c("01", "02", "03")
 
 for (subj_id in subjects_to_analyze) {
-  # Create subject interface
   subj <- bids_subject(proj, subj_id)
-  
-  # Get subject-specific data
   scans <- subj$scans()
   events <- subj$events()
-  
-  cat(sprintf("Subject %s: %d scans, %d event files\n", 
+  cat(sprintf("Subject %s: %d scans, %d event files\n",
               subj_id, length(scans), length(events)))
 }
-#> Rows: 158 Columns: 1
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 156 Columns: 1
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 149 Columns: 1
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 #> Subject 01: 3 scans, 5 event files
-#> Rows: 185 Columns: 1
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 184 Columns: 1
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 186 Columns: 1
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 #> Subject 02: 3 scans, 5 event files
-#> Rows: 150 Columns: 1
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 169 Columns: 1
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 175 Columns: 1
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset duration    trial_type  cash_demean control_pumps_demean    explode_...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 #> Subject 03: 3 scans, 5 event files
 ```
 
@@ -449,138 +365,231 @@ The subject interface makes it easy to write analysis pipelines that
 iterate over subjects without manually constructing filters:
 
 ``` r
-# Compare trial counts across subjects using the subject interface
-subject_trial_summary <- tibble(
-  subject = character(),
-  n_trials = numeric(),
-  n_scans = numeric()
-)
-
-for (subj_id in participants(proj)[1:3]) {  # Just first 3 subjects for demo
+subject_trial_summary <- lapply(participants(proj)[1:3], function(subj_id) {
   subj <- bids_subject(proj, subj_id)
-  
-  # Count trials
-  event_data <- suppressMessages(subj$events())
+  event_data <- subj$events()
   n_trials <- if (nrow(event_data) > 0) {
-    event_data %>% 
-      unnest(cols = c(data)) %>% 
-      nrow()
+    event_data %>% unnest(cols = c(data)) %>% nrow()
   } else {
     0
   }
-  
-  # Count scans
-  n_scans <- length(subj$scans())
-  
-  # Add to summary
-  subject_trial_summary <- bind_rows(
-    subject_trial_summary,
-    tibble(subject = subj_id, n_trials = n_trials, n_scans = n_scans)
-  )
-}
+  tibble(subject = subj_id, n_trials = n_trials, n_scans = length(subj$scans()))
+}) %>% bind_rows()
 
-print("Trial and scan summary by subject:")
-#> [1] "Trial and scan summary by subject:"
-print(subject_trial_summary)
+subject_trial_summary
 #> # A tibble: 3 × 3
 #>   subject n_trials n_scans
-#>   <chr>      <dbl>   <dbl>
+#>   <chr>      <int>   <int>
 #> 1 01           463       3
 #> 2 02           555       3
 #> 3 03           494       3
 ```
 
-## Advanced Querying
+## Advanced Querying with `query_files()`
 
-### Custom File Searches
+[`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
+is the primary file-finding API in bidser. It supports exact, regex, and
+glob matching modes, scoped searches across raw data and derivatives,
+and can return either paths or a tibble with parsed entities.
 
-The
-[`search_files()`](https://bbuchsbaum.github.io/bidser/reference/search_files.md)
-function is very flexible for custom queries:
+### Match Modes
 
 ``` r
-# Find all JSON sidecar files
-json_files <- search_files(proj, regex = "\\.json$")
-print(paste("Found", length(json_files), "JSON files"))
-#> [1] "Found 0 JSON files"
+# Exact entity matching -- reproducible, no regex surprises
+exact_bold <- query_files(
+  proj,
+  regex = "bold\\.nii\\.gz$",
+  subid = "01",
+  task = "balloonanalogrisktask",
+  match_mode = "exact"
+)
+cat("Exact-match BOLD files:", length(exact_bold), "\n")
+#> Exact-match BOLD files: 3
 
-# Find files for specific runs
-run1_files <- search_files(proj, regex = "bold", run = "01")
-print(paste("Found", length(run1_files), "files from run 01"))
-#> [1] "Found 16 files from run 01"
+# Regex entity matching -- select multiple values with patterns
+regex_bold <- query_files(
+  proj,
+  regex = "bold\\.nii\\.gz$",
+  subid = "0[1-3]",
+  task = "balloon.*",
+  match_mode = "regex"
+)
+cat("Regex-match BOLD files:", length(regex_bold), "\n")
+#> Regex-match BOLD files: 9
 
-# Complex pattern matching
-# Find T1w files for subjects 01-05
-t1w_subset <- search_files(proj, regex = "T1w", subid = "0[1-5]")
-print(paste("Found", length(t1w_subset), "T1w files for subjects 01-05"))
-#> [1] "Found 5 T1w files for subjects 01-05"
+# Glob matching -- shell-style wildcards
+glob_bold <- query_files(
+  proj,
+  regex = "bold\\.nii\\.gz$",
+  subid = "0*",
+  match_mode = "glob"
+)
+cat("Glob-match BOLD files:", length(glob_bold), "\n")
+#> Glob-match BOLD files: 30
 ```
 
-### Getting Full File Paths
-
-Sometimes you need the complete file paths for analysis:
+### Entity Presence, Extension, and Datatype Filters
 
 ``` r
-# Get full paths to functional scans for analysis
+# Require the queried entity to actually exist on returned files
+task_annotated <- query_files(
+  proj,
+  regex = "\\.nii\\.gz$",
+  task = ".*",
+  require_entity = TRUE,
+  scope = "raw"
+)
+cat("Files with an explicit task entity:", length(task_annotated), "\n")
+#> Files with an explicit task entity: 48
+
+# Filter by extension and datatype directly
+json_files <- query_files(proj, extension = "\\.json$")
+cat("JSON files:", length(json_files), "\n")
+#> JSON files: 0
+
+func_niftis <- query_files(proj, datatype = "func", extension = "\\.nii\\.gz$")
+cat("Functional NIfTIs:", length(func_niftis), "\n")
+#> Functional NIfTIs: 48
+```
+
+### Tibble Output with Parsed Entities
+
+``` r
+# Return a tibble instead of paths -- includes all parsed BIDS entities
+bold_tbl <- query_files(
+  proj,
+  regex = "bold\\.nii\\.gz$",
+  subid = "0[1-3]",
+  return = "tibble"
+)
+bold_tbl |> select(path, subid, task, run)
+#> # A tibble: 9 × 4
+#>   path                                                         subid task  run  
+#>   <chr>                                                        <chr> <chr> <chr>
+#> 1 sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.n… 01    ball… 01   
+#> 2 sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.n… 01    ball… 02   
+#> 3 sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.n… 01    ball… 03   
+#> 4 sub-02/func/sub-02_task-balloonanalogrisktask_run-01_bold.n… 02    ball… 01   
+#> 5 sub-02/func/sub-02_task-balloonanalogrisktask_run-02_bold.n… 02    ball… 02   
+#> 6 sub-02/func/sub-02_task-balloonanalogrisktask_run-03_bold.n… 02    ball… 03   
+#> 7 sub-03/func/sub-03_task-balloonanalogrisktask_run-01_bold.n… 03    ball… 01   
+#> 8 sub-03/func/sub-03_task-balloonanalogrisktask_run-02_bold.n… 03    ball… 02   
+#> 9 sub-03/func/sub-03_task-balloonanalogrisktask_run-03_bold.n… 03    ball… 03
+```
+
+The tibble is sorted deterministically by subject, session, task, run,
+and path.
+
+### Scoped Queries and Derivatives
+
+When derivatives are present, `scope` controls where to search and
+`pipeline` selects specific derivative pipelines:
+
+``` r
+deriv_path <- get_example_bids_dataset("ds000001-fmriprep")
+proj_deriv <- bids_project(deriv_path)
+
+# Search only derivatives from a specific pipeline
+prep_bold <- query_files(
+  proj_deriv,
+  regex = "bold\\.nii\\.gz$",
+  desc = "preproc",
+  scope = "derivatives",
+  pipeline = "fmriprep",
+  match_mode = "exact"
+)
+
+# Or use the convenience wrapper
+deriv_bold <- derivative_files(proj_deriv, pipeline = "fmriprep",
+                               regex = "bold\\.nii\\.gz$")
+
+# Search everywhere and get a tibble with scope/pipeline columns
+all_bold <- query_files(
+  proj_deriv,
+  regex = "bold\\.nii\\.gz$",
+  scope = "all",
+  return = "tibble"
+)
+```
+
+### Permissive Loading
+
+[`bids_project()`](https://bbuchsbaum.github.io/bidser/reference/bids_project.md)
+can handle real-world datasets missing `participants.tsv` – subjects are
+inferred from the directory tree:
+
+``` r
+proj_relaxed <- bids_project(
+  "/path/to/bids",
+  strict_participants = FALSE
+)
+
+# Check where participant IDs came from
+participants(proj_relaxed, as_tibble = TRUE)
+
+# See which derivative pipelines were discovered
+derivative_pipelines(proj_relaxed)
+```
+
+### Run-Level Variables and Report Data
+
+[`variables_table()`](https://bbuchsbaum.github.io/bidser/reference/variables_table.md)
+gives you a run-level tibble that nests scan inventory, events, and
+confounds – ready for downstream R workflows:
+
+``` r
+vars <- variables_table(
+  proj_deriv,
+  scope = "all",
+  pipeline = "fmriprep"
+)
+
+vars[, c(".subid", ".task", ".run", "n_scans", "n_events", "n_confound_rows")]
+
+report <- bids_report(proj_deriv, scope = "all", pipeline = "fmriprep")
+report
+```
+
+### Full File Paths
+
+When you need absolute paths for analysis tools:
+
+``` r
 full_paths <- func_scans(proj, subid = "01", full_path = TRUE)
-print("Full paths to subject 01's functional scans:")
-#> [1] "Full paths to subject 01's functional scans:"
-print(full_paths)
-#> [1] "/tmp/Rtmpk3HtqF/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
-#> [2] "/tmp/Rtmpk3HtqF/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
-#> [3] "/tmp/Rtmpk3HtqF/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
+full_paths
+#> [1] "/tmp/RtmpKAX8q7/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
+#> [2] "/tmp/RtmpKAX8q7/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
+#> [3] "/tmp/RtmpKAX8q7/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
 
-# Check that files actually exist
-if (length(full_paths) > 0) {
-  files_exist <- file.exists(full_paths)
-  print(paste("All files exist:", all(files_exist)))
-}
-#> [1] "All files exist: TRUE"
+all(file.exists(full_paths))
+#> [1] TRUE
 ```
 
-## Next Steps
+## Working with fMRIPrep Derivatives
 
-This quickstart covered the basic functionality of bidser for querying
-BIDS datasets. For more advanced usage, see:
-
-- **fMRIPrep integration**: Working with preprocessed derivatives
-- **Data loading**: Reading neuroimaging data with `neurobase` or
-  `RNifti`
-- **Confound regression**: Using physiological and motion regressors
-- **Group analysis**: Combining data across subjects efficiently
-
-## Reading files produced by FMRIPrep
-
-If you have processed a dataset with FMRIPrep, `bidser` can be used to
-read in many of the resultant derivative files. If a project has an
-FMRIPrep derivatives folder, then we can read in the BIDS hierarchy plus
-derivatives as follows:
+`bidser` automatically discovers derivative pipelines under
+`derivatives/`. You can query preprocessed scans, confounds, and masks
+through
+[`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md):
 
 ``` r
-# Try to get a derivatives dataset - note this may not be available
-tryCatch({
-  # Some BIDS examples may have derivatives, or we can demonstrate with empty structure
-  deriv_path <- get_example_bids_dataset("ds000001-fmriprep")
-  proj_deriv <- bids_project(deriv_path, fmriprep=TRUE)
-  
-  print(proj_deriv)
-  
-  # Now we can access various derivative files with convenience functions.
-  # For example, to read in "preproc" scans we can use the `preproc_scans` function.
-  pscans <- preproc_scans(proj_deriv)
-  if (!is.null(pscans) && length(pscans) > 0) {
-    print(head(as.character(pscans)))
-  } else {
-    message("No preprocessed scans found in this example dataset")
-  }
-  
-  # Clean up derivatives dataset
-  unlink(deriv_path, recursive=TRUE)
-  
-}, error = function(e) {
-  message("Derivatives example not available: ", e$message)
-  message("This is normal - not all BIDS examples include fMRIPrep derivatives.")
-})
-#> Derivatives example not available: participants.tsv is missing
-#> This is normal - not all BIDS examples include fMRIPrep derivatives.
+deriv_path <- get_example_bids_dataset("ds000001-fmriprep")
+proj_deriv <- bids_project(deriv_path)
+
+# See which pipelines were discovered
+derivative_pipelines(proj_deriv)
+
+# Query preprocessed BOLD scans
+preproc <- query_files(
+  proj_deriv,
+  regex = "bold\\.nii\\.gz$",
+  desc = "preproc",
+  scope = "derivatives",
+  pipeline = "fmriprep",
+  return = "tibble"
+)
+head(preproc$path)
+
+# Read confound regressors
+conf <- read_confounds(proj_deriv, subid = "01")
 ```

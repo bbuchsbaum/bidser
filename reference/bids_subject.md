@@ -102,24 +102,27 @@ tryCatch({
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })
-#> Rows: 158 Columns: 1
+#> Rows: 158 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 156 Columns: 1
+#> Rows: 156 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 149 Columns: 1
+#> Rows: 149 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
@@ -149,31 +152,33 @@ tryCatch({
   # For example, get only specific tasks:
   task_scans <- subj$scans(task = "balloonanalogrisktask")
   
-  # Note: Don't unlink - cached for performance
-  # unlink(ds001_path, recursive=TRUE)
+  # Dataset cache is intentionally retained for performance.
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })
 #> [1] "Subject 01 has 3 functional scans"
 #> [1] "Subject 01 has 3 event files"
-#> Rows: 158 Columns: 1
+#> Rows: 158 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 156 Columns: 1
+#> Rows: 156 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 149 Columns: 1
+#> Rows: 149 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
@@ -182,9 +187,9 @@ tryCatch({
 #> # Groups:   .task, .session, .run, .subid [3]
 #>   .subid .session .run  .task                 data              
 #>   <chr>  <chr>    <chr> <chr>                 <list>            
-#> 1 01     NA       01    balloonanalogrisktask <tibble [158 × 2]>
-#> 2 01     NA       02    balloonanalogrisktask <tibble [156 × 2]>
-#> 3 01     NA       03    balloonanalogrisktask <tibble [149 × 2]>
+#> 1 01     NA       01    balloonanalogrisktask <tibble [158 × 9]>
+#> 2 01     NA       02    balloonanalogrisktask <tibble [156 × 9]>
+#> 3 01     NA       03    balloonanalogrisktask <tibble [149 × 9]>
 # }
 # \donttest{
 # Create a subject interface
@@ -200,8 +205,7 @@ tryCatch({
   events <- subj$event_files()
   print(paste("Subject 01:", length(scans), "scans,", length(events), "events"))
   
-  # Note: Don't unlink - cached for performance
-  # unlink(ds001_path, recursive=TRUE)  
+  # Dataset cache is intentionally retained for performance.
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })

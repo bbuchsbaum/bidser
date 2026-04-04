@@ -1,20 +1,28 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://bbuchsbaum.github.io/bidser/404.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/AGENTS.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/CI-STATUS.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/CLAUDE.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/CONTRIBUTING.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/LICENSE-text.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/LICENSE.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/articles/confounds-and-variables.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/articles/derivatives.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/articles/index.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/articles/mock-bids.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/articles/quickstart.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/authors.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/bidser_cheatsheet.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/index.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/news/index.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/anat_parser.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_check_compliance.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_heatmap.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_index.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_parser.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_project.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_report.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_report_data.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_subject.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_summary.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_transform.html</loc></url>
@@ -33,6 +41,8 @@
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/create_regex_parser.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/create_smooth_transformer.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/decode_bids_entities.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/derivative_files.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/derivative_pipelines.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/encode.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/event_files-method.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/extract_bids_components.html</loc></url>
@@ -47,6 +57,7 @@
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/func_scans.bids_project.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/func_scans.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/get_example_bids_dataset.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/get_metadata.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/get_repetition_time.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/index.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/infer_tr.html</loc></url>
@@ -71,6 +82,7 @@
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/preproc_scans-method.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/preproc_scans.bids_project.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/print.mock_bids_project.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/query_files.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/read_confounds-method.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/read_confounds.bids_project.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/read_confounds.html</loc></url>
@@ -88,5 +100,6 @@
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/tasks-method.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/tasks.mock_bids_project.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/transform_files.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/variables_table.html</loc></url>
 </urlset>
 

@@ -74,7 +74,7 @@ read_confounds(
 A `bids_confounds` tibble (nested if nest=TRUE) with identifier columns
 for participant_id, task, session, and run. When PCA is requested, the
 object includes a `pca` attribute with per-run loadings and variance
-used for plotting.
+used by [`plot()`](https://rdrr.io/r/graphics/plot.default.html).
 
 ## Examples
 

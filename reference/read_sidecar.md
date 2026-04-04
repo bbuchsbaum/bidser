@@ -19,6 +19,8 @@ read_sidecar(
   session = ".*",
   modality = "bold",
   full_path = TRUE,
+  inherit = FALSE,
+  inherit_scope = c("auto", "raw", "derivatives", "all"),
   ...
 )
 ```
@@ -53,6 +55,19 @@ read_sidecar(
 - full_path:
 
   If TRUE, return full file paths in the `file` column. Default is TRUE.
+
+- inherit:
+
+  If TRUE, resolve metadata using BIDS inheritance across parent
+  sidecars. If FALSE (default), read each JSON sidecar directly.
+
+- inherit_scope:
+
+  Scope used when `inherit = TRUE`:
+
+  - `"auto"` (default) infers raw/derivatives from file location
+
+  - `"raw"`, `"derivatives"`, or `"all"` override scope explicitly
 
 - ...:
 

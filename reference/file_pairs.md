@@ -82,6 +82,5 @@ tryCatch({
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })
-#> Example requires internet connection: In argument: `stringr::str_detect(task, task)`.
 # }
 ```

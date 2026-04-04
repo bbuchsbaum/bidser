@@ -62,6 +62,19 @@ matches found.
 
 A character vector of matching file paths, or `NULL` if no matches.
 
+## Details
+
+`search_files()` remains available as the compatibility interface for
+existing code and ad hoc regex-heavy searches. For new code, prefer
+[`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md),
+which provides explicit matching mode, entity-existence semantics, and
+scope controls without changing `search_files()` behavior.
+
+This method remains available for backward compatibility and flexible
+regex-driven searches. Prefer
+[`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
+for explicit query semantics in new code.
+
 ## Examples
 
 ``` r

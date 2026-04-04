@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bidser</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,8 +18,12 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/confounds-and-variables.html">Working with Confounds and Variables</a></li>
+    <li><a class="dropdown-item" href="../articles/derivatives.html">Work With Derivatives and Confounds</a></li>
+    <li><a class="dropdown-item" href="../articles/mock-bids.html">Create Mock BIDS Projects for Tests and Examples</a></li>
+    <li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/bbuchsbaum/bidser/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -80,6 +84,28 @@
 and <code>data</code> (containing the event tibbles), or an empty tibble if no matching data.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">parts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"01"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fs</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  subid <span class="op">=</span> <span class="st">"01"</span>, datatype <span class="op">=</span> <span class="st">"func"</span>,</span></span>
+<span class="r-in"><span>  suffix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bold.nii.gz"</span>, <span class="st">"events.tsv"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  task <span class="op">=</span> <span class="st">"rest"</span>, run <span class="op">=</span> <span class="st">"01"</span>, fmriprep <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">evt_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">evt_data</span><span class="op">[[</span><span class="st">"sub-01/func/sub-01_task-rest_run-01_events.tsv"</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span></span></span>
+<span class="r-in"><span>  <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>onset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span>, duration <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                 trial_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"go"</span>, <span class="st">"stop"</span>, <span class="st">"go"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mock</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_mock_bids.html">create_mock_bids</a></span><span class="op">(</span><span class="st">"EventTest"</span>, <span class="va">parts</span>, <span class="va">fs</span>, event_data <span class="op">=</span> <span class="va">evt_data</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">events</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_events.html">read_events</a></span><span class="op">(</span><span class="va">mock</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">events</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 5</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Groups:   .subid, .task, .run, .session [1]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .subid .task .run  .session data            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 01     rest  01    <span style="color: #BB0000;">NA</span>       <span style="color: #949494;">&lt;tibble [3 × 3]&gt;</span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

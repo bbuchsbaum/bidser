@@ -9,7 +9,14 @@ aggregates loadings across runs.
 
 ``` r
 # S3 method for class 'bids_confounds'
-plot(x, view = c("auto", "run", "aggregate"), pcs = NULL, top_n = 8, max_panels = 6, ...)
+plot(
+  x,
+  view = c("auto", "run", "aggregate"),
+  pcs = NULL,
+  top_n = 8,
+  max_panels = 6,
+  ...
+)
 ```
 
 ## Arguments
@@ -51,15 +58,29 @@ available.
 
 ``` r
 # \donttest{
-tryCatch({
-  ds_path <- get_example_bids_dataset("ds000001-fmriprep")
-  proj <- bids_project(ds_path, fmriprep = TRUE)
-  conf <- read_confounds(proj, npcs = 5)
+parts <- c("01", "02")
+fs <- tibble::tibble(
+  subid = rep(c("01", "02"), each = 2),
+  datatype = "func",
+  suffix = rep(c("bold.nii.gz", "desc-confounds_timeseries.tsv"), 2),
+  task = "rest", fmriprep = TRUE
+)
+conf_data <- list()
+for (p in parts) {
+  key <- paste0("derivatives/fmriprep/sub-", p,
+                "/func/sub-", p, "_task-rest_desc-confounds_timeseries.tsv")
+  conf_data[[key]] <- data.frame(
+    csf = rnorm(100), white_matter = rnorm(100),
+    global_signal = rnorm(100), framewise_displacement = abs(rnorm(100)),
+    trans_x = rnorm(100), trans_y = rnorm(100), trans_z = rnorm(100),
+    rot_x = rnorm(100), rot_y = rnorm(100), rot_z = rnorm(100)
+  )
+}
+mock <- create_mock_bids("ConfPlot", parts, fs, confound_data = conf_data)
+conf <- read_confounds(mock, npcs = 3)
+if (requireNamespace("ggplot2", quietly = TRUE)) {
   plot(conf)
-  unlink(ds_path, recursive=TRUE)
-}, error = function(e) {
-  message("Example requires derivatives dataset with confounds: ", e$message)
-})
-#> Example requires derivatives dataset with confounds: participants.tsv is missing
+}
+
 # }
 ```

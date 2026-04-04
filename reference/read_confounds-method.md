@@ -66,3 +66,28 @@ read_confounds(
 ## Value
 
 A `bids_confounds` tibble of confound data (nested if `nest = TRUE`).
+
+## Examples
+
+``` r
+parts <- c("01")
+fs <- tibble::tibble(
+  subid = "01", datatype = "func",
+  suffix = c("bold.nii.gz", "desc-confounds_timeseries.tsv"),
+  task = "rest", fmriprep = c(TRUE, TRUE)
+)
+conf_data <- list()
+key <- "derivatives/fmriprep/sub-01/func/sub-01_task-rest_desc-confounds_timeseries.tsv"
+conf_data[[key]] <- data.frame(
+  csf = rnorm(50), white_matter = rnorm(50),
+  trans_x = rnorm(50), trans_y = rnorm(50)
+)
+mock <- create_mock_bids("ConfTest", parts, fs, confound_data = conf_data)
+conf <- read_confounds(mock)
+print(conf)
+#> # A tibble: 1 × 6
+#> # Groups:   .subid, .task, .run, .session, .desc [1]
+#>   .subid .task .run  .session .desc     data             
+#>   <chr>  <chr> <chr> <chr>    <chr>     <list>           
+#> 1 01     rest  NA    NA       confounds <tibble [50 × 4]>
+```

@@ -10,7 +10,16 @@ checking BIDS compliance.
 ## Usage
 
 ``` r
-bids_project(path = ".", fmriprep = FALSE, prep_dir = "derivatives/fmriprep")
+bids_project(
+  path = ".",
+  fmriprep = FALSE,
+  prep_dir = "derivatives/fmriprep",
+  strict_participants = TRUE,
+  derivatives = c("auto", "legacy", "none"),
+  pipelines = NULL,
+  index = c("auto", "none"),
+  index_path = NULL
+)
 ```
 
 ## Arguments
@@ -23,12 +32,52 @@ bids_project(path = ".", fmriprep = FALSE, prep_dir = "derivatives/fmriprep")
 - fmriprep:
 
   Logical. Whether to load the fMRIPrep derivatives folder hierarchy.
-  Defaults to FALSE.
+  Defaults to FALSE. This remains available as a legacy compatibility
+  switch for existing fMRIPrep-oriented workflows.
 
 - prep_dir:
 
   Character string. The location of the fMRIPrep subfolder relative to
-  the derivatives directory. Defaults to "derivatives/fmriprep".
+  the derivatives directory. Defaults to "derivatives/fmriprep". New
+  code should prefer `derivatives = "auto"` plus
+  [`derivative_pipelines()`](https://bbuchsbaum.github.io/bidser/reference/derivative_pipelines.md).
+
+- strict_participants:
+
+  Logical. If TRUE (default), require `participants.tsv`. If FALSE,
+  infer participants from `sub-*` directories when the file is missing
+  or incomplete.
+
+- derivatives:
+
+  Derivatives loading mode:
+
+  - `"auto"` discovers available pipelines under `derivatives/`
+    (default)
+
+  - `"legacy"` keeps the older `fmriprep`/`prep_dir` behavior
+
+  - `"none"` disables derivative discovery
+
+- pipelines:
+
+  Optional character vector of derivative pipeline names (or relative
+  roots) to include when `derivatives = "auto"`.
+
+- index:
+
+  Whether to use an on-disk file index:
+
+  - `"auto"` loads an existing index or creates one on first load
+    (default). The index is automatically rebuilt when the dataset
+    directory mtime changes.
+
+  - `"none"` disables indexing
+
+- index_path:
+
+  Optional path for the persisted index file. Defaults to
+  `file.path(path, ".bidser_index.rds")`.
 
 ## Value
 

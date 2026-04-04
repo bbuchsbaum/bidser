@@ -99,385 +99,437 @@ tryCatch({
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })
-#> Rows: 158 Columns: 1
+#> Rows: 158 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 156 Columns: 1
+#> Rows: 156 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 149 Columns: 1
+#> Rows: 149 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 185 Columns: 1
+#> Rows: 185 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 184 Columns: 1
+#> Rows: 184 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 186 Columns: 1
+#> Rows: 186 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 150 Columns: 1
+#> Rows: 150 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 169 Columns: 1
+#> Rows: 169 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 175 Columns: 1
+#> Rows: 175 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 166 Columns: 1
+#> Rows: 166 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 175 Columns: 1
+#> Rows: 175 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 169 Columns: 1
+#> Rows: 169 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 135 Columns: 1
+#> Rows: 135 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 138 Columns: 1
+#> Rows: 138 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 146 Columns: 1
+#> Rows: 146 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 177 Columns: 1
+#> Rows: 177 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 187 Columns: 1
+#> Rows: 187 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 172 Columns: 1
+#> Rows: 172 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 170 Columns: 1
+#> Rows: 170 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 162 Columns: 1
+#> Rows: 162 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 160 Columns: 1
+#> Rows: 160 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 163 Columns: 1
+#> Rows: 163 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 166 Columns: 1
+#> Rows: 166 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 165 Columns: 1
+#> Rows: 165 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 172 Columns: 1
+#> Rows: 172 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 167 Columns: 1
+#> Rows: 167 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 158 Columns: 1
+#> Rows: 158 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 175 Columns: 1
+#> Rows: 175 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 173 Columns: 1
+#> Rows: 173 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 173 Columns: 1
+#> Rows: 173 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 150 Columns: 1
+#> Rows: 150 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 153 Columns: 1
+#> Rows: 153 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 168 Columns: 1
+#> Rows: 168 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 149 Columns: 1
+#> Rows: 149 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 156 Columns: 1
+#> Rows: 156 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 148 Columns: 1
+#> Rows: 148 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 151 Columns: 1
+#> Rows: 151 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 172 Columns: 1
+#> Rows: 172 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 162 Columns: 1
+#> Rows: 162 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 168 Columns: 1
+#> Rows: 168 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 173 Columns: 1
+#> Rows: 173 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 162 Columns: 1
+#> Rows: 162 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 149 Columns: 1
+#> Rows: 149 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 127 Columns: 1
+#> Rows: 127 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 135 Columns: 1
+#> Rows: 135 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 121 Columns: 1
+#> Rows: 121 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 141 Columns: 1
+#> Rows: 141 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 157 Columns: 1
+#> Rows: 157 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 158 Columns: 1
+#> Rows: 158 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 156 Columns: 1
+#> Rows: 156 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 149 Columns: 1
+#> Rows: 149 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 158 Columns: 1
+#> Rows: 158 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 185 Columns: 1
+#> Rows: 185 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 150 Columns: 1
+#> Rows: 150 Columns: 8
 #> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: " "
-#> chr (1): onset  duration    trial_type  cash_demean control_pumps_demean    explode_...
+#> Delimiter: "\t"
+#> chr (1): trial_type
+#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Warning: Unknown or uninitialised column: `duration`.
-#> Warning: argument is not numeric or logical: returning NA
 # }
 ```

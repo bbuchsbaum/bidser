@@ -38,7 +38,7 @@ pack_bids(
 
   Character string specifying the output archive filename. Should end
   with ".tar.gz" or ".zip". If not specified, defaults to
-  "project_name_metadata.tar.gz" in the current directory.
+  `"{project_name}_metadata.tar.gz"` in the current directory.
 
 - format:
 

@@ -8,10 +8,16 @@
   : Basic BIDS Compliance Checks
 - [`bids_heatmap()`](https://bbuchsbaum.github.io/bidser/reference/bids_heatmap.md)
   : Create a specialized heatmap visualization of BIDS data
+- [`bids_index()`](https://bbuchsbaum.github.io/bidser/reference/bids_index.md)
+  : Build or retrieve a persistent file index for a BIDS project
 - [`bids_parser()`](https://bbuchsbaum.github.io/bidser/reference/bids_parser.md)
   : BIDS filename parsers using regex
 - [`bids_project()`](https://bbuchsbaum.github.io/bidser/reference/bids_project.md)
   : Create a BIDS Project Object
+- [`bids_report()`](https://bbuchsbaum.github.io/bidser/reference/bids_report.md)
+  : Create a lightweight text report for a BIDS project
+- [`bids_report_data()`](https://bbuchsbaum.github.io/bidser/reference/bids_report_data.md)
+  : Assemble lightweight report data for a BIDS project
 - [`bids_subject()`](https://bbuchsbaum.github.io/bidser/reference/bids_subject.md)
   [`bids_subject.bids_project()`](https://bbuchsbaum.github.io/bidser/reference/bids_subject.md)
   : Access a single subject from a BIDS project
@@ -45,6 +51,10 @@
   : Create a simple smoothing transformer
 - [`decode_bids_entities()`](https://bbuchsbaum.github.io/bidser/reference/decode_bids_entities.md)
   : Decode BIDS entities back into a filename
+- [`derivative_files()`](https://bbuchsbaum.github.io/bidser/reference/derivative_files.md)
+  : Query derivative files from a BIDS project
+- [`derivative_pipelines()`](https://bbuchsbaum.github.io/bidser/reference/derivative_pipelines.md)
+  : List derivative pipelines in a BIDS project
 - [`encode()`](https://bbuchsbaum.github.io/bidser/reference/encode.md)
   : Encode a string into a BIDS key-value list
 - [`event_files()`](https://bbuchsbaum.github.io/bidser/reference/event_files-method.md)
@@ -67,6 +77,8 @@
   : Get Functional Scans from a BIDS Project
 - [`get_example_bids_dataset()`](https://bbuchsbaum.github.io/bidser/reference/get_example_bids_dataset.md)
   : Download Example BIDS Dataset
+- [`get_metadata()`](https://bbuchsbaum.github.io/bidser/reference/get_metadata.md)
+  : Resolve metadata for a BIDS file
 - [`get_repetition_time()`](https://bbuchsbaum.github.io/bidser/reference/get_repetition_time.md)
   : Get Repetition Time (TR) from a sidecar JSON
 - [`infer_tr()`](https://bbuchsbaum.github.io/bidser/reference/infer_tr.md)
@@ -102,6 +114,8 @@
   : Get preprocessed scans from a BIDS project
 - [`print(`*`<mock_bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/print.mock_bids_project.md)
   : Print Mock BIDS Project Summary
+- [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
+  : Query files in BIDS structure with explicit semantics
 - [`read_confounds(`*`<mock_bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/read_confounds-method.md)
   : Read Confound Files (Mock Implementation)
 - [`read_confounds()`](https://bbuchsbaum.github.io/bidser/reference/read_confounds.md)
@@ -134,3 +148,5 @@
   : Get Tasks from Mock BIDS Project
 - [`transform_files()`](https://bbuchsbaum.github.io/bidser/reference/transform_files.md)
   : Query Transform Files from a BIDS Project
+- [`variables_table()`](https://bbuchsbaum.github.io/bidser/reference/variables_table.md)
+  : Create a tidy run-level variables table

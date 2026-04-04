@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bidser</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,8 +18,12 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/confounds-and-variables.html">Working with Confounds and Variables</a></li>
+    <li><a class="dropdown-item" href="../articles/derivatives.html">Work With Derivatives and Confounds</a></li>
+    <li><a class="dropdown-item" href="../articles/mock-bids.html">Create Mock BIDS Projects for Tests and Examples</a></li>
+    <li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/bbuchsbaum/bidser/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -67,6 +71,13 @@
 
         <dt>
 
+          <code><a href="bids_index.html">bids_index()</a></code>
+
+        </dt>
+        <dd>Build or retrieve a persistent file index for a BIDS project</dd>
+
+        <dt>
+
           <code><a href="bids_parser.html">bids_parser()</a></code>
 
         </dt>
@@ -78,6 +89,20 @@
 
         </dt>
         <dd>Create a BIDS Project Object</dd>
+
+        <dt>
+
+          <code><a href="bids_report.html">bids_report()</a></code>
+
+        </dt>
+        <dd>Create a lightweight text report for a BIDS project</dd>
+
+        <dt>
+
+          <code><a href="bids_report_data.html">bids_report_data()</a></code>
+
+        </dt>
+        <dd>Assemble lightweight report data for a BIDS project</dd>
 
         <dt>
 
@@ -193,6 +218,20 @@
 
         <dt>
 
+          <code><a href="derivative_files.html">derivative_files()</a></code>
+
+        </dt>
+        <dd>Query derivative files from a BIDS project</dd>
+
+        <dt>
+
+          <code><a href="derivative_pipelines.html">derivative_pipelines()</a></code>
+
+        </dt>
+        <dd>List derivative pipelines in a BIDS project</dd>
+
+        <dt>
+
           <code><a href="encode.html">encode()</a></code>
 
         </dt>
@@ -267,6 +306,13 @@
 
         </dt>
         <dd>Download Example BIDS Dataset</dd>
+
+        <dt>
+
+          <code><a href="get_metadata.html">get_metadata()</a></code>
+
+        </dt>
+        <dd>Resolve metadata for a BIDS file</dd>
 
         <dt>
 
@@ -389,6 +435,13 @@
 
         <dt>
 
+          <code><a href="query_files.html">query_files()</a></code>
+
+        </dt>
+        <dd>Query files in BIDS structure with explicit semantics</dd>
+
+        <dt>
+
           <code><a href="read_confounds-method.html">read_confounds(<i>&lt;mock_bids_project&gt;</i>)</a></code>
 
         </dt>
@@ -498,6 +551,13 @@
 
         </dt>
         <dd>Query Transform Files from a BIDS Project</dd>
+
+        <dt>
+
+          <code><a href="variables_table.html">variables_table()</a></code>
+
+        </dt>
+        <dd>Create a tidy run-level variables table</dd>
       </dl></div>
   </main></div>
 

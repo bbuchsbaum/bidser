@@ -176,12 +176,22 @@ print(search_files(mock_proj, suffix = "preproc_bold.nii.gz"))
 #> NULL
 
 # Check stub directory (if created)
-# list.files(mock_proj_stub$path, recursive = TRUE)
-# if (file.exists(file.path(mock_proj_stub$path, names(event_data_list)[1]))) {
-#   print(readLines(file.path(mock_proj_stub$path, names(event_data_list)[1])))
-# }
+stub_files <- list.files(mock_proj_stub$path, recursive = TRUE)
+print(head(stub_files))
+#> [1] "bids-examples.zip"                                        
+#> [2] "bids_example_ds000001-fmriprep/README"                    
+#> [3] "bids_example_ds000001-fmriprep/code/update_res_in_json.py"
+#> [4] "bids_example_ds000001-fmriprep/dataset_description.json"  
+#> [5] "bids_example_ds000001-fmriprep/desc-aparcaseg_dseg.tsv"   
+#> [6] "bids_example_ds000001-fmriprep/desc-aseg_dseg.tsv"        
 
-# Clean up stub directory if created in temp
-# unlink(mock_proj_stub$path, recursive = TRUE)
+# Read one injected stub event file if present
+stub_event_path <- file.path(mock_proj_stub$path, names(event_data_list)[1])
+if (file.exists(stub_event_path)) {
+  print(readLines(stub_event_path, n = 1))
+}
+#> [1] "onset\tduration\ttrial_type"
+
+# Cleanup is intentionally omitted in this example.
 # }
 ```
