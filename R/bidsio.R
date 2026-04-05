@@ -44,7 +44,7 @@ read_func_scans.bids_project <- function(x, mask, mode = c("normal", "bigvec"),
   }
   
   if (!requireNamespace("neuroim2", quietly=TRUE)) {
-    stop("Package `neuroim2` is required for `read_func_scans`.")
+    stop("Package 'neuroim2' is required for this function. Install with: remotes::install_github('bbuchsbaum/neuroim2')", call. = FALSE)
   }
   
   neuroim2::read_vec(fnames, mask=mask, mode=mode, ...)
@@ -135,7 +135,7 @@ read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bi
   }
   
   if (!requireNamespace("neuroim2", quietly=TRUE)) {
-    stop("Package `neuroim2` is required for `read_preproc_scans`.")
+    stop("Package 'neuroim2' is required for this function. Install with: remotes::install_github('bbuchsbaum/neuroim2')", call. = FALSE)
   }
   
   neuroim2::read_vec(fnames, mask=mask, mode=mode, ...)
@@ -257,7 +257,7 @@ create_preproc_mask.bids_project <- function(x, subid, thresh=.99,
   }
 
   if (!requireNamespace("neuroim2", quietly = TRUE)) {
-    stop("Package `neuroim2` is required for `create_preproc_mask`.")
+    stop("Package 'neuroim2' is required for this function. Install with: remotes::install_github('bbuchsbaum/neuroim2')", call. = FALSE)
   }
 
   vols <- lapply(maskfiles, neuroim2::read_vol)

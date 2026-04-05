@@ -49,7 +49,6 @@
 #' @importFrom dplyr bind_rows tibble filter
 #' @importFrom tidyr unnest
 #' @importFrom stringr str_detect
-#' @importFrom magrittr %>%
 #' @export
 check_func_scans <- function(x) {
   if (!inherits(x, "bids_project")) {
@@ -173,13 +172,11 @@ check_func_scans <- function(x) {
 #' }
 #'
 #' @importFrom dplyr filter mutate tibble bind_rows group_by summarize
-#' @importFrom assertthat assert_that
 #' @importFrom stringr str_detect str_match
-#' @importFrom stringdist stringdistmatrix
 #' @importFrom rlang sym
 #' @export
 file_pairs <- function(x, pair=c("bold-events", "preproc-events"), task=".*", matchon=c("run", "task"), ...) {
-  assertthat::assert_that(inherits(x, "bids_project"))
+  if (!inherits(x, "bids_project")) stop("`x` must be a 'bids_project' object", call. = FALSE)
   
   pair <- match.arg(pair)
   sids <- participants(x)
@@ -251,13 +248,16 @@ file_pairs <- function(x, pair=c("bold-events", "preproc-events"), task=".*", ma
     }
     
     # Match rows by run/task strings using stringdist
+    if (!requireNamespace("stringdist", quietly = TRUE)) {
+      stop("Package 'stringdist' is required for file_pairs(). Install with: install.packages('stringdist')", call. = FALSE)
+    }
     mat1 <- df1[, matchon, drop=FALSE]
     mat2 <- df2[, matchon, drop=FALSE]
-    
+
     # Create strings to match on
     str1 <- apply(mat1, 1, paste, collapse="-")
     str2 <- apply(mat2, 1, paste, collapse="-")
-    
+
     sdmat <- stringdist::stringdistmatrix(str1, str2)
     
     # For each row in df1, find the best match in df2 with a distance of 0

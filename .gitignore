@@ -21,3 +21,6 @@ pkgdown/
 CRAN-SUBMISSION
 pybids/
 .covr_result.rds
+.rcmdcheck_result.rds
+vendor/
+vignettes/*.html

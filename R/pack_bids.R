@@ -378,7 +378,7 @@ pack_bids <- function(x,
     }
     # Check for neuroim2 package
     if (!requireNamespace("neuroim2", quietly = TRUE)) {
-      stop("The 'neuroim2' package is required for downsampling. Please install it.")
+      stop("Package 'neuroim2' is required for this function. Install with: remotes::install_github('bbuchsbaum/neuroim2')", call. = FALSE)
     }
   }
   

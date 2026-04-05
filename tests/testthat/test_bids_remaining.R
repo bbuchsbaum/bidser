@@ -524,7 +524,12 @@ test_that(".bidser_discover_derivatives reads dataset_description.json", {
   fmriprep_row <- result[result$pipeline == "fmriprep", ]
   expect_true(is.list(fmriprep_row$description))
   desc <- fmriprep_row$description[[1]]
-  expect_equal(desc$Name, "fmriprep")
+  # description column now holds bids_dataset_description objects
+  if (inherits(desc, "bids_dataset_description")) {
+    expect_equal(dataset_name(desc), "fmriprep")
+  } else {
+    expect_equal(desc$Name, "fmriprep")
+  }
 })
 
 # ===========================================================================

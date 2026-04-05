@@ -38,3 +38,8 @@ repomix-output.xml
 ^AGENTS\.md$
 ^bidser-top5-prd\.json$
 ^\.covr_result\.rds$
+^\.rcmdcheck_result\.rds$
+^vendor$
+^vendor/
+^vignettes/.*\.html$
+^vendor($|/)

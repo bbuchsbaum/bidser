@@ -518,6 +518,40 @@ query_files.bids_project <- function(x, regex = ".*", full_path = FALSE,
   return <- match.arg(return)
   use_index <- match.arg(use_index)
 
+  # Formulas passed positionally can land in regex, full_path, or strict slots.
+  # Rescue them back into dots_all before checking for formula filters.
+  dots_all <- list(...)
+  if (inherits(strict, "formula")) {
+    dots_all <- c(list(strict), dots_all)
+    strict <- TRUE
+  }
+  if (inherits(full_path, "formula")) {
+    dots_all <- c(list(full_path), dots_all)
+    full_path <- FALSE
+  }
+  if (inherits(regex, "formula")) {
+    dots_all <- c(list(regex), dots_all)
+    regex <- ".*"
+  }
+  split_f <- .bidser_split_filters(dots_all)
+  if (length(split_f$formula_filters) > 0L) {
+    result <- do.call(search_files, c(
+      list(x, regex = regex, full_path = full_path, strict = strict),
+      dots_all
+    ))
+    if (identical(return, "tibble")) {
+      if (is.null(result) || length(result) == 0L) {
+        return(tibble::tibble(
+          path = character(0), file = character(0),
+          scope = character(0), pipeline = character(0)
+        ))
+      }
+      rows <- dplyr::bind_rows(lapply(result, function(p) .bidser_index_row_from_path(x, p)))
+      return(.bidser_sort_query_tibble(rows))
+    }
+    return(result)
+  }
+
   filters_raw <- list(...)
   raw_filters <- .bidser_normalize_filter_names(filters_raw)
   filters <- .bidser_prepare_query_filters(filters_raw, match_mode = match_mode)
@@ -612,6 +646,42 @@ query_files.mock_bids_project <- function(x, regex = ".*", full_path = FALSE,
   scope <- match.arg(scope)
   return <- match.arg(return)
   use_index <- match.arg(use_index)
+
+  # Rescue formulas from positional slots (regex, full_path, strict) into dots_all
+  dots_all <- list(...)
+  if (inherits(strict, "formula")) {
+    dots_all <- c(list(strict), dots_all)
+    strict <- TRUE
+  }
+  if (inherits(full_path, "formula")) {
+    dots_all <- c(list(full_path), dots_all)
+    full_path <- FALSE
+  }
+  if (inherits(regex, "formula")) {
+    dots_all <- c(list(regex), dots_all)
+    regex <- ".*"
+  }
+  split_f <- .bidser_split_filters(dots_all)
+  if (length(split_f$formula_filters) > 0L) {
+    result <- do.call(search_files, c(
+      list(x, regex = regex, full_path = full_path, strict = strict),
+      dots_all
+    ))
+    if (identical(return, "tibble")) {
+      if (is.null(result) || length(result) == 0L) {
+        return(tibble::tibble(
+          path = character(0), file = character(0),
+          scope = character(0), pipeline = character(0)
+        ))
+      }
+      rows <- lapply(result, function(p) {
+        rel <- .bidser_to_relative_path(x$path, p)
+        .bidser_index_row_from_path(x, rel)
+      })
+      return(dplyr::bind_rows(rows))
+    }
+    return(result)
+  }
 
   filters_raw <- list(...)
   filters <- .bidser_prepare_query_filters(filters_raw, match_mode = match_mode)

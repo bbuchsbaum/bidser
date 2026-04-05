@@ -286,19 +286,25 @@ plot_bids <- function(x, interactive = TRUE, color_scheme = "viridis",
       }
       
       # Combine plots using patchwork
-      (plots$heatmap) / 
-                        (plots$completeness + plots$file_sizes) / 
+      (plots$heatmap) /
+                        (plots$completeness + plots$file_sizes) /
                         (plots$tasks + plots$structure) +
                         patchwork::plot_annotation(
                           title = paste0("BIDS Dataset Overview: ", x$name),
                           subtitle = paste0(
-                            length(participants(x)), " subjects, ", 
-                            ifelse(!is.null(x$sessions) && length(x$sessions) > 0, 
+                            length(participants(x)), " subjects, ",
+                            ifelse(!is.null(x$sessions) && length(x$sessions) > 0,
                                   paste0(length(x$sessions), " sessions, "), ""),
-                            length(tasks(x)), " tasks"),
-                          tag_levels = "A"
+                            length(tasks(x)), " tasks")
                         ) +
-                        patchwork::plot_layout(heights = c(1.5, 1, 1))
+                        patchwork::plot_layout(heights = c(1.5, 1, 1)) &
+                        ggplot2::theme(
+                          plot.title = ggplot2::element_text(size = 9),
+                          axis.title = ggplot2::element_text(size = 8),
+                          axis.text  = ggplot2::element_text(size = 7),
+                          legend.text = ggplot2::element_text(size = 7),
+                          legend.title = ggplot2::element_text(size = 8)
+                        )
       
     }, error = function(e) {
       warning("Error creating complete visualization: ", e$message)
@@ -343,16 +349,22 @@ plot_bids <- function(x, interactive = TRUE, color_scheme = "viridis",
       }
       
       # Combine plots using patchwork
-      (plots$completeness + plots$file_sizes) / 
+      (plots$completeness + plots$file_sizes) /
                         (plots$tasks + plots$structure) +
                         patchwork::plot_annotation(
                           title = paste0("BIDS Dataset Overview: ", x$name),
                           subtitle = paste0(
-                            length(participants(x)), " subjects, ", 
-                            ifelse(!is.null(x$sessions) && length(x$sessions) > 0, 
+                            length(participants(x)), " subjects, ",
+                            ifelse(!is.null(x$sessions) && length(x$sessions) > 0,
                                   paste0(length(x$sessions), " sessions, "), ""),
-                            length(tasks(x)), " tasks"),
-                          tag_levels = "A"
+                            length(tasks(x)), " tasks")
+                        ) &
+                        ggplot2::theme(
+                          plot.title = ggplot2::element_text(size = 9),
+                          axis.title = ggplot2::element_text(size = 8),
+                          axis.text  = ggplot2::element_text(size = 7),
+                          legend.text = ggplot2::element_text(size = 7),
+                          legend.title = ggplot2::element_text(size = 8)
                         )
     }, error = function(e) {
       warning("Error creating standard visualization: ", e$message)
@@ -640,7 +652,16 @@ plot_bids_file_sizes <- function(data, color_scheme = "viridis", scale = "log") 
   if (!"type" %in% names(raw_data)) {
     stop("missing 'type' column")
   }
-  
+
+  # Drop rows with unknown type or zero/missing file size
+  raw_data <- raw_data[!is.na(raw_data$type) & raw_data$file_size > 0, ]
+
+  if (nrow(raw_data) == 0) {
+    return(ggplot2::ggplot() +
+      ggplot2::annotate("text", x = 0.5, y = 0.5, label = "No file size data available") +
+      ggplot2::theme_void())
+  }
+
   # Create a boxplot of file sizes by type
   p <- ggplot2::ggplot(raw_data, ggplot2::aes(x = type, y = file_size, fill = type)) +
     ggplot2::geom_boxplot(alpha = 0.8, outlier.shape = 21, outlier.size = 1.5) +

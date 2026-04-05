@@ -834,7 +834,10 @@ bids_summary <- function(x) {
 #' Basic BIDS Compliance Checks
 #'
 #' @param x A bids_project object
-#' @return A list with compliance check results
+#' @param schema_check Logical. Whether to run schema validation (default \code{TRUE}).
+#' @param schema_version Character. BIDS schema version to use (default \code{"1.10.1"}).
+#' @return A list with compliance check results including \code{passed}, \code{issues},
+#'   \code{warnings}, \code{participants_source}, and \code{schema_checked}.
 #' @export
 #' @examples
 #' \donttest{
@@ -842,14 +845,14 @@ bids_summary <- function(x) {
 #'   ds001_path <- get_example_bids_dataset("ds001")
 #'   proj <- bids_project(ds001_path)
 #'   compliance <- bids_check_compliance(proj)
-#'   
+#'
 #'   # Clean up
 #'   unlink(ds001_path, recursive=TRUE)
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
 #' }
-bids_check_compliance <- function(x) {
+bids_check_compliance <- function(x, schema_check = TRUE, schema_version = "1.10.1") {
   UseMethod("bids_check_compliance")
 }
 
@@ -896,6 +899,135 @@ anomalies <- function(x, ...) {
 #' @noRd
 get_data_matrix <- function(x, ...) {
   UseMethod("get_data_matrix")
+}
+
+# ---------------------------------------------------------------------------
+# Milestone 0.6: typed metadata generics
+# ---------------------------------------------------------------------------
+
+#' Read the dataset_description.json for a BIDS project
+#'
+#' @param x A `bids_project` object or a character path.
+#' @param ... Additional arguments passed to methods.
+#' @return A `bids_dataset_description` object, or NULL if the file is absent.
+#' @export
+#' @rdname read_dataset_description
+read_dataset_description <- function(x, ...) {
+  UseMethod("read_dataset_description")
+}
+
+# Internal accessors for bids_dataset_description fields.
+# Users access these via proj$description$fields$Name etc., or read_dataset_description().
+#' @keywords internal
+#' @noRd
+dataset_name <- function(x, ...) UseMethod("dataset_name")
+#' @keywords internal
+#' @noRd
+dataset_type <- function(x, ...) UseMethod("dataset_type")
+#' @keywords internal
+#' @noRd
+generated_by <- function(x, ...) UseMethod("generated_by")
+#' @keywords internal
+#' @noRd
+dataset_links <- function(x, ...) UseMethod("dataset_links")
+#' @keywords internal
+#' @noRd
+hed_version <- function(x, ...) UseMethod("hed_version")
+#' @keywords internal
+#' @noRd
+license <- function(x, ...) UseMethod("license")
+
+#' Get the BIDS version of a dataset
+#'
+#' @param x A `bids_dataset_description` or `bids_project` object.
+#' @param ... Additional arguments passed to methods.
+#' @return A character scalar BIDS version string, or `NA_character_`.
+#' @export
+#' @rdname bids_version
+bids_version <- function(x, ...) {
+  UseMethod("bids_version")
+}
+
+#' Get the dataset_description object from a BIDS project
+#'
+#' @param x A `bids_project` object.
+#' @param ... Additional arguments passed to methods.
+#' @return A `bids_dataset_description` object, or NULL.
+#' @export
+#' @rdname dataset_description
+dataset_description <- function(x, ...) {
+  UseMethod("dataset_description")
+}
+
+#' Read participants.tsv as a typed tabular object
+#'
+#' @param x A `bids_project` object or a character path.
+#' @param ... Additional arguments passed to methods.
+#' @return A `bids_participants` object inheriting from `tbl_df`, or NULL.
+#' @export
+#' @rdname read_participants
+read_participants <- function(x, ...) {
+  UseMethod("read_participants")
+}
+
+#' Read a scans.tsv file for a subject
+#'
+#' @param x A `bids_project` object.
+#' @param subid Subject ID (without `sub-` prefix).
+#' @param session Optional session ID (without `ses-` prefix).
+#' @param ... Additional arguments passed to methods.
+#' @return A `bids_scans_tsv` object inheriting from `tbl_df`, or NULL.
+#' @export
+#' @rdname read_scans_tsv
+read_scans_tsv <- function(x, subid, session = NULL, ...) {
+  UseMethod("read_scans_tsv")
+}
+
+#' Read a sessions.tsv file for a subject
+#'
+#' @param x A `bids_project` object.
+#' @param subid Subject ID (without `sub-` prefix).
+#' @param ... Additional arguments passed to methods.
+#' @return A `bids_sessions_tsv` object inheriting from `tbl_df`, or NULL.
+#' @export
+#' @rdname read_sessions_tsv
+read_sessions_tsv <- function(x, subid, ...) {
+  UseMethod("read_sessions_tsv")
+}
+
+#' Get the sidecar metadata attached to a tabular BIDS object
+#'
+#' @param x A `bids_tabular` object.
+#' @param ... Additional arguments passed to methods.
+#' @return A named list of sidecar metadata, or an empty list if none.
+#' @export
+#' @rdname sidecar
+sidecar <- function(x, ...) {
+  UseMethod("sidecar")
+}
+
+#' Coerce to a BIDS URI object
+#'
+#' @param x A character scalar BIDS URI string, or a `bids_uri` object.
+#' @param ... Additional arguments passed to methods.
+#' @return A `bids_uri` object.
+#' @export
+#' @rdname as_bids_uri
+as_bids_uri <- function(x, ...) {
+  UseMethod("as_bids_uri")
+}
+
+#' Resolve a BIDS URI to a local or remote path
+#'
+#' @param uri A `bids_uri` object or a character scalar BIDS URI string.
+#' @param description A `bids_dataset_description` or `bids_project` object.
+#' @param ... Additional arguments passed to methods.
+#' @param must_exist Logical. If `TRUE`, the resolved path must exist on disk.
+#' @return A character scalar path (or URL for remote links).
+#' @export
+#' @rdname resolve_bids_uri
+resolve_bids_uri <- function(uri, description, ..., must_exist = FALSE) {
+  UseMethod("resolve_bids_uri", uri)
 }
 
 

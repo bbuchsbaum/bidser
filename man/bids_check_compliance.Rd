@@ -4,15 +4,20 @@
 \alias{bids_check_compliance}
 \title{Basic BIDS Compliance Checks}
 \usage{
-bids_check_compliance(x)
+bids_check_compliance(x, schema_check = TRUE, schema_version = "1.10.1")
 
-bids_check_compliance(x)
+bids_check_compliance(x, schema_check = TRUE, schema_version = "1.10.1")
 }
 \arguments{
 \item{x}{A \code{bids_project} object.}
+
+\item{schema_check}{Logical. Whether to run schema validation (default \code{TRUE}).}
+
+\item{schema_version}{Character. BIDS schema version to use (default \code{"1.10.1"}).}
 }
 \value{
-A list with compliance check results
+A list with compliance check results including \code{passed}, \code{issues},
+\code{warnings}, \code{participants_source}, and \code{schema_checked}.
 
 A list with:
 \itemize{
@@ -38,7 +43,7 @@ tryCatch({
   ds001_path <- get_example_bids_dataset("ds001")
   proj <- bids_project(ds001_path)
   compliance <- bids_check_compliance(proj)
-  
+
   # Clean up
   unlink(ds001_path, recursive=TRUE)
 }, error = function(e) {

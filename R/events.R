@@ -80,7 +80,6 @@ event_files.bids_project <- function(x, subid=".*", task=".*", run=".*", session
 #'
 #' @importFrom dplyr mutate group_by bind_rows %>% filter
 #' @importFrom tidyr nest
-#' @importFrom magrittr %>%
 #' @importFrom stringr str_detect
 #' @importFrom rlang .data
 #' @importFrom readr read_delim

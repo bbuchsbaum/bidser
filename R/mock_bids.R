@@ -7,7 +7,6 @@
 #' @importFrom fs file_size dir_create file_create path_dir file_exists dir_exists
 #' @importFrom tibble as_tibble is_tibble tibble add_row deframe enframe has_name lst is_tibble
 #' @importFrom rlang sym := abort warn inform is_scalar_character is_scalar_logical list2 exec enquo quo_name is_installed is_interactive check_installed check_dots_empty check_dots_used check_dots_unnamed caller_env current_env global_env interrupt %||% maybe_missing missing_arg seq2 set_names try_fetch with_options zap format_error_bullets is_string as_name inject parse_expr eval_tidy expr exprs new_environment env env_bind env_get env_has env_parent env_parents env_poke expr_deparse f_lhs f_rhs is_call is_call_simple is_formula is_integerish is_list is_named is_null is_primitive is_true is_false is_symbol local_options parse_expr caller_env empty_env global_env is_environment new_formula new_quosure quo quo_get_env quo_get_expr quo_is_call quo_is_missing quo_is_null quo_is_symbol quos rep_along splice with_handlers
-#' @importFrom crayon has_color bold cyan green magenta yellow
 NULL
 
 # ---------------------------------------------------------------------------
@@ -900,43 +899,44 @@ create_mock_bids <- function(project_name,
 #' print(mock_proj)
 print.mock_bids_project <- function(x, ...) {
   # Check if crayon is available and use it
-  has_crayon <- rlang::is_installed("crayon") && crayon::has_color()
+  has_crayon <- requireNamespace("crayon", quietly = TRUE) && crayon::has_color()
 
-  cat_col <- function(label, value, col_fn = crayon::cyan) {
-      if (has_crayon) {
-          cat(crayon::bold(label), col_fn(value), "\n")
-      } else {
-          cat(label, value, "\n")
-      }
+  cat_col <- function(label, value, col_fn = NULL) {
+    if (has_crayon) {
+      if (is.null(col_fn)) col_fn <- crayon::cyan
+      cat(crayon::bold(label), col_fn(value), "\n")
+    } else {
+      cat(label, value, "\n")
+    }
   }
 
   cat(if (has_crayon) crayon::bold("Mock BIDS Project Summary") else "Mock BIDS Project Summary", "\n")
   cat_col("Project Name: ", x$name)
-  cat_col("Participants (n): ", nrow(x$part_df), col_fn = crayon::green)
+  cat_col("Participants (n): ", nrow(x$part_df), col_fn = if (has_crayon) crayon::green else NULL)
 
   tasks_list <- tasks(x)
   tasks_str <- if (length(tasks_list) > 0) paste(tasks_list, collapse = ", ") else "(none)"
-  cat_col("Tasks: ", tasks_str, col_fn = crayon::yellow)
+  cat_col("Tasks: ", tasks_str, col_fn = if (has_crayon) crayon::yellow else NULL)
 
   if (x$has_sessions) {
     sessions_list <- sessions(x)
     sessions_str <- if (length(sessions_list) > 0) paste(sessions_list, collapse = ", ") else "(none)"
-    cat_col("Sessions: ", sessions_str, col_fn = crayon::yellow)
+    cat_col("Sessions: ", sessions_str, col_fn = if (has_crayon) crayon::yellow else NULL)
   }
 
   if (x$has_fmriprep) {
-    cat_col("Derivatives: ", x$prep_dir, col_fn = crayon::magenta)
+    cat_col("Derivatives: ", x$prep_dir, col_fn = if (has_crayon) crayon::magenta else NULL)
   }
 
   # Get unique datatypes from the tree structure
   datatypes <- unique(na.omit(x$bids_tree$Get("datatype", filterFun = data.tree::isLeaf)))
   dt_str <- if (length(datatypes) > 0) paste(datatypes, collapse = ", ") else "(none)"
-  cat_col("Datatypes: ", dt_str, col_fn = crayon::green)
+  cat_col("Datatypes: ", dt_str, col_fn = if (has_crayon) crayon::green else NULL)
 
   # Get unique suffixes from leaf nodes
   suffixes <- unique(na.omit(x$bids_tree$Get("suffix", filterFun = data.tree::isLeaf)))
   suf_str <- if (length(suffixes) > 0) paste(suffixes, collapse = ", ") else "(none)"
-  cat_col("Suffixes: ", suf_str, col_fn = crayon::green)
+  cat_col("Suffixes: ", suf_str, col_fn = if (has_crayon) crayon::green else NULL)
 
   # Get all unique keys stored in leaf nodes
   all_keys <- unique(unlist(x$bids_tree$Get(function(node) names(node$attributes), filterFun = data.tree::isLeaf)))
@@ -944,7 +944,7 @@ print.mock_bids_project <- function(x, ...) {
   internal_keys <- c("name", "relative_path", "children", "level", "parent", "path", "path_string", "position", "count", "is_leaf", "is_root", "root", "height")
   bids_keys <- sort(setdiff(all_keys, internal_keys))
   keys_str <- if (length(bids_keys) > 0) paste(bids_keys, collapse = ", ") else "(none)"
-  cat_col("BIDS Keys: ", keys_str, col_fn = crayon::yellow)
+  cat_col("BIDS Keys: ", keys_str, col_fn = if (has_crayon) crayon::yellow else NULL)
 
   cat("Path: ", x$path, "\n") # Display the path (mock or stub)
 
@@ -1073,24 +1073,44 @@ tasks.mock_bids_project <- function(x, ...) {
 search_files.mock_bids_project <- function(x, regex = ".*", full_path = FALSE, strict = TRUE, ...) {
   # Extract fmriprep parameter if provided
   dots <- list(...)
+
+  # Handle formulas in positional argument slots (regex, full_path, strict)
+  if (inherits(strict, "formula")) {
+    dots <- c(list(strict), dots)
+    strict <- TRUE
+  }
+  if (inherits(full_path, "formula")) {
+    dots <- c(list(full_path), dots)
+    full_path <- FALSE
+  }
+  if (inherits(regex, "formula")) {
+    dots <- c(list(regex), dots)
+    regex <- ".*"
+  }
+
+  # Split formula filters from string filters
+  split_f <- .bidser_split_filters(dots)
+  formula_matcher <- .bidser_formula_matcher(split_f$formula_filters, envir = parent.frame())
+  dots <- split_f$string_filters
+
   fmriprep_filter <- NULL
-  
+
   # Handle parameter name conversion
   # Map 'sub' to 'subid' and vice versa to handle inconsistencies in storage vs search
   # Only duplicate if not already present to avoid confusion
-  if("subid" %in% names(dots) && !("sub" %in% names(dots))) { 
+  if("subid" %in% names(dots) && !("sub" %in% names(dots))) {
     dots$sub <- dots$subid  # When user passes subid, also check sub
   } else if("sub" %in% names(dots) && !("subid" %in% names(dots))) {
     dots$subid <- dots$sub  # When user passes sub, also check subid
   }
-  
+
   # Use `ses` for consistency if provided as `session`
-  if("session" %in% names(dots) && !("ses" %in% names(dots))) { 
-    dots$ses <- dots$session 
+  if("session" %in% names(dots) && !("ses" %in% names(dots))) {
+    dots$ses <- dots$session
   }
   # Also ensure 'session' exists if 'ses' is provided
-  if("ses" %in% names(dots) && !("session" %in% names(dots))) { 
-    dots$session <- dots$ses 
+  if("ses" %in% names(dots) && !("session" %in% names(dots))) {
+    dots$session <- dots$ses
   }
 
   if ("fmriprep" %in% names(dots)) {
@@ -1145,6 +1165,11 @@ search_files.mock_bids_project <- function(x, regex = ".*", full_path = FALSE, s
     # Regular entity filtering using mock_key_match
     if (!mock_key_match(node_attrs = node, filters = dots, default = !strict)) {
       # Debugging for specific node failures can go here if needed, carefully accessing variables
+      return(FALSE)
+    }
+
+    # Formula-based entity filters
+    if (!formula_matcher(node)) {
       return(FALSE)
     }
 
