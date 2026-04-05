@@ -13,6 +13,7 @@ coverage](https://codecov.io/gh/bbuchsbaum/bidser/branch/master/graph/badge.svg)
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/bidser)](https://CRAN.R-project.org/package=bidser)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
 [BIDS](https://bids.neuroimaging.io/) in R – (it’s a start!)
@@ -34,6 +35,12 @@ devtools::install_github("bbuchsbaum/bidser")
 ## Example
 
 See <https://bbuchsbaum.github.io/bidser/articles/quickstart.html>
+
+## Citation
+
+If you use bidser in published work, please cite:
+
+Buchsbaum, B. (2026). *bidser: Work with Brain Imaging Data Structure (BIDS) Projects*. R package version 0.4.0. <https://github.com/bbuchsbaum/bidser>
 
 <!-- albersdown:theme-note:start -->
 ## Albers theme
