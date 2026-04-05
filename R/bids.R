@@ -12,7 +12,7 @@ utils::globalVariables(c(
   "total_files", "label", "missing",
   # NSE variables in project_extensions.R
   ".subid", ".session", ".task", ".run",
-  "n_scans", "n_events", "n_confound_rows"
+  "n_scans", "n_events", "n_confound_rows", "n_files"
 ))
 
 # Package environment for caching

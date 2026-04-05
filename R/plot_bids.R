@@ -522,8 +522,9 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
       p <- ggplot2::ggplot(completeness_data, ggplot2::aes(x = subid, y = interaction(session, task),
                                          fill = total_size)) +
         ggplot2::geom_tile(color = "white", linewidth = 0.2) +
-        ggplot2::scale_fill_viridis_c(option = color_scheme, name = "Data Size (bytes)",
-                             trans = "log10", na.value = "grey90") +
+        ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
+                             trans = "log10", na.value = "grey90",
+                             labels = scales::label_bytes()) +
         ggplot2::labs(
           title = "Data Completeness by Subject, Session, and Task",
           x = "Subject ID",
@@ -552,8 +553,9 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
       p <- ggplot2::ggplot(completeness_data, ggplot2::aes(x = subid, y = interaction(session, type),
                                          fill = total_size)) +
         ggplot2::geom_tile(color = "white", linewidth = 0.2) +
-        ggplot2::scale_fill_viridis_c(option = color_scheme, name = "Data Size (bytes)",
-                             trans = "log10", na.value = "grey90") +
+        ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
+                             trans = "log10", na.value = "grey90",
+                             labels = scales::label_bytes()) +
         ggplot2::labs(
           title = "Data Completeness by Subject, Session, and Type",
           x = "Subject ID",
@@ -586,8 +588,9 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
       # Plot
       p <- ggplot2::ggplot(completeness_data, ggplot2::aes(x = subid, y = task, fill = total_size)) +
         ggplot2::geom_tile(color = "white", linewidth = 0.2) +
-        ggplot2::scale_fill_viridis_c(option = color_scheme, name = "Data Size (bytes)",
-                             trans = "log10", na.value = "grey90") +
+        ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
+                             trans = "log10", na.value = "grey90",
+                             labels = scales::label_bytes()) +
         ggplot2::labs(
           title = "Data Completeness by Subject and Task",
           x = "Subject ID",
@@ -615,8 +618,9 @@ plot_bids_completeness <- function(data, color_scheme = "viridis") {
       # Plot
       p <- ggplot2::ggplot(completeness_data, ggplot2::aes(x = subid, y = type, fill = total_size)) +
         ggplot2::geom_tile(color = "white", linewidth = 0.2) +
-        ggplot2::scale_fill_viridis_c(option = color_scheme, name = "Data Size (bytes)",
-                             trans = "log10", na.value = "grey90") +
+        ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
+                             trans = "log10", na.value = "grey90",
+                             labels = scales::label_bytes()) +
         ggplot2::labs(
           title = "Data Completeness by Subject and Type",
           x = "Subject ID",
@@ -662,28 +666,51 @@ plot_bids_file_sizes <- function(data, color_scheme = "viridis", scale = "log") 
       ggplot2::theme_void())
   }
 
-  # Create a boxplot of file sizes by type
-  p <- ggplot2::ggplot(raw_data, ggplot2::aes(x = type, y = file_size, fill = type)) +
-    ggplot2::geom_boxplot(alpha = 0.8, outlier.shape = 21, outlier.size = 1.5) +
-    ggplot2::scale_fill_viridis_d(option = color_scheme) +
-    ggplot2::labs(
-      title = "File Size Distribution by Type",
-      x = "Data Type",
-      y = "File Size (bytes)"
-    ) +
-    ggplot2::theme_minimal() +
-    ggplot2::theme(
-      axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
-      legend.position = "none"
-    )
-  
-  # Apply scale transformation
-  if (scale == "log") {
-    p <- p + ggplot2::scale_y_log10()
-  } else if (scale == "sqrt") {
-    p <- p + ggplot2::scale_y_sqrt()
+  n_types <- dplyr::n_distinct(raw_data$type)
+
+  if (n_types == 1) {
+    # Single type: dot plot showing individual file sizes
+    p <- ggplot2::ggplot(raw_data, ggplot2::aes(x = type, y = file_size)) +
+      ggplot2::geom_jitter(width = 0.15, alpha = 0.7, size = 2,
+                           color = viridis::viridis(1, option = color_scheme)) +
+      ggplot2::stat_summary(fun = median, geom = "crossbar", width = 0.4,
+                            color = "grey30", linewidth = 0.5) +
+      ggplot2::scale_y_continuous(labels = scales::label_bytes()) +
+      ggplot2::labs(
+        title = "File Size Distribution by Type",
+        x = "Data Type",
+        y = "File Size"
+      ) +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(
+        axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+        legend.position = "none"
+      )
+  } else {
+    # Multiple types: boxplot
+    p <- ggplot2::ggplot(raw_data, ggplot2::aes(x = type, y = file_size, fill = type)) +
+      ggplot2::geom_boxplot(alpha = 0.8, outlier.shape = 21, outlier.size = 1.5) +
+      ggplot2::scale_fill_viridis_d(option = color_scheme) +
+      ggplot2::labs(
+        title = "File Size Distribution by Type",
+        x = "Data Type",
+        y = "File Size"
+      ) +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(
+        axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+        legend.position = "none"
+      )
+
+    if (scale == "log") {
+      p <- p + ggplot2::scale_y_log10(labels = scales::label_bytes())
+    } else if (scale == "sqrt") {
+      p <- p + ggplot2::scale_y_sqrt(labels = scales::label_bytes())
+    } else {
+      p <- p + ggplot2::scale_y_continuous(labels = scales::label_bytes())
+    }
   }
-  
+
   return(p)
 }
 
@@ -774,21 +801,46 @@ plot_bids_tasks <- function(data, color_scheme = "viridis") {
         dplyr::filter(!is.na(task)) %>%
         dplyr::group_by(subid, task) %>%
         dplyr::summarize(runs = dplyr::n_distinct(run), .groups = "drop")
-      
-      p <- ggplot2::ggplot(task_summary, ggplot2::aes(x = task, y = runs, fill = task)) +
-        ggplot2::geom_boxplot(alpha = 0.8) +
-        ggplot2::geom_jitter(alpha = 0.5, width = 0.2, height = 0) +
-        ggplot2::scale_fill_viridis_d(option = color_scheme) +
-        ggplot2::labs(
-          title = "Run Distribution by Task",
-          x = "Task",
-          y = "Number of Runs"
-        ) +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(
-          axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
-          legend.position = "none"
-        )
+
+      all_same_runs <- length(unique(task_summary$runs)) <= 1
+
+      if (all_same_runs) {
+        # Degenerate: every subject has the same run count — show scans per subject
+        scan_summary <- raw_data %>%
+          dplyr::filter(!is.na(task)) %>%
+          dplyr::group_by(subid, task) %>%
+          dplyr::summarize(n_scans = dplyr::n(), .groups = "drop")
+
+        p <- ggplot2::ggplot(scan_summary,
+                             ggplot2::aes(x = subid, y = n_scans, fill = task)) +
+          ggplot2::geom_col(width = 0.6) +
+          ggplot2::scale_fill_viridis_d(option = color_scheme) +
+          ggplot2::labs(
+            title = "Scans per Subject by Task",
+            x = "Subject ID",
+            y = "Number of Scans",
+            fill = "Task"
+          ) +
+          ggplot2::theme_minimal() +
+          ggplot2::theme(
+            axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)
+          )
+      } else {
+        p <- ggplot2::ggplot(task_summary, ggplot2::aes(x = task, y = runs, fill = task)) +
+          ggplot2::geom_boxplot(alpha = 0.8) +
+          ggplot2::geom_jitter(alpha = 0.5, width = 0.2, height = 0) +
+          ggplot2::scale_fill_viridis_d(option = color_scheme) +
+          ggplot2::labs(
+            title = "Run Distribution by Task",
+            x = "Task",
+            y = "Number of Runs"
+          ) +
+          ggplot2::theme_minimal() +
+          ggplot2::theme(
+            axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+            legend.position = "none"
+          )
+      }
     }
   }
   
@@ -812,7 +864,28 @@ plot_bids_structure <- function(data, color_scheme = "viridis") {
   if (!"type" %in% names(raw_data)) {
     stop("missing 'type' column")
   }
-  
+
+  # When only one data type exists, a stacked proportion chart is uninformative
+  # (every bar is 100% the same colour). Show file counts per subject instead.
+  n_types <- dplyr::n_distinct(raw_data$type[!is.na(raw_data$type)])
+  if (n_types <= 1) {
+    count_data <- raw_data %>%
+      dplyr::filter(!is.na(subid)) %>%
+      dplyr::group_by(subid) %>%
+      dplyr::summarize(n_files = dplyr::n(), .groups = "drop")
+
+    p <- ggplot2::ggplot(count_data, ggplot2::aes(x = subid, y = n_files)) +
+      ggplot2::geom_col(fill = viridis::viridis(1, option = color_scheme), width = 0.6) +
+      ggplot2::labs(
+        title = "Files per Subject",
+        x = "Subject ID",
+        y = "Number of Files"
+      ) +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
+    return(p)
+  }
+
   # Create a tree-like structure representation
   # This is a simplified version that shows the proportion of different data types
   
@@ -1567,4 +1640,4 @@ create_virtual_bids_project <- function(name = "Virtual Project",
   mock_project$is_virtual <- TRUE
   
   return(mock_project)
-} 
+}
