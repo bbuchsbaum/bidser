@@ -3,7 +3,7 @@
 #' Loads the vendored BIDS JSON schema and caches the result in the package
 #' environment so repeated calls within a session are free.
 #'
-#' @param version Character. BIDS schema version to load (default \code{"1.10.1"}).
+#' @param version Character. BIDS schema version to load (default \code{"1.10.0"}).
 #' @return A named list representing the compiled schema with top-level keys
 #'   \code{objects}, \code{rules}, \code{meta}, etc.
 #' @examples
@@ -14,7 +14,7 @@
 #' @seealso \code{\link{bids_schema_versions}}
 #' @importFrom jsonlite read_json
 #' @export
-bids_schema <- function(version = "1.10.1") {
+bids_schema <- function(version = "1.10.0") {
   cache_key <- paste0("schema_", version)
   cached <- bidser_pkg_env[[cache_key]]
   if (!is.null(cached)) return(cached)

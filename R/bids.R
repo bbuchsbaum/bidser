@@ -1683,7 +1683,7 @@ bids_summary <- function(x) {
 #'   - `issues` (character vector): Descriptions of any issues found.
 #'
 #' @export
-bids_check_compliance <- function(x, schema_check = TRUE, schema_version = "1.10.1") {
+bids_check_compliance <- function(x, schema_check = TRUE, schema_version = "1.10.0") {
   issues <- character(0)
   warnings <- character(0)
 
