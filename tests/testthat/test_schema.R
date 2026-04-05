@@ -15,7 +15,7 @@ create_schema_test_bids <- function() {
     file.path(tmp, "participants.tsv")
   )
   jsonlite::write_json(
-    list(Name = "SchemaTest", BIDSVersion = "1.10.1"),
+    list(Name = "SchemaTest", BIDSVersion = "1.10.0"),
     file.path(tmp, "dataset_description.json"),
     auto_unbox = TRUE
   )
@@ -37,9 +37,9 @@ test_that("bids_schema_versions() returns a character vector", {
   expect_type(vers, "character")
 })
 
-test_that("bids_schema_versions() includes 1.10.1", {
+test_that("bids_schema_versions() includes 1.10.0", {
   vers <- bids_schema_versions()
-  expect_true("1.10.1" %in% vers)
+  expect_true("1.10.0" %in% vers)
 })
 
 # ===========================================================================

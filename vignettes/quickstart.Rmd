@@ -1,22 +1,21 @@
 ---
 title: Getting Started with bidser
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Getting Started with bidser}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+output:
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 2.0
+    css: albers.css
 params:
   family: red
   preset: homage
-css: albers.css
 resource_files:
 - albers.css
 - albers.js
-includes:
-  in_header: |-
-    <script src="albers.js"></script>
-    <script>document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('palette-red');});</script>
 
+vignette: |
+  %\VignetteIndexEntry{Getting Started with bidser}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -29,6 +28,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r theme-setup, include = FALSE}
+if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(family = params$family, preset = params$preset))
 albers_pkg <- "albersdown"
 if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace(albers_pkg, quietly = TRUE)) {
   theme_fn <- get("theme_albers", envir = asNamespace(albers_pkg))
@@ -42,6 +42,20 @@ suppressPackageStartupMessages({
   library(gluedown)
 })
 ```
+
+```{r albers-classes, echo=FALSE, results='asis'}
+cat(sprintf(
+  paste0(
+    '<script>document.addEventListener("DOMContentLoaded",function(){',
+    'document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-study","preset-structural","preset-adobe","preset-midnight");',
+    'document.body.classList.add("palette-%s","preset-%s");',
+    '});</script>'
+  ),
+  params$family,
+  params$preset
+))
+```
+
 
 ## Introduction to bidser
 

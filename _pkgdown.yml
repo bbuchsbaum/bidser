@@ -2,3 +2,12 @@ url: https://bbuchsbaum.github.io/bidser/
 template:
   bootstrap: 5
   package: albersdown
+
+articles:
+- title: Vignettes
+  navbar: ~
+  contents:
+  - quickstart
+  - derivatives
+  - mock-bids
+  - confounds-and-variables

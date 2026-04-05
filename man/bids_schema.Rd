@@ -4,10 +4,10 @@
 \alias{bids_schema}
 \title{Load and cache the BIDS schema}
 \usage{
-bids_schema(version = "1.10.1")
+bids_schema(version = "1.10.0")
 }
 \arguments{
-\item{version}{Character. BIDS schema version to load (default \code{"1.10.1"}).}
+\item{version}{Character. BIDS schema version to load (default \code{"1.10.0"}).}
 }
 \value{
 A named list representing the compiled schema with top-level keys

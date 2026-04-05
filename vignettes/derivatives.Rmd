@@ -5,19 +5,12 @@ output:
     toc: yes
     toc_depth: 2.0
     css: albers.css
-    includes:
-      in_header:
-      - |-
-        <script src="albers.js"></script>
-        <script>document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('palette-red');});</script>
-      - albers-header.html
 params:
   family: red
   preset: homage
 resource_files:
 - albers.css
 - albers.js
-- albers-header.html
 
 vignette: |
   %\VignetteIndexEntry{Work With Derivatives and Confounds}
@@ -46,6 +39,7 @@ cat(sprintf(
   params$preset
 ))
 ```
+
 
 ```{r theme-setup, include = FALSE}
 if (requireNamespace("ggplot2", quietly = TRUE) &&

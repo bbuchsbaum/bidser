@@ -43,3 +43,4 @@ repomix-output.xml
 ^vendor/
 ^vignettes/.*\.html$
 ^vendor($|/)
+^data-raw$

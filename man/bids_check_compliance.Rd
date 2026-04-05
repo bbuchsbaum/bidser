@@ -4,9 +4,9 @@
 \alias{bids_check_compliance}
 \title{Basic BIDS Compliance Checks}
 \usage{
-bids_check_compliance(x, schema_check = TRUE, schema_version = "1.10.1")
+bids_check_compliance(x, schema_check = TRUE, schema_version = "1.10.0")
 
-bids_check_compliance(x, schema_check = TRUE, schema_version = "1.10.1")
+bids_check_compliance(x, schema_check = TRUE, schema_version = "1.10.0")
 }
 \arguments{
 \item{x}{A \code{bids_project} object.}
