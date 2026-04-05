@@ -5,15 +5,15 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Work with Brain Imaging Data Structure (BIDS) Projects • bidser</title>
+<title>Work with BIDS (Brain Imaging Data Structure) Projects • bidser</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
-<script src="extra.js"></script><meta property="og:title" content="Work with Brain Imaging Data Structure (BIDS) Projects">
-<meta name="description" content="Tools for working with Brain Imaging Data Structure (BIDS) formatted neuroimaging datasets. The package provides functionality for reading and querying BIDS-compliant projects, creating mock BIDS datasets for testing, and extracting preprocessed data from fMRIPrep derivatives. It supports searching and filtering BIDS files by various entities such as subject, session, task, and run to streamline neuroimaging data workflows. See Gorgolewski et al. (2016) &lt;doi:10.1038/sdata.2016.44&gt; for the BIDS specification.">
-<meta property="og:description" content="Tools for working with Brain Imaging Data Structure (BIDS) formatted neuroimaging datasets. The package provides functionality for reading and querying BIDS-compliant projects, creating mock BIDS datasets for testing, and extracting preprocessed data from fMRIPrep derivatives. It supports searching and filtering BIDS files by various entities such as subject, session, task, and run to streamline neuroimaging data workflows. See Gorgolewski et al. (2016) &lt;doi:10.1038/sdata.2016.44&gt; for the BIDS specification.">
+<script src="extra.js"></script><meta property="og:title" content="Work with BIDS (Brain Imaging Data Structure) Projects">
+<meta name="description" content="Tools for working with BIDS (Brain Imaging Data Structure) formatted neuroimaging datasets. The package provides functionality for reading and querying BIDS-compliant projects, creating mock BIDS datasets for testing, and extracting preprocessed data from fMRIPrep derivatives. It supports searching and filtering BIDS files by various entities such as subject, session, task, and run to streamline neuroimaging data workflows. See Gorgolewski et al. (2016) &lt;doi:10.1038/sdata.2016.44&gt; for the BIDS specification.">
+<meta property="og:description" content="Tools for working with BIDS (Brain Imaging Data Structure) formatted neuroimaging datasets. The package provides functionality for reading and querying BIDS-compliant projects, creating mock BIDS datasets for testing, and extracting preprocessed data from fMRIPrep derivatives. It supports searching and filtering BIDS files by various entities such as subject, session, task, and run to streamline neuroimaging data workflows. See Gorgolewski et al. (2016) &lt;doi:10.1038/sdata.2016.44&gt; for the BIDS specification.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">bidser</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +36,10 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/quickstart.html">Getting Started with bidser</a></li>
+<li><a class="dropdown-item" href="articles/confounds-and-variables.html">Working with Confounds and Variables</a></li>
+    <li><a class="dropdown-item" href="articles/derivatives.html">Work With Derivatives and Confounds</a></li>
+    <li><a class="dropdown-item" href="articles/mock-bids.html">Create Mock BIDS Projects for Tests and Examples</a></li>
+    <li><a class="dropdown-item" href="articles/quickstart.html">Getting Started with bidser</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -66,7 +69,7 @@
 <p>Install the development version from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"bbuchsbaum/bidser"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/install-deprecated.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"bbuchsbaum/bidser"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
@@ -77,12 +80,13 @@
 <div class="section level2">
 <h2 id="albers-theme">Albers theme<a class="anchor" aria-label="anchor" href="#albers-theme"></a>
 </h2>
-<p>This package uses the albersdown theme. Existing vignette theme hooks are replaced so <code>albers.css</code> and local <code>albers.js</code> render consistently on CRAN and GitHub Pages. The palette family is provided via <code>params$family</code> (default ‘red’). The pkgdown site uses <code>template: { package: albersdown }</code>. <!-- albersdown:theme-note:end --></p>
+<p>This package uses the albersdown theme. Existing vignette theme hooks are replaced so <code>albers.css</code> and local <code>albers.js</code> render consistently on CRAN and GitHub Pages. The defaults are configured via <code>params$family</code> and <code>params$preset</code> (family = ‘red’, preset = ‘homage’). The pkgdown site uses <code>template: { package: albersdown }</code> together with generated <code>pkgdown/extra.css</code> and <code>pkgdown/extra.js</code> so the theme is linked and activated on site pages. <!-- albersdown:theme-note:end --></p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
+<li><a href="https://cloud.r-project.org/package=bidser" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/bbuchsbaum/bidser/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/bbuchsbaum/bidser/issues" class="external-link">Report a bug</a></li>
 </ul>
@@ -121,6 +125,7 @@
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://github.com/bbuchsbaum/bidser/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/bbuchsbaum/bidser/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://bbuchsbaum.github.io/bidser/"><img src="https://github.com/bbuchsbaum/bidser/actions/workflows/pkgdown.yaml/badge.svg" alt="pkgdown"></a></li>
 <li><a href="https://app.codecov.io/gh/bbuchsbaum/bidser?branch=master" class="external-link"><img src="https://codecov.io/gh/bbuchsbaum/bidser/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
 <li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
 <li><a href="https://CRAN.R-project.org/package=bidser" class="external-link"><img src="https://www.r-pkg.org/badges/version/bidser" alt="CRAN status"></a></li>

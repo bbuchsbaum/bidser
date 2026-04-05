@@ -19,7 +19,7 @@ Finds files in the mock BIDS tree by matching file names and BIDS entities."></h
 
     <a class="navbar-brand me-2" href="../index.html">bidser</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,7 +30,10 @@ Finds files in the mock BIDS tree by matching file names and BIDS entities."></h
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/confounds-and-variables.html">Working with Confounds and Variables</a></li>
+    <li><a class="dropdown-item" href="../articles/derivatives.html">Work With Derivatives and Confounds</a></li>
+    <li><a class="dropdown-item" href="../articles/mock-bids.html">Create Mock BIDS Projects for Tests and Examples</a></li>
+    <li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -104,6 +107,16 @@ If <code>FALSE</code>, files lacking the queried entity are not automatically ex
     <p>A character vector of file paths matching the criteria, or NULL if no matches found.</p>
 <p>A character vector of file paths matching the criteria, or NULL if no matches found.</p>
 <p>A character vector of matching file paths, or <code>NULL</code> if no matches.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p><code>search_files()</code> remains available as the compatibility interface for
+existing code and ad hoc regex-heavy searches. For new code, prefer
+<code><a href="query_files.html">query_files()</a></code>, which provides explicit matching mode, entity-existence
+semantics, and scope controls without changing <code>search_files()</code> behavior.</p>
+<p>This method remains available for backward compatibility and flexible
+regex-driven searches. Prefer <code><a href="query_files.html">query_files()</a></code> for explicit query semantics
+in new code.</p>
     </div>
 
     <div class="section level2">

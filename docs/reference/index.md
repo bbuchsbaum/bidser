@@ -1,0 +1,186 @@
+# Package index
+
+## All functions
+
+- [`anat_parser()`](https://bbuchsbaum.github.io/bidser/reference/anat_parser.md)
+  : Anatomical parser constructor
+- [`as_bids_uri()`](https://bbuchsbaum.github.io/bidser/reference/as_bids_uri.md)
+  : Coerce to a BIDS URI object
+- [`bids_check_compliance()`](https://bbuchsbaum.github.io/bidser/reference/bids_check_compliance.md)
+  : Basic BIDS Compliance Checks
+- [`bids_heatmap()`](https://bbuchsbaum.github.io/bidser/reference/bids_heatmap.md)
+  : Create a specialized heatmap visualization of BIDS data
+- [`bids_index()`](https://bbuchsbaum.github.io/bidser/reference/bids_index.md)
+  : Build or retrieve a persistent file index for a BIDS project
+- [`bids_parser()`](https://bbuchsbaum.github.io/bidser/reference/bids_parser.md)
+  : BIDS filename parsers using regex
+- [`bids_project()`](https://bbuchsbaum.github.io/bidser/reference/bids_project.md)
+  : Create a BIDS Project Object
+- [`bids_report()`](https://bbuchsbaum.github.io/bidser/reference/bids_report.md)
+  : Create a lightweight text report for a BIDS project
+- [`bids_report_data()`](https://bbuchsbaum.github.io/bidser/reference/bids_report_data.md)
+  : Assemble lightweight report data for a BIDS project
+- [`bids_schema()`](https://bbuchsbaum.github.io/bidser/reference/bids_schema.md)
+  : Load and cache the BIDS schema
+- [`bids_schema_versions()`](https://bbuchsbaum.github.io/bidser/reference/bids_schema_versions.md)
+  : List available BIDS schema versions
+- [`bids_subject()`](https://bbuchsbaum.github.io/bidser/reference/bids_subject.md)
+  [`bids_subject.bids_project()`](https://bbuchsbaum.github.io/bidser/reference/bids_subject.md)
+  : Access a single subject from a BIDS project
+- [`bids_summary()`](https://bbuchsbaum.github.io/bidser/reference/bids_summary.md)
+  : Summarize a BIDS dataset
+- [`bids_transform()`](https://bbuchsbaum.github.io/bidser/reference/bids_transform.md)
+  : Apply a transformation to BIDS files
+- [`bids_uri()`](https://bbuchsbaum.github.io/bidser/reference/bids_uri.md)
+  : Construct a BIDS URI object
+- [`bids_version()`](https://bbuchsbaum.github.io/bidser/reference/bids_version.md)
+  : Get the BIDS version of a dataset
+- [`brain_mask()`](https://bbuchsbaum.github.io/bidser/reference/brain_mask.md)
+  : Retrieve a brain mask for a subject
+- [`build_subject_graph()`](https://bbuchsbaum.github.io/bidser/reference/build_subject_graph.md)
+  : Build Subject Graph Structure
+- [`check_func_scans()`](https://bbuchsbaum.github.io/bidser/reference/check_func_scans.md)
+  : Check Functional Scans in a BIDS Project
+- [`clear_example_bids_cache()`](https://bbuchsbaum.github.io/bidser/reference/clear_example_bids_cache.md)
+  : Clear Example BIDS Dataset Cache
+- [`confound_files()`](https://bbuchsbaum.github.io/bidser/reference/confound_files-method.md)
+  : Get confound files from a BIDS project
+- [`confound_set()`](https://bbuchsbaum.github.io/bidser/reference/confound_set.md)
+  : Convenience confound sets for fMRIPrep
+- [`confound_strategy()`](https://bbuchsbaum.github.io/bidser/reference/confound_strategy.md)
+  : Confound denoising strategies
+- [`create_mock_bids()`](https://bbuchsbaum.github.io/bidser/reference/create_mock_bids.md)
+  : Create a Mock BIDS Project Object
+- [`create_preproc_mask(`*`<mock_bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/create_preproc_mask-method.md)
+  : Create Preprocessing Mask (Mock Implementation)
+- [`create_preproc_mask()`](https://bbuchsbaum.github.io/bidser/reference/create_preproc_mask.md)
+  : Create a preprocessing mask from BIDS data
+- [`create_preproc_mask(`*`<bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/create_preproc_mask.bids_project.md)
+  : Create a binary brain mask from preprocessed scans
+- [`create_smooth_transformer()`](https://bbuchsbaum.github.io/bidser/reference/create_smooth_transformer.md)
+  : Create a simple smoothing transformer
+- [`dataset_description()`](https://bbuchsbaum.github.io/bidser/reference/dataset_description.md)
+  : Get the dataset_description object from a BIDS project
+- [`decode_bids_entities()`](https://bbuchsbaum.github.io/bidser/reference/decode_bids_entities.md)
+  : Decode BIDS entities back into a filename
+- [`derivative_files()`](https://bbuchsbaum.github.io/bidser/reference/derivative_files.md)
+  : Query derivative files from a BIDS project
+- [`derivative_pipelines()`](https://bbuchsbaum.github.io/bidser/reference/derivative_pipelines.md)
+  : List derivative pipelines in a BIDS project
+- [`.bidser_get_registry()`](https://bbuchsbaum.github.io/bidser/reference/dot-bidser_get_registry.md)
+  : Datatype registry for bidser
+- [`encode()`](https://bbuchsbaum.github.io/bidser/reference/encode.md)
+  : Encode a string into a BIDS key-value list
+- [`event_files()`](https://bbuchsbaum.github.io/bidser/reference/event_files-method.md)
+  : Get event files from a BIDS project
+- [`file_pairs()`](https://bbuchsbaum.github.io/bidser/reference/file_pairs.md)
+  : Find File Pairs in a BIDS Project
+- [`flat_list()`](https://bbuchsbaum.github.io/bidser/reference/flat_list-method.md)
+  : Get "flat" representation of BIDS Project
+- [`fmap_parser()`](https://bbuchsbaum.github.io/bidser/reference/fmap_parser.md)
+  : Fieldmap parser constructor
+- [`fmriprep_anat_parser()`](https://bbuchsbaum.github.io/bidser/reference/fmriprep_anat_parser.md)
+  : fMRIPrep anatomical parser constructor
+- [`fmriprep_func_parser()`](https://bbuchsbaum.github.io/bidser/reference/fmriprep_func_parser.md)
+  : fMRIPrep functional parser constructor
+- [`func_parser()`](https://bbuchsbaum.github.io/bidser/reference/func_parser.md)
+  : Functional parser constructor
+- [`func_scans()`](https://bbuchsbaum.github.io/bidser/reference/func_scans.md)
+  : Get functional scans from a BIDS project
+- [`func_scans(`*`<bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/func_scans.bids_project.md)
+  : Get Functional Scans from a BIDS Project
+- [`get_example_bids_dataset()`](https://bbuchsbaum.github.io/bidser/reference/get_example_bids_dataset.md)
+  : Download Example BIDS Dataset
+- [`get_metadata()`](https://bbuchsbaum.github.io/bidser/reference/get_metadata.md)
+  : Resolve metadata for a BIDS file
+- [`get_repetition_time()`](https://bbuchsbaum.github.io/bidser/reference/get_repetition_time.md)
+  : Get Repetition Time (TR) from a sidecar JSON
+- [`infer_tr()`](https://bbuchsbaum.github.io/bidser/reference/infer_tr.md)
+  : Infer TR (Repetition Time) from a BOLD file or sidecar
+- [`is_bids_uri()`](https://bbuchsbaum.github.io/bidser/reference/is_bids_uri.md)
+  : Test whether an object is a BIDS URI
+- [`list_confound_sets()`](https://bbuchsbaum.github.io/bidser/reference/list_confound_sets.md)
+  : List available confound sets
+- [`list_confound_strategies()`](https://bbuchsbaum.github.io/bidser/reference/list_confound_strategies.md)
+  : List available confound strategies
+- [`list_datatypes()`](https://bbuchsbaum.github.io/bidser/reference/list_datatypes.md)
+  : List registered BIDS datatypes
+- [`list_pack_bids()`](https://bbuchsbaum.github.io/bidser/reference/list_pack_bids.md)
+  : List Contents of Packed BIDS Archive
+- [`load_all_events()`](https://bbuchsbaum.github.io/bidser/reference/load_all_events-method.md)
+  : Load All Event Files
+- [`mask_files()`](https://bbuchsbaum.github.io/bidser/reference/mask_files.md)
+  : Query Mask Files from a BIDS Project
+- [`pack_bids()`](https://bbuchsbaum.github.io/bidser/reference/pack_bids.md)
+  : Pack BIDS Project with Stub or Downsampled Imaging Files
+- [`parse()`](https://bbuchsbaum.github.io/bidser/reference/parse-method.md)
+  : Parse a file-name into BIDS components
+- [`participants()`](https://bbuchsbaum.github.io/bidser/reference/participants-method.md)
+  : Get participants from a BIDS project
+- [`participants(`*`<mock_bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/participants.mock_bids_project.md)
+  : Get Participants from Mock BIDS Project
+- [`plot(`*`<bids_confounds>`*`)`](https://bbuchsbaum.github.io/bidser/reference/plot.bids_confounds.md)
+  : Plot PCA confounds
+- [`plot(`*`<bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/plot.bids_project.md)
+  [`plot(`*`<mock_bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/plot.bids_project.md)
+  : Plot a BIDS project as a dendrogram
+- [`plot_bids()`](https://bbuchsbaum.github.io/bidser/reference/plot_bids.md)
+  : Plot a comprehensive visual overview of a BIDS project
+- [`preproc_scans()`](https://bbuchsbaum.github.io/bidser/reference/preproc_scans-method.md)
+  : Get preprocessed functional MRI scans
+- [`preproc_scans(`*`<bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/preproc_scans.bids_project.md)
+  : Get preprocessed scans from a BIDS project
+- [`print(`*`<mock_bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/print.mock_bids_project.md)
+  : Print Mock BIDS Project Summary
+- [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
+  : Query files in BIDS structure with explicit semantics
+- [`read_confounds(`*`<mock_bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/read_confounds-method.md)
+  : Read Confound Files (Mock Implementation)
+- [`read_confounds()`](https://bbuchsbaum.github.io/bidser/reference/read_confounds.md)
+  : Read Confound Files from a BIDS Project
+- [`read_confounds(`*`<bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/read_confounds.bids_project.md)
+  : Read confound files
+- [`read_dataset_description()`](https://bbuchsbaum.github.io/bidser/reference/read_dataset_description.md)
+  : Read the dataset_description.json for a BIDS project
+- [`read_events(`*`<mock_bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/read_events-method.md)
+  : Read Event Files from Mock BIDS Project
+- [`read_events()`](https://bbuchsbaum.github.io/bidser/reference/read_events.md)
+  : Read Event Files from a BIDS Project
+- [`read_events(`*`<bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/read_events.bids_project.md)
+  : Read event files from a BIDS project
+- [`read_func_scans.bids_project()`](https://bbuchsbaum.github.io/bidser/reference/read_func_scans.md)
+  : Read in a set of four-dimensional functional scans
+- [`read_participants()`](https://bbuchsbaum.github.io/bidser/reference/read_participants.md)
+  : Read participants.tsv as a typed tabular object
+- [`read_preproc_scans.bids_project()`](https://bbuchsbaum.github.io/bidser/reference/read_preproc_scans.bids_project.md)
+  : Read preprocessed functional MRI scans from a BIDS project
+- [`read_scans_tsv()`](https://bbuchsbaum.github.io/bidser/reference/read_scans_tsv.md)
+  : Read a scans.tsv file for a subject
+- [`read_sessions_tsv()`](https://bbuchsbaum.github.io/bidser/reference/read_sessions_tsv.md)
+  : Read a sessions.tsv file for a subject
+- [`read_sidecar()`](https://bbuchsbaum.github.io/bidser/reference/read_sidecar.md)
+  : Read sidecar JSON files and return metadata as a tidy tibble
+- [`register_datatype()`](https://bbuchsbaum.github.io/bidser/reference/register_datatype.md)
+  : Register a custom BIDS datatype
+- [`resolve_bids_uri()`](https://bbuchsbaum.github.io/bidser/reference/resolve_bids_uri.md)
+  : Resolve a BIDS URI to a local or remote path
+- [`search_files()`](https://bbuchsbaum.github.io/bidser/reference/search_files.md)
+  : Search files in BIDS structure
+- [`sessions()`](https://bbuchsbaum.github.io/bidser/reference/sessions-method.md)
+  : Get sessions from a BIDS project
+- [`sessions(`*`<mock_bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/sessions.mock_bids_project.md)
+  : Get Sessions from Mock BIDS Project
+- [`sidecar()`](https://bbuchsbaum.github.io/bidser/reference/sidecar.md)
+  : Get the sidecar metadata attached to a tabular BIDS object
+- [`surface_files()`](https://bbuchsbaum.github.io/bidser/reference/surface_files.md)
+  : Query Surface Files from a BIDS Project
+- [`tasks()`](https://bbuchsbaum.github.io/bidser/reference/tasks-method.md)
+  : Get tasks from a BIDS project
+- [`tasks(`*`<mock_bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/tasks.mock_bids_project.md)
+  : Get Tasks from Mock BIDS Project
+- [`transform_files()`](https://bbuchsbaum.github.io/bidser/reference/transform_files.md)
+  : Query Transform Files from a BIDS Project
+- [`unregister_datatype()`](https://bbuchsbaum.github.io/bidser/reference/unregister_datatype.md)
+  : Unregister a custom BIDS datatype
+- [`variables_table()`](https://bbuchsbaum.github.io/bidser/reference/variables_table.md)
+  : Create a tidy run-level variables table
