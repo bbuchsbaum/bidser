@@ -1,11 +1,9 @@
 #' Helper functions for downloading BIDS example datasets
-#' 
+#'
 #' These functions download datasets from the official BIDS examples repository
 #' at https://github.com/bids-standard/bids-examples for use in tests.
-
-library(httr)
-library(fs)
-library(jsonlite)
+#' httr, fs, and jsonlite are Suggests/Imports — use namespace-qualified calls,
+#' no top-level library() that can abort the whole test session.
 
 # Version pinning for reproducibility
 BIDS_EXAMPLES_REPO <- "https://github.com/bids-standard/bids-examples"
@@ -17,6 +15,7 @@ BIDS_EXAMPLES_VERSION <- "master"  # Could pin to specific tag like "v1.9.0"
 #' Check if we have internet connectivity
 #' @return logical
 has_internet <- function() {
+  if (!requireNamespace("httr", quietly = TRUE)) return(FALSE)
   tryCatch({
     httr::GET("https://github.com", httr::timeout(5))
     TRUE

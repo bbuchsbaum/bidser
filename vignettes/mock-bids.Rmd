@@ -5,12 +5,15 @@ output:
     toc: yes
     toc_depth: 2.0
     css: albers.css
+    includes:
+      in_header: albers-header.html
 params:
   family: red
   preset: homage
 resource_files:
 - albers.css
 - albers.js
+- albers-header.html
 
 vignette: |
   %\VignetteIndexEntry{Create Mock BIDS Projects for Tests and Examples}
@@ -39,6 +42,7 @@ cat(sprintf(
   params$preset
 ))
 ```
+
 
 
 ```{r theme-setup, include = FALSE}
