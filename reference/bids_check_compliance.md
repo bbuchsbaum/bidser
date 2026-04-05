@@ -14,9 +14,9 @@ requirements:
 ## Usage
 
 ``` r
-bids_check_compliance(x)
+bids_check_compliance(x, schema_check = TRUE, schema_version = "1.10.0")
 
-bids_check_compliance(x)
+bids_check_compliance(x, schema_check = TRUE, schema_version = "1.10.0")
 ```
 
 ## Arguments
@@ -25,9 +25,18 @@ bids_check_compliance(x)
 
   A `bids_project` object.
 
+- schema_check:
+
+  Logical. Whether to run schema validation (default `TRUE`).
+
+- schema_version:
+
+  Character. BIDS schema version to use (default `"1.10.1"`).
+
 ## Value
 
-A list with compliance check results
+A list with compliance check results including `passed`, `issues`,
+`warnings`, `participants_source`, and `schema_checked`.
 
 A list with:
 
@@ -48,7 +57,7 @@ tryCatch({
   ds001_path <- get_example_bids_dataset("ds001")
   proj <- bids_project(ds001_path)
   compliance <- bids_check_compliance(proj)
-  
+
   # Clean up
   unlink(ds001_path, recursive=TRUE)
 }, error = function(e) {

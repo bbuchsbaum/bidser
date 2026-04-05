@@ -33,10 +33,10 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/confounds-and-variables.html">Working with Confounds and Variables</a></li>
+<li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
     <li><a class="dropdown-item" href="../articles/derivatives.html">Work With Derivatives and Confounds</a></li>
     <li><a class="dropdown-item" href="../articles/mock-bids.html">Create Mock BIDS Projects for Tests and Examples</a></li>
-    <li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
+    <li><a class="dropdown-item" href="../articles/confounds-and-variables.html">Working with Confounds and Variables</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -68,7 +68,7 @@
 
     
     
-<div class="section level2">
+<script>document.addEventListener("DOMContentLoaded",function(){document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-study","preset-structural","preset-adobe","preset-midnight");document.body.classList.add("palette-red","preset-homage");});</script><div class="section level2">
 <h2 id="introduction-to-bidser">Introduction to bidser<a class="anchor" aria-label="anchor" href="#introduction-to-bidser"></a>
 </h2>
 <p><code>bidser</code> is an R package designed for working with
@@ -134,9 +134,9 @@ subjects.</p>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Participants Source: </span> <span style="color: #BBBB00;">file</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Tasks: </span> <span style="color: #BBBB00;">balloonanalogrisktask</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Index: </span> <span style="color: #00BB00;">enabled</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Image Types: </span> <span style="color: #00BB00;">anat, func</span> </span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Image Types: </span> <span style="color: #00BB00;">func, anat</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Modalities: </span> <span style="color: #00BB00;">(none)</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Keys: </span> <span style="color: #BBBB00;">folder, kind, relative_path, subid, suffix, type, run, task</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Keys: </span> <span style="color: #BBBB00;">folder, kind, relative_path, run, subid, suffix, task, type</span></span></span></code></pre></div>
 <p>The <code>bids_project</code> object provides a high-level interface
 to the dataset. We can see it contains 16 subjects with both anatomical
 and functional data.</p>
@@ -621,9 +621,9 @@ workflows:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">full_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">"01"</span>, full_path <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">full_paths</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpKAX8q7/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
-<span><span class="co">#&gt; [2] "/tmp/RtmpKAX8q7/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
-<span><span class="co">#&gt; [3] "/tmp/RtmpKAX8q7/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpGZbqOe/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [2] "/tmp/RtmpGZbqOe/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [3] "/tmp/RtmpGZbqOe/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">full_paths</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>

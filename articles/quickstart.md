@@ -46,9 +46,9 @@ proj
 #> Participants Source:  file 
 #> Tasks:  balloonanalogrisktask 
 #> Index:  enabled 
-#> Image Types:  anat, func 
+#> Image Types:  func, anat 
 #> Modalities:  (none) 
-#> Keys:  folder, kind, relative_path, subid, suffix, type, run, task
+#> Keys:  folder, kind, relative_path, run, subid, suffix, task, type
 ```
 
 The `bids_project` object provides a high-level interface to the
@@ -557,9 +557,9 @@ When you need absolute paths for analysis tools:
 ``` r
 full_paths <- func_scans(proj, subid = "01", full_path = TRUE)
 full_paths
-#> [1] "/tmp/RtmpKAX8q7/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
-#> [2] "/tmp/RtmpKAX8q7/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
-#> [3] "/tmp/RtmpKAX8q7/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
+#> [1] "/tmp/RtmpGZbqOe/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
+#> [2] "/tmp/RtmpGZbqOe/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
+#> [3] "/tmp/RtmpGZbqOe/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
 
 all(file.exists(full_paths))
 #> [1] TRUE

@@ -20,10 +20,20 @@ devtools::install_github("bbuchsbaum/bidser")
 
 See <https://bbuchsbaum.github.io/bidser/articles/quickstart.html>
 
+## Citation
+
+If you use bidser in published work, please cite:
+
+Buchsbaum, B. (2026). *bidser: Work with Brain Imaging Data Structure
+(BIDS) Projects*. R package version 0.4.0.
+<https://github.com/bbuchsbaum/bidser>
+
 ## Albers theme
 
 This package uses the albersdown theme. Existing vignette theme hooks
 are replaced so `albers.css` and local `albers.js` render consistently
-on CRAN and GitHub Pages. The palette family is provided via
-`params$family` (default ‘red’). The pkgdown site uses
-`template: { package: albersdown }`.
+on CRAN and GitHub Pages. The defaults are configured via
+`params$family` and `params$preset` (family = ‘red’, preset = ‘homage’).
+The pkgdown site uses `template: { package: albersdown }` together with
+generated `pkgdown/extra.css` and `pkgdown/extra.js` so the theme is
+linked and activated on site pages.

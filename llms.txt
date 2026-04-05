@@ -20,13 +20,23 @@ devtools::install_github("bbuchsbaum/bidser")
 
 See <https://bbuchsbaum.github.io/bidser/articles/quickstart.html>
 
+## Citation
+
+If you use bidser in published work, please cite:
+
+Buchsbaum, B. (2026). *bidser: Work with Brain Imaging Data Structure
+(BIDS) Projects*. R package version 0.4.0.
+<https://github.com/bbuchsbaum/bidser>
+
 ## Albers theme
 
 This package uses the albersdown theme. Existing vignette theme hooks
 are replaced so `albers.css` and local `albers.js` render consistently
-on CRAN and GitHub Pages. The palette family is provided via
-`params$family` (default ‘red’). The pkgdown site uses
-`template: { package: albersdown }`.
+on CRAN and GitHub Pages. The defaults are configured via
+`params$family` and `params$preset` (family = ‘red’, preset = ‘homage’).
+The pkgdown site uses `template: { package: albersdown }` together with
+generated `pkgdown/extra.css` and `pkgdown/extra.js` so the theme is
+linked and activated on site pages.
 
 # Package index
 
@@ -34,8 +44,12 @@ on CRAN and GitHub Pages. The palette family is provided via
 
 - [`anat_parser()`](https://bbuchsbaum.github.io/bidser/reference/anat_parser.md)
   : Anatomical parser constructor
+- [`as_bids_uri()`](https://bbuchsbaum.github.io/bidser/reference/as_bids_uri.md)
+  : Coerce to a BIDS URI object
 - [`bids_check_compliance()`](https://bbuchsbaum.github.io/bidser/reference/bids_check_compliance.md)
   : Basic BIDS Compliance Checks
+- [`bids_datatype_spec()`](https://bbuchsbaum.github.io/bidser/reference/bids_datatype_spec.md)
+  : Build a custom BIDS datatype spec
 - [`bids_heatmap()`](https://bbuchsbaum.github.io/bidser/reference/bids_heatmap.md)
   : Create a specialized heatmap visualization of BIDS data
 - [`bids_index()`](https://bbuchsbaum.github.io/bidser/reference/bids_index.md)
@@ -48,6 +62,10 @@ on CRAN and GitHub Pages. The palette family is provided via
   : Create a lightweight text report for a BIDS project
 - [`bids_report_data()`](https://bbuchsbaum.github.io/bidser/reference/bids_report_data.md)
   : Assemble lightweight report data for a BIDS project
+- [`bids_schema()`](https://bbuchsbaum.github.io/bidser/reference/bids_schema.md)
+  : Load and cache the BIDS schema
+- [`bids_schema_versions()`](https://bbuchsbaum.github.io/bidser/reference/bids_schema_versions.md)
+  : List available BIDS schema versions
 - [`bids_subject()`](https://bbuchsbaum.github.io/bidser/reference/bids_subject.md)
   [`bids_subject.bids_project()`](https://bbuchsbaum.github.io/bidser/reference/bids_subject.md)
   : Access a single subject from a BIDS project
@@ -55,6 +73,10 @@ on CRAN and GitHub Pages. The palette family is provided via
   : Summarize a BIDS dataset
 - [`bids_transform()`](https://bbuchsbaum.github.io/bidser/reference/bids_transform.md)
   : Apply a transformation to BIDS files
+- [`bids_uri()`](https://bbuchsbaum.github.io/bidser/reference/bids_uri.md)
+  : Construct a BIDS URI object
+- [`bids_version()`](https://bbuchsbaum.github.io/bidser/reference/bids_version.md)
+  : Get the BIDS version of a dataset
 - [`brain_mask()`](https://bbuchsbaum.github.io/bidser/reference/brain_mask.md)
   : Retrieve a brain mask for a subject
 - [`build_subject_graph()`](https://bbuchsbaum.github.io/bidser/reference/build_subject_graph.md)
@@ -79,12 +101,16 @@ on CRAN and GitHub Pages. The palette family is provided via
   : Create a binary brain mask from preprocessed scans
 - [`create_smooth_transformer()`](https://bbuchsbaum.github.io/bidser/reference/create_smooth_transformer.md)
   : Create a simple smoothing transformer
+- [`dataset_description()`](https://bbuchsbaum.github.io/bidser/reference/dataset_description.md)
+  : Get the dataset_description object from a BIDS project
 - [`decode_bids_entities()`](https://bbuchsbaum.github.io/bidser/reference/decode_bids_entities.md)
   : Decode BIDS entities back into a filename
 - [`derivative_files()`](https://bbuchsbaum.github.io/bidser/reference/derivative_files.md)
   : Query derivative files from a BIDS project
 - [`derivative_pipelines()`](https://bbuchsbaum.github.io/bidser/reference/derivative_pipelines.md)
   : List derivative pipelines in a BIDS project
+- [`.bidser_get_registry()`](https://bbuchsbaum.github.io/bidser/reference/dot-bidser_get_registry.md)
+  : Datatype registry for bidser
 - [`encode()`](https://bbuchsbaum.github.io/bidser/reference/encode.md)
   : Encode a string into a BIDS key-value list
 - [`event_files()`](https://bbuchsbaum.github.io/bidser/reference/event_files-method.md)
@@ -105,6 +131,8 @@ on CRAN and GitHub Pages. The palette family is provided via
   : Get functional scans from a BIDS project
 - [`func_scans(`*`<bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/func_scans.bids_project.md)
   : Get Functional Scans from a BIDS Project
+- [`gen_parser()`](https://bbuchsbaum.github.io/bidser/reference/gen_parser.md)
+  : Generate a parser from a spec
 - [`get_example_bids_dataset()`](https://bbuchsbaum.github.io/bidser/reference/get_example_bids_dataset.md)
   : Download Example BIDS Dataset
 - [`get_metadata()`](https://bbuchsbaum.github.io/bidser/reference/get_metadata.md)
@@ -113,10 +141,14 @@ on CRAN and GitHub Pages. The palette family is provided via
   : Get Repetition Time (TR) from a sidecar JSON
 - [`infer_tr()`](https://bbuchsbaum.github.io/bidser/reference/infer_tr.md)
   : Infer TR (Repetition Time) from a BOLD file or sidecar
+- [`is_bids_uri()`](https://bbuchsbaum.github.io/bidser/reference/is_bids_uri.md)
+  : Test whether an object is a BIDS URI
 - [`list_confound_sets()`](https://bbuchsbaum.github.io/bidser/reference/list_confound_sets.md)
   : List available confound sets
 - [`list_confound_strategies()`](https://bbuchsbaum.github.io/bidser/reference/list_confound_strategies.md)
   : List available confound strategies
+- [`list_datatypes()`](https://bbuchsbaum.github.io/bidser/reference/list_datatypes.md)
+  : List registered BIDS datatypes
 - [`list_pack_bids()`](https://bbuchsbaum.github.io/bidser/reference/list_pack_bids.md)
   : List Contents of Packed BIDS Archive
 - [`load_all_events()`](https://bbuchsbaum.github.io/bidser/reference/load_all_events-method.md)
@@ -152,6 +184,8 @@ on CRAN and GitHub Pages. The palette family is provided via
   : Read Confound Files from a BIDS Project
 - [`read_confounds(`*`<bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/read_confounds.bids_project.md)
   : Read confound files
+- [`read_dataset_description()`](https://bbuchsbaum.github.io/bidser/reference/read_dataset_description.md)
+  : Read the dataset_description.json for a BIDS project
 - [`read_events(`*`<mock_bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/read_events-method.md)
   : Read Event Files from Mock BIDS Project
 - [`read_events()`](https://bbuchsbaum.github.io/bidser/reference/read_events.md)
@@ -160,16 +194,28 @@ on CRAN and GitHub Pages. The palette family is provided via
   : Read event files from a BIDS project
 - [`read_func_scans.bids_project()`](https://bbuchsbaum.github.io/bidser/reference/read_func_scans.md)
   : Read in a set of four-dimensional functional scans
+- [`read_participants()`](https://bbuchsbaum.github.io/bidser/reference/read_participants.md)
+  : Read participants.tsv as a typed tabular object
 - [`read_preproc_scans.bids_project()`](https://bbuchsbaum.github.io/bidser/reference/read_preproc_scans.bids_project.md)
   : Read preprocessed functional MRI scans from a BIDS project
+- [`read_scans_tsv()`](https://bbuchsbaum.github.io/bidser/reference/read_scans_tsv.md)
+  : Read a scans.tsv file for a subject
+- [`read_sessions_tsv()`](https://bbuchsbaum.github.io/bidser/reference/read_sessions_tsv.md)
+  : Read a sessions.tsv file for a subject
 - [`read_sidecar()`](https://bbuchsbaum.github.io/bidser/reference/read_sidecar.md)
   : Read sidecar JSON files and return metadata as a tidy tibble
+- [`register_datatype()`](https://bbuchsbaum.github.io/bidser/reference/register_datatype.md)
+  : Register a custom BIDS datatype
+- [`resolve_bids_uri()`](https://bbuchsbaum.github.io/bidser/reference/resolve_bids_uri.md)
+  : Resolve a BIDS URI to a local or remote path
 - [`search_files()`](https://bbuchsbaum.github.io/bidser/reference/search_files.md)
   : Search files in BIDS structure
 - [`sessions()`](https://bbuchsbaum.github.io/bidser/reference/sessions-method.md)
   : Get sessions from a BIDS project
 - [`sessions(`*`<mock_bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/sessions.mock_bids_project.md)
   : Get Sessions from Mock BIDS Project
+- [`sidecar()`](https://bbuchsbaum.github.io/bidser/reference/sidecar.md)
+  : Get the sidecar metadata attached to a tabular BIDS object
 - [`surface_files()`](https://bbuchsbaum.github.io/bidser/reference/surface_files.md)
   : Query Surface Files from a BIDS Project
 - [`tasks()`](https://bbuchsbaum.github.io/bidser/reference/tasks-method.md)
@@ -178,18 +224,20 @@ on CRAN and GitHub Pages. The palette family is provided via
   : Get Tasks from Mock BIDS Project
 - [`transform_files()`](https://bbuchsbaum.github.io/bidser/reference/transform_files.md)
   : Query Transform Files from a BIDS Project
+- [`unregister_datatype()`](https://bbuchsbaum.github.io/bidser/reference/unregister_datatype.md)
+  : Unregister a custom BIDS datatype
 - [`variables_table()`](https://bbuchsbaum.github.io/bidser/reference/variables_table.md)
   : Create a tidy run-level variables table
 
 # Articles
 
-### All vignettes
+### Vignettes
 
-- [Working with Confounds and
-  Variables](https://bbuchsbaum.github.io/bidser/articles/confounds-and-variables.md):
+- [Getting Started with
+  bidser](https://bbuchsbaum.github.io/bidser/articles/quickstart.md):
 - [Work With Derivatives and
   Confounds](https://bbuchsbaum.github.io/bidser/articles/derivatives.md):
 - [Create Mock BIDS Projects for Tests and
   Examples](https://bbuchsbaum.github.io/bidser/articles/mock-bids.md):
-- [Getting Started with
-  bidser](https://bbuchsbaum.github.io/bidser/articles/quickstart.md):
+- [Working with Confounds and
+  Variables](https://bbuchsbaum.github.io/bidser/articles/confounds-and-variables.md):

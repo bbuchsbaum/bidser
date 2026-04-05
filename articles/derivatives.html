@@ -33,10 +33,10 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/confounds-and-variables.html">Working with Confounds and Variables</a></li>
+<li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
     <li><a class="dropdown-item" href="../articles/derivatives.html">Work With Derivatives and Confounds</a></li>
     <li><a class="dropdown-item" href="../articles/mock-bids.html">Create Mock BIDS Projects for Tests and Examples</a></li>
-    <li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
+    <li><a class="dropdown-item" href="../articles/confounds-and-variables.html">Working with Confounds and Variables</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -68,7 +68,7 @@
 
     
     
-<p>When a BIDS project already has derivatives, the first job is usually
+<script>document.addEventListener("DOMContentLoaded",function(){document.body.classList.remove("palette-red","palette-lapis","palette-ochre","palette-teal","palette-green","palette-violet","preset-homage","preset-study","preset-structural","preset-adobe","preset-midnight");document.body.classList.add("palette-red","preset-homage");});</script><p>When a BIDS project already has derivatives, the first job is usually
 not data loading. It is figuring out which pipeline produced which
 files, whether the expected confounds are present, and whether each run
 is analysis-ready.</p>
@@ -82,17 +82,17 @@ start with <code><a href="../articles/quickstart.html">vignette("quickstart")</a
 project plus attached derivative folders.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_bids.html">plot_bids</a></span><span class="op">(</span><span class="va">proj</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="derivatives_files/figure-html/overview-plot-1.png" class="r-plt" alt="" width="700"></p>
+<p><img src="derivatives_files/figure-html/overview-plot-1.png" class="r-plt" alt="" width="864"></p>
 <p>For code, <code><a href="../reference/derivative_pipelines.html">derivative_pipelines()</a></code> is the clearest
 inspection entry point.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pipes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/derivative_pipelines.html">derivative_pipelines</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span>
 <span><span class="va">pipes</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 4</span></span></span>
-<span><span class="co">#&gt;   pipeline root                 description      source    </span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> fmriprep derivatives/fmriprep <span style="color: #949494;">&lt;named list [3]&gt;</span> discovered</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> qsiprep  derivatives/qsiprep  <span style="color: #949494;">&lt;named list [3]&gt;</span> discovered</span></span>
+<span><span class="co">#&gt;   pipeline root                 description source    </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> fmriprep derivatives/fmriprep <span style="color: #949494;">&lt;bds_dts_&gt;</span>  discovered</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> qsiprep  derivatives/qsiprep  <span style="color: #949494;">&lt;bds_dts_&gt;</span>  discovered</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">pipes</span><span class="op">)</span> <span class="op">==</span> <span class="fl">2L</span>,</span>
@@ -216,7 +216,7 @@ compact text report.</p>
 <span></span>
 <span><span class="va">report</span></span>
 <span><span class="co">#&gt; BIDS Report</span></span>
-<span><span class="co">#&gt; Project: bidser-deriv-5a8056fa5b23 </span></span>
+<span><span class="co">#&gt; Project: bidser-deriv-5a9a3ebee6cc </span></span>
 <span><span class="co">#&gt; Participants source: file </span></span>
 <span><span class="co">#&gt; Subjects: 1 </span></span>
 <span><span class="co">#&gt; Sessions: 0 </span></span>

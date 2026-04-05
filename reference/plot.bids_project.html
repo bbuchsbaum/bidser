@@ -22,10 +22,10 @@ graphics. Large projects can be trimmed by setting a maximum depth."></head><bod
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/confounds-and-variables.html">Working with Confounds and Variables</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
     <li><a class="dropdown-item" href="../articles/derivatives.html">Work With Derivatives and Confounds</a></li>
     <li><a class="dropdown-item" href="../articles/mock-bids.html">Create Mock BIDS Projects for Tests and Examples</a></li>
-    <li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
+    <li><a class="dropdown-item" href="../articles/confounds-and-variables.html">Working with Confounds and Variables</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -98,102 +98,102 @@ graphics. Large projects can be trimmed by setting a maximum depth.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1   bids_example_ds001                                                  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2    °--raw                                                             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3        ¦--sub-01                                                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4        ¦   ¦--anat                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5        ¦   ¦   ¦--sub-01_T1w.nii.gz                                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6        ¦   ¦   °--sub-01_inplaneT2.nii.gz                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7        ¦   °--func                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8        ¦       ¦--sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9        ¦       ¦--sub-01_task-balloonanalogrisktask_run-01_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10       ¦       ¦--sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11       ¦       ¦--sub-01_task-balloonanalogrisktask_run-02_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12       ¦       ¦--sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13       ¦       °--sub-01_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4        ¦   ¦--func                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        ¦   ¦   ¦--sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6        ¦   ¦   ¦--sub-01_task-balloonanalogrisktask_run-01_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7        ¦   ¦   ¦--sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8        ¦   ¦   ¦--sub-01_task-balloonanalogrisktask_run-02_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9        ¦   ¦   ¦--sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10       ¦   ¦   °--sub-01_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11       ¦   °--anat                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12       ¦       ¦--sub-01_T1w.nii.gz                                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13       ¦       °--sub-01_inplaneT2.nii.gz                             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 14       ¦--sub-02                                                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15       ¦   ¦--anat                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16       ¦   ¦   ¦--sub-02_T1w.nii.gz                                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17       ¦   ¦   °--sub-02_inplaneT2.nii.gz                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18       ¦   °--func                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19       ¦       ¦--sub-02_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20       ¦       ¦--sub-02_task-balloonanalogrisktask_run-01_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21       ¦       ¦--sub-02_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22       ¦       ¦--sub-02_task-balloonanalogrisktask_run-02_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23       ¦       ¦--sub-02_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24       ¦       °--sub-02_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15       ¦   ¦--func                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16       ¦   ¦   ¦--sub-02_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17       ¦   ¦   ¦--sub-02_task-balloonanalogrisktask_run-01_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18       ¦   ¦   ¦--sub-02_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19       ¦   ¦   ¦--sub-02_task-balloonanalogrisktask_run-02_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20       ¦   ¦   ¦--sub-02_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21       ¦   ¦   °--sub-02_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22       ¦   °--anat                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23       ¦       ¦--sub-02_T1w.nii.gz                                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24       ¦       °--sub-02_inplaneT2.nii.gz                             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 25       ¦--sub-03                                                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26       ¦   ¦--anat                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 27       ¦   ¦   ¦--sub-03_T1w.nii.gz                                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28       ¦   ¦   °--sub-03_inplaneT2.nii.gz                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29       ¦   °--func                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 30       ¦       ¦--sub-03_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 31       ¦       ¦--sub-03_task-balloonanalogrisktask_run-01_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 32       ¦       ¦--sub-03_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 33       ¦       ¦--sub-03_task-balloonanalogrisktask_run-02_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 34       ¦       ¦--sub-03_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 35       ¦       °--sub-03_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26       ¦   ¦--func                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27       ¦   ¦   ¦--sub-03_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28       ¦   ¦   ¦--sub-03_task-balloonanalogrisktask_run-01_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 29       ¦   ¦   ¦--sub-03_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 30       ¦   ¦   ¦--sub-03_task-balloonanalogrisktask_run-02_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 31       ¦   ¦   ¦--sub-03_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 32       ¦   ¦   °--sub-03_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 33       ¦   °--anat                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 34       ¦       ¦--sub-03_T1w.nii.gz                                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 35       ¦       °--sub-03_inplaneT2.nii.gz                             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 36       ¦--sub-04                                                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37       ¦   ¦--anat                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38       ¦   ¦   ¦--sub-04_T1w.nii.gz                                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 39       ¦   ¦   °--sub-04_inplaneT2.nii.gz                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 40       ¦   °--func                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 41       ¦       ¦--sub-04_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 42       ¦       ¦--sub-04_task-balloonanalogrisktask_run-01_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 43       ¦       ¦--sub-04_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 44       ¦       ¦--sub-04_task-balloonanalogrisktask_run-02_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 45       ¦       ¦--sub-04_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 46       ¦       °--sub-04_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37       ¦   ¦--func                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 38       ¦   ¦   ¦--sub-04_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 39       ¦   ¦   ¦--sub-04_task-balloonanalogrisktask_run-01_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 40       ¦   ¦   ¦--sub-04_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 41       ¦   ¦   ¦--sub-04_task-balloonanalogrisktask_run-02_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 42       ¦   ¦   ¦--sub-04_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 43       ¦   ¦   °--sub-04_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 44       ¦   °--anat                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 45       ¦       ¦--sub-04_T1w.nii.gz                                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 46       ¦       °--sub-04_inplaneT2.nii.gz                             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 47       ¦--sub-05                                                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 48       ¦   ¦--anat                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 49       ¦   ¦   ¦--sub-05_T1w.nii.gz                                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 50       ¦   ¦   °--sub-05_inplaneT2.nii.gz                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 51       ¦   °--func                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 52       ¦       ¦--sub-05_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 53       ¦       ¦--sub-05_task-balloonanalogrisktask_run-01_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 54       ¦       ¦--sub-05_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 55       ¦       ¦--sub-05_task-balloonanalogrisktask_run-02_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 56       ¦       ¦--sub-05_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 57       ¦       °--sub-05_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 48       ¦   ¦--func                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 49       ¦   ¦   ¦--sub-05_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 50       ¦   ¦   ¦--sub-05_task-balloonanalogrisktask_run-01_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 51       ¦   ¦   ¦--sub-05_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 52       ¦   ¦   ¦--sub-05_task-balloonanalogrisktask_run-02_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 53       ¦   ¦   ¦--sub-05_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 54       ¦   ¦   °--sub-05_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 55       ¦   °--anat                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 56       ¦       ¦--sub-05_T1w.nii.gz                                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 57       ¦       °--sub-05_inplaneT2.nii.gz                             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 58       ¦--sub-06                                                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 59       ¦   ¦--anat                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60       ¦   ¦   ¦--sub-06_T1w.nii.gz                                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 61       ¦   ¦   °--sub-06_inplaneT2.nii.gz                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 62       ¦   °--func                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 63       ¦       ¦--sub-06_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 64       ¦       ¦--sub-06_task-balloonanalogrisktask_run-01_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 65       ¦       ¦--sub-06_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 66       ¦       ¦--sub-06_task-balloonanalogrisktask_run-02_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 67       ¦       ¦--sub-06_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 68       ¦       °--sub-06_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 59       ¦   ¦--func                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 60       ¦   ¦   ¦--sub-06_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 61       ¦   ¦   ¦--sub-06_task-balloonanalogrisktask_run-01_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 62       ¦   ¦   ¦--sub-06_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 63       ¦   ¦   ¦--sub-06_task-balloonanalogrisktask_run-02_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 64       ¦   ¦   ¦--sub-06_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 65       ¦   ¦   °--sub-06_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 66       ¦   °--anat                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 67       ¦       ¦--sub-06_T1w.nii.gz                                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 68       ¦       °--sub-06_inplaneT2.nii.gz                             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 69       ¦--sub-07                                                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 70       ¦   ¦--anat                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71       ¦   ¦   ¦--sub-07_T1w.nii.gz                                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 72       ¦   ¦   °--sub-07_inplaneT2.nii.gz                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 73       ¦   °--func                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 74       ¦       ¦--sub-07_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 75       ¦       ¦--sub-07_task-balloonanalogrisktask_run-01_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 76       ¦       ¦--sub-07_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 77       ¦       ¦--sub-07_task-balloonanalogrisktask_run-02_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 78       ¦       ¦--sub-07_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 79       ¦       °--sub-07_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 70       ¦   ¦--func                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 71       ¦   ¦   ¦--sub-07_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 72       ¦   ¦   ¦--sub-07_task-balloonanalogrisktask_run-01_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 73       ¦   ¦   ¦--sub-07_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 74       ¦   ¦   ¦--sub-07_task-balloonanalogrisktask_run-02_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 75       ¦   ¦   ¦--sub-07_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 76       ¦   ¦   °--sub-07_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 77       ¦   °--anat                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 78       ¦       ¦--sub-07_T1w.nii.gz                                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 79       ¦       °--sub-07_inplaneT2.nii.gz                             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 80       ¦--sub-08                                                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 81       ¦   ¦--anat                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 82       ¦   ¦   ¦--sub-08_T1w.nii.gz                                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 83       ¦   ¦   °--sub-08_inplaneT2.nii.gz                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 84       ¦   °--func                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 85       ¦       ¦--sub-08_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 86       ¦       ¦--sub-08_task-balloonanalogrisktask_run-01_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 87       ¦       ¦--sub-08_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 88       ¦       ¦--sub-08_task-balloonanalogrisktask_run-02_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 89       ¦       ¦--sub-08_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 90       ¦       °--sub-08_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 81       ¦   ¦--func                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 82       ¦   ¦   ¦--sub-08_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 83       ¦   ¦   ¦--sub-08_task-balloonanalogrisktask_run-01_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 84       ¦   ¦   ¦--sub-08_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 85       ¦   ¦   ¦--sub-08_task-balloonanalogrisktask_run-02_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 86       ¦   ¦   ¦--sub-08_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 87       ¦   ¦   °--sub-08_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 88       ¦   °--anat                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 89       ¦       ¦--sub-08_T1w.nii.gz                                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 90       ¦       °--sub-08_inplaneT2.nii.gz                             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 91       ¦--sub-09                                                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 92       ¦   ¦--anat                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 93       ¦   ¦   ¦--sub-09_T1w.nii.gz                                   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 94       ¦   ¦   °--sub-09_inplaneT2.nii.gz                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 95       ¦   °--func                                                    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 96       ¦       ¦--sub-09_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 97       ¦       ¦--sub-09_task-balloonanalogrisktask_run-01_events.tsv </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 98       ¦       ¦--sub-09_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 99       ¦       ¦--sub-09_task-balloonanalogrisktask_run-02_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 92       ¦   ¦--func                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 93       ¦   ¦   ¦--sub-09_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 94       ¦   ¦   ¦--sub-09_task-balloonanalogrisktask_run-01_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 95       ¦   ¦   ¦--sub-09_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 96       ¦   ¦   ¦--sub-09_task-balloonanalogrisktask_run-02_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 97       ¦   ¦   ¦--sub-09_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 98       ¦   ¦   °--sub-09_task-balloonanalogrisktask_run-03_events.tsv </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 99       ¦   °--anat                                                    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 100      ¦       °--... 2 nodes w/ 0 sub                                </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 101      °--... 7 nodes w/ 72 sub                                       </span>
 <span class="r-in"><span><span class="co"># }</span></span></span>

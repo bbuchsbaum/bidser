@@ -18,10 +18,10 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/confounds-and-variables.html">Working with Confounds and Variables</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
     <li><a class="dropdown-item" href="../articles/derivatives.html">Work With Derivatives and Confounds</a></li>
     <li><a class="dropdown-item" href="../articles/mock-bids.html">Create Mock BIDS Projects for Tests and Examples</a></li>
-    <li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
+    <li><a class="dropdown-item" href="../articles/confounds-and-variables.html">Working with Confounds and Variables</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -57,10 +57,24 @@
 
         <dt>
 
+          <code><a href="as_bids_uri.html">as_bids_uri()</a></code>
+
+        </dt>
+        <dd>Coerce to a BIDS URI object</dd>
+
+        <dt>
+
           <code><a href="bids_check_compliance.html">bids_check_compliance()</a></code>
 
         </dt>
         <dd>Basic BIDS Compliance Checks</dd>
+
+        <dt>
+
+          <code><a href="bids_datatype_spec.html">bids_datatype_spec()</a></code>
+
+        </dt>
+        <dd>Build a custom BIDS datatype spec</dd>
 
         <dt>
 
@@ -106,6 +120,20 @@
 
         <dt>
 
+          <code><a href="bids_schema.html">bids_schema()</a></code>
+
+        </dt>
+        <dd>Load and cache the BIDS schema</dd>
+
+        <dt>
+
+          <code><a href="bids_schema_versions.html">bids_schema_versions()</a></code>
+
+        </dt>
+        <dd>List available BIDS schema versions</dd>
+
+        <dt>
+
           <code><a href="bids_subject.html">bids_subject()</a></code> <code><a href="bids_subject.html">bids_subject.bids_project()</a></code>
 
         </dt>
@@ -124,6 +152,20 @@
 
         </dt>
         <dd>Apply a transformation to BIDS files</dd>
+
+        <dt>
+
+          <code><a href="bids_uri.html">bids_uri()</a></code>
+
+        </dt>
+        <dd>Construct a BIDS URI object</dd>
+
+        <dt>
+
+          <code><a href="bids_version.html">bids_version()</a></code>
+
+        </dt>
+        <dd>Get the BIDS version of a dataset</dd>
 
         <dt>
 
@@ -211,6 +253,13 @@
 
         <dt>
 
+          <code><a href="dataset_description.html">dataset_description()</a></code>
+
+        </dt>
+        <dd>Get the dataset_description object from a BIDS project</dd>
+
+        <dt>
+
           <code><a href="decode_bids_entities.html">decode_bids_entities()</a></code>
 
         </dt>
@@ -229,6 +278,13 @@
 
         </dt>
         <dd>List derivative pipelines in a BIDS project</dd>
+
+        <dt>
+
+          <code><a href="dot-bidser_get_registry.html">.bidser_get_registry()</a></code>
+
+        </dt>
+        <dd>Datatype registry for bidser</dd>
 
         <dt>
 
@@ -302,6 +358,13 @@
 
         <dt>
 
+          <code><a href="gen_parser.html">gen_parser()</a></code>
+
+        </dt>
+        <dd>Generate a parser from a spec</dd>
+
+        <dt>
+
           <code><a href="get_example_bids_dataset.html">get_example_bids_dataset()</a></code>
 
         </dt>
@@ -330,6 +393,13 @@
 
         <dt>
 
+          <code><a href="is_bids_uri.html">is_bids_uri()</a></code>
+
+        </dt>
+        <dd>Test whether an object is a BIDS URI</dd>
+
+        <dt>
+
           <code><a href="list_confound_sets.html">list_confound_sets()</a></code>
 
         </dt>
@@ -341,6 +411,13 @@
 
         </dt>
         <dd>List available confound strategies</dd>
+
+        <dt>
+
+          <code><a href="list_datatypes.html">list_datatypes()</a></code>
+
+        </dt>
+        <dd>List registered BIDS datatypes</dd>
 
         <dt>
 
@@ -463,6 +540,13 @@
 
         <dt>
 
+          <code><a href="read_dataset_description.html">read_dataset_description()</a></code>
+
+        </dt>
+        <dd>Read the dataset_description.json for a BIDS project</dd>
+
+        <dt>
+
           <code><a href="read_events-method.html">read_events(<i>&lt;mock_bids_project&gt;</i>)</a></code>
 
         </dt>
@@ -491,6 +575,13 @@
 
         <dt>
 
+          <code><a href="read_participants.html">read_participants()</a></code>
+
+        </dt>
+        <dd>Read participants.tsv as a typed tabular object</dd>
+
+        <dt>
+
           <code><a href="read_preproc_scans.bids_project.html">read_preproc_scans.bids_project()</a></code>
 
         </dt>
@@ -498,10 +589,38 @@
 
         <dt>
 
+          <code><a href="read_scans_tsv.html">read_scans_tsv()</a></code>
+
+        </dt>
+        <dd>Read a scans.tsv file for a subject</dd>
+
+        <dt>
+
+          <code><a href="read_sessions_tsv.html">read_sessions_tsv()</a></code>
+
+        </dt>
+        <dd>Read a sessions.tsv file for a subject</dd>
+
+        <dt>
+
           <code><a href="read_sidecar.html">read_sidecar()</a></code>
 
         </dt>
         <dd>Read sidecar JSON files and return metadata as a tidy tibble</dd>
+
+        <dt>
+
+          <code><a href="register_datatype.html">register_datatype()</a></code>
+
+        </dt>
+        <dd>Register a custom BIDS datatype</dd>
+
+        <dt>
+
+          <code><a href="resolve_bids_uri.html">resolve_bids_uri()</a></code>
+
+        </dt>
+        <dd>Resolve a BIDS URI to a local or remote path</dd>
 
         <dt>
 
@@ -523,6 +642,13 @@
 
         </dt>
         <dd>Get Sessions from Mock BIDS Project</dd>
+
+        <dt>
+
+          <code><a href="sidecar.html">sidecar()</a></code>
+
+        </dt>
+        <dd>Get the sidecar metadata attached to a tabular BIDS object</dd>
 
         <dt>
 
@@ -551,6 +677,13 @@
 
         </dt>
         <dd>Query Transform Files from a BIDS Project</dd>
+
+        <dt>
+
+          <code><a href="unregister_datatype.html">unregister_datatype()</a></code>
+
+        </dt>
+        <dd>Unregister a custom BIDS datatype</dd>
 
         <dt>
 

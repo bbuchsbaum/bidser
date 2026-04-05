@@ -52,102 +52,102 @@ tryCatch({
 #> 1   bids_example_ds001                                                  
 #> 2    °--raw                                                             
 #> 3        ¦--sub-01                                                      
-#> 4        ¦   ¦--anat                                                    
-#> 5        ¦   ¦   ¦--sub-01_T1w.nii.gz                                   
-#> 6        ¦   ¦   °--sub-01_inplaneT2.nii.gz                             
-#> 7        ¦   °--func                                                    
-#> 8        ¦       ¦--sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz
-#> 9        ¦       ¦--sub-01_task-balloonanalogrisktask_run-01_events.tsv 
-#> 10       ¦       ¦--sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz
-#> 11       ¦       ¦--sub-01_task-balloonanalogrisktask_run-02_events.tsv 
-#> 12       ¦       ¦--sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz
-#> 13       ¦       °--sub-01_task-balloonanalogrisktask_run-03_events.tsv 
+#> 4        ¦   ¦--func                                                    
+#> 5        ¦   ¦   ¦--sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz
+#> 6        ¦   ¦   ¦--sub-01_task-balloonanalogrisktask_run-01_events.tsv 
+#> 7        ¦   ¦   ¦--sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz
+#> 8        ¦   ¦   ¦--sub-01_task-balloonanalogrisktask_run-02_events.tsv 
+#> 9        ¦   ¦   ¦--sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz
+#> 10       ¦   ¦   °--sub-01_task-balloonanalogrisktask_run-03_events.tsv 
+#> 11       ¦   °--anat                                                    
+#> 12       ¦       ¦--sub-01_T1w.nii.gz                                   
+#> 13       ¦       °--sub-01_inplaneT2.nii.gz                             
 #> 14       ¦--sub-02                                                      
-#> 15       ¦   ¦--anat                                                    
-#> 16       ¦   ¦   ¦--sub-02_T1w.nii.gz                                   
-#> 17       ¦   ¦   °--sub-02_inplaneT2.nii.gz                             
-#> 18       ¦   °--func                                                    
-#> 19       ¦       ¦--sub-02_task-balloonanalogrisktask_run-01_bold.nii.gz
-#> 20       ¦       ¦--sub-02_task-balloonanalogrisktask_run-01_events.tsv 
-#> 21       ¦       ¦--sub-02_task-balloonanalogrisktask_run-02_bold.nii.gz
-#> 22       ¦       ¦--sub-02_task-balloonanalogrisktask_run-02_events.tsv 
-#> 23       ¦       ¦--sub-02_task-balloonanalogrisktask_run-03_bold.nii.gz
-#> 24       ¦       °--sub-02_task-balloonanalogrisktask_run-03_events.tsv 
+#> 15       ¦   ¦--func                                                    
+#> 16       ¦   ¦   ¦--sub-02_task-balloonanalogrisktask_run-01_bold.nii.gz
+#> 17       ¦   ¦   ¦--sub-02_task-balloonanalogrisktask_run-01_events.tsv 
+#> 18       ¦   ¦   ¦--sub-02_task-balloonanalogrisktask_run-02_bold.nii.gz
+#> 19       ¦   ¦   ¦--sub-02_task-balloonanalogrisktask_run-02_events.tsv 
+#> 20       ¦   ¦   ¦--sub-02_task-balloonanalogrisktask_run-03_bold.nii.gz
+#> 21       ¦   ¦   °--sub-02_task-balloonanalogrisktask_run-03_events.tsv 
+#> 22       ¦   °--anat                                                    
+#> 23       ¦       ¦--sub-02_T1w.nii.gz                                   
+#> 24       ¦       °--sub-02_inplaneT2.nii.gz                             
 #> 25       ¦--sub-03                                                      
-#> 26       ¦   ¦--anat                                                    
-#> 27       ¦   ¦   ¦--sub-03_T1w.nii.gz                                   
-#> 28       ¦   ¦   °--sub-03_inplaneT2.nii.gz                             
-#> 29       ¦   °--func                                                    
-#> 30       ¦       ¦--sub-03_task-balloonanalogrisktask_run-01_bold.nii.gz
-#> 31       ¦       ¦--sub-03_task-balloonanalogrisktask_run-01_events.tsv 
-#> 32       ¦       ¦--sub-03_task-balloonanalogrisktask_run-02_bold.nii.gz
-#> 33       ¦       ¦--sub-03_task-balloonanalogrisktask_run-02_events.tsv 
-#> 34       ¦       ¦--sub-03_task-balloonanalogrisktask_run-03_bold.nii.gz
-#> 35       ¦       °--sub-03_task-balloonanalogrisktask_run-03_events.tsv 
+#> 26       ¦   ¦--func                                                    
+#> 27       ¦   ¦   ¦--sub-03_task-balloonanalogrisktask_run-01_bold.nii.gz
+#> 28       ¦   ¦   ¦--sub-03_task-balloonanalogrisktask_run-01_events.tsv 
+#> 29       ¦   ¦   ¦--sub-03_task-balloonanalogrisktask_run-02_bold.nii.gz
+#> 30       ¦   ¦   ¦--sub-03_task-balloonanalogrisktask_run-02_events.tsv 
+#> 31       ¦   ¦   ¦--sub-03_task-balloonanalogrisktask_run-03_bold.nii.gz
+#> 32       ¦   ¦   °--sub-03_task-balloonanalogrisktask_run-03_events.tsv 
+#> 33       ¦   °--anat                                                    
+#> 34       ¦       ¦--sub-03_T1w.nii.gz                                   
+#> 35       ¦       °--sub-03_inplaneT2.nii.gz                             
 #> 36       ¦--sub-04                                                      
-#> 37       ¦   ¦--anat                                                    
-#> 38       ¦   ¦   ¦--sub-04_T1w.nii.gz                                   
-#> 39       ¦   ¦   °--sub-04_inplaneT2.nii.gz                             
-#> 40       ¦   °--func                                                    
-#> 41       ¦       ¦--sub-04_task-balloonanalogrisktask_run-01_bold.nii.gz
-#> 42       ¦       ¦--sub-04_task-balloonanalogrisktask_run-01_events.tsv 
-#> 43       ¦       ¦--sub-04_task-balloonanalogrisktask_run-02_bold.nii.gz
-#> 44       ¦       ¦--sub-04_task-balloonanalogrisktask_run-02_events.tsv 
-#> 45       ¦       ¦--sub-04_task-balloonanalogrisktask_run-03_bold.nii.gz
-#> 46       ¦       °--sub-04_task-balloonanalogrisktask_run-03_events.tsv 
+#> 37       ¦   ¦--func                                                    
+#> 38       ¦   ¦   ¦--sub-04_task-balloonanalogrisktask_run-01_bold.nii.gz
+#> 39       ¦   ¦   ¦--sub-04_task-balloonanalogrisktask_run-01_events.tsv 
+#> 40       ¦   ¦   ¦--sub-04_task-balloonanalogrisktask_run-02_bold.nii.gz
+#> 41       ¦   ¦   ¦--sub-04_task-balloonanalogrisktask_run-02_events.tsv 
+#> 42       ¦   ¦   ¦--sub-04_task-balloonanalogrisktask_run-03_bold.nii.gz
+#> 43       ¦   ¦   °--sub-04_task-balloonanalogrisktask_run-03_events.tsv 
+#> 44       ¦   °--anat                                                    
+#> 45       ¦       ¦--sub-04_T1w.nii.gz                                   
+#> 46       ¦       °--sub-04_inplaneT2.nii.gz                             
 #> 47       ¦--sub-05                                                      
-#> 48       ¦   ¦--anat                                                    
-#> 49       ¦   ¦   ¦--sub-05_T1w.nii.gz                                   
-#> 50       ¦   ¦   °--sub-05_inplaneT2.nii.gz                             
-#> 51       ¦   °--func                                                    
-#> 52       ¦       ¦--sub-05_task-balloonanalogrisktask_run-01_bold.nii.gz
-#> 53       ¦       ¦--sub-05_task-balloonanalogrisktask_run-01_events.tsv 
-#> 54       ¦       ¦--sub-05_task-balloonanalogrisktask_run-02_bold.nii.gz
-#> 55       ¦       ¦--sub-05_task-balloonanalogrisktask_run-02_events.tsv 
-#> 56       ¦       ¦--sub-05_task-balloonanalogrisktask_run-03_bold.nii.gz
-#> 57       ¦       °--sub-05_task-balloonanalogrisktask_run-03_events.tsv 
+#> 48       ¦   ¦--func                                                    
+#> 49       ¦   ¦   ¦--sub-05_task-balloonanalogrisktask_run-01_bold.nii.gz
+#> 50       ¦   ¦   ¦--sub-05_task-balloonanalogrisktask_run-01_events.tsv 
+#> 51       ¦   ¦   ¦--sub-05_task-balloonanalogrisktask_run-02_bold.nii.gz
+#> 52       ¦   ¦   ¦--sub-05_task-balloonanalogrisktask_run-02_events.tsv 
+#> 53       ¦   ¦   ¦--sub-05_task-balloonanalogrisktask_run-03_bold.nii.gz
+#> 54       ¦   ¦   °--sub-05_task-balloonanalogrisktask_run-03_events.tsv 
+#> 55       ¦   °--anat                                                    
+#> 56       ¦       ¦--sub-05_T1w.nii.gz                                   
+#> 57       ¦       °--sub-05_inplaneT2.nii.gz                             
 #> 58       ¦--sub-06                                                      
-#> 59       ¦   ¦--anat                                                    
-#> 60       ¦   ¦   ¦--sub-06_T1w.nii.gz                                   
-#> 61       ¦   ¦   °--sub-06_inplaneT2.nii.gz                             
-#> 62       ¦   °--func                                                    
-#> 63       ¦       ¦--sub-06_task-balloonanalogrisktask_run-01_bold.nii.gz
-#> 64       ¦       ¦--sub-06_task-balloonanalogrisktask_run-01_events.tsv 
-#> 65       ¦       ¦--sub-06_task-balloonanalogrisktask_run-02_bold.nii.gz
-#> 66       ¦       ¦--sub-06_task-balloonanalogrisktask_run-02_events.tsv 
-#> 67       ¦       ¦--sub-06_task-balloonanalogrisktask_run-03_bold.nii.gz
-#> 68       ¦       °--sub-06_task-balloonanalogrisktask_run-03_events.tsv 
+#> 59       ¦   ¦--func                                                    
+#> 60       ¦   ¦   ¦--sub-06_task-balloonanalogrisktask_run-01_bold.nii.gz
+#> 61       ¦   ¦   ¦--sub-06_task-balloonanalogrisktask_run-01_events.tsv 
+#> 62       ¦   ¦   ¦--sub-06_task-balloonanalogrisktask_run-02_bold.nii.gz
+#> 63       ¦   ¦   ¦--sub-06_task-balloonanalogrisktask_run-02_events.tsv 
+#> 64       ¦   ¦   ¦--sub-06_task-balloonanalogrisktask_run-03_bold.nii.gz
+#> 65       ¦   ¦   °--sub-06_task-balloonanalogrisktask_run-03_events.tsv 
+#> 66       ¦   °--anat                                                    
+#> 67       ¦       ¦--sub-06_T1w.nii.gz                                   
+#> 68       ¦       °--sub-06_inplaneT2.nii.gz                             
 #> 69       ¦--sub-07                                                      
-#> 70       ¦   ¦--anat                                                    
-#> 71       ¦   ¦   ¦--sub-07_T1w.nii.gz                                   
-#> 72       ¦   ¦   °--sub-07_inplaneT2.nii.gz                             
-#> 73       ¦   °--func                                                    
-#> 74       ¦       ¦--sub-07_task-balloonanalogrisktask_run-01_bold.nii.gz
-#> 75       ¦       ¦--sub-07_task-balloonanalogrisktask_run-01_events.tsv 
-#> 76       ¦       ¦--sub-07_task-balloonanalogrisktask_run-02_bold.nii.gz
-#> 77       ¦       ¦--sub-07_task-balloonanalogrisktask_run-02_events.tsv 
-#> 78       ¦       ¦--sub-07_task-balloonanalogrisktask_run-03_bold.nii.gz
-#> 79       ¦       °--sub-07_task-balloonanalogrisktask_run-03_events.tsv 
+#> 70       ¦   ¦--func                                                    
+#> 71       ¦   ¦   ¦--sub-07_task-balloonanalogrisktask_run-01_bold.nii.gz
+#> 72       ¦   ¦   ¦--sub-07_task-balloonanalogrisktask_run-01_events.tsv 
+#> 73       ¦   ¦   ¦--sub-07_task-balloonanalogrisktask_run-02_bold.nii.gz
+#> 74       ¦   ¦   ¦--sub-07_task-balloonanalogrisktask_run-02_events.tsv 
+#> 75       ¦   ¦   ¦--sub-07_task-balloonanalogrisktask_run-03_bold.nii.gz
+#> 76       ¦   ¦   °--sub-07_task-balloonanalogrisktask_run-03_events.tsv 
+#> 77       ¦   °--anat                                                    
+#> 78       ¦       ¦--sub-07_T1w.nii.gz                                   
+#> 79       ¦       °--sub-07_inplaneT2.nii.gz                             
 #> 80       ¦--sub-08                                                      
-#> 81       ¦   ¦--anat                                                    
-#> 82       ¦   ¦   ¦--sub-08_T1w.nii.gz                                   
-#> 83       ¦   ¦   °--sub-08_inplaneT2.nii.gz                             
-#> 84       ¦   °--func                                                    
-#> 85       ¦       ¦--sub-08_task-balloonanalogrisktask_run-01_bold.nii.gz
-#> 86       ¦       ¦--sub-08_task-balloonanalogrisktask_run-01_events.tsv 
-#> 87       ¦       ¦--sub-08_task-balloonanalogrisktask_run-02_bold.nii.gz
-#> 88       ¦       ¦--sub-08_task-balloonanalogrisktask_run-02_events.tsv 
-#> 89       ¦       ¦--sub-08_task-balloonanalogrisktask_run-03_bold.nii.gz
-#> 90       ¦       °--sub-08_task-balloonanalogrisktask_run-03_events.tsv 
+#> 81       ¦   ¦--func                                                    
+#> 82       ¦   ¦   ¦--sub-08_task-balloonanalogrisktask_run-01_bold.nii.gz
+#> 83       ¦   ¦   ¦--sub-08_task-balloonanalogrisktask_run-01_events.tsv 
+#> 84       ¦   ¦   ¦--sub-08_task-balloonanalogrisktask_run-02_bold.nii.gz
+#> 85       ¦   ¦   ¦--sub-08_task-balloonanalogrisktask_run-02_events.tsv 
+#> 86       ¦   ¦   ¦--sub-08_task-balloonanalogrisktask_run-03_bold.nii.gz
+#> 87       ¦   ¦   °--sub-08_task-balloonanalogrisktask_run-03_events.tsv 
+#> 88       ¦   °--anat                                                    
+#> 89       ¦       ¦--sub-08_T1w.nii.gz                                   
+#> 90       ¦       °--sub-08_inplaneT2.nii.gz                             
 #> 91       ¦--sub-09                                                      
-#> 92       ¦   ¦--anat                                                    
-#> 93       ¦   ¦   ¦--sub-09_T1w.nii.gz                                   
-#> 94       ¦   ¦   °--sub-09_inplaneT2.nii.gz                             
-#> 95       ¦   °--func                                                    
-#> 96       ¦       ¦--sub-09_task-balloonanalogrisktask_run-01_bold.nii.gz
-#> 97       ¦       ¦--sub-09_task-balloonanalogrisktask_run-01_events.tsv 
-#> 98       ¦       ¦--sub-09_task-balloonanalogrisktask_run-02_bold.nii.gz
-#> 99       ¦       ¦--sub-09_task-balloonanalogrisktask_run-02_events.tsv 
+#> 92       ¦   ¦--func                                                    
+#> 93       ¦   ¦   ¦--sub-09_task-balloonanalogrisktask_run-01_bold.nii.gz
+#> 94       ¦   ¦   ¦--sub-09_task-balloonanalogrisktask_run-01_events.tsv 
+#> 95       ¦   ¦   ¦--sub-09_task-balloonanalogrisktask_run-02_bold.nii.gz
+#> 96       ¦   ¦   ¦--sub-09_task-balloonanalogrisktask_run-02_events.tsv 
+#> 97       ¦   ¦   ¦--sub-09_task-balloonanalogrisktask_run-03_bold.nii.gz
+#> 98       ¦   ¦   °--sub-09_task-balloonanalogrisktask_run-03_events.tsv 
+#> 99       ¦   °--anat                                                    
 #> 100      ¦       °--... 2 nodes w/ 0 sub                                
 #> 101      °--... 7 nodes w/ 72 sub                                       
 # }

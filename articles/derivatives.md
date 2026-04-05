@@ -30,10 +30,10 @@ is the clearest inspection entry point.
 pipes <- derivative_pipelines(proj)
 pipes
 #> # A tibble: 2 × 4
-#>   pipeline root                 description      source    
-#>   <chr>    <chr>                <list>           <chr>     
-#> 1 fmriprep derivatives/fmriprep <named list [3]> discovered
-#> 2 qsiprep  derivatives/qsiprep  <named list [3]> discovered
+#>   pipeline root                 description source    
+#>   <chr>    <chr>                <list>      <chr>     
+#> 1 fmriprep derivatives/fmriprep <bds_dts_>  discovered
+#> 2 qsiprep  derivatives/qsiprep  <bds_dts_>  discovered
 
 stopifnot(
   nrow(pipes) == 2L,
@@ -171,7 +171,7 @@ report <- bids_report(
 
 report
 #> BIDS Report
-#> Project: bidser-deriv-5a8056fa5b23 
+#> Project: bidser-deriv-5a9a3ebee6cc 
 #> Participants source: file 
 #> Subjects: 1 
 #> Sessions: 0 

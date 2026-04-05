@@ -11,14 +11,14 @@ Source:
 [`inst/CITATION`](https://github.com/bbuchsbaum/bidser/blob/master/inst/CITATION)
 
 Buchsbaum B (2026). *bidser: Work with Brain Imaging Data Structure
-(BIDS) Projects*. R package version 0.2.0,
+(BIDS) Projects*. R package version 0.4.0,
 <https://github.com/bbuchsbaum/bidser>.
 
     @Manual{,
       title = {bidser: Work with Brain Imaging Data Structure (BIDS) Projects},
       author = {Bradley Buchsbaum},
       year = {2026},
-      note = {R package version 0.2.0},
+      note = {R package version 0.4.0},
       url = {https://github.com/bbuchsbaum/bidser},
     }
 
