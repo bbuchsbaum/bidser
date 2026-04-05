@@ -1,12 +1,17 @@
-#' Given a match specification, generate a parser
+#' Generate a parser from a spec
 #'
-#' @param spec A specification object containing `keystruc` and `kinds` tables.
-#'   `keystruc` defines the keys and their regex patterns, and `kinds` defines 
-#'   the possible file types and suffixes.
-#' @param typename The name given to the final type element. Default is "kind".
-#' @return A parser function generated from the specification.
-#' @keywords internal
-#' @noRd
+#' Converts a \code{parser_spec} list (as returned by \code{\link{bids_datatype_spec}}
+#' or the internal \code{func_spec()} etc.) into a parser object suitable for
+#' passing to \code{\link{register_datatype}}.
+#'
+#' @param spec A \code{parser_spec} list with elements \code{keystruc},
+#'   \code{kinds}, and \code{type}, as returned by
+#'   \code{\link{bids_datatype_spec}}.
+#' @param typename The name given to the final type element. Default is
+#'   \code{"kind"}.
+#' @return A regex-based parser object.
+#' @seealso \code{\link{bids_datatype_spec}}, \code{\link{register_datatype}}
+#' @export
 gen_parser <- function(spec, typename = "kind") {
   # Check input
   if (!is.list(spec) || !all(c("keystruc", "kinds", "type") %in% names(spec))) {
