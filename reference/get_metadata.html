@@ -109,6 +109,19 @@ are merged in deterministic path order after less specific ancestors, so the
 final values are reproducible.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">ds001_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_example_bids_dataset.html">get_example_bids_dataset</a></span><span class="op">(</span><span class="st">"ds001"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">ds001_path</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">"01"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></span>
+<span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">f</span><span class="op">)</span><span class="op">)</span> <span class="fu">get_metadata</span><span class="op">(</span><span class="va">proj</span>, <span class="va">f</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">ds001_path</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span>, error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Example requires internet: "</span>, <span class="va">e</span><span class="op">$</span><span class="va">message</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

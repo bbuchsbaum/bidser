@@ -32,3 +32,17 @@ read_scans_tsv(x, subid, session = NULL, ...)
 ## Value
 
 A `bids_scans_tsv` object inheriting from `tbl_df`, or NULL.
+
+## Examples
+
+``` r
+# \donttest{
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  scans <- read_scans_tsv(proj, subid = "01")
+  unlink(ds001_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+#> No scans.tsv found for sub-01
+# }
+```

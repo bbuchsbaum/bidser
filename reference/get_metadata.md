@@ -64,3 +64,17 @@ A named list of metadata fields.
 If multiple sidecars are equally specific at the same directory depth,
 they are merged in deterministic path order after less specific
 ancestors, so the final values are reproducible.
+
+## Examples
+
+``` r
+# \donttest{
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  f <- func_scans(proj, subid = "01")[1]
+  if (!is.null(f)) get_metadata(proj, f)
+  unlink(ds001_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+# }
+```

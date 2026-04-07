@@ -69,8 +69,6 @@
   : Query derivative files from a BIDS project
 - [`derivative_pipelines()`](https://bbuchsbaum.github.io/bidser/reference/derivative_pipelines.md)
   : List derivative pipelines in a BIDS project
-- [`.bidser_get_registry()`](https://bbuchsbaum.github.io/bidser/reference/dot-bidser_get_registry.md)
-  : Datatype registry for bidser
 - [`encode()`](https://bbuchsbaum.github.io/bidser/reference/encode.md)
   : Encode a string into a BIDS key-value list
 - [`event_files()`](https://bbuchsbaum.github.io/bidser/reference/event_files-method.md)

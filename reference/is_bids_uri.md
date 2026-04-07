@@ -17,3 +17,13 @@ is_bids_uri(x)
 ## Value
 
 `TRUE` if `x` inherits from `"bids_uri"`, `FALSE` otherwise.
+
+## Examples
+
+``` r
+u <- bids_uri("bids::sub-01/anat/sub-01_T1w.nii.gz")
+is_bids_uri(u)      # TRUE
+#> [1] TRUE
+is_bids_uri("bids::sub-01/anat/sub-01_T1w.nii.gz")  # FALSE
+#> [1] FALSE
+```

@@ -32,3 +32,14 @@ A regex-based parser object.
 
 [`bids_datatype_spec`](https://bbuchsbaum.github.io/bidser/reference/bids_datatype_spec.md),
 [`register_datatype`](https://bbuchsbaum.github.io/bidser/reference/register_datatype.md)
+
+## Examples
+
+``` r
+spec <- bids_datatype_spec(
+  type     = "dwi",
+  entities = c("sub", "ses", "acq", "run"),
+  suffixes = list(dwi = c(".nii.gz", ".nii", ".bvec", ".bval", ".json"))
+)
+parser <- gen_parser(spec)
+```

@@ -21,3 +21,17 @@ derivative_pipelines(x)
 
 A tibble with one row per derivative pipeline and columns `pipeline`,
 `root`, `description`, and `source`.
+
+## Examples
+
+``` r
+# \donttest{
+tryCatch({
+  ds_path <- get_example_bids_dataset("ds000001-fmriprep")
+  proj <- bids_project(ds_path, fmriprep = TRUE)
+  derivative_pipelines(proj)
+  unlink(ds_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+#> Example requires internet: participants.tsv is missing
+# }
+```

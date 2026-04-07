@@ -29,3 +29,17 @@ derivative_files(x, pipeline = NULL, ...)
 ## Value
 
 Character vector of file paths (or tibble when `return = "tibble"`).
+
+## Examples
+
+``` r
+# \donttest{
+tryCatch({
+  ds_path <- get_example_bids_dataset("ds000001-fmriprep")
+  proj <- bids_project(ds_path, fmriprep = TRUE)
+  df <- derivative_files(proj)
+  unlink(ds_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+#> Example requires internet: participants.tsv is missing
+# }
+```

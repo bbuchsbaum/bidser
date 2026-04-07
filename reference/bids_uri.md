@@ -22,3 +22,18 @@ bids_uri(uri)
 
 An object of class `bids_uri` with fields `dataset_name`,
 `relative_path`, and `uri`.
+
+## Examples
+
+``` r
+u <- bids_uri("bids::sub-01/func/sub-01_task-rest_bold.nii.gz")
+u$dataset_name   # ""
+#> [1] ""
+u$relative_path  # "sub-01/func/sub-01_task-rest_bold.nii.gz"
+#> [1] "sub-01/func/sub-01_task-rest_bold.nii.gz"
+
+# URI with a named dataset link
+u2 <- bids_uri("bids:deriv1:sub-01/anat/sub-01_T1w.nii.gz")
+u2$dataset_name  # "deriv1"
+#> [1] "deriv1"
+```

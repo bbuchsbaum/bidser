@@ -30,3 +30,16 @@ bids_version(x, ...)
 ## Value
 
 A character scalar BIDS version string, or `NA_character_`.
+
+## Examples
+
+``` r
+# \donttest{
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  desc <- read_dataset_description(ds001_path)
+  bids_version(desc)
+  unlink(ds001_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+# }
+```
