@@ -47,6 +47,14 @@
 #' @return An object of class `bids_uri` with fields `dataset_name`,
 #'   `relative_path`, and `uri`.
 #' @export
+#' @examples
+#' u <- bids_uri("bids::sub-01/func/sub-01_task-rest_bold.nii.gz")
+#' u$dataset_name   # ""
+#' u$relative_path  # "sub-01/func/sub-01_task-rest_bold.nii.gz"
+#'
+#' # URI with a named dataset link
+#' u2 <- bids_uri("bids:deriv1:sub-01/anat/sub-01_T1w.nii.gz")
+#' u2$dataset_name  # "deriv1"
 bids_uri <- function(uri) {
   if (!is.character(uri) || length(uri) != 1L) {
     stop("'uri' must be a character scalar")
@@ -71,6 +79,10 @@ bids_uri <- function(uri) {
 #' @param x Any object.
 #' @return `TRUE` if `x` inherits from `"bids_uri"`, `FALSE` otherwise.
 #' @export
+#' @examples
+#' u <- bids_uri("bids::sub-01/anat/sub-01_T1w.nii.gz")
+#' is_bids_uri(u)      # TRUE
+#' is_bids_uri("bids::sub-01/anat/sub-01_T1w.nii.gz")  # FALSE
 is_bids_uri <- function(x) inherits(x, "bids_uri")
 
 #' @export

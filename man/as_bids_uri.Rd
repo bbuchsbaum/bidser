@@ -23,3 +23,8 @@ A \code{bids_uri} object.
 \description{
 Coerce to a BIDS URI object
 }
+\examples{
+u <- as_bids_uri("bids::sub-01/anat/sub-01_T1w.nii.gz")
+u$dataset_name   # ""
+u$relative_path  # "sub-01/anat/sub-01_T1w.nii.gz"
+}

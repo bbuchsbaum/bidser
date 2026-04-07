@@ -8,6 +8,15 @@
 #' @return A tibble with one row per derivative pipeline and columns `pipeline`,
 #'   `root`, `description`, and `source`.
 #' @export
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds_path <- get_example_bids_dataset("ds000001-fmriprep")
+#'   proj <- bids_project(ds_path, fmriprep = TRUE)
+#'   derivative_pipelines(proj)
+#'   unlink(ds_path, recursive = TRUE)
+#' }, error = function(e) message("Example requires internet: ", e$message))
+#' }
 derivative_pipelines <- function(x) {
   if (!inherits(x, "bids_project")) {
     stop("`x` must be a `bids_project` object.")
@@ -27,6 +36,15 @@ derivative_pipelines <- function(x) {
 #' @param ... Additional arguments passed to [query_files()].
 #' @return Character vector of file paths (or tibble when `return = "tibble"`).
 #' @export
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds_path <- get_example_bids_dataset("ds000001-fmriprep")
+#'   proj <- bids_project(ds_path, fmriprep = TRUE)
+#'   df <- derivative_files(proj)
+#'   unlink(ds_path, recursive = TRUE)
+#' }, error = function(e) message("Example requires internet: ", e$message))
+#' }
 derivative_files <- function(x, pipeline = NULL, ...) {
   if (!inherits(x, "bids_project")) {
     stop("`x` must be a `bids_project` object.")
@@ -46,6 +64,16 @@ derivative_files <- function(x, pipeline = NULL, ...) {
 #' @param persist If `TRUE`, save the index to `x$index_path`.
 #' @return A tibble describing indexed files.
 #' @export
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   idx <- bids_index(proj, persist = FALSE)
+#'   print(idx)
+#'   unlink(ds001_path, recursive = TRUE)
+#' }, error = function(e) message("Example requires internet: ", e$message))
+#' }
 bids_index <- function(x, rebuild = FALSE, persist = TRUE) {
   if (!inherits(x, "bids_project")) {
     stop("`x` must be a `bids_project` object.")
@@ -217,6 +245,16 @@ bids_index <- function(x, rebuild = FALSE, persist = TRUE) {
 #' @return A tibble with one row per run and list-columns `scans`, `events`, and
 #'   `confounds` when available.
 #' @export
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   vt <- variables_table(proj)
+#'   print(vt)
+#'   unlink(ds001_path, recursive = TRUE)
+#' }, error = function(e) message("Example requires internet: ", e$message))
+#' }
 variables_table <- function(x, subid = ".*", task = ".*", run = ".*", session = ".*",
                             include = c("events", "confounds"),
                             scope = c("all", "raw", "derivatives"),
@@ -324,6 +362,15 @@ variables_table <- function(x, subid = ".*", task = ".*", run = ".*", session = 
 #' @param ... Additional arguments passed to [variables_table()].
 #' @return A list with report-ready summary tables and metadata.
 #' @export
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   rd <- bids_report_data(proj)
+#'   unlink(ds001_path, recursive = TRUE)
+#' }, error = function(e) message("Example requires internet: ", e$message))
+#' }
 bids_report_data <- function(x, ...) {
   if (!inherits(x, "bids_project")) {
     stop("`x` must be a `bids_project` object.")
@@ -381,6 +428,16 @@ bids_report_data <- function(x, ...) {
 #' @param ... Additional arguments passed to [bids_report_data()].
 #' @return An object of class `bids_report`.
 #' @export
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   rpt <- bids_report(proj)
+#'   print(rpt)
+#'   unlink(ds001_path, recursive = TRUE)
+#' }, error = function(e) message("Example requires internet: ", e$message))
+#' }
 bids_report <- function(x, ...) {
   structure(
     bids_report_data(x, ...),

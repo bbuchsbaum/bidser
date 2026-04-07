@@ -17,3 +17,14 @@ An object of class \code{bids_report}.
 \description{
 Create a lightweight text report for a BIDS project
 }
+\examples{
+\donttest{
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  rpt <- bids_report(proj)
+  print(rpt)
+  unlink(ds001_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+}
+}

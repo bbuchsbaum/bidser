@@ -18,3 +18,13 @@ Returns a tibble describing the derivative pipelines currently attached to a
 \code{bids_project}. This is the preferred inspection entry point for new code;
 legacy \code{fmriprep} / \code{prep_dir} fields remain available for compatibility.
 }
+\examples{
+\donttest{
+tryCatch({
+  ds_path <- get_example_bids_dataset("ds000001-fmriprep")
+  proj <- bids_project(ds_path, fmriprep = TRUE)
+  derivative_pipelines(proj)
+  unlink(ds_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+}
+}

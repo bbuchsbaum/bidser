@@ -22,6 +22,14 @@ Converts a \code{parser_spec} list (as returned by \code{\link{bids_datatype_spe
 or the internal \code{func_spec()} etc.) into a parser object suitable for
 passing to \code{\link{register_datatype}}.
 }
+\examples{
+spec <- bids_datatype_spec(
+  type     = "dwi",
+  entities = c("sub", "ses", "acq", "run"),
+  suffixes = list(dwi = c(".nii.gz", ".nii", ".bvec", ".bval", ".json"))
+)
+parser <- gen_parser(spec)
+}
 \seealso{
 \code{\link{bids_datatype_spec}}, \code{\link{register_datatype}}
 }

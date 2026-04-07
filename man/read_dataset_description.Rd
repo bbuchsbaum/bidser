@@ -23,3 +23,13 @@ A \code{bids_dataset_description} object, or NULL if the file is absent.
 \description{
 Read the dataset_description.json for a BIDS project
 }
+\examples{
+\donttest{
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  desc <- read_dataset_description(ds001_path)
+  print(desc)
+  unlink(ds001_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+}
+}

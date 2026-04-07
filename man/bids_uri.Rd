@@ -19,3 +19,12 @@ An object of class \code{bids_uri} with fields \code{dataset_name},
 Parses a BIDS URI string of the form \verb{bids:<dataset_name>:<relative_path>}
 and returns an S3 object of class \code{bids_uri}.
 }
+\examples{
+u <- bids_uri("bids::sub-01/func/sub-01_task-rest_bold.nii.gz")
+u$dataset_name   # ""
+u$relative_path  # "sub-01/func/sub-01_task-rest_bold.nii.gz"
+
+# URI with a named dataset link
+u2 <- bids_uri("bids:deriv1:sub-01/anat/sub-01_T1w.nii.gz")
+u2$dataset_name  # "deriv1"
+}

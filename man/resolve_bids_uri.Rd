@@ -27,3 +27,14 @@ A character scalar path (or URL for remote links).
 \description{
 Resolve a BIDS URI to a local or remote path
 }
+\examples{
+\donttest{
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  desc <- read_dataset_description(ds001_path)
+  uri <- bids_uri("bids::sub-01/anat/sub-01_T1w.nii.gz")
+  path <- resolve_bids_uri(uri, desc)
+  unlink(ds001_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+}
+}

@@ -22,3 +22,13 @@ A \code{bids_sessions_tsv} object inheriting from \code{tbl_df}, or NULL.
 \description{
 Read a sessions.tsv file for a subject
 }
+\examples{
+\donttest{
+tryCatch({
+  ds007_path <- get_example_bids_dataset("ds007")
+  proj <- bids_project(ds007_path)
+  sess <- read_sessions_tsv(proj, subid = "01")
+  unlink(ds007_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+}
+}

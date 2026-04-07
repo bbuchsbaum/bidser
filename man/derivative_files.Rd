@@ -21,3 +21,13 @@ Character vector of file paths (or tibble when \code{return = "tibble"}).
 Convenience wrapper around \code{\link[=query_files]{query_files()}} that restricts results to
 derivative pipelines.
 }
+\examples{
+\donttest{
+tryCatch({
+  ds_path <- get_example_bids_dataset("ds000001-fmriprep")
+  proj <- bids_project(ds_path, fmriprep = TRUE)
+  df <- derivative_files(proj)
+  unlink(ds_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+}
+}

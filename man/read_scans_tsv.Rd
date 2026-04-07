@@ -24,3 +24,13 @@ A \code{bids_scans_tsv} object inheriting from \code{tbl_df}, or NULL.
 \description{
 Read a scans.tsv file for a subject
 }
+\examples{
+\donttest{
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  scans <- read_scans_tsv(proj, subid = "01")
+  unlink(ds001_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+}
+}

@@ -15,3 +15,8 @@ is_bids_uri(x)
 \description{
 Test whether an object is a BIDS URI
 }
+\examples{
+u <- bids_uri("bids::sub-01/anat/sub-01_T1w.nii.gz")
+is_bids_uri(u)      # TRUE
+is_bids_uri("bids::sub-01/anat/sub-01_T1w.nii.gz")  # FALSE
+}

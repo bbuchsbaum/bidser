@@ -764,6 +764,16 @@ query_files <- function(x, ...) {
 #' @return A named list of metadata fields.
 #' @export
 #' @rdname get_metadata
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   f <- func_scans(proj, subid = "01")[1]
+#'   if (!is.null(f)) get_metadata(proj, f)
+#'   unlink(ds001_path, recursive = TRUE)
+#' }, error = function(e) message("Example requires internet: ", e$message))
+#' }
 get_metadata <- function(x, file, inherit = TRUE, scope = c("auto", "raw", "derivatives", "all"), ...) {
   UseMethod("get_metadata", x)
 }
@@ -912,6 +922,15 @@ get_data_matrix <- function(x, ...) {
 #' @return A `bids_dataset_description` object, or NULL if the file is absent.
 #' @export
 #' @rdname read_dataset_description
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   desc <- read_dataset_description(ds001_path)
+#'   print(desc)
+#'   unlink(ds001_path, recursive = TRUE)
+#' }, error = function(e) message("Example requires internet: ", e$message))
+#' }
 read_dataset_description <- function(x, ...) {
   UseMethod("read_dataset_description")
 }
@@ -944,6 +963,15 @@ license <- function(x, ...) UseMethod("license")
 #' @return A character scalar BIDS version string, or `NA_character_`.
 #' @export
 #' @rdname bids_version
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   desc <- read_dataset_description(ds001_path)
+#'   bids_version(desc)
+#'   unlink(ds001_path, recursive = TRUE)
+#' }, error = function(e) message("Example requires internet: ", e$message))
+#' }
 bids_version <- function(x, ...) {
   UseMethod("bids_version")
 }
@@ -955,6 +983,16 @@ bids_version <- function(x, ...) {
 #' @return A `bids_dataset_description` object, or NULL.
 #' @export
 #' @rdname dataset_description
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   desc <- dataset_description(proj)
+#'   print(desc)
+#'   unlink(ds001_path, recursive = TRUE)
+#' }, error = function(e) message("Example requires internet: ", e$message))
+#' }
 dataset_description <- function(x, ...) {
   UseMethod("dataset_description")
 }
@@ -966,6 +1004,15 @@ dataset_description <- function(x, ...) {
 #' @return A `bids_participants` object inheriting from `tbl_df`, or NULL.
 #' @export
 #' @rdname read_participants
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   pt <- read_participants(ds001_path)
+#'   print(pt)
+#'   unlink(ds001_path, recursive = TRUE)
+#' }, error = function(e) message("Example requires internet: ", e$message))
+#' }
 read_participants <- function(x, ...) {
   UseMethod("read_participants")
 }
@@ -979,6 +1026,15 @@ read_participants <- function(x, ...) {
 #' @return A `bids_scans_tsv` object inheriting from `tbl_df`, or NULL.
 #' @export
 #' @rdname read_scans_tsv
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   scans <- read_scans_tsv(proj, subid = "01")
+#'   unlink(ds001_path, recursive = TRUE)
+#' }, error = function(e) message("Example requires internet: ", e$message))
+#' }
 read_scans_tsv <- function(x, subid, session = NULL, ...) {
   UseMethod("read_scans_tsv")
 }
@@ -991,6 +1047,15 @@ read_scans_tsv <- function(x, subid, session = NULL, ...) {
 #' @return A `bids_sessions_tsv` object inheriting from `tbl_df`, or NULL.
 #' @export
 #' @rdname read_sessions_tsv
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds007_path <- get_example_bids_dataset("ds007")
+#'   proj <- bids_project(ds007_path)
+#'   sess <- read_sessions_tsv(proj, subid = "01")
+#'   unlink(ds007_path, recursive = TRUE)
+#' }, error = function(e) message("Example requires internet: ", e$message))
+#' }
 read_sessions_tsv <- function(x, subid, ...) {
   UseMethod("read_sessions_tsv")
 }
@@ -1002,6 +1067,15 @@ read_sessions_tsv <- function(x, subid, ...) {
 #' @return A named list of sidecar metadata, or an empty list if none.
 #' @export
 #' @rdname sidecar
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   pt <- read_participants(ds001_path)
+#'   sc <- sidecar(pt)
+#'   unlink(ds001_path, recursive = TRUE)
+#' }, error = function(e) message("Example requires internet: ", e$message))
+#' }
 sidecar <- function(x, ...) {
   UseMethod("sidecar")
 }
@@ -1013,6 +1087,10 @@ sidecar <- function(x, ...) {
 #' @return A `bids_uri` object.
 #' @export
 #' @rdname as_bids_uri
+#' @examples
+#' u <- as_bids_uri("bids::sub-01/anat/sub-01_T1w.nii.gz")
+#' u$dataset_name   # ""
+#' u$relative_path  # "sub-01/anat/sub-01_T1w.nii.gz"
 as_bids_uri <- function(x, ...) {
   UseMethod("as_bids_uri")
 }
@@ -1026,6 +1104,16 @@ as_bids_uri <- function(x, ...) {
 #' @return A character scalar path (or URL for remote links).
 #' @export
 #' @rdname resolve_bids_uri
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   desc <- read_dataset_description(ds001_path)
+#'   uri <- bids_uri("bids::sub-01/anat/sub-01_T1w.nii.gz")
+#'   path <- resolve_bids_uri(uri, desc)
+#'   unlink(ds001_path, recursive = TRUE)
+#' }, error = function(e) message("Example requires internet: ", e$message))
+#' }
 resolve_bids_uri <- function(uri, description, ..., must_exist = FALSE) {
   UseMethod("resolve_bids_uri", uri)
 }

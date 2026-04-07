@@ -11,6 +11,8 @@
 # Internal registry accessors
 # ---------------------------------------------------------------------------
 
+#' @keywords internal
+#' @noRd
 .bidser_get_registry <- function() {
   if (!exists(".bidser_registry", envir = bidser_pkg_env, inherits = FALSE)) {
     reg <- new.env(parent = emptyenv())

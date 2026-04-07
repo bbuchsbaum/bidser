@@ -20,3 +20,14 @@ A \code{bids_dataset_description} object, or NULL.
 \description{
 Get the dataset_description object from a BIDS project
 }
+\examples{
+\donttest{
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  desc <- dataset_description(proj)
+  print(desc)
+  unlink(ds001_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+}
+}

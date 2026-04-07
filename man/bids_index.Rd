@@ -21,3 +21,14 @@ Creates a lightweight on-disk index of files and parsed BIDS entities. The
 index is stored as an RDS file and does not change user-facing query
 semantics; it simply provides a cached tabular representation of the project.
 }
+\examples{
+\donttest{
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  idx <- bids_index(proj, persist = FALSE)
+  print(idx)
+  unlink(ds001_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+}
+}

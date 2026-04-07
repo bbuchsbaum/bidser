@@ -12,6 +12,13 @@
 #' @return A regex-based parser object.
 #' @seealso \code{\link{bids_datatype_spec}}, \code{\link{register_datatype}}
 #' @export
+#' @examples
+#' spec <- bids_datatype_spec(
+#'   type     = "dwi",
+#'   entities = c("sub", "ses", "acq", "run"),
+#'   suffixes = list(dwi = c(".nii.gz", ".nii", ".bvec", ".bval", ".json"))
+#' )
+#' parser <- gen_parser(spec)
 gen_parser <- function(spec, typename = "kind") {
   # Check input
   if (!is.list(spec) || !all(c("keystruc", "kinds", "type") %in% names(spec))) {

@@ -19,3 +19,13 @@ Produces a structured report payload composed from dataset summary,
 compliance checks, derivative pipeline discovery, and run-level variables
 coverage.
 }
+\examples{
+\donttest{
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  rd <- bids_report_data(proj)
+  unlink(ds001_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+}
+}

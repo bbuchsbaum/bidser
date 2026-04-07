@@ -23,3 +23,13 @@ A \code{bids_participants} object inheriting from \code{tbl_df}, or NULL.
 \description{
 Read participants.tsv as a typed tabular object
 }
+\examples{
+\donttest{
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  pt <- read_participants(ds001_path)
+  print(pt)
+  unlink(ds001_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+}
+}

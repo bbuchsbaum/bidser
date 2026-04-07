@@ -45,3 +45,14 @@ run-level tibble with normalized identifiers and nested list-columns. This is
 a lightweight variables layer for downstream R workflows rather than a full
 model-spec engine.
 }
+\examples{
+\donttest{
+tryCatch({
+  ds001_path <- get_example_bids_dataset("ds001")
+  proj <- bids_project(ds001_path)
+  vt <- variables_table(proj)
+  print(vt)
+  unlink(ds001_path, recursive = TRUE)
+}, error = function(e) message("Example requires internet: ", e$message))
+}
+}
