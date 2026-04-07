@@ -38,7 +38,7 @@ tryCatch({
   print(pt)
   unlink(ds001_path, recursive = TRUE)
 }, error = function(e) message("Example requires internet: ", e$message))
-#> <bids_participants> /tmp/Rtmp3Iz8RC/bids_example_ds001/participants.tsv (16 rows x 3 cols, sidecar: yes)
+#> <bids_participants> /tmp/RtmpFX03lG/bids_example_ds001/participants.tsv (16 rows x 3 cols, sidecar: yes)
 #> # A tibble: 16 × 3
 #>    participant_id sex     age
 #>  * <chr>          <chr> <dbl>
