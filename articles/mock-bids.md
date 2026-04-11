@@ -80,7 +80,7 @@ mock_proj
 #> Datatypes:  func 
 #> Suffixes:  nii.gz, tsv 
 #> BIDS Keys:  (none) 
-#> Path:  /tmp/Rtmp6TGXfR/bidser-mock-6b0732d63175
+#> Path:  /tmp/RtmpDo6ng5/bidser-mock-6be86fc49822
 
 stopifnot(file.exists(file.path(mock_dir, "participants.tsv")))
 ```
@@ -199,13 +199,13 @@ archive_contents <- list_pack_bids(packed, verbose = FALSE)
 archive_contents %>%
   select(file, type, is_stub) %>%
   head()
-#>                                                                                              file
-#> 1                                                               RestMock/dataset_description.json
-#> 2                   RestMock/derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz
-#> 3 RestMock/derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_desc-confounds_timeseries.tsv
-#> 4                                                                       RestMock/participants.tsv
-#> 5                                        RestMock/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz
-#> 6                                         RestMock/sub-01/func/sub-01_task-rest_run-01_events.tsv
+#>                                                                                                                file
+#> 1                                                               RestMock_pack_6be832cf8dae/dataset_description.json
+#> 2                   RestMock_pack_6be832cf8dae/derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz
+#> 3 RestMock_pack_6be832cf8dae/derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_desc-confounds_timeseries.tsv
+#> 4                                                                       RestMock_pack_6be832cf8dae/participants.tsv
+#> 5                                        RestMock_pack_6be832cf8dae/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz
+#> 6                                         RestMock_pack_6be832cf8dae/sub-01/func/sub-01_task-rest_run-01_events.tsv
 #>           type is_stub
 #> 1         json   FALSE
 #> 2 imaging_stub    TRUE

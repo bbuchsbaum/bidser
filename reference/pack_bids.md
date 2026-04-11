@@ -195,7 +195,24 @@ tryCatch({
 #>   - 55 metadata/other files
 #> 
 #> Processing metadata and supporting files...
-#> Warning: Failed to create archive: file can not be copied both 'from' and 'to'
+#>   Processed 50/55 metadata files (copied: 50, stubbed: 0, excluded: 0)
+#>   Processed 55/55 metadata files (copied: 55, stubbed: 0, excluded: 0)
+#>   Final: 55 copied, 0 stubbed (size), 0 excluded (pattern)
+#> 
+#> Creating stub files for 80 imaging files...
+#>   Created 50/80 stub files
+#>   Created 80/80 stub files
+#> 
+#> Creating archive...
+#> 
+#> === pack_bids Complete ===
+#> Archive created: bids_example_ds001_metadata.tar.gz
+#> Archive size: 0.07 MB
+#> 
+#> Timing:
+#>   Archive creation: 0.0 seconds
+#>   Total time: 0.1 seconds
+#> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 1.00 MB
 #> 
 #> === Starting pack_bids ===
@@ -207,18 +224,125 @@ tryCatch({
 #> Exclude pattern: \.h5$
 #> 
 #> Creating temporary copy of BIDS project...
-#>   - 0 imaging files (.nii/.nii.gz)
-#>   - 0 metadata/other files
+#> 
+#> Found 135 total files to process
+#>   - 80 imaging files (.nii/.nii.gz)
+#>   - 55 metadata/other files
+#> 
+#> Processing metadata and supporting files...
+#>   Processed 50/55 metadata files (copied: 50, stubbed: 0, excluded: 0)
+#>   Processed 55/55 metadata files (copied: 55, stubbed: 0, excluded: 0)
+#>   Final: 55 copied, 0 stubbed (size), 0 excluded (pattern)
+#> 
+#> Creating stub files for 80 imaging files...
+#>   Created 50/80 stub files
+#>   Created 80/80 stub files
 #> 
 #> Creating archive...
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-02/func/sub-02_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-02/func/sub-02_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-02/func/sub-02_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-03/func/sub-03_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-03/func/sub-03_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-03/func/sub-03_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-04/func/sub-04_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-04/func/sub-04_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-04/func/sub-04_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-05/func/sub-05_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-05/func/sub-05_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-05/func/sub-05_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-06/func/sub-06_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-06/func/sub-06_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-06/func/sub-06_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-07/func/sub-07_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-07/func/sub-07_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-07/func/sub-07_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-08/func/sub-08_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-08/func/sub-08_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-08/func/sub-08_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-09/func/sub-09_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-09/func/sub-09_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-09/func/sub-09_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-10/func/sub-10_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-10/func/sub-10_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-10/func/sub-10_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-11/func/sub-11_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-11/func/sub-11_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-11/func/sub-11_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-12/func/sub-12_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-12/func/sub-12_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-12/func/sub-12_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-13/func/sub-13_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-13/func/sub-13_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-13/func/sub-13_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-14/func/sub-14_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-14/func/sub-14_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-14/func/sub-14_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-15/func/sub-15_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-15/func/sub-15_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-15/func/sub-15_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-16/func/sub-16_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-16/func/sub-16_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b44dc4e81d/sub-16/func/sub-16_task-balloonanalogrisktask_run-03_bold.nii.gz’
 #> 
 #> === pack_bids Complete ===
 #> Archive created: ds001_filtered.tar.gz
-#> Archive size: 0.00 MB
+#> Archive size: 0.07 MB
 #> 
 #> Timing:
-#>   Archive creation: 0.0 seconds
-#>   Total time: 0.0 seconds
+#>   Archive creation: 0.1 seconds
+#>   Total time: 0.1 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 10.00 MB
 #> 
@@ -230,19 +354,140 @@ tryCatch({
 #> Max file size: 10.00 MB
 #> 
 #> Creating temporary copy of BIDS project...
-#>   - 0 imaging files (.nii/.nii.gz)
-#>   - 0 metadata/other files
+#> 
+#> Found 135 total files to process
+#>   - 80 imaging files (.nii/.nii.gz)
+#>   - 55 metadata/other files
+#> 
+#> Processing metadata and supporting files...
+#>   Processed 50/55 metadata files (copied: 50, stubbed: 0, excluded: 0)
+#>   Processed 55/55 metadata files (copied: 55, stubbed: 0, excluded: 0)
+#>   Final: 55 copied, 0 stubbed (size), 0 excluded (pattern)
+#> 
+#> Processing 80 imaging files for downsampling...
+#>   Target reduction: 4.00x (factor: 0.25)
+#>   Using sequential processing
+#>   Processing file 1/80: sub-01_T1w.nii.gz
+#>   Processing file 10/80: sub-02_task-balloonanalogrisktask_run-03_bold.nii.gz
+#>   Processing file 20/80: sub-04_task-balloonanalogrisktask_run-03_bold.nii.gz
+#>   Processing file 30/80: sub-06_task-balloonanalogrisktask_run-03_bold.nii.gz
+#>   Processing file 40/80: sub-08_task-balloonanalogrisktask_run-03_bold.nii.gz
+#>   Processing file 50/80: sub-10_task-balloonanalogrisktask_run-03_bold.nii.gz
+#>   Processing file 60/80: sub-12_task-balloonanalogrisktask_run-03_bold.nii.gz
+#>   Processing file 70/80: sub-14_task-balloonanalogrisktask_run-03_bold.nii.gz
+#>   Processing file 80/80: sub-16_task-balloonanalogrisktask_run-03_bold.nii.gz
+#> 
+#> Downsampling complete:
+#>   Successfully downsampled: 0 files
+#>   Created stubs for 80 files (downsampling failed)
+#>   Time taken: 0.1 seconds
 #> 
 #> Creating archive...
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-02/func/sub-02_task-balloonanalogrisktask_run-01_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-02/func/sub-02_task-balloonanalogrisktask_run-02_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-02/func/sub-02_task-balloonanalogrisktask_run-03_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-03/func/sub-03_task-balloonanalogrisktask_run-01_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-03/func/sub-03_task-balloonanalogrisktask_run-02_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-03/func/sub-03_task-balloonanalogrisktask_run-03_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-04/func/sub-04_task-balloonanalogrisktask_run-01_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-04/func/sub-04_task-balloonanalogrisktask_run-02_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-04/func/sub-04_task-balloonanalogrisktask_run-03_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-05/func/sub-05_task-balloonanalogrisktask_run-01_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-05/func/sub-05_task-balloonanalogrisktask_run-02_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-05/func/sub-05_task-balloonanalogrisktask_run-03_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-06/func/sub-06_task-balloonanalogrisktask_run-01_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-06/func/sub-06_task-balloonanalogrisktask_run-02_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-06/func/sub-06_task-balloonanalogrisktask_run-03_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-07/func/sub-07_task-balloonanalogrisktask_run-01_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-07/func/sub-07_task-balloonanalogrisktask_run-02_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-07/func/sub-07_task-balloonanalogrisktask_run-03_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-08/func/sub-08_task-balloonanalogrisktask_run-01_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-08/func/sub-08_task-balloonanalogrisktask_run-02_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-08/func/sub-08_task-balloonanalogrisktask_run-03_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-09/func/sub-09_task-balloonanalogrisktask_run-01_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-09/func/sub-09_task-balloonanalogrisktask_run-02_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-09/func/sub-09_task-balloonanalogrisktask_run-03_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-10/func/sub-10_task-balloonanalogrisktask_run-01_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-10/func/sub-10_task-balloonanalogrisktask_run-02_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-10/func/sub-10_task-balloonanalogrisktask_run-03_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-11/func/sub-11_task-balloonanalogrisktask_run-01_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-11/func/sub-11_task-balloonanalogrisktask_run-02_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-11/func/sub-11_task-balloonanalogrisktask_run-03_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-12/func/sub-12_task-balloonanalogrisktask_run-01_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-12/func/sub-12_task-balloonanalogrisktask_run-02_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-12/func/sub-12_task-balloonanalogrisktask_run-03_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-13/func/sub-13_task-balloonanalogrisktask_run-01_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-13/func/sub-13_task-balloonanalogrisktask_run-02_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-13/func/sub-13_task-balloonanalogrisktask_run-03_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-14/func/sub-14_task-balloonanalogrisktask_run-01_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-14/func/sub-14_task-balloonanalogrisktask_run-02_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-14/func/sub-14_task-balloonanalogrisktask_run-03_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-15/func/sub-15_task-balloonanalogrisktask_run-01_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-15/func/sub-15_task-balloonanalogrisktask_run-02_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-15/func/sub-15_task-balloonanalogrisktask_run-03_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-16/func/sub-16_task-balloonanalogrisktask_run-01_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-16/func/sub-16_task-balloonanalogrisktask_run-02_res-low4x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b4293c422a/sub-16/func/sub-16_task-balloonanalogrisktask_run-03_res-low4x_bold.nii.gz’
 #> 
 #> === pack_bids Complete ===
 #> Archive created: ds001_low4x.tar.gz
-#> Archive size: 0.00 MB
+#> Archive size: 0.07 MB
 #> Expected size reduction: ~64.0x for 3D, ~64.0x for 4D
 #> 
 #> Timing:
-#>   Archive creation: 0.0 seconds
-#>   Total time: 0.0 seconds
+#>   Archive creation: 0.1 seconds
+#>   Total time: 0.2 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 10.00 MB
 #> Using parallel processing with 2 cores for downsampling
@@ -256,19 +501,133 @@ tryCatch({
 #> Max file size: 10.00 MB
 #> 
 #> Creating temporary copy of BIDS project...
-#>   - 0 imaging files (.nii/.nii.gz)
-#>   - 0 metadata/other files
+#> 
+#> Found 135 total files to process
+#>   - 80 imaging files (.nii/.nii.gz)
+#>   - 55 metadata/other files
+#> 
+#> Processing metadata and supporting files...
+#>   Processed 50/55 metadata files (copied: 50, stubbed: 0, excluded: 0)
+#>   Processed 55/55 metadata files (copied: 55, stubbed: 0, excluded: 0)
+#>   Final: 55 copied, 0 stubbed (size), 0 excluded (pattern)
+#> 
+#> Processing 80 imaging files for downsampling...
+#>   Target reduction: 2.00x (factor: 0.50)
+#>   Using parallel processing with 2 workers
+#>   Starting parallel processing of 80 files...
+#>   (Progress updates not available in parallel mode)
+#> 
+#> Downsampling complete:
+#>   Successfully downsampled: 0 files
+#>   Created stubs for 80 files (downsampling failed)
+#>   Time taken: 4.5 seconds
 #> 
 #> Creating archive...
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-02/func/sub-02_task-balloonanalogrisktask_run-01_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-02/func/sub-02_task-balloonanalogrisktask_run-02_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-02/func/sub-02_task-balloonanalogrisktask_run-03_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-03/func/sub-03_task-balloonanalogrisktask_run-01_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-03/func/sub-03_task-balloonanalogrisktask_run-02_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-03/func/sub-03_task-balloonanalogrisktask_run-03_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-04/func/sub-04_task-balloonanalogrisktask_run-01_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-04/func/sub-04_task-balloonanalogrisktask_run-02_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-04/func/sub-04_task-balloonanalogrisktask_run-03_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-05/func/sub-05_task-balloonanalogrisktask_run-01_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-05/func/sub-05_task-balloonanalogrisktask_run-02_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-05/func/sub-05_task-balloonanalogrisktask_run-03_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-06/func/sub-06_task-balloonanalogrisktask_run-01_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-06/func/sub-06_task-balloonanalogrisktask_run-02_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-06/func/sub-06_task-balloonanalogrisktask_run-03_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-07/func/sub-07_task-balloonanalogrisktask_run-01_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-07/func/sub-07_task-balloonanalogrisktask_run-02_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-07/func/sub-07_task-balloonanalogrisktask_run-03_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-08/func/sub-08_task-balloonanalogrisktask_run-01_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-08/func/sub-08_task-balloonanalogrisktask_run-02_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-08/func/sub-08_task-balloonanalogrisktask_run-03_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-09/func/sub-09_task-balloonanalogrisktask_run-01_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-09/func/sub-09_task-balloonanalogrisktask_run-02_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-09/func/sub-09_task-balloonanalogrisktask_run-03_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-10/func/sub-10_task-balloonanalogrisktask_run-01_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-10/func/sub-10_task-balloonanalogrisktask_run-02_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-10/func/sub-10_task-balloonanalogrisktask_run-03_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-11/func/sub-11_task-balloonanalogrisktask_run-01_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-11/func/sub-11_task-balloonanalogrisktask_run-02_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-11/func/sub-11_task-balloonanalogrisktask_run-03_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-12/func/sub-12_task-balloonanalogrisktask_run-01_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-12/func/sub-12_task-balloonanalogrisktask_run-02_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-12/func/sub-12_task-balloonanalogrisktask_run-03_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-13/func/sub-13_task-balloonanalogrisktask_run-01_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-13/func/sub-13_task-balloonanalogrisktask_run-02_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-13/func/sub-13_task-balloonanalogrisktask_run-03_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-14/func/sub-14_task-balloonanalogrisktask_run-01_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-14/func/sub-14_task-balloonanalogrisktask_run-02_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-14/func/sub-14_task-balloonanalogrisktask_run-03_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-15/func/sub-15_task-balloonanalogrisktask_run-01_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-15/func/sub-15_task-balloonanalogrisktask_run-02_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-15/func/sub-15_task-balloonanalogrisktask_run-03_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-16/func/sub-16_task-balloonanalogrisktask_run-01_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-16/func/sub-16_task-balloonanalogrisktask_run-02_res-low2x_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b468eee58/sub-16/func/sub-16_task-balloonanalogrisktask_run-03_res-low2x_bold.nii.gz’
 #> 
 #> === pack_bids Complete ===
 #> Archive created: ds001_low2x.tar.gz
-#> Archive size: 0.00 MB
+#> Archive size: 0.07 MB
 #> Expected size reduction: ~8.0x for 3D, ~8.0x for 4D
 #> 
 #> Timing:
-#>   Archive creation: 0.0 seconds
-#>   Total time: 0.0 seconds
+#>   Archive creation: 0.1 seconds
+#>   Total time: 4.9 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 10.00 MB
 #> 
@@ -280,11 +639,30 @@ tryCatch({
 #> Max file size: 10.00 MB
 #> 
 #> Creating temporary copy of BIDS project...
-#>   - 0 imaging files (.nii/.nii.gz)
-#>   - 0 metadata/other files
+#> 
+#> Found 135 total files to process
+#>   - 80 imaging files (.nii/.nii.gz)
+#>   - 55 metadata/other files
+#> 
+#> Processing metadata and supporting files...
+#>   Processed 50/55 metadata files (copied: 50, stubbed: 0, excluded: 0)
+#>   Processed 55/55 metadata files (copied: 55, stubbed: 0, excluded: 0)
+#>   Final: 55 copied, 0 stubbed (size), 0 excluded (pattern)
+#> 
+#> Creating stub files for 80 imaging files...
+#>   Created 50/80 stub files
+#>   Created 80/80 stub files
 #> 
 #> Creating archive...
-#> Warning: No files found to archive
+#> 
+#> === pack_bids Complete ===
+#> Archive created: ds001_metadata.zip
+#> Archive size: 0.11 MB
+#> 
+#> Timing:
+#>   Archive creation: 0.0 seconds
+#>   Total time: 0.1 seconds
+#> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 10.00 MB
 #> 
 #> === Starting pack_bids ===
@@ -295,18 +673,125 @@ tryCatch({
 #> Max file size: 10.00 MB
 #> 
 #> Creating temporary copy of BIDS project...
-#>   - 0 imaging files (.nii/.nii.gz)
-#>   - 0 metadata/other files
+#> 
+#> Found 135 total files to process
+#>   - 80 imaging files (.nii/.nii.gz)
+#>   - 55 metadata/other files
+#> 
+#> Processing metadata and supporting files...
+#>   Processed 50/55 metadata files (copied: 50, stubbed: 0, excluded: 0)
+#>   Processed 55/55 metadata files (copied: 55, stubbed: 0, excluded: 0)
+#>   Final: 55 copied, 0 stubbed (size), 0 excluded (pattern)
+#> 
+#> Creating stub files for 80 imaging files...
+#>   Created 50/80 stub files
+#>   Created 80/80 stub files
 #> 
 #> Creating archive...
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-02/func/sub-02_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-02/func/sub-02_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-02/func/sub-02_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-03/func/sub-03_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-03/func/sub-03_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-03/func/sub-03_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-04/func/sub-04_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-04/func/sub-04_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-04/func/sub-04_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-05/func/sub-05_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-05/func/sub-05_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-05/func/sub-05_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-06/func/sub-06_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-06/func/sub-06_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-06/func/sub-06_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-07/func/sub-07_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-07/func/sub-07_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-07/func/sub-07_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-08/func/sub-08_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-08/func/sub-08_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-08/func/sub-08_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-09/func/sub-09_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-09/func/sub-09_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-09/func/sub-09_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-10/func/sub-10_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-10/func/sub-10_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-10/func/sub-10_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-11/func/sub-11_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-11/func/sub-11_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-11/func/sub-11_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-12/func/sub-12_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-12/func/sub-12_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-12/func/sub-12_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-13/func/sub-13_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-13/func/sub-13_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-13/func/sub-13_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-14/func/sub-14_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-14/func/sub-14_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-14/func/sub-14_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-15/func/sub-15_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-15/func/sub-15_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-15/func/sub-15_task-balloonanalogrisktask_run-03_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-16/func/sub-16_task-balloonanalogrisktask_run-01_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-16/func/sub-16_task-balloonanalogrisktask_run-02_bold.nii.gz’
+#> Warning: storing paths of more than 100 bytes is not portable:
+#>   ‘bids_example_ds001_pack_21b41bfcba47/sub-16/func/sub-16_task-balloonanalogrisktask_run-03_bold.nii.gz’
 #> 
 #> === pack_bids Complete ===
 #> Archive created: bids_example_ds001_metadata.tar.gz
-#> Archive size: 0.00 MB
+#> Archive size: 0.07 MB
 #> 
 #> Timing:
-#>   Archive creation: 0.0 seconds
-#>   Total time: 0.0 seconds
+#>   Archive creation: 0.1 seconds
+#>   Total time: 0.1 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 10.00 MB
 #> 
@@ -318,6 +803,31 @@ tryCatch({
 #> Max file size: 10.00 MB
 #> 
 #> Creating temporary copy of BIDS project...
-#> Warning: Failed to create archive: invalid subscript type 'list'
+#> 
+#> Filtered out 2 non-BIDS files (strict mode)
+#> 
+#> Found 133 total files to process
+#>   - 80 imaging files (.nii/.nii.gz)
+#>   - 53 metadata/other files
+#> 
+#> Processing metadata and supporting files...
+#>   Processed 50/53 metadata files (copied: 50, stubbed: 0, excluded: 0)
+#>   Processed 53/53 metadata files (copied: 53, stubbed: 0, excluded: 0)
+#>   Final: 53 copied, 0 stubbed (size), 0 excluded (pattern)
+#> 
+#> Creating stub files for 80 imaging files...
+#>   Created 50/80 stub files
+#>   Created 80/80 stub files
+#> 
+#> Creating archive...
+#> 
+#> === pack_bids Complete ===
+#> Archive created: ds001_strict.tar.gz
+#> Archive size: 0.07 MB
+#> 
+#> Timing:
+#>   Archive creation: 0.0 seconds
+#>   Total time: 0.5 seconds
+#> Temporary files cleaned up
 # }
 ```

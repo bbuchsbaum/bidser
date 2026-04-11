@@ -106,8 +106,124 @@ showing file sizes and identifying which files are stubs.</p>
 <span class="r-in"><span><span class="op">}</span>, error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Example failed: "</span>, <span class="va">e</span><span class="op">$</span><span class="va">message</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Failed to create archive: file can not be copied both 'from' and 'to'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Example failed: invalid 'file' argument</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-02/func/sub-02_task-balloonanalogrisktask_run-01_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-02/func/sub-02_task-balloonanalogrisktask_run-02_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-02/func/sub-02_task-balloonanalogrisktask_run-03_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-03/func/sub-03_task-balloonanalogrisktask_run-01_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-03/func/sub-03_task-balloonanalogrisktask_run-02_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-03/func/sub-03_task-balloonanalogrisktask_run-03_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-04/func/sub-04_task-balloonanalogrisktask_run-01_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-04/func/sub-04_task-balloonanalogrisktask_run-02_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-04/func/sub-04_task-balloonanalogrisktask_run-03_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-05/func/sub-05_task-balloonanalogrisktask_run-01_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-05/func/sub-05_task-balloonanalogrisktask_run-02_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-05/func/sub-05_task-balloonanalogrisktask_run-03_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-06/func/sub-06_task-balloonanalogrisktask_run-01_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-06/func/sub-06_task-balloonanalogrisktask_run-02_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-06/func/sub-06_task-balloonanalogrisktask_run-03_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-07/func/sub-07_task-balloonanalogrisktask_run-01_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-07/func/sub-07_task-balloonanalogrisktask_run-02_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-07/func/sub-07_task-balloonanalogrisktask_run-03_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-08/func/sub-08_task-balloonanalogrisktask_run-01_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-08/func/sub-08_task-balloonanalogrisktask_run-02_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-08/func/sub-08_task-balloonanalogrisktask_run-03_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-09/func/sub-09_task-balloonanalogrisktask_run-01_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-09/func/sub-09_task-balloonanalogrisktask_run-02_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-09/func/sub-09_task-balloonanalogrisktask_run-03_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-10/func/sub-10_task-balloonanalogrisktask_run-01_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-10/func/sub-10_task-balloonanalogrisktask_run-02_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-10/func/sub-10_task-balloonanalogrisktask_run-03_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-11/func/sub-11_task-balloonanalogrisktask_run-01_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-11/func/sub-11_task-balloonanalogrisktask_run-02_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-11/func/sub-11_task-balloonanalogrisktask_run-03_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-12/func/sub-12_task-balloonanalogrisktask_run-01_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-12/func/sub-12_task-balloonanalogrisktask_run-02_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-12/func/sub-12_task-balloonanalogrisktask_run-03_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-13/func/sub-13_task-balloonanalogrisktask_run-01_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-13/func/sub-13_task-balloonanalogrisktask_run-02_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-13/func/sub-13_task-balloonanalogrisktask_run-03_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-14/func/sub-14_task-balloonanalogrisktask_run-01_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-14/func/sub-14_task-balloonanalogrisktask_run-02_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-14/func/sub-14_task-balloonanalogrisktask_run-03_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-15/func/sub-15_task-balloonanalogrisktask_run-01_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-15/func/sub-15_task-balloonanalogrisktask_run-02_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-15/func/sub-15_task-balloonanalogrisktask_run-03_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-16/func/sub-16_task-balloonanalogrisktask_run-01_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-16/func/sub-16_task-balloonanalogrisktask_run-02_bold.nii.gz’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>storing paths of more than 100 bytes is not portable:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   ‘bids_example_ds001_pack_21b427729b33/sub-16/func/sub-16_task-balloonanalogrisktask_run-03_bold.nii.gz’</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Archive contents summary:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Total files: 135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Stub imaging files: 80</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Downsampled imaging files: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Metadata files (JSON): 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Data files (TSV): 49</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Other files: 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Total size: 0.40 MB</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                                     file</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                                     bids_example_ds001_pack_21b427729b33/sub-01/anat/sub-01_T1w.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                               bids_example_ds001_pack_21b427729b33/sub-01/anat/sub-01_inplaneT2.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  bids_example_ds001_pack_21b427729b33/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 bids_example_ds001_pack_21b427729b33/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 bids_example_ds001_pack_21b427729b33/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15                                    bids_example_ds001_pack_21b427729b33/sub-02/anat/sub-02_T1w.nii.gz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    size is_stub is_downsampled         type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7     0    TRUE          FALSE imaging_stub</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8     0    TRUE          FALSE imaging_stub</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9     0    TRUE          FALSE imaging_stub</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11    0    TRUE          FALSE imaging_stub</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13    0    TRUE          FALSE imaging_stub</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15    0    TRUE          FALSE imaging_stub</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
