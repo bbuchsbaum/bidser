@@ -24,6 +24,12 @@ jobs:
             any::digest
             any::desc
 
+      - name: Fetch EcoAtlas tools from eco-oracle
+        run: |
+          mkdir -p tools
+          curl -sL https://raw.githubusercontent.com/bbuchsbaum/eco-oracle/main/tools/eco_atlas_extract.R -o tools/eco_atlas_extract.R
+          curl -sL https://raw.githubusercontent.com/bbuchsbaum/eco-oracle/main/tools/eco_atlas_distill.mjs -o tools/eco_atlas_distill.mjs
+
       - name: Build EcoAtlas snippet/symbol packs
         env:
           ECO_ATLAS_OUT: atlas
