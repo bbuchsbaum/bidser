@@ -148,6 +148,55 @@ generate_bids_path <- function(subid, session = NULL, datatype, fmriprep = FALSE
 }
 
 #' @keywords internal
+#' @noRd
+mock_bids_suffix_candidates <- function(suffix) {
+  if (is.null(suffix) || is.na(suffix) || suffix == "") {
+    return(character())
+  }
+
+  suffix <- as.character(suffix)
+  if (grepl("\\.", suffix)) {
+    return(suffix)
+  }
+
+  unique(c(
+    suffix,
+    paste0(suffix, ".nii.gz"),
+    paste0(suffix, ".tsv"),
+    paste0(suffix, ".json"),
+    paste0(suffix, ".h5")
+  ))
+}
+
+#' @keywords internal
+#' @noRd
+canonicalize_mock_data_paths <- function(data, generated_paths, prep_dir = NULL) {
+  if (length(data) == 0) {
+    return(data)
+  }
+
+  data_names <- names(data)
+  canonical_names <- data_names
+
+  for (i in seq_along(data_names)) {
+    original_name <- data_names[[i]]
+    if (original_name %in% generated_paths) {
+      next
+    }
+
+    if (!is.null(prep_dir) && !startsWith(original_name, paste0(prep_dir, "/"))) {
+      prefixed_name <- file.path(prep_dir, original_name)
+      if (prefixed_name %in% generated_paths) {
+        canonical_names[[i]] <- prefixed_name
+      }
+    }
+  }
+
+  names(data) <- canonical_names
+  data
+}
+
+#' @keywords internal
 mock_key_match <- function(node_attrs, filters, default = FALSE) {
   # No longer uses ..., takes filters list directly
   if (length(filters) == 0) {
@@ -516,12 +565,47 @@ create_mock_bids <- function(project_name,
       }
     }
 
-    # Generate filename and path
-    filename <- tryCatch({
+    # Generate filename and normalize shorthand suffixes like "bold" or "events".
+    suffix_candidates <- mock_bids_suffix_candidates(row$suffix)
+    filename <- NULL
+    encoded_entities <- NULL
+    chosen_suffix <- row$suffix
+
+    for (suffix_candidate in suffix_candidates) {
+      entities_try <- entities_clean
+      entities_try$suffix <- suffix_candidate
+
+      candidate_filename <- tryCatch({
+        rlang::exec(generate_bids_filename, !!!entities_try)
+      }, error = function(e) {
+        NULL
+      })
+
+      if (is.null(candidate_filename)) {
+        next
+      }
+
+      candidate_encoded <- tryCatch({
+        bidser::encode(candidate_filename)
+      }, error = function(e) {
+        NULL
+      })
+
+      if (!is.null(candidate_encoded)) {
+        filename <- candidate_filename
+        encoded_entities <- candidate_encoded
+        chosen_suffix <- suffix_candidate
+        break
+      }
+    }
+
+    if (is.null(filename)) {
+      filename <- tryCatch({
         rlang::exec(generate_bids_filename, !!!entities_clean)
-    }, error = function(e) {
+      }, error = function(e) {
         abort(paste("Error generating filename for row", i, ":", e$message))
-    })
+      })
+    }
 
     relative_dir <- generate_bids_path(
       subid = row$subid,
@@ -534,9 +618,10 @@ create_mock_bids <- function(project_name,
 
     # Use bidser::encode to get canonical entities (important!)
     # Call directly and handle any errors
-    encoded_entities <- tryCatch({
+    if (is.null(encoded_entities)) {
+      encoded_entities <- tryCatch({
         bidser::encode(filename)
-    }, error = function(e) {
+      }, error = function(e) {
         warn(paste("Could not encode generated filename:", filename, " - May impact querying. Error:", e$message))
         # Fallback: use entities from file_structure row directly with standardized names
         fallback_entities <- list(
@@ -558,21 +643,21 @@ create_mock_bids <- function(project_name,
             fallback_entities$kind <- row$kind
         } else {
             # Try to guess kind from suffix
-            if (grepl("bold", row$suffix, ignore.case = TRUE)) {
+            if (grepl("bold", chosen_suffix, ignore.case = TRUE)) {
                 fallback_entities$kind <- "bold"
                 fallback_entities$suffix <- "bold" # Extract BIDS suffix part
             } 
-            else if (grepl("T1w", row$suffix, ignore.case = TRUE)) {
+            else if (grepl("T1w", chosen_suffix, ignore.case = TRUE)) {
                 fallback_entities$kind <- "T1w"
                 fallback_entities$suffix <- "T1w"
             } 
-            else if (grepl("events.tsv", row$suffix, fixed=TRUE)) {
+            else if (grepl("events.tsv", chosen_suffix, fixed=TRUE)) {
                 fallback_entities$kind <- "events"
                 fallback_entities$suffix <- "events"
             }
             else {
                 # Default: try to extract suffix without extension
-                suffix_part <- sub("\\.[^.]*$", "", row$suffix)
+                suffix_part <- sub("\\.[^.]*$", "", chosen_suffix)
                 fallback_entities$suffix <- suffix_part
                 fallback_entities$kind <- suffix_part
             }
@@ -583,7 +668,8 @@ create_mock_bids <- function(project_name,
         fallback_entities <- fallback_entities[!sapply(fallback_entities, is.na)]
                 
         return(fallback_entities)
-    })
+      })
+    }
 
     if (is.null(encoded_entities)) {
        warn(paste("Encoding failed for:", filename, "- skipping this file in mock tree."))
@@ -652,16 +738,17 @@ create_mock_bids <- function(project_name,
     }
 
     # Track generated event and confound file paths
-    if (isTRUE(endsWith(row$suffix, "events.tsv"))) {
+    if (isTRUE(endsWith(chosen_suffix, "events.tsv"))) {
         generated_event_paths <- c(generated_event_paths, relative_path)
     }
-    if (grepl("(confounds|regressors|timeseries)", row$suffix) && endsWith(row$suffix, ".tsv")) {
+    if (grepl("(confounds|regressors|timeseries)", chosen_suffix) && endsWith(chosen_suffix, ".tsv")) {
         generated_confound_paths <- c(generated_confound_paths, relative_path)
     }
 
   } # End loop through file_structure
 
   # --- Validate Event Data ---
+  event_data <- canonicalize_mock_data_paths(event_data, generated_event_paths)
   event_data_names <- names(event_data)
   mismatched_event_paths <- event_data_names[!event_data_names %in% generated_event_paths]
   if (length(mismatched_event_paths) > 0) {
@@ -674,6 +761,7 @@ create_mock_bids <- function(project_name,
   event_data_store <- lapply(event_data, tibble::as_tibble)
 
   # --- Validate Confound Data ---
+  confound_data <- canonicalize_mock_data_paths(confound_data, generated_confound_paths, prep_dir = prep_dir)
   confound_data_names <- names(confound_data)
   mismatched_confound_paths <- confound_data_names[!confound_data_names %in% generated_confound_paths]
   if (length(mismatched_confound_paths) > 0) {
