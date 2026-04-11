@@ -171,6 +171,47 @@ test_that("pack_bids handles cleanup option", {
   unlink(temp_bids_dir, recursive = TRUE)
 })
 
+test_that("pack_bids uses an isolated temp copy when source lives in temp_dir", {
+  participants_df <- tibble::tibble(participant_id = "01")
+  file_structure_df <- tibble::tribble(
+    ~subid, ~datatype, ~suffix,       ~fmriprep,
+    "01",   "func",    "bold.nii.gz", FALSE
+  )
+
+  temp_bids_dir <- tempfile("mock_bids_")
+  proj <- create_mock_bids(
+    project_name = "TempCollisionProject",
+    participants = participants_df,
+    file_structure = file_structure_df,
+    create_stub = TRUE,
+    stub_path = temp_bids_dir
+  )
+
+  parent_dir <- dirname(proj$path)
+  before_dirs <- list.dirs(parent_dir, recursive = FALSE, full.names = TRUE)
+  output_file <- tempfile(fileext = ".tar.gz")
+
+  result <- pack_bids(
+    proj,
+    output_file = output_file,
+    temp_dir = parent_dir,
+    cleanup = FALSE,
+    verbose = FALSE
+  )
+
+  after_dirs <- list.dirs(parent_dir, recursive = FALSE, full.names = TRUE)
+  staged_dirs <- setdiff(after_dirs, before_dirs)
+
+  expect_true(file.exists(result))
+  expect_true(length(staged_dirs) >= 1)
+  expect_false(any(normalizePath(staged_dirs, winslash = "/", mustWork = FALSE) ==
+    normalizePath(proj$path, winslash = "/", mustWork = FALSE)))
+
+  unlink(output_file)
+  unlink(staged_dirs, recursive = TRUE)
+  unlink(temp_bids_dir, recursive = TRUE)
+})
+
 test_that("list_pack_bids provides accurate summary", {
   skip_on_cran()
   skip_if_offline()

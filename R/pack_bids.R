@@ -455,9 +455,14 @@ pack_bids <- function(x,
   if (is.null(temp_dir)) {
     temp_dir <- tempdir()
   }
-  
-  # Use shorter directory name to avoid path length issues
-  temp_project_dir <- file.path(temp_dir, project_name)
+
+  # Always stage into a distinct directory. Some tests build projects inside
+  # tempdir(), so reusing file.path(temp_dir, project_name) can alias the
+  # source tree and make file.copy() fail on platforms that reject from == to.
+  temp_project_dir <- tempfile(
+    pattern = paste0(basename(project_name), "_pack_"),
+    tmpdir = temp_dir
+  )
   
   if (verbose) {
     message("\n=== Starting pack_bids ===")
