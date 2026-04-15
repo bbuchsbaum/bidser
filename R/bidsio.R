@@ -235,6 +235,10 @@ create_preproc_mask.bids_project <- function(x, subid, thresh=.99,
   }
   maskfiles <- unique(maskfiles)
 
+  # Restrict to actual image masks; search_files can also return JSON sidecars
+  # that share the same desc/kind entities.
+  maskfiles <- maskfiles[grepl("\\.nii(\\.gz)?$", maskfiles)]
+
   # Restrict to functional (BOLD) masks: require `_task-` in the filename.
   # Anatomical brain masks (anat/) lack a task entity, so this reliably
 

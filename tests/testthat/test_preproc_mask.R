@@ -26,3 +26,42 @@ test_that("create_preproc_mask locates mask files", {
   expect_true(inherits(mask, "LogicalNeuroVol"))
 })
 
+test_that("create_preproc_mask ignores JSON sidecars for mask matches", {
+  skip_if_not_installed("RNifti")
+
+  tmp <- tempfile("preproc_mask_sidecar_")
+  dir.create(tmp, recursive = TRUE)
+  on.exit(unlink(tmp, recursive = TRUE, force = TRUE), add = TRUE)
+
+  readr::write_tsv(
+    tibble::tibble(participant_id = "sub-1001"),
+    file.path(tmp, "participants.tsv")
+  )
+  jsonlite::write_json(
+    list(Name = "MaskSidecar", BIDSVersion = "1.8.0"),
+    file.path(tmp, "dataset_description.json"),
+    auto_unbox = TRUE
+  )
+  dir.create(file.path(tmp, "sub-1001", "func"), recursive = TRUE)
+  file.create(file.path(tmp, "sub-1001", "func",
+                         "sub-1001_task-audio_run-01_bold.nii.gz"))
+
+  deriv_root <- file.path(tmp, "derivatives", "fmriprep", "sub-1001", "func")
+  dir.create(deriv_root, recursive = TRUE)
+  jsonlite::write_json(
+    list(Name = "fmriprep", BIDSVersion = "1.8.0", DatasetType = "derivative"),
+    file.path(tmp, "derivatives", "fmriprep", "dataset_description.json"),
+    auto_unbox = TRUE
+  )
+
+  mask_path <- file.path(
+    deriv_root,
+    "sub-1001_task-audio_run-01_space-MNI152NLin2009cAsym_res-2_desc-brain_mask.nii.gz"
+  )
+  RNifti::writeNifti(array(1, dim = c(2, 2, 2)), mask_path)
+  writeLines("{}", sub("\\.nii\\.gz$", ".json", mask_path))
+
+  proj <- bids_project(tmp, fmriprep = TRUE)
+  mask <- create_preproc_mask(proj, subid = "1001")
+  expect_true(inherits(mask, "LogicalNeuroVol"))
+})
