@@ -47,6 +47,43 @@ create_confounds_fixture <- function() {
   tmp
 }
 
+create_confounds_fixture_direct_root <- function() {
+  tmp <- tempfile("bidser_conf_direct_")
+  dir.create(tmp, recursive = TRUE)
+  readr::write_tsv(
+    tibble::tibble(participant_id = "sub-01"),
+    file.path(tmp, "participants.tsv")
+  )
+  jsonlite::write_json(
+    list(Name = "ConfDirectRoot", BIDSVersion = "1.8.0"),
+    file.path(tmp, "dataset_description.json"),
+    auto_unbox = TRUE
+  )
+  dir.create(file.path(tmp, "sub-01", "func"), recursive = TRUE)
+  file.create(file.path(tmp, "sub-01", "func",
+                         "sub-01_task-rest_run-01_bold.nii.gz"))
+
+  deriv_root <- file.path(tmp, "derivatives")
+  dir.create(file.path(deriv_root, "sub-01", "func"), recursive = TRUE)
+  jsonlite::write_json(
+    list(Name = "direct-root-fmriprep", BIDSVersion = "1.8.0", DatasetType = "derivative"),
+    file.path(deriv_root, "dataset_description.json"),
+    auto_unbox = TRUE
+  )
+  file.create(file.path(deriv_root, "sub-01", "func",
+                         "sub-01_task-rest_run-01_space-MNI_desc-preproc_bold.nii.gz"))
+  readr::write_tsv(
+    tibble::tibble(
+      CSF = c(0.1, 0.2),
+      WhiteMatter = c(0.3, 0.4),
+      cosine_00 = c(0.5, 0.6)
+    ),
+    file.path(deriv_root, "sub-01", "func",
+              "sub-01_task-rest_run-01_desc-confounds_timeseries.tsv")
+  )
+  tmp
+}
+
 # ===========================================================================
 # resolve_cvars
 # ===========================================================================
@@ -207,6 +244,24 @@ test_that("read_confounds returns a bids_confounds tibble", {
   # inner data should have 2 rows (our fixture has 2 timepoints)
   inner <- conf$data[[1]]
   expect_equal(nrow(inner), 2)
+})
+
+test_that("direct-root derivatives preserve confound helpers when prep_dir points to derivatives", {
+  tmp <- create_confounds_fixture_direct_root()
+  on.exit(unlink(tmp, recursive = TRUE, force = TRUE), add = TRUE)
+
+  proj <- bids_project(tmp, fmriprep = TRUE, prep_dir = "derivatives", index = "none")
+  expect_true(proj$has_fmriprep)
+  expect_equal(proj$prep_dir, "derivatives")
+
+  cf <- confound_files(proj, task = "rest")
+  expect_true(is.character(cf))
+  expect_equal(length(cf), 1)
+  expect_true(grepl("desc-confounds_timeseries\\.tsv$", cf[[1]]))
+
+  conf <- read_confounds(proj, task = "rest", cvars = c("csf", "white_matter"), nest = FALSE)
+  expect_s3_class(conf, "bids_confounds")
+  expect_equal(nrow(conf), 2)
 })
 
 test_that("read_confounds warns for non-matching subid and returns NULL", {

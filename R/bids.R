@@ -344,7 +344,17 @@ get_sessions <- function(path, sid) {
     deriv_root <- file.path(path, "derivatives")
     if (dir.exists(deriv_root)) {
       pipe_dirs <- basename(list.dirs(deriv_root, recursive = FALSE, full.names = TRUE))
-      roots <- file.path("derivatives", pipe_dirs)
+      subject_dirs <- pipe_dirs[grepl("^sub-[A-Za-z0-9]+$", pipe_dirs)]
+      pipeline_dirs <- pipe_dirs[!grepl("^sub-[A-Za-z0-9]+$", pipe_dirs)]
+      roots <- file.path("derivatives", pipeline_dirs)
+
+      # Some datasets place derivative subjects directly under derivatives/
+      # rather than derivatives/<pipeline>/. When the caller points prep_dir at
+      # that root, preserve it as a valid derivative pipeline.
+      if (length(subject_dirs) > 0 &&
+          file.exists(file.path(deriv_root, "dataset_description.json"))) {
+        roots <- unique(c("derivatives", roots))
+      }
     }
     if (isTRUE(fmriprep) && dir.exists(file.path(path, prep_dir))) {
       roots <- unique(c(prep_dir, roots))
@@ -764,11 +774,13 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmripre
   tbl <- tibble::as_tibble(data.tree::ToDataFrameTypeCol(bids, 'name', 'type', 'subid', 'session', 'task', 'run', 'modality', 'suffix', 'desc', 'space'))
   tbl <- tbl %>% select(-starts_with("level_"))
 
-  legacy_prep_dir <- prep_dir
-  if (!"fmriprep" %in% deriv_info$pipeline) {
-    legacy_prep_dir <- ""
-  } else {
-    legacy_prep_dir <- deriv_info$root[[match("fmriprep", deriv_info$pipeline)]]
+  legacy_prep_dir <- ""
+  if (isTRUE(fmriprep) && nrow(deriv_info) > 0) {
+    if (!is.null(prep_dir) && nzchar(prep_dir) && prep_dir %in% deriv_info$root) {
+      legacy_prep_dir <- prep_dir
+    } else if ("fmriprep" %in% deriv_info$pipeline) {
+      legacy_prep_dir <- deriv_info$root[[match("fmriprep", deriv_info$pipeline)]]
+    }
   }
   legacy_has_fmriprep <- nzchar(legacy_prep_dir)
   
