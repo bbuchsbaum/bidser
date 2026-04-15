@@ -55,7 +55,8 @@ read_func_scans.bids_project <- function(x, mask, mode = c("normal", "bigvec"),
 #'
 #' This function reads preprocessed functional MRI scans from a BIDS project's fMRIPrep
 #' derivatives directory. It uses the \code{preproc_scans} function to locate the files
-#' and then reads them into a \code{NeuroVec} object using the neuroim2 package. If a
+#' and then reads each one into its own \code{NeuroVec} object using the
+#' neuroim2 package. If a
 #' mask is not provided, one will be automatically created from available brainmask files.
 #'
 #' @param x A \code{bids_project} object with fMRIPrep derivatives
@@ -67,7 +68,8 @@ read_func_scans.bids_project <- function(x, mask, mode = c("normal", "bigvec"),
 #' @param modality Image modality to match (default: "bold" for functional MRI)
 #' @param ... Extra arguments passed to \code{neuroim2::read_vec}
 #' 
-#' @return An instance of type \code{NeuroVec} containing the preprocessed functional data.
+#' @return A named list of \code{NeuroVec} objects, one per matched preprocessed
+#'   scan, in file order.
 #' 
 #' @details
 #' This function requires the \code{neuroim2} package to be installed. It will throw an
@@ -100,6 +102,7 @@ read_func_scans.bids_project <- function(x, mask, mode = c("normal", "bigvec"),
 #'   # Provide a custom mask
 #'   mask <- create_preproc_mask(proj, thresh=0.95)
 #'   masked_scans <- read_preproc_scans(proj, mask=mask)
+#'   first_run <- masked_scans[[1]]
 #'   
 #'   # Clean up
 #'   unlink(ds_path, recursive=TRUE)
@@ -138,7 +141,11 @@ read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bi
     stop("Package 'neuroim2' is required for this function. Install with: remotes::install_github('bbuchsbaum/neuroim2')", call. = FALSE)
   }
   
-  neuroim2::read_vec(fnames, mask=mask, mode=mode, ...)
+  scans <- lapply(fnames, function(fname) {
+    neuroim2::read_vec(fname, mask=mask, mode=mode, ...)
+  })
+  names(scans) <- fnames
+  scans
 }
 
 

@@ -1,5 +1,16 @@
 # bidser 0.4.0
 
+* Change `read_preproc_scans()` to return a file-ordered list of `NeuroVec`
+  objects, one per matched preprocessed scan, instead of collapsing multiple
+  files into a single container.
+* Fix derivative discovery and legacy fMRIPrep helpers for datasets that place
+  derivative subject folders directly under `derivatives/` with
+  `prep_dir = "derivatives"`.
+* Make `read_confounds()` raise informative, selection-aware errors when no
+  matching participants, confound files, or usable requested confounds are
+  found.
+* Fix `create_preproc_mask()` to ignore matching JSON sidecars and only read
+  actual NIfTI mask images.
 * Add `query_files()` as the recommended explicit query API for new workflows,
   with `match_mode`, `require_entity`, and raw/derivatives `scope` controls.
 * Add `get_metadata()` for inheritance-aware BIDS metadata resolution with
