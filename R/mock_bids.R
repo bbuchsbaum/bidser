@@ -1662,19 +1662,24 @@ confound_files.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 #' @export
 read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", session = ".*", run = ".*",
                                              cvars = NULL, npcs = -1, perc_var = -1, nest = TRUE, ...) {
+  selection <- paste0(
+    "subid=", shQuote(subid),
+    ", task=", shQuote(task),
+    ", session=", shQuote(session),
+    ", run=", shQuote(run)
+  )
 
   conf_paths <- confound_files.mock_bids_project(x, subid = subid, task = task,
                                                  session = session, run = run,
                                                  full_path = FALSE, ...)
 
   if (is.null(conf_paths) || length(conf_paths) == 0) {
-    out <- tibble::tibble(
-      .subid = character(), .task = character(), .run = character(),
-      .session = character(), data = list()
+    rlang::abort(
+      paste0(
+        "read_confounds() found no confound files matching the requested filters. ",
+        "Selection: ", selection, "."
+      )
     )
-    class(out) <- c("bids_confounds", class(out))
-    attr(out, "pca") <- NULL
-    return(out)
   }
 
   all_conf <- list()
@@ -1734,6 +1739,15 @@ read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 
   final_df <- dplyr::bind_rows(all_conf)
   pca_meta <- if (length(all_pca) > 0) dplyr::bind_rows(all_pca) else NULL
+
+  if (nrow(final_df) == 0) {
+    rlang::abort(
+      paste0(
+        "read_confounds() found matching confound files, but none produced usable confound data. ",
+        "Selection: ", selection, "."
+      )
+    )
+  }
 
   if (!nest) {
     class(final_df) <- c("bids_confounds", class(final_df))

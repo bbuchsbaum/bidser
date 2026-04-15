@@ -264,16 +264,15 @@ test_that("direct-root derivatives preserve confound helpers when prep_dir point
   expect_equal(nrow(conf), 2)
 })
 
-test_that("read_confounds warns for non-matching subid and returns NULL", {
+test_that("read_confounds errors for non-matching subid", {
   tmp <- create_confounds_fixture()
   on.exit(unlink(tmp, recursive = TRUE, force = TRUE), add = TRUE)
 
   proj <- bids_project(tmp, fmriprep = TRUE)
-  expect_warning(
-    res <- read_confounds(proj, subid = "^99$"),
-    "No matching participants"
+  expect_error(
+    read_confounds(proj, subid = "^99$"),
+    "found no participants matching the requested subject filter"
   )
-  expect_null(res)
 })
 
 test_that("read_confounds with nest=FALSE returns flat tibble", {

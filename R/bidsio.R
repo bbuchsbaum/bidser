@@ -561,23 +561,31 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
     stop("`x` must be a `bids_project` object.")
   }
 
+  selection <- paste0(
+    "subid=", shQuote(subid),
+    ", task=", shQuote(task),
+    ", session=", shQuote(session),
+    ", run=", shQuote(run)
+  )
+  abort_no_confounds <- function(reason) {
+    rlang::abort(paste0("read_confounds() ", reason, ". Selection: ", selection, "."))
+  }
+
   # Detect confound_strategy objects
   use_strategy <- inherits(cvars, "confound_strategy")
 
   # Check participants
   sids <- participants(x)
   if (length(sids) == 0) {
-    warning("No participants found in the BIDS project.")
-    return(NULL)
+    abort_no_confounds("could not find any participants in the BIDS project")
   }
   gidx <- grep(subid, sids)
   if (length(gidx) == 0) {
-    warning("No matching participants found for regex: ", subid)
-    return(NULL)
+    abort_no_confounds("found no participants matching the requested subject filter")
   }
   sids <- sids[gidx]
 
-  ret <- lapply(sids, function(s) {
+  ret_all <- lapply(sids, function(s) {
     # Use confound_files to get all possible confound files
     fnames <- confound_files(x, subid=paste0("^", as.character(s), "$"), task=task, session=session)
 
@@ -594,8 +602,7 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
     }
 
     if (length(fnames) == 0) {
-      # No confound files for this participant; return empty frame
-      return(list(data = data.frame(), pca = NULL))
+      return(list(data = data.frame(), pca = NULL, status = "no_files"))
     }
 
     # Process each confound file
@@ -699,7 +706,9 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 
     # Filter out any NULL returns
     dflist <- dflist[!sapply(dflist, is.null)]
-    if (length(dflist) == 0) return(list(data = data.frame(), pca = NULL))
+    if (length(dflist) == 0) {
+      return(list(data = data.frame(), pca = NULL, status = "no_usable_confounds"))
+    }
 
     data_list <- lapply(dflist, `[[`, "data")
     pca_list <- lapply(dflist, `[[`, "pca")
@@ -709,13 +718,24 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
     data_out <- dplyr::bind_rows(data_list)
     pca_out <- if (length(pca_list) > 0) dplyr::bind_rows(pca_list) else NULL
 
-    list(data = data_out, pca = pca_out)
+    list(data = data_out, pca = pca_out, status = "ok")
   })
 
-  ret <- ret[!sapply(ret, function(z) nrow(z$data)==0)]
+  ret <- ret_all[!sapply(ret_all, function(z) nrow(z$data)==0)]
   if (length(ret) == 0) {
-    message("No confound data found for the given selection.")
-    return(NULL)
+    raw_statuses <- unique(vapply(
+      Filter(function(z) !is.null(z$status), ret_all),
+      `[[`,
+      character(1),
+      "status"
+    ))
+    if (length(raw_statuses) == 0 || identical(raw_statuses, "no_files")) {
+      abort_no_confounds("found no confound files matching the requested filters")
+    }
+    if (all(raw_statuses == "no_usable_confounds")) {
+      abort_no_confounds("found matching confound files, but none contained usable confounds for the requested variables")
+    }
+    abort_no_confounds("found matching confound files, but none produced usable confound data")
   }
 
   ret_data <- dplyr::bind_rows(lapply(ret, `[[`, "data"))

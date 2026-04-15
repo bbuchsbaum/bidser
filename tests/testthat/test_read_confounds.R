@@ -42,11 +42,13 @@ test_that("valid confound file is read and nested", {
 })
 
 
-test_that("missing confound files return NULL", {
+test_that("missing confound files raise an informative error", {
   setup <- create_confounds_proj()
   on.exit(unlink(setup$path, recursive = TRUE, force = TRUE), add = TRUE)
-  res <- read_confounds(setup$proj, subid = "99")
-  expect_null(res)
+  expect_error(
+    read_confounds(setup$proj, subid = "99"),
+    "found no participants matching the requested subject filter"
+  )
 })
 
 
@@ -77,10 +79,14 @@ test_that("canonical names resolve to dataset columns", {
   expect_true(all(c("CSF", "WhiteMatter", "FramewiseDisplacement", "GlobalSignal") %in% cols))
 })
 
-test_that("file without requested confounds is skipped", {
+test_that("file without requested confounds raises an informative error", {
   setup <- create_confounds_proj()
   on.exit(unlink(setup$path, recursive = TRUE, force = TRUE), add = TRUE)
-  expect_warning(res <- read_confounds(setup$proj, cvars = "junkvar"),
-                 "No requested confounds")
-  expect_null(res)
+  expect_warning(
+    expect_error(
+      read_confounds(setup$proj, cvars = "junkvar"),
+      "none contained usable confounds for the requested variables"
+    ),
+    "No requested confounds"
+  )
 })
