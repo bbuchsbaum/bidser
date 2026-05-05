@@ -63,6 +63,9 @@
   : Create a simple smoothing transformer
 - [`dataset_description()`](https://bbuchsbaum.github.io/bidser/reference/dataset_description.md)
   : Get the dataset_description object from a BIDS project
+- [`dataset_name()`](https://bbuchsbaum.github.io/bidser/reference/dataset_name.md)
+  [`dataset_type()`](https://bbuchsbaum.github.io/bidser/reference/dataset_name.md)
+  : Get fields from a BIDS dataset description
 - [`decode_bids_entities()`](https://bbuchsbaum.github.io/bidser/reference/decode_bids_entities.md)
   : Decode BIDS entities back into a filename
 - [`derivative_files()`](https://bbuchsbaum.github.io/bidser/reference/derivative_files.md)

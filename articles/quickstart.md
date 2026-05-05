@@ -39,6 +39,7 @@ We’ll use the `ds001` dataset from the BIDS examples, which contains
 data from a “Balloon Analog Risk Task” experiment with 16 subjects.
 
 ``` r
+
 proj
 #> BIDS Project Summary 
 #> Project Name:  bids_example_ds001 
@@ -62,6 +63,7 @@ functional data.
 Let’s explore the basic structure of this dataset:
 
 ``` r
+
 # Check if the dataset has multiple sessions per subject
 sessions(proj)
 #> NULL
@@ -98,6 +100,7 @@ bids_summary(proj)
 Let’s find the most common neuroimaging file types:
 
 ``` r
+
 # Find all anatomical T1-weighted images
 t1w_files <- query_files(proj, regex = "T1w\\.nii", full_path = FALSE)
 head(t1w_files)
@@ -121,6 +124,7 @@ head(bold_files)
 One of bidser’s key strengths is filtering data by BIDS metadata:
 
 ``` r
+
 # Get functional scans for specific subjects
 sub01_scans <- func_scans(proj, subid = "01")
 sub02_scans <- func_scans(proj, subid = "02")
@@ -146,6 +150,7 @@ cat("Subject 01, balloon task:", length(sub01_task_scans), "scans\n")
 You can use regular expressions to select multiple subjects at once:
 
 ``` r
+
 # Get scans for subjects 01, 02, and 03
 first_three_scans <- func_scans(proj, subid = "0[123]")
 cat("First 3 subjects:", length(first_three_scans), "scans total\n")
@@ -164,6 +169,7 @@ presented, what responses occurred, etc. This is crucial for task-based
 fMRI analysis.
 
 ``` r
+
 # Find all event files
 event_file_paths <- event_files(proj)
 cat("Found", length(event_file_paths), "event files\n")
@@ -192,6 +198,7 @@ events_data
 Let’s explore the event data structure:
 
 ``` r
+
 # Unnest events for subject 01
 first_subject_events <- events_data %>%
   filter(.subid == "01") %>%
@@ -223,6 +230,7 @@ names(first_subject_events)
 Let’s do some basic exploration of the experimental design:
 
 ``` r
+
 # How many trials per subject?
 trial_counts <- events_data %>%
   unnest(cols = c(data)) %>%
@@ -258,6 +266,7 @@ both direct sidecar reads and inheritance-aware resolution following the
 BIDS inheritance principle.
 
 ``` r
+
 # Read sidecar rows directly
 direct_sidecars <- read_sidecar(
   proj,
@@ -279,6 +288,7 @@ or set `inherit = TRUE` in
 [`read_sidecar()`](https://bbuchsbaum.github.io/bidser/reference/read_sidecar.md):
 
 ``` r
+
 # Resolve metadata for a specific BOLD file with inheritance
 resolved_meta <- get_metadata(proj, bold_files[[1]], inherit = TRUE)
 
@@ -318,6 +328,7 @@ single subject. It returns a lightweight object with helper functions
 that automatically filter data for that subject.
 
 ``` r
+
 # Create a subject-specific interface for subject 01
 subject_01 <- bids_subject(proj, "01")
 
@@ -347,6 +358,7 @@ This approach is particularly useful when you’re doing subject-level
 analyses:
 
 ``` r
+
 subjects_to_analyze <- c("01", "02", "03")
 
 for (subj_id in subjects_to_analyze) {
@@ -365,6 +377,7 @@ The subject interface makes it easy to write analysis pipelines that
 iterate over subjects without manually constructing filters:
 
 ``` r
+
 subject_trial_summary <- lapply(participants(proj)[1:3], function(subj_id) {
   subj <- bids_subject(proj, subj_id)
   event_data <- subj$events()
@@ -395,6 +408,7 @@ and can return either paths or a tibble with parsed entities.
 ### Match Modes
 
 ``` r
+
 # Exact entity matching -- reproducible, no regex surprises
 exact_bold <- query_files(
   proj,
@@ -431,6 +445,7 @@ cat("Glob-match BOLD files:", length(glob_bold), "\n")
 ### Entity Presence, Extension, and Datatype Filters
 
 ``` r
+
 # Require the queried entity to actually exist on returned files
 task_annotated <- query_files(
   proj,
@@ -455,6 +470,7 @@ cat("Functional NIfTIs:", length(func_niftis), "\n")
 ### Tibble Output with Parsed Entities
 
 ``` r
+
 # Return a tibble instead of paths -- includes all parsed BIDS entities
 bold_tbl <- query_files(
   proj,
@@ -486,6 +502,7 @@ When derivatives are present, `scope` controls where to search and
 `pipeline` selects specific derivative pipelines:
 
 ``` r
+
 deriv_path <- get_example_bids_dataset("ds000001-fmriprep")
 proj_deriv <- bids_project(deriv_path)
 
@@ -519,6 +536,7 @@ can handle real-world datasets missing `participants.tsv` – subjects are
 inferred from the directory tree:
 
 ``` r
+
 proj_relaxed <- bids_project(
   "/path/to/bids",
   strict_participants = FALSE
@@ -538,6 +556,7 @@ gives you a run-level tibble that nests scan inventory, events, and
 confounds – ready for downstream R workflows:
 
 ``` r
+
 vars <- variables_table(
   proj_deriv,
   scope = "all",
@@ -555,11 +574,12 @@ report
 When you need absolute paths for analysis tools:
 
 ``` r
+
 full_paths <- func_scans(proj, subid = "01", full_path = TRUE)
 full_paths
-#> [1] "/tmp/RtmpDED6iC/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
-#> [2] "/tmp/RtmpDED6iC/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
-#> [3] "/tmp/RtmpDED6iC/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
+#> [1] "/tmp/Rtmpk8YTNe/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
+#> [2] "/tmp/Rtmpk8YTNe/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
+#> [3] "/tmp/Rtmpk8YTNe/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
 
 all(file.exists(full_paths))
 #> [1] TRUE
@@ -573,6 +593,7 @@ through
 [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md):
 
 ``` r
+
 deriv_path <- get_example_bids_dataset("ds000001-fmriprep")
 proj_deriv <- bids_project(deriv_path)
 

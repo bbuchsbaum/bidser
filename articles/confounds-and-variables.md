@@ -1,6 +1,7 @@
 # Working with Confounds and Variables
 
 ``` r
+
 library(bidser)
 library(dplyr)
 library(tidyr)
@@ -21,10 +22,11 @@ realistic fMRIPrep-style confound files so that every code chunk in this
 vignette runs without network access.
 
 ``` r
+
 proj <- bids_project(temp_dir, fmriprep = TRUE)
 proj
 #> BIDS Project Summary 
-#> Project Name:  bids_confounds_vignette_564c11431dc9 
+#> Project Name:  bids_confounds_vignette_56fa516917f9 
 #> Participants (n):  2 
 #> Participants Source:  file 
 #> Tasks:  nback, rest 
@@ -46,6 +48,7 @@ ships with. These are curated variable lists that match common denoising
 strategies from the fMRI literature.
 
 ``` r
+
 list_confound_sets()
 #>         set                                                        description
 #> 1   motion6                                       Rigid-body motion (6 params)
@@ -67,6 +70,7 @@ Each set is a named collection of confound variable names. You can
 inspect what a set contains:
 
 ``` r
+
 # 6 rigid-body motion parameters
 confound_set("motion6")
 #> [1] "trans_x" "trans_y" "trans_z" "rot_x"   "rot_y"   "rot_z"
@@ -87,6 +91,7 @@ reads fMRIPrep confound TSV files and returns tidy tibbles. Pass a
 confound set name to select variables:
 
 ``` r
+
 conf_nested <- read_confounds(proj, cvars = confound_set("motion6"))
 conf_nested
 #> # A tibble: 4 × 5
@@ -104,6 +109,7 @@ timeseries tucked inside the `data` list column. This structure makes it
 easy to iterate over runs in a modeling pipeline:
 
 ``` r
+
 conf_nested |>
   unnest(data) |>
   select(participant_id, task, run, trans_x, rot_x) |>
@@ -126,6 +132,7 @@ You can also pass a character vector of specific variable names, or use
 wildcards to match patterns:
 
 ``` r
+
 # All CompCor components
 compcor_conf <- read_confounds(
   proj,
@@ -143,6 +150,7 @@ names(compcor_conf$data[[1]])
 When you just want a single table for modeling, use `nest = FALSE`:
 
 ``` r
+
 conf_flat <- read_confounds(
   proj,
   cvars = confound_set("motion6"),
@@ -175,6 +183,7 @@ splits variables into two groups: those reduced via PCA and those kept
 as-is.
 
 ``` r
+
 list_confound_strategies()
 #>     strategy                                                      description
 #> 1 pcabasic80 PCA(motion24 + aCompCor + tCompCor + CSF + WM, 80% var) + cosine
@@ -185,6 +194,7 @@ variables (retaining 80% of variance) while keeping cosine regressors
 unchanged:
 
 ``` r
+
 strat <- confound_strategy("pcabasic80")
 conf_pca <- read_confounds(proj, subid = "01", task = "rest", cvars = strat)
 names(conf_pca$data[[1]])
@@ -204,6 +214,7 @@ You can build your own strategy by specifying which variables get
 PCA-reduced and which are kept raw:
 
 ``` r
+
 my_strat <- confound_strategy(
   pca_vars = c(confound_set("motion24"), confound_set("acompcor")),
   raw_vars = c("framewise_displacement", confound_set("cosine")),
@@ -228,6 +239,7 @@ and conditions.
 returns them as nested tibbles:
 
 ``` r
+
 events <- read_events(proj, task = "nback")
 events
 #> # A tibble: 2 × 5
@@ -241,6 +253,7 @@ events
 Unnest to get a flat trial table:
 
 ``` r
+
 trials <- events |>
   unnest(data) |>
   select(.subid, .task, .run, onset, duration, trial_type, response_time)
@@ -259,6 +272,7 @@ head(trials)
 ```
 
 ``` r
+
 trials |>
   group_by(.subid, trial_type) |>
   summarise(
@@ -279,6 +293,7 @@ If you want everything in one flat table directly, use
 [`load_all_events()`](https://bbuchsbaum.github.io/bidser/reference/load_all_events-method.md):
 
 ``` r
+
 all_events <- load_all_events(proj, task = "nback")
 nrow(all_events)
 #> [1] 80
@@ -291,6 +306,7 @@ pulls together scans, events, and confounds into a single run-level
 tibble. This is the tidy bridge between BIDS and your analysis code:
 
 ``` r
+
 vars <- variables_table(proj)
 vars |> select(.subid, .task, .run, any_of(c("n_scans", "n_events", "n_confound_rows")))
 #> # A tibble: 4 × 5
@@ -307,6 +323,7 @@ hold the nested data. You can selectively include only events or only
 confounds:
 
 ``` r
+
 vars_events <- variables_table(proj, task = "nback", include = "events")
 vars_events |> select(.subid, .task, .run, n_events)
 #> # A tibble: 2 × 4
@@ -320,6 +337,7 @@ This structure makes it straightforward to write a per-run analysis
 loop:
 
 ``` r
+
 # Use the nback-only table which has both events and confounds columns
 vars_nback <- variables_table(proj, task = "nback")
 
@@ -346,10 +364,11 @@ assembles a lightweight QA summary covering project metadata, compliance
 checks, pipeline discovery, and run-level coverage:
 
 ``` r
+
 report <- bids_report(proj)
 report
 #> BIDS Report
-#> Project: bids_confounds_vignette_564c11431dc9 
+#> Project: bids_confounds_vignette_56fa516917f9 
 #> Participants source: file 
 #> Subjects: 2 
 #> Sessions: 0 
@@ -364,6 +383,7 @@ report
 The underlying data is fully accessible for custom reporting:
 
 ``` r
+
 rdata <- bids_report_data(proj)
 rdata$summary
 #> $n_subjects
@@ -394,6 +414,7 @@ rdata$run_coverage
 You can use the coverage table to spot missing data at a glance:
 
 ``` r
+
 rdata$run_coverage |>
   mutate(
     has_scans = n_scans > 0,
@@ -416,6 +437,7 @@ A typical analysis script combines these pieces into a pipeline. Here is
 a sketch that extracts design-ready data for each run:
 
 ``` r
+
 analysis_data <- variables_table(proj, task = "nback") |>
   filter(n_events > 0, n_confound_rows > 0) |>
   rowwise() |>

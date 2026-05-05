@@ -21,6 +21,7 @@ Before broad code search across related package repos:
 ### Building and Installation
 
 ``` r
+
 # Install package dependencies
 devtools::install_deps()
 
@@ -37,6 +38,7 @@ devtools::check(cran = TRUE)
 ### Testing
 
 ``` r
+
 # Run all tests
 devtools::test()
 
@@ -53,6 +55,7 @@ devtools::test(filter = "mock_bids")
 ### Documentation
 
 ``` r
+
 # Generate documentation from roxygen comments
 devtools::document()
 
@@ -134,12 +137,14 @@ representation - Tidyverse packages: `dplyr`, `tidyr`, `purrr`, `readr`,
 1.  **Loading a BIDS project**:
 
     ``` r
+
     proj <- bids_project("/path/to/bids/dataset", fmriprep = TRUE)
     ```
 
 2.  **Querying data**:
 
     ``` r
+
     # Get functional scans for subject 01
     func_scans(proj, subid = "01")
 
@@ -150,6 +155,7 @@ representation - Tidyverse packages: `dplyr`, `tidyr`, `purrr`, `readr`,
 3.  **Working with preprocessed data**:
 
     ``` r
+
     # Get preprocessed scans
     preproc_scans(proj, space = "MNI152NLin2009cAsym")
 

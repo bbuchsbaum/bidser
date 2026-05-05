@@ -17,6 +17,7 @@ to get a fast overview of the raw project plus attached derivative
 folders.
 
 ``` r
+
 plot_bids(proj, interactive = FALSE)
 ```
 
@@ -27,6 +28,7 @@ For code,
 is the clearest inspection entry point.
 
 ``` r
+
 pipes <- derivative_pipelines(proj)
 pipes
 #> # A tibble: 2 × 4
@@ -52,6 +54,7 @@ Use
 when you want explicit scope and pipeline control.
 
 ``` r
+
 prep_bold <- query_files(
   proj,
   regex = "bold\\.nii\\.gz$",
@@ -84,6 +87,7 @@ reads the derivative table and returns a tibble that stays indexed by
 subject, task, run, and session.
 
 ``` r
+
 confounds_flat <- read_confounds(
   proj,
   subid = "01",
@@ -112,6 +116,7 @@ If you want a compact diagnostic view, ask for principal components and
 plot them.
 
 ``` r
+
 confounds_pca <- read_confounds(
   proj,
   subid = "01",
@@ -135,6 +140,7 @@ pulls scans, events, and confounds into one run-level tibble without
 forcing you to manage separate joins.
 
 ``` r
+
 run_variables <- variables_table(
   proj,
   scope = "all",
@@ -163,6 +169,7 @@ shows whether each run has the pieces you expect.
 wraps the same run-level coverage into a compact text report.
 
 ``` r
+
 report <- bids_report(
   proj,
   scope = "all",
@@ -171,7 +178,7 @@ report <- bids_report(
 
 report
 #> BIDS Report
-#> Project: bidser-deriv-6b4b740ea8e1 
+#> Project: bidser-deriv-6bf6495b73d5 
 #> Participants source: file 
 #> Subjects: 1 
 #> Sessions: 0 

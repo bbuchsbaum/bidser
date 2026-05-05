@@ -434,7 +434,6 @@ tryCatch({
 #> Project does not have fmriprep derivatives enabled. Cannot search for confound files.
 #> Project does not have fmriprep derivatives enabled. Cannot search for confound files.
 #> Project does not have fmriprep derivatives enabled. Cannot search for confound files.
-#> No confound data found for the given selection.
 #> BIDS Report
 #> Project: bids_example_ds001 
 #> Participants source: file 

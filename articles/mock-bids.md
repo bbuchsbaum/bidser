@@ -13,6 +13,7 @@ is the entry point for that job.
 Start by defining participants and a file inventory.
 
 ``` r
+
 participants <- tibble(
   participant_id = c("01", "02")
 )
@@ -32,6 +33,7 @@ Now add the tabular payloads you want written into event and confound
 files.
 
 ``` r
+
 event_data <- list(
   "sub-01/func/sub-01_task-rest_run-01_events.tsv" = tibble(
     onset = c(0, 12),
@@ -58,6 +60,7 @@ confound_data <- list(
 Create the project on disk so you can query it and archive it later.
 
 ``` r
+
 mock_dir <- tempfile("bidser-mock-")
 
 mock_proj <- create_mock_bids(
@@ -80,7 +83,7 @@ mock_proj
 #> Datatypes:  func 
 #> Suffixes:  nii.gz, tsv 
 #> BIDS Keys:  (none) 
-#> Path:  /tmp/RtmpDo6ng5/bidser-mock-6be86fc49822
+#> Path:  /tmp/RtmpDwbaTy/bidser-mock-6c91541b4132
 
 stopifnot(file.exists(file.path(mock_dir, "participants.tsv")))
 ```
@@ -89,6 +92,7 @@ You can inspect the resulting layout immediately with
 [`plot_bids()`](https://bbuchsbaum.github.io/bidser/reference/plot_bids.md).
 
 ``` r
+
 plot_bids(mock_proj, interactive = FALSE)
 ```
 
@@ -102,6 +106,7 @@ works on mock projects too, you can test selection logic before you
 point the same code at a real dataset.
 
 ``` r
+
 raw_runs <- query_files(
   mock_proj,
   regex = "bold\\.nii\\.gz$",
@@ -140,6 +145,7 @@ The mock project stores real tabular data, so the higher-level readers
 work the same way they do on a real project.
 
 ``` r
+
 subject_events <- read_events(mock_proj, subid = "01") %>%
   unnest(cols = data)
 
@@ -158,6 +164,7 @@ stopifnot(
 ```
 
 ``` r
+
 mock_confounds <- read_confounds(
   mock_proj,
   subid = "01",
@@ -192,6 +199,7 @@ That keeps the layout and tabular metadata intact without shipping full
 images.
 
 ``` r
+
 archive_file <- tempfile(fileext = ".tar.gz")
 packed <- pack_bids(mock_proj, output_file = archive_file, verbose = FALSE)
 archive_contents <- list_pack_bids(packed, verbose = FALSE)
@@ -200,12 +208,12 @@ archive_contents %>%
   select(file, type, is_stub) %>%
   head()
 #>                                                                                                                file
-#> 1                                                               RestMock_pack_6be832cf8dae/dataset_description.json
-#> 2                   RestMock_pack_6be832cf8dae/derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz
-#> 3 RestMock_pack_6be832cf8dae/derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_desc-confounds_timeseries.tsv
-#> 4                                                                       RestMock_pack_6be832cf8dae/participants.tsv
-#> 5                                        RestMock_pack_6be832cf8dae/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz
-#> 6                                         RestMock_pack_6be832cf8dae/sub-01/func/sub-01_task-rest_run-01_events.tsv
+#> 1                                                               RestMock_pack_6c913080a602/dataset_description.json
+#> 2                   RestMock_pack_6c913080a602/derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz
+#> 3 RestMock_pack_6c913080a602/derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_desc-confounds_timeseries.tsv
+#> 4                                                                       RestMock_pack_6c913080a602/participants.tsv
+#> 5                                        RestMock_pack_6c913080a602/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz
+#> 6                                         RestMock_pack_6c913080a602/sub-01/func/sub-01_task-rest_run-01_events.tsv
 #>           type is_stub
 #> 1         json   FALSE
 #> 2 imaging_stub    TRUE

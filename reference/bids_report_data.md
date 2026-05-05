@@ -435,6 +435,5 @@ tryCatch({
 #> Project does not have fmriprep derivatives enabled. Cannot search for confound files.
 #> Project does not have fmriprep derivatives enabled. Cannot search for confound files.
 #> Project does not have fmriprep derivatives enabled. Cannot search for confound files.
-#> No confound data found for the given selection.
 # }
 ```

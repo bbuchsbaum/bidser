@@ -473,7 +473,6 @@ tryCatch({
 #> Project does not have fmriprep derivatives enabled. Cannot search for confound files.
 #> Project does not have fmriprep derivatives enabled. Cannot search for confound files.
 #> Project does not have fmriprep derivatives enabled. Cannot search for confound files.
-#> No confound data found for the given selection.
 #> # A tibble: 48 × 8
 #>    .subid .session .task                .run  scans    n_scans events   n_events
 #>    <chr>  <chr>    <chr>                <chr> <list>     <int> <list>      <int>

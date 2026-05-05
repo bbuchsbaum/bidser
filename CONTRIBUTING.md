@@ -51,6 +51,7 @@ following workflows:
 ## Local Development
 
 ``` r
+
 # Install development dependencies
 devtools::install_dev_deps()
 
