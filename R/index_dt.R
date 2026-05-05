@@ -533,7 +533,54 @@
 #' @noRd
 .bidser_persist_index_state <- function(x, state) {
   if (!is.null(x$index_path) && nzchar(x$index_path)) {
-    saveRDS(state, x$index_path)
+    index_warnings <- character(0)
+    index_error <- tryCatch(
+      withCallingHandlers(
+        {
+          saveRDS(state, x$index_path)
+          NULL
+        },
+        warning = function(w) {
+          index_warnings <<- c(index_warnings, conditionMessage(w))
+          invokeRestart("muffleWarning")
+        }
+      ),
+      error = function(e) e
+    )
+
+    if (!is.null(index_error)) {
+      index_parent <- dirname(x$index_path)
+      parent_exists <- dir.exists(index_parent)
+      parent_writable <- if (parent_exists) {
+        file.access(index_parent, mode = 2) == 0
+      } else {
+        NA
+      }
+      index_writable <- if (file.exists(x$index_path)) {
+        file.access(x$index_path, mode = 2) == 0
+      } else {
+        NA
+      }
+      write_reasons <- unique(c(conditionMessage(index_error), index_warnings))
+      write_reasons <- write_reasons[nzchar(write_reasons)]
+
+      warning(
+        paste(
+          c(
+            "Could not write the bidser file index cache; continuing with an in-memory index for this R session.",
+            paste0("Index path: ", x$index_path),
+            paste0("Project path: ", x$path),
+            paste0("Reason: ", paste(write_reasons, collapse = " | ")),
+            paste0("Index parent exists: ", parent_exists),
+            paste0("Index parent writable: ", parent_writable),
+            paste0("Existing index writable: ", index_writable),
+            "To silence this warning, call bids_project(..., index = \"none\") or pass index_path to a writable job-local path."
+          ),
+          collapse = "\n"
+        ),
+        call. = FALSE
+      )
+    }
   }
   .bidser_set_session_index_state(x, state)
   invisible(state)

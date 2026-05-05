@@ -26,7 +26,12 @@ create_index_extensions_fixture <- function() {
   fmriprep_root <- file.path(tmp, "derivatives", "fmriprep")
   dir.create(file.path(fmriprep_root, "sub-01", "func"), recursive = TRUE)
   jsonlite::write_json(
-    list(Name = "fmriprep", BIDSVersion = "1.8.0", DatasetType = "derivative"),
+    list(
+      Name = "fmriprep",
+      BIDSVersion = "1.8.0",
+      DatasetType = "derivative",
+      GeneratedBy = list(list(Name = "fmriprep"))
+    ),
     file.path(fmriprep_root, "dataset_description.json"),
     auto_unbox = TRUE
   )
@@ -125,6 +130,38 @@ test_that("data.table-backed index state preserves query parity", {
     return = "tibble"
   )
   expect_equal(regex_indexed, regex_tree)
+})
+
+test_that("index persistence failures warn with context and keep session cache", {
+  fixture <- create_index_extensions_fixture()
+  on.exit(unlink(fixture, recursive = TRUE, force = TRUE), add = TRUE)
+
+  bad_index_path <- file.path(fixture, "missing-index-dir", "bidser-index.rds")
+  proj <- bids_project(
+    fixture,
+    derivatives = "auto",
+    index = "none",
+    index_path = bad_index_path
+  )
+
+  expect_warning(
+    idx <- bids_index(proj, rebuild = TRUE, persist = TRUE),
+    regexp = paste(
+      "Could not write the bidser file index cache",
+      "Index path:",
+      "Reason:",
+      "index = \"none\"",
+      sep = ".*"
+    )
+  )
+
+  expect_true(nrow(idx) > 0)
+  expect_false(file.exists(bad_index_path))
+  expect_false(is.null(bidser:::.bidser_load_cached_index_state(
+    proj,
+    refresh = FALSE,
+    persist = FALSE
+  )))
 })
 
 test_that("cached metadata is reused and invalidated when sidecars change", {
