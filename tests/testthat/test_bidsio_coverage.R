@@ -25,7 +25,12 @@ create_confounds_fixture <- function() {
   fmriprep_root <- file.path(tmp, "derivatives", "fmriprep")
   dir.create(file.path(fmriprep_root, "sub-01", "func"), recursive = TRUE)
   jsonlite::write_json(
-    list(Name = "fmriprep", BIDSVersion = "1.8.0", DatasetType = "derivative"),
+    list(
+      Name = "fmriprep",
+      BIDSVersion = "1.8.0",
+      DatasetType = "derivative",
+      GeneratedBy = list(list(Name = "fmriprep"))
+    ),
     file.path(fmriprep_root, "dataset_description.json"),
     auto_unbox = TRUE
   )
@@ -66,7 +71,12 @@ create_confounds_fixture_direct_root <- function() {
   deriv_root <- file.path(tmp, "derivatives")
   dir.create(file.path(deriv_root, "sub-01", "func"), recursive = TRUE)
   jsonlite::write_json(
-    list(Name = "direct-root-fmriprep", BIDSVersion = "1.8.0", DatasetType = "derivative"),
+    list(
+      Name = "direct-root-fmriprep",
+      BIDSVersion = "1.8.0",
+      DatasetType = "derivative",
+      GeneratedBy = list(list(Name = "fmriprep"))
+    ),
     file.path(deriv_root, "dataset_description.json"),
     auto_unbox = TRUE
   )

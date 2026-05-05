@@ -605,74 +605,90 @@ pack_bids <- function(x,
           downsample_start <- Sys.time()
         }
         
+        process_downsample_file <- function(rel_path, add_resolution_tag_fn, downsample_fn) {
+          from_file <- file.path(from_path, rel_path)
+          to_file_with_res <- add_resolution_tag_fn(file.path(to_path, rel_path), downsample_factor)
+
+          to_dir <- dirname(to_file_with_res)
+          if (!dir.exists(to_dir)) {
+            dir.create(to_dir, recursive = TRUE, showWarnings = FALSE)
+          }
+
+          downsample_fn(
+            from_file,
+            to_file_with_res,
+            factor = downsample_factor,
+            method = downsample_method,
+            verbose = FALSE
+          )
+        }
+
+        run_sequential_downsampling <- function() {
+          if (verbose) {
+            message("  Using sequential processing")
+          }
+
+          sequential_results <- vector("list", length(imaging_files))
+          for (i in seq_along(imaging_files)) {
+            rel_path <- imaging_files[i]
+
+            if (verbose && (i == 1 || i %% 10 == 0 || i == length(imaging_files))) {
+              message(sprintf("  Processing file %d/%d: %s", i, length(imaging_files), basename(rel_path)))
+            }
+
+            sequential_results[[i]] <- process_downsample_file(
+              rel_path,
+              add_resolution_tag,
+              downsample_single_file
+            )
+          }
+          sequential_results
+        }
+
         # Setup parallel processing if applicable
         if (use_parallel && length(imaging_files) > 1) {
           if (verbose) {
             message(sprintf("  Using parallel processing with %d workers", ncores))
           }
-          # Set up future plan
-          old_plan <- future::plan()
-          on.exit(future::plan(old_plan), add = TRUE)
-          future::plan(future::multisession, workers = ncores)
-          
-          # Process files in parallel
-          if (verbose) {
-            message(sprintf("  Starting parallel processing of %d files...", length(imaging_files)))
-            message("  (Progress updates not available in parallel mode)")
-          }
 
           # Capture internal functions as local variables for parallel workers
           .add_resolution_tag <- add_resolution_tag
           .downsample_single_file <- downsample_single_file
+          .process_downsample_file <- process_downsample_file
 
-          results <- future.apply::future_lapply(imaging_files, function(rel_path) {
-            from_file <- file.path(from_path, rel_path)
-            # Add resolution tag to output filename
-            to_file_with_res <- .add_resolution_tag(file.path(to_path, rel_path), downsample_factor)
+          results <- tryCatch({
+            old_plan <- future::plan()
+            on.exit(future::plan(old_plan), add = TRUE)
+            future::plan(future::multisession, workers = ncores)
 
-            # Create directory if needed
-            to_dir <- dirname(to_file_with_res)
-            if (!dir.exists(to_dir)) {
-              dir.create(to_dir, recursive = TRUE, showWarnings = FALSE)
+            if (verbose) {
+              message(sprintf("  Starting parallel processing of %d files...", length(imaging_files)))
+              message("  (Progress updates not available in parallel mode)")
             }
 
-            # Downsample the file
-            .downsample_single_file(from_file, to_file_with_res,
-                                 factor = downsample_factor,
-                                 method = downsample_method,
-                                 verbose = FALSE)
-          }, future.seed = TRUE)
+            future.apply::future_lapply(imaging_files, function(rel_path) {
+              .process_downsample_file(
+                rel_path,
+                .add_resolution_tag,
+                .downsample_single_file
+              )
+            }, future.seed = TRUE)
+          }, error = function(e) {
+            if (verbose) {
+              message(
+                "  Parallel downsampling failed; retrying sequentially: ",
+                conditionMessage(e)
+              )
+            }
+            NULL
+          })
+
+          if (is.null(results)) {
+            results <- run_sequential_downsampling()
+          }
           
         } else {
-          # Sequential processing
-          if (verbose) {
-            message("  Using sequential processing")
-          }
-          
-          results <- vector("list", length(imaging_files))
-          for (i in seq_along(imaging_files)) {
-            rel_path <- imaging_files[i]
-            
-            if (verbose && (i == 1 || i %% 10 == 0 || i == length(imaging_files))) {
-              message(sprintf("  Processing file %d/%d: %s", i, length(imaging_files), basename(rel_path)))
-            }
-            
-            from_file <- file.path(from_path, rel_path)
-            # Add resolution tag to output filename
-            to_file_with_res <- add_resolution_tag(file.path(to_path, rel_path), downsample_factor)
-            
-            # Create directory if needed
-            to_dir <- dirname(to_file_with_res)
-            if (!dir.exists(to_dir)) {
-              dir.create(to_dir, recursive = TRUE, showWarnings = FALSE)
-            }
-            
-            # Downsample the file
-            results[[i]] <- downsample_single_file(from_file, to_file_with_res, 
-                                                  factor = downsample_factor, 
-                                                  method = downsample_method,
-                                                  verbose = FALSE)
-          }
+          results <- run_sequential_downsampling()
         }
         
         # Summary of results

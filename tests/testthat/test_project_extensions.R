@@ -28,7 +28,12 @@ create_project_extensions_fixture <- function(include_participants = TRUE) {
   fmriprep_root <- file.path(tmp, "derivatives", "fmriprep")
   dir.create(file.path(fmriprep_root, "sub-01", "func"), recursive = TRUE)
   jsonlite::write_json(
-    list(Name = "fmriprep", BIDSVersion = "1.8.0", DatasetType = "derivative"),
+    list(
+      Name = "fmriprep",
+      BIDSVersion = "1.8.0",
+      DatasetType = "derivative",
+      GeneratedBy = list(list(Name = "fmriprep"))
+    ),
     file.path(fmriprep_root, "dataset_description.json"),
     auto_unbox = TRUE
   )
@@ -53,7 +58,12 @@ create_project_extensions_fixture <- function(include_participants = TRUE) {
   qsiprep_root <- file.path(tmp, "derivatives", "qsiprep")
   dir.create(file.path(qsiprep_root, "sub-01", "anat"), recursive = TRUE)
   jsonlite::write_json(
-    list(Name = "qsiprep", BIDSVersion = "1.8.0", DatasetType = "derivative"),
+    list(
+      Name = "qsiprep",
+      BIDSVersion = "1.8.0",
+      DatasetType = "derivative",
+      GeneratedBy = list(list(Name = "qsiprep"))
+    ),
     file.path(qsiprep_root, "dataset_description.json"),
     auto_unbox = TRUE
   )

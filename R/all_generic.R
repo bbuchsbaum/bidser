@@ -935,13 +935,15 @@ read_dataset_description <- function(x, ...) {
   UseMethod("read_dataset_description")
 }
 
-# Internal accessors for bids_dataset_description fields.
-# Users access these via proj$description$fields$Name etc., or read_dataset_description().
-#' @keywords internal
-#' @noRd
+#' Get fields from a BIDS dataset description
+#'
+#' @param x A `bids_dataset_description` object.
+#' @param ... Additional arguments passed to methods.
+#' @return A character scalar.
+#' @export
 dataset_name <- function(x, ...) UseMethod("dataset_name")
-#' @keywords internal
-#' @noRd
+#' @rdname dataset_name
+#' @export
 dataset_type <- function(x, ...) UseMethod("dataset_type")
 #' @keywords internal
 #' @noRd

@@ -112,12 +112,12 @@ read_dataset_description.bids_project <- function(x, ...) {
 # Accessors (generics in R/all_generic.R)
 # ---------------------------------------------------------------------------
 
-#' @noRd
+#' @export
 dataset_name.bids_dataset_description <- function(x, ...) {
   x$fields$Name %||% NA_character_
 }
 
-#' @noRd
+#' @export
 dataset_type.bids_dataset_description <- function(x, ...) {
   x$fields$DatasetType %||% "raw"
 }

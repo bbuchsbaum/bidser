@@ -775,7 +775,7 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmripre
   tbl <- tbl %>% select(-starts_with("level_"))
 
   legacy_prep_dir <- ""
-  if (isTRUE(fmriprep) && nrow(deriv_info) > 0) {
+  if (nrow(deriv_info) > 0 && (isTRUE(fmriprep) || identical(derivatives, "auto"))) {
     if (!is.null(prep_dir) && nzchar(prep_dir) && prep_dir %in% deriv_info$root) {
       legacy_prep_dir <- prep_dir
     } else if ("fmriprep" %in% deriv_info$pipeline) {

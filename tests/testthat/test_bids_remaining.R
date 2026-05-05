@@ -73,7 +73,12 @@ create_remaining_fixture <- function(with_sessions = FALSE, with_fmriprep = FALS
       }
     }
     jsonlite::write_json(
-      list(Name = "fmriprep", BIDSVersion = "1.8.0", DatasetType = "derivative"),
+      list(
+        Name = "fmriprep",
+        BIDSVersion = "1.8.0",
+        DatasetType = "derivative",
+        GeneratedBy = list(list(Name = "fmriprep"))
+      ),
       file.path(fmriprep_root, "dataset_description.json"),
       auto_unbox = TRUE
     )
