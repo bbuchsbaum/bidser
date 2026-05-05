@@ -339,6 +339,62 @@ test_that("load_all_events includes .session column with sessions", {
   expect_true(all(c("01", "02") %in% events$.session))
 })
 
+test_that("event_files finds events nested under session folders", {
+  tmp <- create_remaining_fixture(with_sessions = TRUE)
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
+
+  proj <- bids_project(tmp, fmriprep = FALSE, index = "none")
+
+  events <- event_files(
+    proj,
+    subid = "01",
+    task = "rest",
+    session = "01",
+    full_path = FALSE
+  )
+
+  expect_true(length(events) > 0)
+  expect_true(all(grepl("^sub-01/ses-01/func/", events)))
+  expect_true(all(grepl("events\\.tsv$", events)))
+})
+
+test_that("event_files falls back to path entities when session is omitted from filename", {
+  tmp <- tempfile("bidser_evt_path_session_")
+  dir.create(file.path(tmp, "sub-2001", "ses-1", "func"), recursive = TRUE)
+  on.exit(unlink(tmp, recursive = TRUE, force = TRUE), add = TRUE)
+
+  readr::write_tsv(
+    tibble::tibble(participant_id = "sub-2001"),
+    file.path(tmp, "participants.tsv")
+  )
+  jsonlite::write_json(
+    list(Name = "PathSessionEvents", BIDSVersion = "1.8.0"),
+    file.path(tmp, "dataset_description.json"),
+    auto_unbox = TRUE
+  )
+  file.create(file.path(
+    tmp,
+    "sub-2001",
+    "ses-1",
+    "func",
+    "sub-2001_task-nback_run-01_events.tsv"
+  ))
+
+  proj <- bids_project(tmp, fmriprep = FALSE, index = "none")
+  events <- event_files(
+    proj,
+    subid = "2001",
+    task = "nback",
+    session = "1",
+    full_path = FALSE
+  )
+
+  expect_equal(
+    events,
+    "sub-2001/ses-1/func/sub-2001_task-nback_run-01_events.tsv"
+  )
+})
+
 test_that("load_all_events filters by subid", {
   tmp <- create_remaining_fixture(with_sessions = FALSE)
   on.exit(unlink(tmp, recursive = TRUE), add = TRUE)

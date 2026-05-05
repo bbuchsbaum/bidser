@@ -1,3 +1,66 @@
+.bidser_event_path_entity <- function(path, entity) {
+  pattern <- switch(
+    entity,
+    subid = "(^|/)sub-([^/]+)(/|_|$)",
+    session = "(^|/)ses-([^/]+)(/|_|$)",
+    task = "(^|_)task-([^_/]+)(_|$)",
+    run = "(^|_)run-([^_/]+)(_|$)",
+    stop("Unknown event entity: ", entity)
+  )
+  match <- regexec(pattern, path, perl = TRUE)
+  value <- regmatches(path, match)[[1]]
+  if (length(value) >= 3) value[[3]] else NA_character_
+}
+
+.bidser_event_entity_matches <- function(value, pattern) {
+  if (identical(pattern, ".*")) {
+    return(TRUE)
+  }
+  if (is.null(value) || length(value) == 0 || is.na(value)) {
+    return(FALSE)
+  }
+  grepl(pattern, value)
+}
+
+.bidser_event_files_from_filesystem <- function(x, subid, task, run, session, full_path) {
+  if (is.null(x$path) || !dir.exists(x$path)) {
+    return(NULL)
+  }
+
+  files <- list.files(
+    x$path,
+    pattern = "events\\.tsv$",
+    recursive = TRUE,
+    full.names = TRUE,
+    all.files = FALSE
+  )
+  if (length(files) == 0) {
+    return(NULL)
+  }
+
+  rel <- sub(paste0("^", gsub("([\\^$.|?*+(){}\\[\\]\\\\])", "\\\\\\1", x$path), "/?"), "", files)
+  raw_file <- grepl("^sub-[^/]+/", rel)
+  if (!any(raw_file)) {
+    return(NULL)
+  }
+
+  files <- files[raw_file]
+  rel <- rel[raw_file]
+
+  keep <- vapply(rel, function(path) {
+    .bidser_event_entity_matches(.bidser_event_path_entity(path, "subid"), subid) &&
+      .bidser_event_entity_matches(.bidser_event_path_entity(path, "task"), task) &&
+      .bidser_event_entity_matches(.bidser_event_path_entity(path, "run"), run) &&
+      .bidser_event_entity_matches(.bidser_event_path_entity(path, "session"), session)
+  }, logical(1))
+
+  if (!any(keep)) {
+    return(NULL)
+  }
+
+  unique(if (isTRUE(full_path)) files[keep] else rel[keep])
+}
+
 #' Retrieve event files from a BIDS project
 #' 
 #' Finds event files matching the given subject, task, run, and session criteria.
@@ -34,7 +97,7 @@ event_files.bids_project <- function(x, subid=".*", task=".*", run=".*", session
   
   # Use search_files to find event files
   tryCatch({
-    search_files(
+    ret <- search_files(
       x,
       regex = "events\\.tsv$",  # Match files ending with events.tsv
       subid = subid,
@@ -44,6 +107,17 @@ event_files.bids_project <- function(x, subid=".*", task=".*", run=".*", session
       full_path = full_path,
       strict = TRUE,  # Require that all queried keys exist in matched files
       ...
+    )
+    if (!is.null(ret) && length(ret) > 0) {
+      return(ret)
+    }
+    .bidser_event_files_from_filesystem(
+      x,
+      subid = subid,
+      task = task,
+      run = run,
+      session = session,
+      full_path = full_path
     )
   }, error = function(e) {
     warning("Error searching for event files: ", e$message)
