@@ -14,6 +14,7 @@
   npcs = -1,
   perc_var = -1,
   nest = TRUE,
+  clean = "zero_variance",
   ...
 )
 }
@@ -35,6 +36,10 @@
 \item{perc_var}{PCA variance (applied when requested).}
 
 \item{nest}{If \code{TRUE}, returns a nested tibble keyed by subject, task, session and run.}
+
+\item{clean}{Character vector controlling run-level confound cleaning before
+returning data or running PCA. Supported values are \code{"none"},
+\code{"zero_variance"}, and \code{"rank"}.}
 
 \item{...}{Additional BIDS entities (passed to \code{search_files}).}
 }

@@ -30,6 +30,31 @@ create_confounds_proj <- function() {
 }
 
 
+create_zero_variance_confounds_proj <- function() {
+  temp_dir <- tempfile("bids_conf_zv_")
+  dir.create(temp_dir)
+  readr::write_tsv(tibble(participant_id = "01"),
+                   file.path(temp_dir, "participants.tsv"))
+  jsonlite::write_json(list(Name = "TestZeroVarianceConfounds", BIDSVersion = "1.7.0"),
+                       file.path(temp_dir, "dataset_description.json"),
+                       auto_unbox = TRUE)
+  dir.create(file.path(temp_dir, "sub-01"))
+  conf_dir <- file.path(temp_dir, "derivatives", "fmriprep", "sub-01", "func")
+  dir.create(conf_dir, recursive = TRUE)
+  conf_data <- tibble(
+    cosine00 = c(-1, 0, 1, 2),
+    cosine01 = c(0, 0, 0, 0),
+    cosine02 = c(2, 1, 0, -1),
+    t_comp_cor_02 = c(5, 5, 5, 5)
+  )
+  conf_file <- file.path(conf_dir,
+                         "sub-01_task-test_run-01_desc-confounds_timeseries.tsv")
+  readr::write_tsv(conf_data, conf_file)
+  list(path = temp_dir,
+       proj = bids_project(temp_dir, fmriprep = TRUE))
+}
+
+
 test_that("valid confound file is read and nested", {
   setup <- create_confounds_proj()
   on.exit(unlink(setup$path, recursive = TRUE, force = TRUE), add = TRUE)
@@ -89,4 +114,64 @@ test_that("file without requested confounds raises an informative error", {
     ),
     "No requested confounds"
   )
+})
+
+test_that("read_confounds drops zero-variance columns by run and records diagnostics", {
+  setup <- create_zero_variance_confounds_proj()
+  on.exit(unlink(setup$path, recursive = TRUE, force = TRUE), add = TRUE)
+
+  expect_message(
+    conf <- read_confounds(
+      setup$proj,
+      cvars = c(confound_set("cosine"), "t_comp_cor_02")
+    ),
+    "Dropped zero-variance confounds"
+  )
+
+  inner_cols <- names(conf$data[[1]])
+  expect_true("cosine00" %in% inner_cols)
+  expect_true("cosine02" %in% inner_cols)
+  expect_false("cosine01" %in% inner_cols)
+  expect_false("t_comp_cor_02" %in% inner_cols)
+
+  diag <- attr(conf, "confound_diagnostics")
+  expect_s3_class(diag, "tbl_df")
+  expect_equal(sort(diag$column), c("cosine01", "t_comp_cor_02"))
+  expect_equal(unique(diag$reason), "zero_variance")
+  expect_equal(unique(diag$participant_id), "01")
+  expect_equal(unique(diag$run), "01")
+})
+
+test_that("read_confounds clean='none' preserves selected zero-variance columns", {
+  setup <- create_zero_variance_confounds_proj()
+  on.exit(unlink(setup$path, recursive = TRUE, force = TRUE), add = TRUE)
+
+  conf <- read_confounds(
+    setup$proj,
+    cvars = c(confound_set("cosine"), "t_comp_cor_02"),
+    clean = "none"
+  )
+
+  inner_cols <- names(conf$data[[1]])
+  expect_true(all(c("cosine00", "cosine01", "cosine02", "t_comp_cor_02") %in% inner_cols))
+  expect_equal(nrow(attr(conf, "confound_diagnostics")), 0)
+})
+
+test_that("read_confounds PCA path ignores zero-variance columns instead of failing", {
+  setup <- create_zero_variance_confounds_proj()
+  on.exit(unlink(setup$path, recursive = TRUE, force = TRUE), add = TRUE)
+
+  expect_message(
+    flat <- read_confounds(
+      setup$proj,
+      cvars = confound_set("cosine"),
+      npcs = 1,
+      nest = FALSE
+    ),
+    "Dropped zero-variance confounds"
+  )
+
+  expect_true("PC1" %in% names(flat))
+  expect_false(anyNA(flat$PC1))
+  expect_equal(attr(flat, "confound_diagnostics")$column, "cosine01")
 })

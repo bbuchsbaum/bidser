@@ -530,6 +530,10 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #' @param npcs Perform PCA reduction on confounds and return \code{npcs} PCs.
 #' @param perc_var Perform PCA reduction to retain \code{perc_var}% variance.
 #' @param nest If TRUE, nests confound tables by subject/task/session/run.
+#' @param clean Character vector controlling run-level confound cleaning before
+#'   returning data or running PCA. Supported values are `"none"`,
+#'   `"zero_variance"`, and `"rank"`. The default drops zero-variance columns
+#'   and records diagnostics in the `confound_diagnostics` attribute.
 #' @param ... Additional arguments (not currently used)
 #' @import dplyr
 #' @importFrom readr read_tsv
@@ -538,7 +542,8 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #' @return A `bids_confounds` tibble (nested if nest=TRUE) with identifier columns
 #'   for participant_id, task, session, and run. When PCA is requested, the
 #'   object includes a `pca` attribute with per-run loadings and variance used
-#'   by `plot()`.
+#'   by `plot()`. Dropped or flagged confounds are stored in the
+#'   `confound_diagnostics` attribute.
 #' @examples
 #' \donttest{
 #' # Try to load a BIDS project with fMRIPrep derivatives
@@ -567,10 +572,12 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #' }
 #' @export
 read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", run=".*",
-                                        cvars=DEFAULT_CVARS, npcs=-1, perc_var=-1, nest=TRUE, ...) {
+                                        cvars=DEFAULT_CVARS, npcs=-1, perc_var=-1,
+                                        nest=TRUE, clean="zero_variance", ...) {
   if (!inherits(x, "bids_project")) {
     stop("`x` must be a `bids_project` object.")
   }
+  clean <- .normalize_confound_clean(clean)
 
   selection <- paste0(
     "subid=", shQuote(subid),
@@ -643,6 +650,14 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
       if (is.null(dfx)) return(NULL)
 
       pca_row <- NULL
+      diagnostics <- .empty_confound_diagnostics()
+      diag_id <- list(
+        participant_id = s,
+        task = task_val,
+        run = run_val,
+        session = sess_val,
+        source = fn
+      )
 
       if (use_strategy) {
         # Strategy mode: PCA a subset, keep the rest raw
@@ -658,6 +673,9 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
         }
 
         dfx_pca <- dfx %>% dplyr::select(any_of(pca_cols))
+        pca_clean <- .clean_confound_frame(dfx_pca, clean, id = diag_id, role = "pca")
+        dfx_pca <- pca_clean$data
+        diagnostics <- dplyr::bind_rows(diagnostics, pca_clean$diagnostics)
         s_npcs <- strat$npcs
         s_pv   <- strat$perc_var
         if ((s_npcs > 0 || s_pv > 0) && ncol(dfx_pca) > 1) {
@@ -676,6 +694,9 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 
         if (length(raw_cols) > 0) {
           dfx_raw <- dfx %>% dplyr::select(any_of(raw_cols))
+          raw_clean <- .clean_confound_frame(dfx_raw, clean, id = diag_id, role = "raw")
+          dfx_raw <- raw_clean$data
+          diagnostics <- dplyr::bind_rows(diagnostics, raw_clean$diagnostics)
           dfx <- dplyr::bind_cols(tibble::as_tibble(dfx_pca), dfx_raw)
         } else {
           dfx <- tibble::as_tibble(dfx_pca)
@@ -690,6 +711,9 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
         }
 
         dfx <- dfx %>% dplyr::select(any_of(sel_cvars))
+        selected_clean <- .clean_confound_frame(dfx, clean, id = diag_id, role = "confound")
+        dfx <- selected_clean$data
+        diagnostics <- dplyr::bind_rows(diagnostics, selected_clean$diagnostics)
 
         # Process confounds if PCA requested
         if ((npcs > 0 || perc_var > 0) && ncol(dfx) > 1) {
@@ -711,7 +735,8 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
       list(
         data = dfx %>%
           mutate(participant_id=s, task=task_val, run=run_val, session=sess_val),
-        pca = pca_row
+        pca = pca_row,
+        diagnostics = diagnostics
       )
     })
 
@@ -723,13 +748,16 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 
     data_list <- lapply(dflist, `[[`, "data")
     pca_list <- lapply(dflist, `[[`, "pca")
+    diag_list <- lapply(dflist, `[[`, "diagnostics")
     data_list <- data_list[!sapply(data_list, is.null)]
     pca_list <- pca_list[!sapply(pca_list, is.null)]
+    diag_list <- diag_list[!sapply(diag_list, is.null)]
 
     data_out <- dplyr::bind_rows(data_list)
     pca_out <- if (length(pca_list) > 0) dplyr::bind_rows(pca_list) else NULL
+    diag_out <- if (length(diag_list) > 0) dplyr::bind_rows(diag_list) else .empty_confound_diagnostics()
 
-    list(data = data_out, pca = pca_out, status = "ok")
+    list(data = data_out, pca = pca_out, diagnostics = diag_out, status = "ok")
   })
 
   ret <- ret_all[!sapply(ret_all, function(z) nrow(z$data)==0)]
@@ -753,6 +781,13 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
   pca_list <- lapply(ret, `[[`, "pca")
   pca_list <- pca_list[!sapply(pca_list, is.null)]
   pca_meta <- if (length(pca_list) > 0) dplyr::bind_rows(pca_list) else NULL
+  diag_list <- lapply(ret_all, `[[`, "diagnostics")
+  diag_list <- diag_list[!sapply(diag_list, is.null)]
+  confound_diagnostics <- if (length(diag_list) > 0) {
+    dplyr::bind_rows(diag_list)
+  } else {
+    .empty_confound_diagnostics()
+  }
 
   if (nest) {
     ret_data <- ret_data %>% dplyr::group_by(participant_id, task, run, session) %>% tidyr::nest()
@@ -760,6 +795,8 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 
   class(ret_data) <- c("bids_confounds", class(ret_data))
   attr(ret_data, "pca") <- pca_meta
+  attr(ret_data, "confound_diagnostics") <- confound_diagnostics
+  .inform_confound_diagnostics(confound_diagnostics)
 
   ret_data
 }
@@ -767,6 +804,16 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 
 #' @keywords internal
 process_confounds <- function(dfx, center=TRUE, scale=TRUE, npcs=-1, perc_var=-1, return_pca=FALSE) {
+  cleaned <- .clean_confound_frame(dfx, clean = "zero_variance", action = "drop", drop = TRUE)
+  dfx <- cleaned$data
+  if (ncol(dfx) == 0) {
+    empty <- data.frame(row.names = seq_len(nrow(cleaned$data)))
+    if (return_pca) {
+      return(list(scores = empty, pca = NULL))
+    }
+    return(empty)
+  }
+
   m <- as.matrix(dfx)
   # Impute NAs
   if (anyNA(m)) {

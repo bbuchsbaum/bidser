@@ -1640,6 +1640,9 @@ confound_files.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 #' @param npcs PCA components (applied when requested).
 #' @param perc_var PCA variance (applied when requested).
 #' @param nest If `TRUE`, returns a nested tibble keyed by subject, task, session and run.
+#' @param clean Character vector controlling run-level confound cleaning before
+#'   returning data or running PCA. Supported values are `"none"`,
+#'   `"zero_variance"`, and `"rank"`.
 #' @param ... Additional BIDS entities (passed to `search_files`).
 #' @return A `bids_confounds` tibble of confound data (nested if `nest = TRUE`).
 #' @examples
@@ -1661,7 +1664,9 @@ confound_files.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 #' @rdname read_confounds-method
 #' @export
 read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", session = ".*", run = ".*",
-                                             cvars = NULL, npcs = -1, perc_var = -1, nest = TRUE, ...) {
+                                             cvars = NULL, npcs = -1, perc_var = -1,
+                                             nest = TRUE, clean = "zero_variance", ...) {
+  clean <- .normalize_confound_clean(clean)
   selection <- paste0(
     "subid=", shQuote(subid),
     ", task=", shQuote(task),
@@ -1684,6 +1689,7 @@ read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 
   all_conf <- list()
   all_pca <- list()
+  all_diagnostics <- list()
   for (rel_path in conf_paths) {
     if (rel_path %in% names(x$confound_data_store)) {
       conf_df <- x$confound_data_store[[rel_path]]
@@ -1715,6 +1721,15 @@ read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
     }
 
     pca_row <- NULL
+    diag_id <- list(
+      participant_id = meta$.subid,
+      task = meta$.task,
+      run = meta$.run,
+      session = meta$.session,
+      source = rel_path
+    )
+    cleaned <- .clean_confound_frame(conf_df, clean, id = diag_id, role = "confound")
+    conf_df <- cleaned$data
     if ((npcs > 0 || perc_var > 0) && ncol(conf_df) > 1) {
       proc <- process_confounds(conf_df, npcs=npcs, perc_var=perc_var, return_pca=TRUE)
       conf_df <- proc$scores
@@ -1732,6 +1747,7 @@ read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 
     combined_df <- dplyr::bind_cols(tibble::as_tibble(meta), tibble::as_tibble(conf_df))
     all_conf[[rel_path]] <- combined_df
+    all_diagnostics[[rel_path]] <- cleaned$diagnostics
     if (!is.null(pca_row)) {
       all_pca[[rel_path]] <- pca_row
     }
@@ -1739,6 +1755,11 @@ read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 
   final_df <- dplyr::bind_rows(all_conf)
   pca_meta <- if (length(all_pca) > 0) dplyr::bind_rows(all_pca) else NULL
+  confound_diagnostics <- if (length(all_diagnostics) > 0) {
+    dplyr::bind_rows(all_diagnostics)
+  } else {
+    .empty_confound_diagnostics()
+  }
 
   if (nrow(final_df) == 0) {
     rlang::abort(
@@ -1752,6 +1773,8 @@ read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
   if (!nest) {
     class(final_df) <- c("bids_confounds", class(final_df))
     attr(final_df, "pca") <- pca_meta
+    attr(final_df, "confound_diagnostics") <- confound_diagnostics
+    .inform_confound_diagnostics(confound_diagnostics)
     return(final_df)
   }
 
@@ -1759,6 +1782,8 @@ read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
   out <- final_df %>% dplyr::group_by(!!!rlang::syms(grouping_vars)) %>% tidyr::nest()
   class(out) <- c("bids_confounds", class(out))
   attr(out, "pca") <- pca_meta
+  attr(out, "confound_diagnostics") <- confound_diagnostics
+  .inform_confound_diagnostics(confound_diagnostics)
   out
 }
 

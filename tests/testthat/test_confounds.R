@@ -53,6 +53,44 @@ test_that("list_confound_sets returns a data.frame with expected columns", {
   expect_true("9p" %in% df$set)
 })
 
+
+test_that("check_confounds flags zero-variance and rank-deficient columns", {
+  df <- tibble::tibble(
+    participant_id = "01",
+    task = "rest",
+    run = "01",
+    x = c(1, 2, 3, 4),
+    y = c(2, 4, 6, 8),
+    z = c(1, 1, 1, 1)
+  )
+
+  diag <- check_confounds(df, checks = c("zero_variance", "rank"))
+  expect_true("z" %in% diag$column[diag$reason == "zero_variance"])
+  expect_equal(sum(diag$reason == "rank_deficient"), 1)
+  expect_equal(unique(diag$action), "flag")
+})
+
+test_that("clean_confounds drops flagged columns and preserves diagnostics", {
+  df <- tibble::tibble(
+    participant_id = "01",
+    task = "rest",
+    run = "01",
+    x = c(1, 2, 3, 4),
+    y = c(2, 4, 6, 8),
+    z = c(1, 1, 1, 1)
+  )
+
+  expect_message(
+    cleaned <- clean_confounds(df, clean = c("zero_variance", "rank")),
+    "Dropped"
+  )
+  data_cols <- setdiff(names(cleaned), c("participant_id", "task", "run"))
+  expect_equal(length(data_cols), 1)
+  diag <- attr(cleaned, "confound_diagnostics")
+  expect_true(all(c("zero_variance", "rank_deficient") %in% diag$reason))
+  expect_equal(unique(diag$action), "drop")
+})
+
 # --- confound_strategy tests ---
 
 test_that("confound_strategy creates pcabasic80 object", {

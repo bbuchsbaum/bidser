@@ -376,3 +376,25 @@ test_that("process_confounds without PCA returns scaled data", {
   # Scaled data should have mean ~0
   expect_true(abs(mean(res$a)) < 1e-10)
 })
+
+test_that("process_confounds drops zero-variance columns before scaling", {
+  df <- data.frame(
+    a = c(1, 1, 1, 1),
+    b = c(1, 2, 3, 4)
+  )
+  res <- bidser:::process_confounds(df)
+  expect_equal(names(res), "b")
+  expect_false(anyNA(res$b))
+})
+
+test_that("process_confounds PCA does not fail on zero-variance columns", {
+  df <- data.frame(
+    a = c(1, 1, 1, 1),
+    b = c(1, 2, 3, 4),
+    c = c(4, 1, 3, 2)
+  )
+  res <- bidser:::process_confounds(df, npcs = 1, return_pca = TRUE)
+  expect_true("PC1" %in% names(res$scores))
+  expect_false(anyNA(res$scores$PC1))
+  expect_false("a" %in% rownames(res$pca$rotation))
+})

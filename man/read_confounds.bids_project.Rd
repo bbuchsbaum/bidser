@@ -14,6 +14,7 @@
   npcs = -1,
   perc_var = -1,
   nest = TRUE,
+  clean = "zero_variance",
   ...
 )
 }
@@ -42,13 +43,19 @@ You can also pass convenience sets from \code{confound_set()}, e.g.,
 
 \item{nest}{If TRUE, nests confound tables by subject/task/session/run.}
 
+\item{clean}{Character vector controlling run-level confound cleaning before
+returning data or running PCA. Supported values are \code{"none"},
+\code{"zero_variance"}, and \code{"rank"}. The default drops zero-variance columns
+and records diagnostics in the \code{confound_diagnostics} attribute.}
+
 \item{...}{Additional arguments (not currently used)}
 }
 \value{
 A \code{bids_confounds} tibble (nested if nest=TRUE) with identifier columns
 for participant_id, task, session, and run. When PCA is requested, the
 object includes a \code{pca} attribute with per-run loadings and variance used
-by \code{plot()}.
+by \code{plot()}. Dropped or flagged confounds are stored in the
+\code{confound_diagnostics} attribute.
 }
 \description{
 Reads in fmriprep confound tables for one or more subjects.

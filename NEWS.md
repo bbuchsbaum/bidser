@@ -9,6 +9,10 @@
 * Make `read_confounds()` raise informative, selection-aware errors when no
   matching participants, confound files, or usable requested confounds are
   found.
+* Add run-level confound diagnostics and cleaning via `check_confounds()`,
+  `clean_confounds()`, and `read_confounds(..., clean = )`, with zero-variance
+  confounds dropped by default and recorded in a `confound_diagnostics`
+  attribute.
 * Fix `create_preproc_mask()` to ignore matching JSON sidecars and only read
   actual NIfTI mask images.
 * Add `query_files()` as the recommended explicit query API for new workflows,
