@@ -16,6 +16,7 @@ read_confounds(
   npcs = -1,
   perc_var = -1,
   nest = TRUE,
+  clean = "zero_variance",
   ...
 )
 ```
@@ -58,6 +59,12 @@ read_confounds(
 
   If `TRUE`, returns a nested tibble keyed by subject, task, session and
   run.
+
+- clean:
+
+  Character vector controlling run-level confound cleaning before
+  returning data or running PCA. Supported values are `"none"`,
+  `"zero_variance"`, and `"rank"`.
 
 - ...:
 

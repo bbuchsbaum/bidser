@@ -41,6 +41,9 @@
   : Retrieve a brain mask for a subject
 - [`build_subject_graph()`](https://bbuchsbaum.github.io/bidser/reference/build_subject_graph.md)
   : Build Subject Graph Structure
+- [`check_confounds()`](https://bbuchsbaum.github.io/bidser/reference/check_confounds.md)
+  [`clean_confounds()`](https://bbuchsbaum.github.io/bidser/reference/check_confounds.md)
+  : Check and clean confound tables
 - [`check_func_scans()`](https://bbuchsbaum.github.io/bidser/reference/check_func_scans.md)
   : Check Functional Scans in a BIDS Project
 - [`clear_example_bids_cache()`](https://bbuchsbaum.github.io/bidser/reference/clear_example_bids_cache.md)

@@ -16,6 +16,7 @@ read_confounds(
   npcs = -1,
   perc_var = -1,
   nest = TRUE,
+  clean = "zero_variance",
   ...
 )
 ```
@@ -65,6 +66,14 @@ read_confounds(
 
   If TRUE, nests confound tables by subject/task/session/run.
 
+- clean:
+
+  Character vector controlling run-level confound cleaning before
+  returning data or running PCA. Supported values are `"none"`,
+  `"zero_variance"`, and `"rank"`. The default drops zero-variance
+  columns and records diagnostics in the `confound_diagnostics`
+  attribute.
+
 - ...:
 
   Additional arguments (not currently used)
@@ -75,6 +84,8 @@ A `bids_confounds` tibble (nested if nest=TRUE) with identifier columns
 for participant_id, task, session, and run. When PCA is requested, the
 object includes a `pca` attribute with per-run loadings and variance
 used by [`plot()`](https://rdrr.io/r/graphics/plot.default.html).
+Dropped or flagged confounds are stored in the `confound_diagnostics`
+attribute.
 
 ## Examples
 

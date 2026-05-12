@@ -12,6 +12,11 @@
   [`read_confounds()`](https://bbuchsbaum.github.io/bidser/reference/read_confounds.md)
   raise informative, selection-aware errors when no matching
   participants, confound files, or usable requested confounds are found.
+- Add run-level confound diagnostics and cleaning via
+  [`check_confounds()`](https://bbuchsbaum.github.io/bidser/reference/check_confounds.md),
+  [`clean_confounds()`](https://bbuchsbaum.github.io/bidser/reference/check_confounds.md),
+  and `read_confounds(..., clean = )`, with zero-variance confounds
+  dropped by default and recorded in a `confound_diagnostics` attribute.
 - Fix
   [`create_preproc_mask()`](https://bbuchsbaum.github.io/bidser/reference/create_preproc_mask.md)
   to ignore matching JSON sidecars and only read actual NIfTI mask

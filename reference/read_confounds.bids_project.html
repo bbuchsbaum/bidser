@@ -57,6 +57,7 @@
 <span>  npcs <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,</span>
 <span>  perc_var <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,</span>
 <span>  nest <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  clean <span class="op">=</span> <span class="st">"zero_variance"</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -107,6 +108,13 @@ You can also pass convenience sets from <code><a href="confound_set.html">confou
 <dd><p>If TRUE, nests confound tables by subject/task/session/run.</p></dd>
 
 
+<dt id="arg-clean">clean<a class="anchor" aria-label="anchor" href="#arg-clean"></a></dt>
+<dd><p>Character vector controlling run-level confound cleaning before
+returning data or running PCA. Supported values are <code>"none"</code>,
+<code>"zero_variance"</code>, and <code>"rank"</code>. The default drops zero-variance columns
+and records diagnostics in the <code>confound_diagnostics</code> attribute.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments (not currently used)</p></dd>
 
@@ -116,7 +124,8 @@ You can also pass convenience sets from <code><a href="confound_set.html">confou
     <p>A <code>bids_confounds</code> tibble (nested if nest=TRUE) with identifier columns
 for participant_id, task, session, and run. When PCA is requested, the
 object includes a <code>pca</code> attribute with per-run loadings and variance used
-by <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>.</p>
+by <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. Dropped or flagged confounds are stored in the
+<code>confound_diagnostics</code> attribute.</p>
     </div>
 
     <div class="section level2">
