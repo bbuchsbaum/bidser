@@ -42,6 +42,20 @@ test_that("confound_set acompcor respects n", {
   expect_equal(acc_all, "a_comp_cor_*")
 })
 
+test_that("confound_set dvars defaults to standardized DVARS", {
+  dvars <- confound_set("dvars")
+  expect_equal(dvars, "std_dvars")
+  expect_false("dvars" %in% dvars)
+})
+
+test_that("confound_set exposes explicit raw and family DVARS selectors", {
+  expect_equal(confound_set("raw_dvars"), "dvars")
+  expect_equal(
+    confound_set("dvars_family"),
+    c("dvars", "std_dvars", "non_std_dvars", "vx_wisestd_dvars")
+  )
+})
+
 test_that("confound_set errors on unknown set", {
   expect_error(confound_set("nonexistent"), "Unknown confound set")
 })
