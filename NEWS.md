@@ -13,6 +13,10 @@
   `clean_confounds()`, and `read_confounds(..., clean = )`, with zero-variance
   confounds dropped by default and recorded in a `confound_diagnostics`
   attribute.
+* Add explicit DVARS selectors in `confound_set()`: `"dvars"` now returns only
+  `std_dvars` by default to avoid pairing raw and standardized DVARS in the
+  same nuisance set, while `"dvars_family"` preserves the previous full-family
+  behavior and `"raw_dvars"` selects raw `dvars` only.
 * Fix `create_preproc_mask()` to ignore matching JSON sidecars and only read
   actual NIfTI mask images.
 * Add `query_files()` as the recommended explicit query API for new workflows,
