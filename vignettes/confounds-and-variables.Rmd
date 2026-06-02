@@ -260,6 +260,12 @@ head(conf_flat)
 Each row is one volume, with subject/task/run identifiers alongside the
 confound values -- ready to join with your design matrix.
 
+fMRIPrep writes leading `NA` values for derivative-type confounds such as
+`framewise_displacement` and `*_derivative1`. The default preserves those
+values for backward compatibility. For raw nuisance regressors that need to go
+directly into a GLM design matrix, set `na_action = "zero"` to use the common
+fMRIPrep convention of replacing those leading values with zero.
+
 ## Confound strategies: PCA reduction
 
 For high-dimensional confound sets, you often want to reduce the

@@ -534,6 +534,11 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #'   returning data or running PCA. Supported values are `"none"`,
 #'   `"zero_variance"`, and `"rank"`. The default drops zero-variance columns
 #'   and records diagnostics in the `confound_diagnostics` attribute.
+#' @param na_action How to handle missing values in raw confound columns before
+#'   returning them. Supported values are `"leave"` (default, preserve missing
+#'   values), `"zero"` (replace missing numeric confounds with 0), and
+#'   `"median"` (replace missing numeric confounds with the column median).
+#'   PCA-reduced confounds already use median imputation internally.
 #' @param ... Additional arguments (not currently used)
 #' @import dplyr
 #' @importFrom readr read_tsv
@@ -573,11 +578,13 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #' @export
 read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", run=".*",
                                         cvars=DEFAULT_CVARS, npcs=-1, perc_var=-1,
-                                        nest=TRUE, clean="zero_variance", ...) {
+                                        nest=TRUE, clean="zero_variance",
+                                        na_action = "leave", ...) {
   if (!inherits(x, "bids_project")) {
     stop("`x` must be a `bids_project` object.")
   }
   clean <- .normalize_confound_clean(clean)
+  na_action <- .normalize_confound_na_action(na_action)
 
   selection <- paste0(
     "subid=", shQuote(subid),
@@ -678,9 +685,11 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
         diagnostics <- dplyr::bind_rows(diagnostics, pca_clean$diagnostics)
         s_npcs <- strat$npcs
         s_pv   <- strat$perc_var
+        pca_reduced <- FALSE
         if ((s_npcs > 0 || s_pv > 0) && ncol(dfx_pca) > 1) {
           proc <- process_confounds(dfx_pca, npcs = s_npcs, perc_var = s_pv, return_pca = TRUE)
           dfx_pca <- proc$scores
+          pca_reduced <- TRUE
           if (!is.null(proc$pca)) {
             pca_row <- tibble::tibble(
               participant_id = s,
@@ -691,11 +700,14 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
             )
           }
         }
+        if (!pca_reduced) {
+          dfx_pca <- .apply_confound_na_action(dfx_pca, na_action)
+        }
 
         if (length(raw_cols) > 0) {
           dfx_raw <- dfx %>% dplyr::select(any_of(raw_cols))
           raw_clean <- .clean_confound_frame(dfx_raw, clean, id = diag_id, role = "raw")
-          dfx_raw <- raw_clean$data
+          dfx_raw <- .apply_confound_na_action(raw_clean$data, na_action)
           diagnostics <- dplyr::bind_rows(diagnostics, raw_clean$diagnostics)
           dfx <- dplyr::bind_cols(tibble::as_tibble(dfx_pca), dfx_raw)
         } else {
@@ -716,9 +728,11 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
         diagnostics <- dplyr::bind_rows(diagnostics, selected_clean$diagnostics)
 
         # Process confounds if PCA requested
+        pca_reduced <- FALSE
         if ((npcs > 0 || perc_var > 0) && ncol(dfx) > 1) {
           proc <- process_confounds(dfx, npcs=npcs, perc_var=perc_var, return_pca=TRUE)
           dfx <- proc$scores
+          pca_reduced <- TRUE
           if (!is.null(proc$pca)) {
             pca_row <- tibble::tibble(
               participant_id = s,
@@ -728,6 +742,9 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
               pca = list(proc$pca)
             )
           }
+        }
+        if (!pca_reduced) {
+          dfx <- .apply_confound_na_action(dfx, na_action)
         }
       }
 

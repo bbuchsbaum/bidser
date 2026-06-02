@@ -315,6 +315,44 @@ list_confound_strategies <- function() {
 }
 
 
+.normalize_confound_na_action <- function(na_action) {
+  match.arg(na_action, c("leave", "zero", "median"))
+}
+
+
+.apply_confound_na_action <- function(dfx, na_action) {
+  na_action <- .normalize_confound_na_action(na_action)
+  dfx <- tibble::as_tibble(dfx)
+  if (identical(na_action, "leave") || ncol(dfx) == 0) {
+    return(dfx)
+  }
+
+  num_cols <- .confound_numeric_columns(dfx)
+  for (col in num_cols) {
+    v <- dfx[[col]]
+    missing <- is.na(v)
+    if (!any(missing)) {
+      next
+    }
+
+    fill <- switch(
+      na_action,
+      zero = 0,
+      median = {
+        v_num <- as.numeric(v)
+        finite <- is.finite(v_num)
+        if (any(finite)) stats::median(v_num[finite]) else 0
+      }
+    )
+    v_num <- as.numeric(v)
+    v_num[missing] <- fill
+    dfx[[col]] <- v_num
+  }
+
+  dfx
+}
+
+
 .empty_confound_diagnostics <- function() {
   tibble::tibble(
     participant_id = character(),

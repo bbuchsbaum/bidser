@@ -1,14 +1,27 @@
 context("read_confounds.bids_project")
 library(testthat)
 library(bidser)
-library(tibble)
+
+write_fmriprep_description <- function(path) {
+  deriv_root <- file.path(path, "derivatives", "fmriprep")
+  dir.create(deriv_root, recursive = TRUE, showWarnings = FALSE)
+  jsonlite::write_json(
+    list(
+      Name = "fMRIPrep",
+      BIDSVersion = "1.7.0",
+      GeneratedBy = list(list(Name = "fMRIPrep", Version = "21.0.0"))
+    ),
+    file.path(deriv_root, "dataset_description.json"),
+    auto_unbox = TRUE
+  )
+}
 
 # Helper to create a temporary BIDS project with a simple confounds file
 create_confounds_proj <- function() {
   temp_dir <- tempfile("bids_conf_")
   dir.create(temp_dir)
   # participants and dataset description
-  readr::write_tsv(tibble(participant_id = "01"),
+  readr::write_tsv(tibble::tibble(participant_id = "01"),
                    file.path(temp_dir, "participants.tsv"))
   jsonlite::write_json(list(Name = "TestConfounds", BIDSVersion = "1.7.0"),
                        file.path(temp_dir, "dataset_description.json"),
@@ -18,13 +31,14 @@ create_confounds_proj <- function() {
   # confounds file in derivatives
   conf_dir <- file.path(temp_dir, "derivatives", "fmriprep", "sub-01", "func")
   dir.create(conf_dir, recursive = TRUE)
-  conf_data <- tibble(CSF = c(0.1, 0.2, 0.3),
-                      WhiteMatter = c(0.5, 0.6, 0.7),
-                      FramewiseDisplacement = c(0.01, 0.02, 0.03),
-                      GlobalSignal = c(1.1, 1.2, 1.3))
+  conf_data <- tibble::tibble(CSF = c(0.1, 0.2, 0.3),
+                              WhiteMatter = c(0.5, 0.6, 0.7),
+                              FramewiseDisplacement = c(0.01, 0.02, 0.03),
+                              GlobalSignal = c(1.1, 1.2, 1.3))
   conf_file <- file.path(conf_dir,
                          "sub-01_task-test_run-01_desc-confounds_timeseries.tsv")
   readr::write_tsv(conf_data, conf_file)
+  write_fmriprep_description(temp_dir)
   list(path = temp_dir,
        proj = bids_project(temp_dir, fmriprep = TRUE))
 }
@@ -33,7 +47,7 @@ create_confounds_proj <- function() {
 create_zero_variance_confounds_proj <- function() {
   temp_dir <- tempfile("bids_conf_zv_")
   dir.create(temp_dir)
-  readr::write_tsv(tibble(participant_id = "01"),
+  readr::write_tsv(tibble::tibble(participant_id = "01"),
                    file.path(temp_dir, "participants.tsv"))
   jsonlite::write_json(list(Name = "TestZeroVarianceConfounds", BIDSVersion = "1.7.0"),
                        file.path(temp_dir, "dataset_description.json"),
@@ -41,7 +55,7 @@ create_zero_variance_confounds_proj <- function() {
   dir.create(file.path(temp_dir, "sub-01"))
   conf_dir <- file.path(temp_dir, "derivatives", "fmriprep", "sub-01", "func")
   dir.create(conf_dir, recursive = TRUE)
-  conf_data <- tibble(
+  conf_data <- tibble::tibble(
     cosine00 = c(-1, 0, 1, 2),
     cosine01 = c(0, 0, 0, 0),
     cosine02 = c(2, 1, 0, -1),
@@ -50,6 +64,33 @@ create_zero_variance_confounds_proj <- function() {
   conf_file <- file.path(conf_dir,
                          "sub-01_task-test_run-01_desc-confounds_timeseries.tsv")
   readr::write_tsv(conf_data, conf_file)
+  write_fmriprep_description(temp_dir)
+  list(path = temp_dir,
+       proj = bids_project(temp_dir, fmriprep = TRUE))
+}
+
+
+create_na_confounds_proj <- function() {
+  temp_dir <- tempfile("bids_conf_na_")
+  dir.create(temp_dir)
+  readr::write_tsv(tibble::tibble(participant_id = "01"),
+                   file.path(temp_dir, "participants.tsv"))
+  jsonlite::write_json(list(Name = "TestNaConfounds", BIDSVersion = "1.7.0"),
+                       file.path(temp_dir, "dataset_description.json"),
+                       auto_unbox = TRUE)
+  dir.create(file.path(temp_dir, "sub-01"))
+  conf_dir <- file.path(temp_dir, "derivatives", "fmriprep", "sub-01", "func")
+  dir.create(conf_dir, recursive = TRUE)
+  conf_data <- tibble::tibble(
+    framewise_displacement = c(NA, 0.2, 0.4),
+    trans_x = c(1, 2, 3),
+    trans_x_derivative1 = c(NA, 0.1, 0.3),
+    cosine00 = c(-1, 0, 1)
+  )
+  conf_file <- file.path(conf_dir,
+                         "sub-01_task-test_run-01_desc-confounds_timeseries.tsv")
+  readr::write_tsv(conf_data, conf_file)
+  write_fmriprep_description(temp_dir)
   list(path = temp_dir,
        proj = bids_project(temp_dir, fmriprep = TRUE))
 }
@@ -174,4 +215,96 @@ test_that("read_confounds PCA path ignores zero-variance columns instead of fail
   expect_true("PC1" %in% names(flat))
   expect_false(anyNA(flat$PC1))
   expect_equal(attr(flat, "confound_diagnostics")$column, "cosine01")
+})
+
+test_that("read_confounds preserves raw confound NAs by default", {
+  setup <- create_na_confounds_proj()
+  on.exit(unlink(setup$path, recursive = TRUE, force = TRUE), add = TRUE)
+
+  conf <- read_confounds(
+    setup$proj,
+    cvars = c("framewise_displacement", "trans_x_derivative1", "cosine00")
+  )
+
+  inner <- conf$data[[1]]
+  expect_true(is.na(inner$framewise_displacement[1]))
+  expect_true(is.na(inner$trans_x_derivative1[1]))
+})
+
+test_that("read_confounds na_action='zero' fills raw confound NAs with zero", {
+  setup <- create_na_confounds_proj()
+  on.exit(unlink(setup$path, recursive = TRUE, force = TRUE), add = TRUE)
+
+  conf <- read_confounds(
+    setup$proj,
+    cvars = c("framewise_displacement", "trans_x_derivative1", "cosine00"),
+    na_action = "zero"
+  )
+
+  inner <- conf$data[[1]]
+  expect_false(anyNA(inner))
+  expect_equal(inner$framewise_displacement[1], 0)
+  expect_equal(inner$trans_x_derivative1[1], 0)
+  expect_equal(inner$cosine00, c(-1, 0, 1))
+})
+
+test_that("read_confounds na_action='median' fills raw confound NAs with finite medians", {
+  setup <- create_na_confounds_proj()
+  on.exit(unlink(setup$path, recursive = TRUE, force = TRUE), add = TRUE)
+
+  conf <- read_confounds(
+    setup$proj,
+    cvars = c("framewise_displacement", "trans_x_derivative1"),
+    na_action = "median"
+  )
+
+  inner <- conf$data[[1]]
+  expect_false(anyNA(inner))
+  expect_equal(inner$framewise_displacement[1], 0.3)
+  expect_equal(inner$trans_x_derivative1[1], 0.2)
+})
+
+test_that("read_confounds na_action applies to raw strategy columns", {
+  setup <- create_na_confounds_proj()
+  on.exit(unlink(setup$path, recursive = TRUE, force = TRUE), add = TRUE)
+
+  strat <- confound_strategy(
+    pca_vars = c("trans_x", "cosine00"),
+    raw_vars = c("framewise_displacement", "trans_x_derivative1"),
+    npcs = 1
+  )
+  conf <- read_confounds(setup$proj, cvars = strat, na_action = "zero")
+
+  inner <- conf$data[[1]]
+  expect_false(anyNA(inner))
+  expect_true("PC1" %in% names(inner))
+  expect_equal(inner$framewise_displacement[1], 0)
+  expect_equal(inner$trans_x_derivative1[1], 0)
+})
+
+test_that("read_confounds mock project supports na_action for API parity", {
+  parts <- c("01")
+  fs <- tibble::tibble(
+    subid = "01",
+    datatype = "func",
+    suffix = c("bold.nii.gz", "desc-confounds_timeseries.tsv"),
+    task = "rest",
+    fmriprep = c(TRUE, TRUE)
+  )
+  key <- "derivatives/fmriprep/sub-01/func/sub-01_task-rest_desc-confounds_timeseries.tsv"
+  conf_data <- list()
+  conf_data[[key]] <- tibble::tibble(
+    framewise_displacement = c(NA, 0.2, 0.4),
+    trans_x = c(1, 2, 3)
+  )
+  mock <- create_mock_bids("ConfNaTest", parts, fs, confound_data = conf_data)
+
+  conf <- read_confounds(
+    mock,
+    cvars = c("framewise_displacement", "trans_x"),
+    na_action = "zero"
+  )
+
+  expect_false(anyNA(conf$data[[1]]))
+  expect_equal(conf$data[[1]]$framewise_displacement[1], 0)
 })

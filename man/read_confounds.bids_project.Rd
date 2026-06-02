@@ -15,6 +15,7 @@
   perc_var = -1,
   nest = TRUE,
   clean = "zero_variance",
+  na_action = "leave",
   ...
 )
 }
@@ -47,6 +48,12 @@ You can also pass convenience sets from \code{confound_set()}, e.g.,
 returning data or running PCA. Supported values are \code{"none"},
 \code{"zero_variance"}, and \code{"rank"}. The default drops zero-variance columns
 and records diagnostics in the \code{confound_diagnostics} attribute.}
+
+\item{na_action}{How to handle missing values in raw confound columns before
+returning them. Supported values are \code{"leave"} (default, preserve missing
+values), \code{"zero"} (replace missing numeric confounds with 0), and
+\code{"median"} (replace missing numeric confounds with the column median).
+PCA-reduced confounds already use median imputation internally.}
 
 \item{...}{Additional arguments (not currently used)}
 }

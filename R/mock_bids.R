@@ -1643,6 +1643,9 @@ confound_files.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 #' @param clean Character vector controlling run-level confound cleaning before
 #'   returning data or running PCA. Supported values are `"none"`,
 #'   `"zero_variance"`, and `"rank"`.
+#' @param na_action How to handle missing values in raw confound columns before
+#'   returning them. Supported values are `"leave"` (default), `"zero"`, and
+#'   `"median"`. PCA-reduced confounds already use median imputation internally.
 #' @param ... Additional BIDS entities (passed to `search_files`).
 #' @return A `bids_confounds` tibble of confound data (nested if `nest = TRUE`).
 #' @examples
@@ -1665,8 +1668,10 @@ confound_files.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
 #' @export
 read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", session = ".*", run = ".*",
                                              cvars = NULL, npcs = -1, perc_var = -1,
-                                             nest = TRUE, clean = "zero_variance", ...) {
+                                             nest = TRUE, clean = "zero_variance",
+                                             na_action = "leave", ...) {
   clean <- .normalize_confound_clean(clean)
+  na_action <- .normalize_confound_na_action(na_action)
   selection <- paste0(
     "subid=", shQuote(subid),
     ", task=", shQuote(task),
@@ -1730,9 +1735,11 @@ read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
     )
     cleaned <- .clean_confound_frame(conf_df, clean, id = diag_id, role = "confound")
     conf_df <- cleaned$data
+    pca_reduced <- FALSE
     if ((npcs > 0 || perc_var > 0) && ncol(conf_df) > 1) {
       proc <- process_confounds(conf_df, npcs=npcs, perc_var=perc_var, return_pca=TRUE)
       conf_df <- proc$scores
+      pca_reduced <- TRUE
       if (!is.null(proc$pca)) {
         pca_row <- tibble::tibble(
           .subid = meta$.subid,
@@ -1743,6 +1750,9 @@ read_confounds.mock_bids_project <- function(x, subid = ".*", task = ".*", sessi
           pca = list(proc$pca)
         )
       }
+    }
+    if (!pca_reduced) {
+      conf_df <- .apply_confound_na_action(conf_df, na_action)
     }
 
     combined_df <- dplyr::bind_cols(tibble::as_tibble(meta), tibble::as_tibble(conf_df))
