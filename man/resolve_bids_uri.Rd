@@ -34,7 +34,7 @@ tryCatch({
   desc <- read_dataset_description(ds001_path)
   uri <- bids_uri("bids::sub-01/anat/sub-01_T1w.nii.gz")
   path <- resolve_bids_uri(uri, desc)
-  unlink(ds001_path, recursive = TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) message("Example requires internet: ", e$message))
 }
 }

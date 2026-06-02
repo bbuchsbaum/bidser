@@ -40,7 +40,7 @@ tryCatch({
   
   # Clean up
   unlink(archive_path)
-  unlink(ds_path, recursive = TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example failed: ", e$message)
 })

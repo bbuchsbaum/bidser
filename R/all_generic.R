@@ -111,7 +111,7 @@ sessions <- function (x, ...) {
 #'   tasks(proj)
 #'   
 #'   # Clean up
-#'   unlink(ds001_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -146,7 +146,7 @@ tasks <- function (x, ...) {
 #'   flat_list(proj, full_path=FALSE)
 #'   
 #'   # Clean up
-#'   unlink(ds001_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -189,7 +189,7 @@ flat_list <- function(x, ...) {
 #'   participants(proj, as_tibble = TRUE)
 #'
 #'   # Clean up
-#'   unlink(ds001_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -232,7 +232,7 @@ participants <- function (x, ...) {
 #'   }
 #'   
 #'   # Clean up
-#'   unlink(ds001_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -273,7 +273,7 @@ event_files <- function (x, ...) {
 #'   confound_files(proj, subid="sub-01", task="balloonanalogrisktask")
 #'   
 #'   # Clean up
-#'   unlink(ds_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -327,7 +327,7 @@ confound_files <- function (x, ...) {
 #'   }
 #'   
 #'   # Clean up
-#'   unlink(ds001_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -401,7 +401,7 @@ read_events <- function(x, ...) {
 #'                                nest=FALSE)
 #'   
 #'   # Clean up
-#'   unlink(ds_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -462,7 +462,7 @@ read_confounds <- function(x, ...) {
 #'   }
 #'   
 #'   # Clean up
-#'   unlink(ds001_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #'   unlink(ds007_path, recursive=TRUE)
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
@@ -513,7 +513,7 @@ func_scans <- function(x, ...) {
 #'   }
 #'   
 #'   # Clean up
-#'   unlink(ds001_deriv_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires derivatives dataset: ", e$message)
 #' })
@@ -544,7 +544,7 @@ preproc_scans <- function(x, subid = ".*", task = ".*", run = ".*", session = ".
 #'   sub01_mask <- create_preproc_mask(proj, subid="01")
 #'   
 #'   # Clean up
-#'   unlink(ds001_deriv_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires derivatives dataset: ", e$message)
 #' })
@@ -576,7 +576,7 @@ create_preproc_mask <- function(x, subid, thresh=0.99, ...) {
 #'   multi_mask <- brain_mask(proj, subid=".*")
 #'   
 #'   # Clean up
-#'   unlink(ds001_deriv_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires derivatives dataset: ", e$message)
 #' })
@@ -626,7 +626,7 @@ brain_mask <- function(x, subid, ...) {
 #'                                  task="balloonanalogrisktask")
 #'   
 #'   # Clean up
-#'   unlink(ds001_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -707,7 +707,7 @@ search_files <- function(x, ...) {
 #'     scope = "raw"
 #'   )
 #'
-#'   unlink(ds001_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -733,7 +733,7 @@ search_files <- function(x, ...) {
 #'     return = "tibble"
 #'   )
 #'
-#'   unlink(deriv_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires derivatives dataset: ", e$message)
 #' })
@@ -771,7 +771,7 @@ query_files <- function(x, ...) {
 #'   proj <- bids_project(ds001_path)
 #'   f <- func_scans(proj, subid = "01")[1]
 #'   if (!is.null(f)) get_metadata(proj, f)
-#'   unlink(ds001_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) message("Example requires internet: ", e$message))
 #' }
 get_metadata <- function(x, file, inherit = TRUE, scope = c("auto", "raw", "derivatives", "all"), ...) {
@@ -810,7 +810,7 @@ get_metadata <- function(x, file, inherit = TRUE, scope = c("auto", "raw", "deri
 #'   }
 #'   
 #'   # Clean up
-#'   unlink(ds001_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -832,7 +832,7 @@ load_all_events <- function(x, ...) {
 #'   summary <- bids_summary(proj)
 #'   
 #'   # Clean up
-#'   unlink(ds001_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -857,7 +857,7 @@ bids_summary <- function(x) {
 #'   compliance <- bids_check_compliance(proj)
 #'
 #'   # Clean up
-#'   unlink(ds001_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -887,7 +887,7 @@ bids_check_compliance <- function(x, schema_check = TRUE, schema_version = "1.10
 #'   subj$scans()
 #'   
 #'   # Clean up
-#'   unlink(ds001_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -928,7 +928,7 @@ get_data_matrix <- function(x, ...) {
 #'   ds001_path <- get_example_bids_dataset("ds001")
 #'   desc <- read_dataset_description(ds001_path)
 #'   print(desc)
-#'   unlink(ds001_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) message("Example requires internet: ", e$message))
 #' }
 read_dataset_description <- function(x, ...) {
@@ -971,7 +971,7 @@ license <- function(x, ...) UseMethod("license")
 #'   ds001_path <- get_example_bids_dataset("ds001")
 #'   desc <- read_dataset_description(ds001_path)
 #'   bids_version(desc)
-#'   unlink(ds001_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) message("Example requires internet: ", e$message))
 #' }
 bids_version <- function(x, ...) {
@@ -992,7 +992,7 @@ bids_version <- function(x, ...) {
 #'   proj <- bids_project(ds001_path)
 #'   desc <- dataset_description(proj)
 #'   print(desc)
-#'   unlink(ds001_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) message("Example requires internet: ", e$message))
 #' }
 dataset_description <- function(x, ...) {
@@ -1012,7 +1012,7 @@ dataset_description <- function(x, ...) {
 #'   ds001_path <- get_example_bids_dataset("ds001")
 #'   pt <- read_participants(ds001_path)
 #'   print(pt)
-#'   unlink(ds001_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) message("Example requires internet: ", e$message))
 #' }
 read_participants <- function(x, ...) {
@@ -1034,7 +1034,7 @@ read_participants <- function(x, ...) {
 #'   ds001_path <- get_example_bids_dataset("ds001")
 #'   proj <- bids_project(ds001_path)
 #'   scans <- read_scans_tsv(proj, subid = "01")
-#'   unlink(ds001_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) message("Example requires internet: ", e$message))
 #' }
 read_scans_tsv <- function(x, subid, session = NULL, ...) {
@@ -1075,7 +1075,7 @@ read_sessions_tsv <- function(x, subid, ...) {
 #'   ds001_path <- get_example_bids_dataset("ds001")
 #'   pt <- read_participants(ds001_path)
 #'   sc <- sidecar(pt)
-#'   unlink(ds001_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) message("Example requires internet: ", e$message))
 #' }
 sidecar <- function(x, ...) {
@@ -1113,7 +1113,7 @@ as_bids_uri <- function(x, ...) {
 #'   desc <- read_dataset_description(ds001_path)
 #'   uri <- bids_uri("bids::sub-01/anat/sub-01_T1w.nii.gz")
 #'   path <- resolve_bids_uri(uri, desc)
-#'   unlink(ds001_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) message("Example requires internet: ", e$message))
 #' }
 resolve_bids_uri <- function(uri, description, ..., must_exist = FALSE) {
@@ -1166,7 +1166,7 @@ resolve_bids_uri <- function(uri, description, ..., must_exist = FALSE) {
 #'   sub01_xfms <- transform_files(proj, subid = "01")
 #'
 #'   # Clean up
-#'   unlink(ds_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -1223,7 +1223,7 @@ transform_files <- function(x, subid = ".*", session = ".*", from = ".*",
 #'   fsnative_surfs <- surface_files(proj, space = "fsnative")
 #'
 #'   # Clean up
-#'   unlink(ds_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -1273,7 +1273,7 @@ surface_files <- function(x, subid = ".*", session = ".*", hemi = ".*",
 #'   sub01_masks <- mask_files(proj, subid = "01")
 #'
 #'   # Clean up
-#'   unlink(ds_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -1333,7 +1333,7 @@ mask_files <- function(x, subid = ".*", session = ".*", space = ".*",
 #'   head(flat)
 #'
 #'   # Clean up
-#'   unlink(ds_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })

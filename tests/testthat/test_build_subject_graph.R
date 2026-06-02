@@ -1,8 +1,6 @@
 # tests/testthat/test_build_subject_graph.R
 
 library(testthat)
-library(tibble)
-library(dplyr)
 library(bidser)
 
 context("build_subject_graph() Function")

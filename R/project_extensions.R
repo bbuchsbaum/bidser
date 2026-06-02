@@ -14,7 +14,7 @@
 #'   ds_path <- get_example_bids_dataset("ds000001-fmriprep")
 #'   proj <- bids_project(ds_path, fmriprep = TRUE)
 #'   derivative_pipelines(proj)
-#'   unlink(ds_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) message("Example requires internet: ", e$message))
 #' }
 derivative_pipelines <- function(x) {
@@ -42,7 +42,7 @@ derivative_pipelines <- function(x) {
 #'   ds_path <- get_example_bids_dataset("ds000001-fmriprep")
 #'   proj <- bids_project(ds_path, fmriprep = TRUE)
 #'   df <- derivative_files(proj)
-#'   unlink(ds_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) message("Example requires internet: ", e$message))
 #' }
 derivative_files <- function(x, pipeline = NULL, ...) {
@@ -71,7 +71,7 @@ derivative_files <- function(x, pipeline = NULL, ...) {
 #'   proj <- bids_project(ds001_path)
 #'   idx <- bids_index(proj, persist = FALSE)
 #'   print(idx)
-#'   unlink(ds001_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) message("Example requires internet: ", e$message))
 #' }
 bids_index <- function(x, rebuild = FALSE, persist = TRUE) {
@@ -252,7 +252,7 @@ bids_index <- function(x, rebuild = FALSE, persist = TRUE) {
 #'   proj <- bids_project(ds001_path)
 #'   vt <- variables_table(proj)
 #'   print(vt)
-#'   unlink(ds001_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) message("Example requires internet: ", e$message))
 #' }
 variables_table <- function(x, subid = ".*", task = ".*", run = ".*", session = ".*",
@@ -368,7 +368,7 @@ variables_table <- function(x, subid = ".*", task = ".*", run = ".*", session = 
 #'   ds001_path <- get_example_bids_dataset("ds001")
 #'   proj <- bids_project(ds001_path)
 #'   rd <- bids_report_data(proj)
-#'   unlink(ds001_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) message("Example requires internet: ", e$message))
 #' }
 bids_report_data <- function(x, ...) {
@@ -435,7 +435,7 @@ bids_report_data <- function(x, ...) {
 #'   proj <- bids_project(ds001_path)
 #'   rpt <- bids_report(proj)
 #'   print(rpt)
-#'   unlink(ds001_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) message("Example requires internet: ", e$message))
 #' }
 bids_report <- function(x, ...) {

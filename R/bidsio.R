@@ -20,7 +20,7 @@
 #'                                      subid="01",
 #'                                      task="balloonanalogrisktask",
 #'                                      run="01")
-#'   unlink(ds_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires derivatives dataset: ", e$message)
 #' })
@@ -105,7 +105,7 @@ read_func_scans.bids_project <- function(x, mask, mode = c("normal", "bigvec"),
 #'   first_run <- masked_scans[[1]]
 #'   
 #'   # Clean up
-#'   unlink(ds_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires derivatives dataset: ", e$message)
 #' })
@@ -205,7 +205,7 @@ read_preproc_scans.bids_project <- function(x, mask=NULL, mode = c("normal", "bi
 #'                                   task="balloonanalogrisktask",
 #'                                   space="MNI152NLin2009cAsym")
 #'
-#'   unlink(ds_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires derivatives dataset: ", e$message)
 #' })
@@ -565,7 +565,7 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #'   conf_flat <- read_confounds(proj, nest=FALSE)
 #'   
 #'   # Clean up
-#'   unlink(ds_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires derivatives dataset with confounds: ", e$message)
 #' })

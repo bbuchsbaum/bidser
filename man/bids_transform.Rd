@@ -10,8 +10,8 @@ bids_transform(x, transformer, pipeline_name, ...)
 \item{x}{A \code{bids_project} object.}
 
 \item{transformer}{A function that performs the transformation. It must take
-the input file path and return the output file path. The transformer is
-responsible for creating the output file.}
+two arguments, the input file path and the output directory, and return the
+output file path. The transformer is responsible for creating the output file.}
 
 \item{pipeline_name}{The name for the new derivative pipeline.}
 
@@ -34,14 +34,14 @@ tryCatch({
   proj <- bids_project(ds_path)
 
   # Create a simple transformer that adds a description
-  add_desc_transformer <- function(infile) {
+  add_desc_transformer <- function(infile, outdir) {
     entities <- encode(basename(infile))
     entities$desc <- if (is.null(entities$desc)) "smooth6mm" else 
                      paste(entities$desc, "smooth6mm", sep="")
     
     # Generate new filename
     new_name <- decode_bids_entities(entities)
-    outfile <- file.path(dirname(infile), new_name)
+    outfile <- file.path(outdir, new_name)
     
     # For demo, just copy the file (real transformer would process it)
     file.copy(infile, outfile)

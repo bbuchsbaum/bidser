@@ -138,7 +138,7 @@ tryCatch({
   unlink(c(archive_path, archive_filtered, archive_downsampled, zip_path, 
            archive_no_deriv, archive_strict))
   if (exists("archive_parallel")) unlink(archive_parallel)
-  unlink(ds_path, recursive = TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example failed: ", e$message)
 })

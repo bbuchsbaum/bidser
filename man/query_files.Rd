@@ -125,7 +125,7 @@ tryCatch({
     scope = "raw"
   )
 
-  unlink(ds001_path, recursive = TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })
@@ -151,7 +151,7 @@ tryCatch({
     return = "tibble"
   )
 
-  unlink(deriv_path, recursive = TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example requires derivatives dataset: ", e$message)
 })

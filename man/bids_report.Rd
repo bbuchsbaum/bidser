@@ -24,7 +24,7 @@ tryCatch({
   proj <- bids_project(ds001_path)
   rpt <- bids_report(proj)
   print(rpt)
-  unlink(ds001_path, recursive = TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) message("Example requires internet: ", e$message))
 }
 }

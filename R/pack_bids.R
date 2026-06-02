@@ -338,7 +338,7 @@ add_resolution_tag <- function(filename, factor) {
 #'   unlink(c(archive_path, archive_filtered, archive_downsampled, zip_path, 
 #'            archive_no_deriv, archive_strict))
 #'   if (exists("archive_parallel")) unlink(archive_parallel)
-#'   unlink(ds_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example failed: ", e$message)
 #' })
@@ -456,13 +456,11 @@ pack_bids <- function(x,
     temp_dir <- tempdir()
   }
 
-  # Always stage into a distinct directory. Some tests build projects inside
-  # tempdir(), so reusing file.path(temp_dir, project_name) can alias the
-  # source tree and make file.copy() fail on platforms that reject from == to.
-  temp_project_dir <- tempfile(
-    pattern = paste0(basename(project_name), "_pack_"),
-    tmpdir = temp_dir
-  )
+  # Always stage inside a distinct parent directory. The archive root itself is
+  # kept short so internal tar does not warn about non-portable member paths.
+  archive_parent_dir <- tempfile("bidser_pack_", tmpdir = temp_dir)
+  archive_root <- .bidser_archive_root_name(project_name)
+  temp_project_dir <- file.path(archive_parent_dir, archive_root)
   
   if (verbose) {
     message("\n=== Starting pack_bids ===")
@@ -757,7 +755,7 @@ pack_bids <- function(x,
       # Change to parent directory for cleaner archive paths
       old_wd <- getwd()
       on.exit(setwd(old_wd), add = TRUE)
-      setwd(temp_dir)
+      setwd(archive_parent_dir)
       
       # Create tar.gz archive with basename to avoid full path issues
       temp_archive <- paste0(basename(temp_project_dir), ".tar.gz")
@@ -774,7 +772,7 @@ pack_bids <- function(x,
       # For zip, we need to get all files in the temp directory
       old_wd <- getwd()
       on.exit(setwd(old_wd), add = TRUE)
-      setwd(temp_dir)
+      setwd(archive_parent_dir)
       
       # Get the project directory name
       proj_dir_name <- basename(temp_project_dir)
@@ -820,8 +818,8 @@ pack_bids <- function(x,
     }
     
     # Cleanup if requested
-    if (cleanup && dir.exists(temp_project_dir)) {
-      unlink(temp_project_dir, recursive = TRUE)
+    if (cleanup && dir.exists(archive_parent_dir)) {
+      unlink(archive_parent_dir, recursive = TRUE)
       if (verbose) {
         message("Temporary files cleaned up")
       }
@@ -838,11 +836,22 @@ pack_bids <- function(x,
   }, error = function(e) {
     warning("Failed to create archive: ", e$message)
     # Cleanup on error
-    if (cleanup && dir.exists(temp_project_dir)) {
-      unlink(temp_project_dir, recursive = TRUE)
+    if (cleanup && dir.exists(archive_parent_dir)) {
+      unlink(archive_parent_dir, recursive = TRUE)
     }
     return(NULL)
   })
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_archive_root_name <- function(project_name) {
+  root <- gsub("[^A-Za-z0-9._-]+", "_", basename(as.character(project_name)))
+  root <- sub("^_+", "", sub("_+$", "", root))
+  if (!nzchar(root)) {
+    root <- "bids"
+  }
+  substr(root, 1L, 16L)
 }
 
 #' List Contents of Packed BIDS Archive
@@ -877,7 +886,7 @@ pack_bids <- function(x,
 #'   
 #'   # Clean up
 #'   unlink(archive_path)
-#'   unlink(ds_path, recursive = TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example failed: ", e$message)
 #' })

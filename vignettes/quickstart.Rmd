@@ -497,6 +497,5 @@ conf <- read_confounds(proj_deriv, subid = "01")
 ```
 
 ```{r cleanup, include=FALSE}
-if (exists("ds001_path")) unlink(ds001_path, recursive = TRUE)
-if (exists("deriv_path")) unlink(deriv_path, recursive = TRUE)
+# Example datasets are cached by get_example_bids_dataset(); leave them in place.
 ```

@@ -1,10 +1,2 @@
-linters: linters_with_defaults(
-    line_length_linter(120),
-    commented_code_linter = NULL,
-    cyclocomp_linter = NULL,
-    object_usage_linter = NULL
-  )
-exclusions: list(
-    "R/RcppExports.R",
-    "tests/testthat.R"
-  ) 
+linters: list(duplicate_argument_linter(), equals_na_linter(), literal_coercion_linter(), missing_argument_linter(), T_and_F_symbol_linter(), unreachable_code_linter())
+exclusions: list("R/RcppExports.R", "tests/testthat.R")

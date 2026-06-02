@@ -10,13 +10,6 @@ skip_if_not_installed("viridis")
 skip_if_not_installed("scales")
 skip_if_not_installed("patchwork")
 
-# Load plotting packages required for tests
-library(ggplot2)
-library(plotly)
-library(viridis)
-library(scales)
-library(patchwork)
-
 # Helper to make a tiny mock project
 make_proj <- function(...) {
   # Create a simple mock BIDS structure
@@ -71,5 +64,4 @@ test_that("bids_heatmap falls back when tasks or runs missing", {
   p <- bids_heatmap(proj_missing_run, interactive = FALSE)
   expect_s3_class(p, "ggplot")
 })
-
 

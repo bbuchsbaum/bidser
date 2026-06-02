@@ -36,7 +36,7 @@ test_that("pack_bids creates tar.gz archive with stub files", {
   
   # Clean up
   unlink(output_file)
-  unlink(dirname(proj$path), recursive = TRUE)
+  # get_example_bids_dataset() uses a session cache; leave it in place.
 })
 
 test_that("pack_bids creates zip archive", {
@@ -65,7 +65,7 @@ test_that("pack_bids creates zip archive", {
   
   # Clean up
   unlink(output_file)
-  unlink(dirname(proj$path), recursive = TRUE)
+  # get_example_bids_dataset() uses a session cache; leave it in place.
 })
 
 test_that("pack_bids handles exclude derivatives option", {
@@ -236,7 +236,7 @@ test_that("list_pack_bids provides accurate summary", {
   
   # Clean up
   unlink(output_file)
-  unlink(dirname(proj$path), recursive = TRUE)
+  # get_example_bids_dataset() uses a session cache; leave it in place.
 })
 
 test_that("pack_bids preserves directory structure", {

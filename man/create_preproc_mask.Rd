@@ -33,7 +33,7 @@ tryCatch({
   sub01_mask <- create_preproc_mask(proj, subid="01")
   
   # Clean up
-  unlink(ds001_deriv_path, recursive=TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example requires derivatives dataset: ", e$message)
 })

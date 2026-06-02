@@ -25,7 +25,7 @@ file_structure_df <- tibble::tribble(
   # Derivatives 
   "01",   NA,       "anat",    NA,      NA,   "T1w",        TRUE,      "preproc", "MNI",  
 "01",   NA,       "func",    "taskA", "01", "bold",       TRUE,      "preproc", "MNI",
-"01",   NA,       "func",    "taskA", "01", "desc-confounds_timeseries.tsv", TRUE, "confounds", NA,
+"01",   NA,       "func",    "taskA", "01", "desc-confounds_timeseries.tsv", TRUE, "confounds", NA
 )
 
 # Define event data (paths must match generated structure)

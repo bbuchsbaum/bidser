@@ -33,9 +33,9 @@ set_key <- function(fname, key, value) {
 #' infrastructure.
 #'
 #' @param x A `bids_project` object.
-#' @param transformer A function that performs the transformation. It must take 
-#'   the input file path and return the output file path. The transformer is 
-#'   responsible for creating the output file.
+#' @param transformer A function that performs the transformation. It must take
+#'   two arguments, the input file path and the output directory, and return the
+#'   output file path. The transformer is responsible for creating the output file.
 #' @param pipeline_name The name for the new derivative pipeline.
 #' @param ... Additional arguments passed to \code{\link{search_files}} to select
 #'   files (e.g., \code{subid = "01"}, \code{task = "rest"}).
@@ -49,14 +49,14 @@ set_key <- function(fname, key, value) {
 #'   proj <- bids_project(ds_path)
 #'
 #'   # Create a simple transformer that adds a description
-#'   add_desc_transformer <- function(infile) {
+#'   add_desc_transformer <- function(infile, outdir) {
 #'     entities <- encode(basename(infile))
 #'     entities$desc <- if (is.null(entities$desc)) "smooth6mm" else 
 #'                      paste(entities$desc, "smooth6mm", sep="")
 #'     
 #'     # Generate new filename
 #'     new_name <- decode_bids_entities(entities)
-#'     outfile <- file.path(dirname(infile), new_name)
+#'     outfile <- file.path(outdir, new_name)
 #'     
 #'     # For demo, just copy the file (real transformer would process it)
 #'     file.copy(infile, outfile)
@@ -306,7 +306,7 @@ list_files_github <- function(user, repo, subdir="") {
   gurl <- paste0("https://api.github.com/repos/", user, "/", repo, "/git/trees/master?recursive=1")
   req <- httr::GET(gurl)
   httr::stop_for_status(req)
-  filelist <- unlist(lapply(httr::content(req)$tree, "[", "path"), use.names = F)
+  filelist <- unlist(lapply(httr::content(req)$tree, "[", "path"), use.names = FALSE)
   if (subdir != "") {
     grep(paste0(subdir, "/"), filelist, value = TRUE, fixed = TRUE)
   } else {
@@ -638,7 +638,7 @@ add_file <- function(bids, name,...) {
 #'   rel_scans <- func_scans(proj, full_path=FALSE)
 #'   
 #'   # Clean up
-#'   unlink(ds001_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -1121,7 +1121,7 @@ participants.bids_project <- function(x, as_tibble = FALSE, ...) {
 #'   rel_scans <- func_scans(proj, full_path=FALSE)
 #'   
 #'   # Clean up
-#'   unlink(ds001_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -1238,7 +1238,7 @@ str_detect_null <- function(x, pat, default=FALSE) {
 #'   res2_scans <- preproc_scans(proj, res = "2")
 #'   
 #'   # Clean up
-#'   unlink(ds_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })
@@ -1406,7 +1406,7 @@ key_match <- function(default=FALSE, ...) {
 #'   full_paths <- search_files(proj, regex="events\\.tsv$", full_path=TRUE)
 #'   
 #'   # Clean up
-#'   unlink(ds001_path, recursive=TRUE)
+#'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) {
 #'   message("Example requires internet connection: ", e$message)
 #' })

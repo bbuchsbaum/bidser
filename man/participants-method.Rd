@@ -46,7 +46,7 @@ tryCatch({
   participants(proj, as_tibble = TRUE)
 
   # Clean up
-  unlink(ds001_path, recursive=TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })

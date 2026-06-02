@@ -65,8 +65,7 @@ test_that("bids_subject preproc interface works", {
       skip("No participants found in test dataset")
     }
     
-    # Clean up
-    unlink(ds_path, recursive = TRUE)
+    # setup_test_dataset() uses a session cache; leave it in place.
     
   }, error = function(e) {
     skip(paste("Test requires internet connection or derivatives dataset:", e$message))
@@ -96,8 +95,7 @@ test_that("bids_subject brain mask works", {
       skip("No participants found in test dataset")
     }
     
-    # Clean up
-    unlink(ds_path, recursive = TRUE)
+    # setup_test_dataset() uses a session cache; leave it in place.
     
   }, error = function(e) {
     skip(paste("Test requires internet connection or derivatives dataset:", e$message))
