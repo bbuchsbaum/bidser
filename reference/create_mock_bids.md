@@ -120,6 +120,7 @@ mock_proj <- create_mock_bids(
   file_structure = file_structure_df,
   event_data = event_data_list
 )
+#> Warning: Encoding failed for: sub-01_task-taskA_run-01_desc-preproc_preproc_bold.nii.gz - skipping this file in mock tree.
 
 # Create the mock project and write stubs
 mock_proj_stub <- create_mock_bids(
@@ -130,6 +131,8 @@ mock_proj_stub <- create_mock_bids(
   create_stub = TRUE,
   stub_path = tempdir() # Use a temporary directory for example
 )
+#> Warning: Encoding failed for: sub-01_task-taskA_run-01_desc-preproc_preproc_bold.nii.gz - skipping this file in mock tree.
+#> Warning: Node fmriprep missing relative_path attribute, cannot create stub file.
 
 # --- Using the Mock Project ---
 print(mock_proj)

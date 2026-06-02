@@ -26,7 +26,7 @@ vignette runs without network access.
 proj <- bids_project(temp_dir, fmriprep = TRUE)
 proj
 #> BIDS Project Summary 
-#> Project Name:  bids_confounds_vignette_561119544f6a 
+#> Project Name:  bids_confounds_vignette_57c749c90e41 
 #> Participants (n):  2 
 #> Participants Source:  file 
 #> Tasks:  nback, rest 
@@ -368,7 +368,7 @@ checks, pipeline discovery, and run-level coverage:
 report <- bids_report(proj)
 report
 #> BIDS Report
-#> Project: bids_confounds_vignette_561119544f6a 
+#> Project: bids_confounds_vignette_57c749c90e41 
 #> Participants source: file 
 #> Subjects: 2 
 #> Sessions: 0 

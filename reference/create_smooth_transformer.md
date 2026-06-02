@@ -39,9 +39,9 @@ infile <- file.path(in_dir, "sub-01_task-rest_bold.nii.gz")
 file.create(infile)
 #> [1] TRUE
 new_file <- smooth_6mm(infile, out_dir)
-#> Processing: sub-01_task-rest_bold.nii.gz -> sub-01_task-rest_desc-smooth6mm_bold_nii.gz
+#> Processing: sub-01_task-rest_bold.nii.gz -> sub-01_task-rest_desc-smooth6mm_bold.nii.gz
 basename(new_file)
-#> [1] "sub-01_task-rest_desc-smooth6mm_bold_nii.gz"
+#> [1] "sub-01_task-rest_desc-smooth6mm_bold.nii.gz"
 unlink(infile)
 unlink(new_file)
 # }

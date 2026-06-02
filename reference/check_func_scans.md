@@ -75,16 +75,16 @@ tryCatch({
 #> # A tibble: 48 × 8
 #>    file                                size subid task  run   kind  suffix type 
 #>    <chr>                              <fs:> <chr> <chr> <chr> <chr> <chr>  <chr>
-#>  1 sub-01_task-balloonanalogrisktask…     0 01    ball… 01    bold  nii.gz func…
-#>  2 sub-01_task-balloonanalogrisktask…     0 01    ball… 02    bold  nii.gz func…
-#>  3 sub-01_task-balloonanalogrisktask…     0 01    ball… 03    bold  nii.gz func…
-#>  4 sub-02_task-balloonanalogrisktask…     0 02    ball… 01    bold  nii.gz func…
-#>  5 sub-02_task-balloonanalogrisktask…     0 02    ball… 02    bold  nii.gz func…
-#>  6 sub-02_task-balloonanalogrisktask…     0 02    ball… 03    bold  nii.gz func…
-#>  7 sub-03_task-balloonanalogrisktask…     0 03    ball… 01    bold  nii.gz func…
-#>  8 sub-03_task-balloonanalogrisktask…     0 03    ball… 02    bold  nii.gz func…
-#>  9 sub-03_task-balloonanalogrisktask…     0 03    ball… 03    bold  nii.gz func…
-#> 10 sub-04_task-balloonanalogrisktask…     0 04    ball… 01    bold  nii.gz func…
+#>  1 sub-01_task-balloonanalogrisktask…     0 01    ball… 01    bold  nii.gz func 
+#>  2 sub-01_task-balloonanalogrisktask…     0 01    ball… 02    bold  nii.gz func 
+#>  3 sub-01_task-balloonanalogrisktask…     0 01    ball… 03    bold  nii.gz func 
+#>  4 sub-02_task-balloonanalogrisktask…     0 02    ball… 01    bold  nii.gz func 
+#>  5 sub-02_task-balloonanalogrisktask…     0 02    ball… 02    bold  nii.gz func 
+#>  6 sub-02_task-balloonanalogrisktask…     0 02    ball… 03    bold  nii.gz func 
+#>  7 sub-03_task-balloonanalogrisktask…     0 03    ball… 01    bold  nii.gz func 
+#>  8 sub-03_task-balloonanalogrisktask…     0 03    ball… 02    bold  nii.gz func 
+#>  9 sub-03_task-balloonanalogrisktask…     0 03    ball… 03    bold  nii.gz func 
+#> 10 sub-04_task-balloonanalogrisktask…     0 04    ball… 01    bold  nii.gz func 
 #> # ℹ 38 more rows
 #> 
 #> $tasklist
@@ -115,16 +115,16 @@ tryCatch({
 #> # A tibble: 48 × 9
 #>    file                     size subid task  run   kind  suffix type  size_delta
 #>    <chr>                   <fs:> <chr> <chr> <chr> <chr> <chr>  <chr> <fs::byte>
-#>  1 sub-01_task-balloonana…     0 01    ball… 01    bold  nii.gz func…          0
-#>  2 sub-01_task-balloonana…     0 01    ball… 02    bold  nii.gz func…          0
-#>  3 sub-01_task-balloonana…     0 01    ball… 03    bold  nii.gz func…          0
-#>  4 sub-02_task-balloonana…     0 02    ball… 01    bold  nii.gz func…          0
-#>  5 sub-02_task-balloonana…     0 02    ball… 02    bold  nii.gz func…          0
-#>  6 sub-02_task-balloonana…     0 02    ball… 03    bold  nii.gz func…          0
-#>  7 sub-03_task-balloonana…     0 03    ball… 01    bold  nii.gz func…          0
-#>  8 sub-03_task-balloonana…     0 03    ball… 02    bold  nii.gz func…          0
-#>  9 sub-03_task-balloonana…     0 03    ball… 03    bold  nii.gz func…          0
-#> 10 sub-04_task-balloonana…     0 04    ball… 01    bold  nii.gz func…          0
+#>  1 sub-01_task-balloonana…     0 01    ball… 01    bold  nii.gz func           0
+#>  2 sub-01_task-balloonana…     0 01    ball… 02    bold  nii.gz func           0
+#>  3 sub-01_task-balloonana…     0 01    ball… 03    bold  nii.gz func           0
+#>  4 sub-02_task-balloonana…     0 02    ball… 01    bold  nii.gz func           0
+#>  5 sub-02_task-balloonana…     0 02    ball… 02    bold  nii.gz func           0
+#>  6 sub-02_task-balloonana…     0 02    ball… 03    bold  nii.gz func           0
+#>  7 sub-03_task-balloonana…     0 03    ball… 01    bold  nii.gz func           0
+#>  8 sub-03_task-balloonana…     0 03    ball… 02    bold  nii.gz func           0
+#>  9 sub-03_task-balloonana…     0 03    ball… 03    bold  nii.gz func           0
+#> 10 sub-04_task-balloonana…     0 04    ball… 01    bold  nii.gz func           0
 #> # ℹ 38 more rows
 #> 
 #> attr(,"class")

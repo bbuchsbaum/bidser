@@ -42,7 +42,7 @@ encode("sub-01_T1w.nii.gz")
 #> [1] "nii.gz"
 #> 
 #> $type
-#> [1] "anatprep"
+#> [1] "anat"
 #> 
 
 # Encode a functional file
@@ -63,7 +63,7 @@ encode("sub-01_task-rest_run-01_bold.nii.gz")
 #> [1] "nii.gz"
 #> 
 #> $type
-#> [1] "funcprep"
+#> [1] "func"
 #> 
 
 # Encode a file with session information
@@ -87,6 +87,6 @@ encode("sub-01_ses-pre_task-rest_run-01_bold.nii.gz")
 #> [1] "nii.gz"
 #> 
 #> $type
-#> [1] "funcprep"
+#> [1] "func"
 #> 
 ```

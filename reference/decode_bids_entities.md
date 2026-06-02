@@ -27,11 +27,11 @@ A character string representing the BIDS filename.
 entities <- encode("sub-01_task-rest_run-01_bold.nii.gz")
 filename <- decode_bids_entities(entities)
 print(filename)
-#> [1] "sub-01_task-rest_run-01_bold_nii.gz"
+#> [1] "sub-01_task-rest_run-01_bold.nii.gz"
 
 # Modify entities and create new filename
 entities$desc <- "smooth6mm"
 new_filename <- decode_bids_entities(entities)
 print(new_filename)
-#> [1] "sub-01_task-rest_run-01_desc-smooth6mm_bold_nii.gz"
+#> [1] "sub-01_task-rest_run-01_desc-smooth6mm_bold.nii.gz"
 ```

@@ -104,7 +104,7 @@ parse(parser, "sub-01_ses-pre_task-rest_run-01_bold.nii.gz")
 #> [1] "nii.gz"
 #> 
 #> $result$type
-#> [1] "funcprep"
+#> [1] "func"
 #> 
 #> 
 #> $remaining

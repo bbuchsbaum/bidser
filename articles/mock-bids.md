@@ -83,7 +83,7 @@ mock_proj
 #> Datatypes:  func 
 #> Suffixes:  nii.gz, tsv 
 #> BIDS Keys:  (none) 
-#> Path:  /tmp/RtmpP0svDe/bidser-mock-6ba965238a07
+#> Path:  /tmp/Rtmpa1hx3a/bidser-mock-6d5f78fd6c65
 
 stopifnot(file.exists(file.path(mock_dir, "participants.tsv")))
 ```
@@ -208,12 +208,12 @@ archive_contents %>%
   select(file, type, is_stub) %>%
   head()
 #>                                                                                                                file
-#> 1                                                               RestMock_pack_6ba91b4ec2d3/dataset_description.json
-#> 2                   RestMock_pack_6ba91b4ec2d3/derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz
-#> 3 RestMock_pack_6ba91b4ec2d3/derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_desc-confounds_timeseries.tsv
-#> 4                                                                       RestMock_pack_6ba91b4ec2d3/participants.tsv
-#> 5                                        RestMock_pack_6ba91b4ec2d3/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz
-#> 6                                         RestMock_pack_6ba91b4ec2d3/sub-01/func/sub-01_task-rest_run-01_events.tsv
+#> 1                                                               RestMock_pack_6d5f3586f584/dataset_description.json
+#> 2                   RestMock_pack_6d5f3586f584/derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz
+#> 3 RestMock_pack_6d5f3586f584/derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_desc-confounds_timeseries.tsv
+#> 4                                                                       RestMock_pack_6d5f3586f584/participants.tsv
+#> 5                                        RestMock_pack_6d5f3586f584/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz
+#> 6                                         RestMock_pack_6d5f3586f584/sub-01/func/sub-01_task-rest_run-01_events.tsv
 #>           type is_stub
 #> 1         json   FALSE
 #> 2 imaging_stub    TRUE
