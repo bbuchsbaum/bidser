@@ -152,28 +152,48 @@ decode_bids_entities <- function(entities) {
     stop("entities must be a named list from encode()")
   }
   
-  # Standard BIDS entity order
-  ordered_keys <- c("sub", "ses", "task", "acq", "ce", "dir", "rec", "run", "echo")
+  # Standard BIDS entity order for the entities this package currently parses.
+  ordered_entities <- c(
+    subid = "sub",
+    session = "ses",
+    task = "task",
+    acquisition = "acq",
+    acq = "acq",
+    contrast = "ce",
+    ce = "ce",
+    dir = "dir",
+    reconstruction = "rec",
+    rec = "rec",
+    run = "run",
+    echo = "echo",
+    space = "space",
+    res = "res",
+    label = "label",
+    desc = "desc",
+    from = "from",
+    to = "to",
+    target = "target",
+    class = "class",
+    mod = "mod",
+    hemi = "hemi",
+    mode = "mode",
+    variant = "variant"
+  )
   
   # Build filename parts
   parts <- character(0)
   entities_copy <- entities
   
   # Add ordered entities first
-  for (key in ordered_keys) {
-    name_key <- switch(key,
-                      "sub" = "subid",
-                      "ses" = "session", 
-                      key)
-    
+  for (name_key in names(ordered_entities)) {
     if (name_key %in% names(entities_copy) && !is.null(entities_copy[[name_key]])) {
-      parts <- c(parts, paste0(key, "-", entities_copy[[name_key]]))
+      parts <- c(parts, paste0(ordered_entities[[name_key]], "-", entities_copy[[name_key]]))
       entities_copy[[name_key]] <- NULL
     }
   }
   
-  # Add remaining entities (excluding suffix, kind, type)
-  remaining_keys <- setdiff(names(entities_copy), c("suffix", "kind", "type"))
+  # Add remaining entities (excluding non-filename metadata)
+  remaining_keys <- setdiff(names(entities_copy), c("suffix", "kind", "type", "modality"))
   remaining_keys <- sort(remaining_keys) # For consistency
   
   for (key in remaining_keys) {
@@ -185,9 +205,14 @@ decode_bids_entities <- function(entities) {
   # Add kind and suffix
   kind <- entities_copy$kind %||% "unknown"
   suffix <- entities_copy$suffix %||% "nii.gz"
+  suffix <- sub("^\\.", "", suffix)
   
   base_name <- paste(parts, collapse = "_")
-  paste(base_name, kind, suffix, sep = c("_", "."))
+  if (nzchar(base_name)) {
+    paste0(base_name, "_", kind, ".", suffix)
+  } else {
+    paste0(kind, ".", suffix)
+  }
 }
 
 #' Create a simple smoothing transformer
@@ -1555,12 +1580,20 @@ match_attribute <- function(x, ...) {
 #' @export
 load_all_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session=".*", full_path=TRUE, ...) {
   # Find all events files matching criteria
-  event_files <- search_files(x, regex="events\\.tsv$", full_path=full_path, strict=TRUE,
-                              subid=subid, task=task, run=run, session=session, ...)
+  event_files_abs <- search_files(x, regex="events\\.tsv$", full_path=TRUE, strict=TRUE,
+                                  subid=subid, task=task, run=run, session=session, ...)
   
-  if (is.null(event_files) || length(event_files) == 0) {
+  if (is.null(event_files_abs) || length(event_files_abs) == 0) {
     message("No matching event files found.")
     return(tibble::tibble())
+  }
+
+  event_files_label <- if (isTRUE(full_path)) {
+    event_files_abs
+  } else {
+    vapply(event_files_abs, function(fn) {
+      .bidser_to_relative_path(x$path, fn)
+    }, character(1))
   }
   
   # A helper to parse metadata from file name using keys in x$tbl
@@ -1586,18 +1619,18 @@ load_all_events.bids_project <- function(x, subid=".*", task=".*", run=".*", ses
   }
   
   # Read and combine
-  df_list <- lapply(event_files, function(fn) {
-    meta <- parse_metadata(fn)
+  df_list <- Map(function(fn_abs, fn_label) {
+    meta <- parse_metadata(fn_label)
     dfx <- tryCatch({
-      readr::read_delim(fn, delim = "\t", na = c("n/a", "NA"))
+      readr::read_delim(fn_abs, delim = "\t", na = c("n/a", "NA"), show_col_types = FALSE)
     }, error = function(e) {
-      warning("Failed to read file: ", fn, " - ", e$message)
+      warning("Failed to read file: ", fn_label, " - ", e$message)
       return(NULL)
     })
     if (is.null(dfx)) return(NULL)
-    dfx <- dfx %>% dplyr::mutate(.file = fn)
+    dfx <- dfx %>% dplyr::mutate(.file = fn_label)
     dplyr::bind_cols(meta, dfx)
-  })
+  }, event_files_abs, event_files_label)
   
   # Filter out any NULLs
   df_list <- df_list[!sapply(df_list, is.null)]
@@ -1732,14 +1765,14 @@ bids_check_compliance <- function(x, schema_check = TRUE, schema_version = "1.10
       sub_dir <- if (!grepl("^sub-", sid)) paste0("sub-", sid) else sid
       s_path <- file.path(x$path, sub_dir)
       if (dir.exists(s_path)) {
-        proj_sess <- sessions(x)
-        if (!is.null(proj_sess) && length(proj_sess) > 0) {
-          for (ss in proj_sess) {
-            sdir <- paste0("ses-", ss)
-            if (!dir.exists(file.path(s_path, sdir))) {
-              issues <- c(issues, paste("Session directory not found for:", sdir, "in", sub_dir))
-            }
-          }
+        child_dirs <- basename(list.dirs(s_path, recursive = FALSE, full.names = TRUE))
+        session_like <- child_dirs[grepl("^ses", child_dirs)]
+        invalid_sessions <- session_like[!grepl("^ses-[A-Za-z0-9]+$", session_like)]
+        if (length(invalid_sessions) > 0) {
+          issues <- c(
+            issues,
+            paste("Invalid session directory name:", invalid_sessions, "in", sub_dir)
+          )
         }
       }
     }

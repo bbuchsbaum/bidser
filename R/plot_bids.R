@@ -231,14 +231,12 @@ plot_bids <- function(x, interactive = TRUE, color_scheme = "viridis",
   if (visualization_mode == "heatmap") {
     # Create just the heatmap visualization
     tryCatch({
-      p <- bids_heatmap(project_data, color_scheme, highlight_missing)
-      
-      if (interactive) {
-        p <- plotly::ggplotly(p) %>%
-          plotly::layout(hovermode = "closest")
-      }
-      
-      return(p)
+      bids_heatmap(
+        x,
+        interactive = interactive,
+        color_scheme = color_scheme,
+        highlight_missing = highlight_missing
+      )
     }, error = function(e) {
       warning("Error creating heatmap visualization: ", e$message)
       # Return an empty plot with error message
@@ -254,7 +252,12 @@ plot_bids <- function(x, interactive = TRUE, color_scheme = "viridis",
     # Safely create each plot component
     combined_plot <- tryCatch({
       # 1. Create the advanced heatmap
-      plots$heatmap <- bids_heatmap(project_data, color_scheme, highlight_missing)
+      plots$heatmap <- bids_heatmap(
+        x,
+        interactive = FALSE,
+        color_scheme = color_scheme,
+        highlight_missing = highlight_missing
+      )
       if (debug) cat("Created heatmap plot\n")
       
       # 2. Create the data completeness heatmap

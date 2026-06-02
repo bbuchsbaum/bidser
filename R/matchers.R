@@ -23,21 +23,20 @@ bids_parser <- function() {
   fmriprep_anat_p <- fmriprep_anat_parser()
   fmriprep_func_p <- fmriprep_func_parser()
   
-  # Create a combined parser that tries each in sequence
-  # Try fMRIPrep parsers first since they handle more entities
+  # Create a combined parser that tries each in sequence.
   parser <- function(filename) {
-    # Try fMRIPrep parsers first (they handle more entities like desc, space)
-    result <- parse(fmriprep_func_p, filename)
-    if (!is.null(result)) return(result)
-    
-    result <- parse(fmriprep_anat_p, filename)
-    if (!is.null(result)) return(result)
-    
-    # Then try basic parsers
+    # Prefer raw parsers for canonical raw filenames. Derivative parsers are
+    # broader because many fMRIPrep entities are optional.
     result <- parse(func_p, filename)
     if (!is.null(result)) return(result)
-    
+
     result <- parse(anat_p, filename)
+    if (!is.null(result)) return(result)
+
+    result <- parse(fmriprep_func_p, filename)
+    if (!is.null(result)) return(result)
+
+    result <- parse(fmriprep_anat_p, filename)
     if (!is.null(result)) return(result)
     
     # No match found

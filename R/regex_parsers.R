@@ -11,20 +11,23 @@
 #' @return A list of extracted components or NULL
 #' @keywords internal
 extract_bids_components <- function(filename, spec) {
-  # Remove file extension first to work with the base filename
-  base_name <- tools::file_path_sans_ext(filename)
-  if (grepl("\\.nii$", base_name)) {
-    base_name <- tools::file_path_sans_ext(base_name)  # Remove .nii from .nii.gz
-  }
-  
   # Determine the kind and suffix
   kind_suffix <- extract_kind_and_suffix(filename, spec$kinds)
   if (is.null(kind_suffix)) {
     return(NULL)
   }
-  
-  # Remove the kind from the base name to get the entity part
-  entity_part <- stringr::str_remove(base_name, paste0("_", kind_suffix$kind, "$"))
+
+  # Remove the matched suffix and kind to get the entity part. This handles
+  # multi-part suffixes such as .nii.gz and .lv.h5.
+  base_name <- basename(filename)
+  suffix_pattern <- paste0("\\.", .bidser_regex_escape(kind_suffix$suffix), "$")
+  base_name <- stringr::str_remove(base_name, suffix_pattern)
+
+  kind_pattern <- paste0("_", .bidser_regex_escape(kind_suffix$kind), "$")
+  if (!stringr::str_detect(base_name, kind_pattern)) {
+    return(NULL)
+  }
+  entity_part <- stringr::str_remove(base_name, kind_pattern)
   
   # Extract BIDS entities
   entities <- extract_bids_entities(entity_part, spec$keystruc)
@@ -37,6 +40,12 @@ extract_bids_components <- function(filename, spec) {
   
   # Clean up - remove NULL values and ensure proper names
   result[!sapply(result, is.null)]
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_regex_escape <- function(x) {
+  gsub("([][{}()+*^$|\\\\?.])", "\\\\\\1", x, perl = TRUE)
 }
 
 #' Extract kind and suffix from filename
@@ -75,66 +84,83 @@ extract_kind_and_suffix <- function(filename, kinds_spec) {
 #' @keywords internal
 extract_bids_entities <- function(entity_part, keystruc_spec) {
   entities <- list()
-  
-  # Start with the first (mandatory) key - subject
-  first_key <- keystruc_spec$key[[1]]
-  first_pattern <- keystruc_spec$pattern[[1]]
-  first_name <- keystruc_spec$name[[1]]
-  
-  # Pattern for first key: key-value (no leading underscore)
-  sub_pattern <- sprintf("^%s-(%s)", first_key, first_pattern)
-  sub_match <- stringr::str_match(entity_part, sub_pattern)
-  
-  if (is.na(sub_match[1])) {
-    return(NULL)  # Must have subject
+
+  if (!is.character(entity_part) || length(entity_part) != 1L || !nzchar(entity_part)) {
+    return(NULL)
   }
-  
-  entities[[first_name]] <- sub_match[2]
-  
-  # Remove the subject part to get remaining entities
-  remaining <- stringr::str_remove(entity_part, sprintf("^%s-%s", first_key, sub_match[2]))
-  
-  # Process remaining keys (optional, with leading underscores)
-  for (i in 2:nrow(keystruc_spec)) {
-    key <- keystruc_spec$key[[i]]
-    pattern <- keystruc_spec$pattern[[i]]
-    name <- keystruc_spec$name[[i]]
-    optional <- keystruc_spec$optional[[i]]
-    
-    if (is.null(pattern)) {
-      # Literal key (like modality)
-      if (is.list(key)) {
-        key_alt <- paste(unlist(key), collapse = "|")
-        entity_pattern <- sprintf("_((%s))(?=_|$)", key_alt)
-      } else {
-        entity_pattern <- sprintf("_(%s)(?=_|$)", key)
-      }
+
+  tokens <- strsplit(entity_part, "_", fixed = TRUE)[[1]]
+  if (length(tokens) == 0L || any(!nzchar(tokens))) {
+    return(NULL)
+  }
+
+  key_values <- function(x) {
+    if (is.list(x)) {
+      unlist(x, use.names = FALSE)
     } else {
-      # Key-value pair
-      if (is.list(key)) {
-        key_alt <- paste(unlist(key), collapse = "|")
-        entity_pattern <- sprintf("_(?:%s)-(%s)(?=_|$)", key_alt, pattern)
-      } else {
-        entity_pattern <- sprintf("_%s-(%s)(?=_|$)", key, pattern)
-      }
+      as.character(x)
     }
-    
-    entity_match <- stringr::str_match(remaining, entity_pattern)
-    
-    if (!is.na(entity_match[1])) {
-      if (is.null(pattern)) {
-        # For literal keys, use the matched literal
-        entities[[name]] <- entity_match[2]
-      } else {
-        # For key-value pairs, use the value part
-        entities[[name]] <- entity_match[2]
+  }
+
+  used_names <- character(0)
+  last_order <- -Inf
+
+  for (token in tokens) {
+    is_key_value <- grepl("-", token, fixed = TRUE)
+
+    if (is_key_value) {
+      key <- sub("-.*$", "", token)
+      value <- sub("^[^-]+-", "", token)
+      if (!nzchar(key) || !nzchar(value)) {
+        return(NULL)
       }
-    } else if (!optional) {
-      # Required key not found
+
+      candidates <- which(vapply(seq_len(nrow(keystruc_spec)), function(i) {
+        pattern <- keystruc_spec$pattern[[i]]
+        if (is.null(pattern) || !key %in% key_values(keystruc_spec$key[[i]])) {
+          return(FALSE)
+        }
+        grepl(paste0("^(", pattern, ")$"), value, perl = TRUE)
+      }, logical(1)))
+    } else {
+      value <- token
+      candidates <- which(vapply(seq_len(nrow(keystruc_spec)), function(i) {
+        pattern <- keystruc_spec$pattern[[i]]
+        is.null(pattern) && value %in% key_values(keystruc_spec$key[[i]])
+      }, logical(1)))
+    }
+
+    if (length(candidates) == 0L) {
       return(NULL)
     }
+
+    candidates <- candidates[vapply(candidates, function(i) {
+      order <- keystruc_spec$order[[i]]
+      name <- keystruc_spec$name[[i]]
+      order >= last_order && !name %in% used_names
+    }, logical(1))]
+
+    if (length(candidates) == 0L) {
+      return(NULL)
+    }
+
+    candidates <- candidates[order(
+      vapply(candidates, function(i) keystruc_spec$order[[i]], numeric(1)),
+      candidates
+    )]
+    i <- candidates[[1]]
+    name <- keystruc_spec$name[[i]]
+
+    entities[[name]] <- value
+    used_names <- c(used_names, name)
+    last_order <- keystruc_spec$order[[i]]
   }
-  
+
+  required <- keystruc_spec$name[!as.logical(keystruc_spec$optional)]
+  if (any(!required %in% names(entities))) {
+    return(NULL)
+  }
+
   entities
 }
 
@@ -167,4 +193,4 @@ create_regex_parser <- function(spec) {
   function(filename) {
     parse_with_regex(filename, spec)
   }
-} 
+}

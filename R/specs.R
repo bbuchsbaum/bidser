@@ -53,10 +53,10 @@ func_spec <- function() {
     "subid",        "sub", FALSE,    "[A-Za-z0-9]+",   1,
     "session",      "ses", TRUE,     "[A-Za-z0-9]+",   2,
     "task",         "task",FALSE,    "[A-Za-z0-9]+",   3,
-    "acquisition",  "acq", TRUE,     "[A-Za-z0-9]+",   5,
-    "contrast",     "ce",  TRUE,     "[A-Za-z0-9]+",   6,
-    "reconstruction","rec",TRUE,     "[A-Za-z0-9]+",   7,
-    "run",          "run", TRUE,     "[0-9]+",         4,
+    "acquisition",  "acq", TRUE,     "[A-Za-z0-9]+",   4,
+    "contrast",     "ce",  TRUE,     "[A-Za-z0-9]+",   5,
+    "reconstruction","rec",TRUE,     "[A-Za-z0-9]+",   6,
+    "run",          "run", TRUE,     "[0-9]+",         7,
     "echo",         "echo",TRUE,     "[0-9]+",         8
   )
   
@@ -85,11 +85,11 @@ anat_spec <- function() {
     ~name,            ~key, ~optional, ~pattern,         ~order,
     "subid",          "sub",FALSE,    "[A-Za-z0-9]+",    1,
     "session",        "ses",TRUE,     "[A-Za-z0-9]+",    2,
-    "acquisition",    "acq",TRUE,     "[A-Za-z0-9]+",    4,
-    "contrast",       "ce", TRUE,     "[A-Za-z0-9]+",    5,
-    "dir",            "dir",TRUE,     "[A-Za-z0-9]+",    6,
-    "reconstruction", "rec",TRUE,     "[A-Za-z0-9]+",    7,
-    "run",            "run",TRUE,     "[0-9]+",          3
+    "acquisition",    "acq",TRUE,     "[A-Za-z0-9]+",    3,
+    "contrast",       "ce", TRUE,     "[A-Za-z0-9]+",    4,
+    "dir",            "dir",TRUE,     "[A-Za-z0-9]+",    5,
+    "reconstruction", "rec",TRUE,     "[A-Za-z0-9]+",    6,
+    "run",            "run",TRUE,     "[0-9]+",          7
   )
   
   kinds <- tibble::tribble(
@@ -129,16 +129,16 @@ funcprepspec <- function() {
     "subid",        "sub",    FALSE,    "[A-Za-z0-9]+",  1,
     "session",      "ses",    TRUE,     "[A-Za-z0-9]+",  2,
     "task",         "task",   FALSE,    "[A-Za-z0-9]+",  3,
-    "acquisition",  "acq",    TRUE,     "[A-Za-z0-9]+",  5,
-    "contrast",     "ce",     TRUE,     "[A-Za-z0-9]+",  6,
+    "acquisition",  "acq",    TRUE,     "[A-Za-z0-9]+",  4,
+    "contrast",     "ce",     TRUE,     "[A-Za-z0-9]+",  5,
     "reconstruction","rec",   TRUE,     "[A-Za-z0-9]+",  6,
-    "run",          "run",    TRUE,     "[a-z0-9]+",     4,
-    "echo",         "echo",   TRUE,     "[0-9]+",        6,
-    "modality",     "bold",   TRUE,     NULL,            8,
-    "space",        "space",  TRUE,     "[A-Za-z0-9]+",  9,
-    "res",          "res",    TRUE,     "[A-Za-z0-9]+", 10,
-    "desc",         "desc",   TRUE,     "[A-Za-z0-9]+", 11,
-    "label",        "label",  TRUE,     "[A-Za-z0-9]+", 12,
+    "run",          "run",    TRUE,     "[a-z0-9]+",     7,
+    "echo",         "echo",   TRUE,     "[0-9]+",        8,
+    "modality",     "bold",   TRUE,     NULL,            9,
+    "space",        "space",  TRUE,     "[A-Za-z0-9]+", 10,
+    "res",          "res",    TRUE,     "[A-Za-z0-9]+", 11,
+    "desc",         "desc",   TRUE,     "[A-Za-z0-9]+", 12,
+    "label",        "label",  TRUE,     "[A-Za-z0-9]+", 13,
     "variant",      "variant",TRUE,     "[A-Za-z0-9]+", 14
   )
   
@@ -178,22 +178,22 @@ anatprepspec <- function() {
     ~name,           ~key,      ~optional, ~pattern,        ~order,
     "subid",         "sub",     FALSE,    "[A-Za-z0-9]+",   1,
     "session",       "ses",     TRUE,     "[A-Za-z0-9]+",   2,
-    "acquisition",   "acq",     TRUE,     "[A-Za-z0-9]+",   4,
+    "acquisition",   "acq",     TRUE,     "[A-Za-z0-9]+",   3,
     "from",          "from",    TRUE,     "[A-Za-z0-9]+",   4,
     "to",            "to",      TRUE,     "[A-Za-z0-9]+",   5,
-    "contrast",      "ce",      TRUE,     "[A-Za-z0-9]+",   5,
-    "dir",           "dir",     TRUE,     "[A-Za-z0-9]+",   6,
-    "reconstruction","rec",     TRUE,     "[A-Za-z0-9]+",   7,
-    "run",           "run",     TRUE,     "[0-9]+",         3,
-    "modality",      list(anat_types),TRUE, NULL,            8,
-    "space",         "space",   TRUE,     "[A-Za-z0-9]+",   9,
-    "label",         "label",   TRUE,     "[A-Za-z0-9]+",  10,
-    "desc",          "desc",    TRUE,     "[A-Za-z0-9]+",  11,
-    "mode",          "mode",    TRUE,     "[A-Za-z0-9]+",  11,
-    "target",        "target",  TRUE,     "[A-Za-z0-9]+",  12,
-    "class",         "class",   TRUE,     "[A-Za-z0-9]+",  13,
-    "mod",           "mod",     TRUE,     "[A-Za-z0-9]+",  14,
-    "hemi",          "hemi",    TRUE,     "[LR]",          15
+    "contrast",      "ce",      TRUE,     "[A-Za-z0-9]+",   6,
+    "dir",           "dir",     TRUE,     "[A-Za-z0-9]+",   7,
+    "reconstruction","rec",     TRUE,     "[A-Za-z0-9]+",   8,
+    "run",           "run",     TRUE,     "[0-9]+",         9,
+    "modality",      list(anat_types),TRUE, NULL,           10,
+    "space",         "space",   TRUE,     "[A-Za-z0-9]+",  11,
+    "label",         "label",   TRUE,     "[A-Za-z0-9]+",  12,
+    "desc",          "desc",    TRUE,     "[A-Za-z0-9]+",  13,
+    "mode",          "mode",    TRUE,     "[A-Za-z0-9]+",  13,
+    "target",        "target",  TRUE,     "[A-Za-z0-9]+",  14,
+    "class",         "class",   TRUE,     "[A-Za-z0-9]+",  15,
+    "mod",           "mod",     TRUE,     "[A-Za-z0-9]+",  16,
+    "hemi",          "hemi",    TRUE,     "[LR]",          17
   )
   
   kinds <- tibble::tribble(
@@ -266,4 +266,3 @@ fmapspec <- function() {
   class(ret) <- c("fmap_spec", "parser_spec")
   ret
 }
-

@@ -367,6 +367,23 @@
 
 #' @keywords internal
 #' @noRd
+.bidser_query_rows_set_full_path <- function(x, rows, full_path) {
+  if (!isTRUE(full_path) || is.null(rows) || nrow(rows) == 0 || !"path" %in% names(rows)) {
+    return(rows)
+  }
+
+  rows$path <- vapply(rows$path, function(p) {
+    if (.bidser_is_absolute_path(p)) {
+      p
+    } else {
+      file.path(x$path, p)
+    }
+  }, character(1))
+  rows
+}
+
+#' @keywords internal
+#' @noRd
 .bidser_require_entity_keys <- function(paths, required_keys, project_path) {
   if (is.null(paths) || length(paths) == 0 || length(required_keys) == 0) {
     return(paths)
@@ -547,6 +564,7 @@ query_files.bids_project <- function(x, regex = ".*", full_path = FALSE,
         ))
       }
       rows <- dplyr::bind_rows(lapply(result, function(p) .bidser_index_row_from_path(x, p)))
+      rows <- .bidser_query_rows_set_full_path(x, rows, full_path)
       return(.bidser_sort_query_tibble(rows))
     }
     return(result)
@@ -626,6 +644,7 @@ query_files.bids_project <- function(x, regex = ".*", full_path = FALSE,
       ))
     }
     rows <- dplyr::bind_rows(lapply(results, function(p) .bidser_index_row_from_path(x, p)))
+    rows <- .bidser_query_rows_set_full_path(x, rows, full_path)
     return(.bidser_sort_query_tibble(rows))
   }
 
@@ -676,7 +695,11 @@ query_files.mock_bids_project <- function(x, regex = ".*", full_path = FALSE,
       }
       rows <- lapply(result, function(p) {
         rel <- .bidser_to_relative_path(x$path, p)
-        .bidser_index_row_from_path(x, rel)
+        row <- .bidser_index_row_from_path(x, rel)
+        if (isTRUE(full_path)) {
+          row$path <- p
+        }
+        row
       })
       return(dplyr::bind_rows(rows))
     }
