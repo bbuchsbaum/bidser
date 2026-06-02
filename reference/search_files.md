@@ -97,7 +97,7 @@ tryCatch({
                                  task="balloonanalogrisktask")
   
   # Clean up
-  unlink(ds001_path, recursive=TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })
@@ -117,7 +117,7 @@ tryCatch({
   full_paths <- search_files(proj, regex="events\\.tsv$", full_path=TRUE)
   
   # Clean up
-  unlink(ds001_path, recursive=TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })

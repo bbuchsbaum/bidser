@@ -129,7 +129,7 @@ tryCatch({
   res2_scans <- preproc_scans(proj, res = "2")
   
   # Clean up
-  unlink(ds_path, recursive=TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })

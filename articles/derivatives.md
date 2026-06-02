@@ -178,7 +178,7 @@ report <- bids_report(
 
 report
 #> BIDS Report
-#> Project: bidser-deriv-6cc43da16cba 
+#> Project: bidser-deriv-6a947537fc66 
 #> Participants source: file 
 #> Subjects: 1 
 #> Sessions: 0 

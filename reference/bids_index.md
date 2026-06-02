@@ -38,7 +38,7 @@ tryCatch({
   proj <- bids_project(ds001_path)
   idx <- bids_index(proj, persist = FALSE)
   print(idx)
-  unlink(ds001_path, recursive = TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) message("Example requires internet: ", e$message))
 #> # A tibble: 128 × 33
 #>    path   file  scope pipeline extension datatype  size file_mtime subid session

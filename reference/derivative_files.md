@@ -38,7 +38,7 @@ tryCatch({
   ds_path <- get_example_bids_dataset("ds000001-fmriprep")
   proj <- bids_project(ds_path, fmriprep = TRUE)
   df <- derivative_files(proj)
-  unlink(ds_path, recursive = TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) message("Example requires internet: ", e$message))
 #> Example requires internet: participants.tsv is missing
 # }

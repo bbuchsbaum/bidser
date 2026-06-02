@@ -32,7 +32,7 @@ tryCatch({
   proj <- bids_project(ds001_path)
   rpt <- bids_report(proj)
   print(rpt)
-  unlink(ds001_path, recursive = TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) message("Example requires internet: ", e$message))
 #> Project does not have fmriprep derivatives enabled. Cannot search for confound files.
 #> Project does not have fmriprep derivatives enabled. Cannot search for confound files.

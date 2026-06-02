@@ -69,7 +69,7 @@ tryCatch({
                                      subid="01",
                                      task="balloonanalogrisktask",
                                      run="01")
-  unlink(ds_path, recursive=TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example requires derivatives dataset: ", e$message)
 })

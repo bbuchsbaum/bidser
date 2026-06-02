@@ -92,7 +92,7 @@ tryCatch({
   sub01_masks <- mask_files(proj, subid = "01")
 
   # Clean up
-  unlink(ds_path, recursive = TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })

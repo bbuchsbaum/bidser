@@ -98,7 +98,7 @@ tryCatch({
   subj$scans()
   
   # Clean up
-  unlink(ds001_path, recursive=TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })
@@ -126,6 +126,9 @@ tryCatch({
 #> 
 #> ℹ Use `spec()` to retrieve the full column specification for this data.
 #> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+#> [1] "/tmp/Rtmp0fyUfk/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
+#> [2] "/tmp/Rtmp0fyUfk/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
+#> [3] "/tmp/Rtmp0fyUfk/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
 # }
 # \donttest{
 tryCatch({

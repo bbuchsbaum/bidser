@@ -74,7 +74,13 @@ tryCatch({
   proj <- bids_project(ds001_path)
   f <- func_scans(proj, subid = "01")[1]
   if (!is.null(f)) get_metadata(proj, f)
-  unlink(ds001_path, recursive = TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) message("Example requires internet: ", e$message))
+#> $RepetitionTime
+#> [1] 2
+#> 
+#> $TaskName
+#> [1] "balloon analog risk task"
+#> 
 # }
 ```

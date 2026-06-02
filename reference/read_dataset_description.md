@@ -36,7 +36,7 @@ tryCatch({
   ds001_path <- get_example_bids_dataset("ds001")
   desc <- read_dataset_description(ds001_path)
   print(desc)
-  unlink(ds001_path, recursive = TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) message("Example requires internet: ", e$message))
 #> <bids_dataset_description> 
 #>   Name:          Balloon Analog Risk-taking Task 

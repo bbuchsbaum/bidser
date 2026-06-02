@@ -67,7 +67,7 @@ tryCatch({
   sub01_check <- check_func_scans(proj, subid="01")
   
   # Clean up
-  unlink(ds001_path, recursive=TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })

@@ -110,7 +110,7 @@ tryCatch({
   conf_flat <- read_confounds(proj, nest=FALSE)
   
   # Clean up
-  unlink(ds_path, recursive=TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example requires derivatives dataset with confounds: ", e$message)
 })

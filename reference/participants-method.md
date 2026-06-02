@@ -56,9 +56,28 @@ tryCatch({
   participants(proj, as_tibble = TRUE)
 
   # Clean up
-  unlink(ds001_path, recursive=TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })
+#> # A tibble: 16 × 4
+#>    participant_id sex     age source
+#>    <chr>          <chr> <int> <chr> 
+#>  1 01             F        26 file  
+#>  2 02             M        24 file  
+#>  3 03             F        27 file  
+#>  4 04             F        20 file  
+#>  5 05             M        22 file  
+#>  6 06             F        26 file  
+#>  7 07             M        24 file  
+#>  8 08             M        21 file  
+#>  9 09             M        26 file  
+#> 10 10             F        21 file  
+#> 11 11             F        24 file  
+#> 12 12             F        22 file  
+#> 13 13             F        21 file  
+#> 14 14             F        30 file  
+#> 15 15             F        24 file  
+#> 16 16             M        19 file  
 # }
 ```

@@ -90,10 +90,13 @@ tryCatch({
   }
   
   # Clean up
-  unlink(ds001_path, recursive=TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })
+#> [1] "/tmp/Rtmp0fyUfk/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_events.tsv"
+#> [2] "/tmp/Rtmp0fyUfk/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_events.tsv"
+#> [3] "/tmp/Rtmp0fyUfk/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_events.tsv"
 # }
 # \donttest{
 # Get event files for a specific subject and task
@@ -103,7 +106,7 @@ tryCatch({
   files <- event_files(x, subid="01", task="balloonanalogrisktask")
   
   # Clean up
-  unlink(ds001_path, recursive=TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })

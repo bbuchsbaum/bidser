@@ -2,9 +2,9 @@
 
 This function reads preprocessed functional MRI scans from a BIDS
 project's fMRIPrep derivatives directory. It uses the `preproc_scans`
-function to locate the files and then reads them into a `NeuroVec`
-object using the neuroim2 package. If a mask is not provided, one will
-be automatically created from available brainmask files.
+function to locate the files and then reads each one into its own
+`NeuroVec` object using the neuroim2 package. If a mask is not provided,
+one will be automatically created from available brainmask files.
 
 ## Usage
 
@@ -61,8 +61,8 @@ read_preproc_scans.bids_project(
 
 ## Value
 
-An instance of type `NeuroVec` containing the preprocessed functional
-data.
+A named list of `NeuroVec` objects, one per matched preprocessed scan,
+in file order.
 
 ## Details
 
@@ -98,9 +98,10 @@ tryCatch({
   # Provide a custom mask
   mask <- create_preproc_mask(proj, thresh=0.95)
   masked_scans <- read_preproc_scans(proj, mask=mask)
+  first_run <- masked_scans[[1]]
   
   # Clean up
-  unlink(ds_path, recursive=TRUE)
+  # Example datasets are cached; leave the cache in place.
 }, error = function(e) {
   message("Example requires derivatives dataset: ", e$message)
 })
