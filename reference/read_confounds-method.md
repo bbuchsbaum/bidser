@@ -17,6 +17,7 @@ read_confounds(
   perc_var = -1,
   nest = TRUE,
   clean = "zero_variance",
+  na_action = "leave",
   ...
 )
 ```
@@ -65,6 +66,13 @@ read_confounds(
   Character vector controlling run-level confound cleaning before
   returning data or running PCA. Supported values are `"none"`,
   `"zero_variance"`, and `"rank"`.
+
+- na_action:
+
+  How to handle missing values in raw confound columns before returning
+  them. Supported values are `"leave"` (default), `"zero"`, and
+  `"median"`. PCA-reduced confounds already use median imputation
+  internally.
 
 - ...:
 

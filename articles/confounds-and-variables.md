@@ -26,7 +26,7 @@ vignette runs without network access.
 proj <- bids_project(temp_dir, fmriprep = TRUE)
 proj
 #> BIDS Project Summary 
-#> Project Name:  bids_confounds_vignette_559659721ab3 
+#> Project Name:  bids_confounds_vignette_567d50874f2f 
 #> Participants (n):  2 
 #> Participants Source:  file 
 #> Tasks:  nback, rest 
@@ -173,6 +173,13 @@ head(conf_flat)
 
 Each row is one volume, with subject/task/run identifiers alongside the
 confound values – ready to join with your design matrix.
+
+fMRIPrep writes leading `NA` values for derivative-type confounds such
+as `framewise_displacement` and `*_derivative1`. The default preserves
+those values for backward compatibility. For raw nuisance regressors
+that need to go directly into a GLM design matrix, set
+`na_action = "zero"` to use the common fMRIPrep convention of replacing
+those leading values with zero.
 
 ## Confound strategies: PCA reduction
 
@@ -368,7 +375,7 @@ checks, pipeline discovery, and run-level coverage:
 report <- bids_report(proj)
 report
 #> BIDS Report
-#> Project: bids_confounds_vignette_559659721ab3 
+#> Project: bids_confounds_vignette_567d50874f2f 
 #> Participants source: file 
 #> Subjects: 2 
 #> Sessions: 0 

@@ -17,6 +17,7 @@ read_confounds(
   perc_var = -1,
   nest = TRUE,
   clean = "zero_variance",
+  na_action = "leave",
   ...
 )
 ```
@@ -73,6 +74,14 @@ read_confounds(
   `"zero_variance"`, and `"rank"`. The default drops zero-variance
   columns and records diagnostics in the `confound_diagnostics`
   attribute.
+
+- na_action:
+
+  How to handle missing values in raw confound columns before returning
+  them. Supported values are `"leave"` (default, preserve missing
+  values), `"zero"` (replace missing numeric confounds with 0), and
+  `"median"` (replace missing numeric confounds with the column median).
+  PCA-reduced confounds already use median imputation internally.
 
 - ...:
 
