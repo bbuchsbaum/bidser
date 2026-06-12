@@ -112,6 +112,54 @@ test_that("load_all_events reads relative labels from any working directory", {
   expect_equal(events$trial_type, "go")
 })
 
+test_that("read_events accepts tab and whitespace-delimited event files", {
+  root <- tempfile("bidser_event_delims_")
+  dir.create(file.path(root, "sub-01", "func"), recursive = TRUE)
+  on.exit(unlink(root, recursive = TRUE), add = TRUE)
+
+  writeLines(
+    '{"Name":"EventDelimiters","BIDSVersion":"1.8.0"}',
+    file.path(root, "dataset_description.json")
+  )
+  writeLines("participant_id\nsub-01", file.path(root, "participants.tsv"))
+
+  event_lines <- list(
+    tab = c("onset\tduration\ttrial_type", "0\t1\tgo", "2\t1\tstop"),
+    space = c("onset duration trial_type", "0 1 go", "2 1 stop"),
+    mixed = c("onset duration trial_type", "0\t1\tgo", "2 1 stop")
+  )
+
+  for (task in names(event_lines)) {
+    file.create(file.path(
+      root,
+      "sub-01",
+      "func",
+      paste0("sub-01_task-", task, "_run-01_bold.nii.gz")
+    ))
+    writeLines(
+      event_lines[[task]],
+      file.path(root, "sub-01", "func",
+                paste0("sub-01_task-", task, "_run-01_events.tsv"))
+    )
+  }
+
+  proj <- bids_project(root, index = "none")
+
+  for (task in names(event_lines)) {
+    events <- read_events(proj, task = paste0("^", task, "$"))
+    expect_equal(nrow(events), 1L)
+    expect_true(all(c("onset", "duration", "trial_type") %in% names(events$data[[1]])))
+    expect_equal(events$data[[1]]$onset, c(0, 2))
+    expect_equal(events$data[[1]]$duration, c(1, 1))
+    expect_equal(events$data[[1]]$trial_type, c("go", "stop"))
+  }
+
+  flat <- load_all_events(proj, task = "^space$", full_path = FALSE)
+  expect_equal(nrow(flat), 2L)
+  expect_true(all(c("onset", "duration", "trial_type") %in% names(flat)))
+  expect_equal(flat$trial_type, c("go", "stop"))
+})
+
 test_that("bids_check_compliance allows sparse session coverage", {
   root <- make_sparse_session_bids()
   on.exit(unlink(root, recursive = TRUE), add = TRUE)

@@ -125,6 +125,26 @@ event_files.bids_project <- function(x, subid=".*", task=".*", run=".*", session
   })
 }
 
+.bidser_read_events_table <- function(file) {
+  first_lines <- readLines(file, n = 25L, warn = FALSE)
+  first_lines <- first_lines[nzchar(trimws(first_lines))]
+
+  if (length(first_lines) == 0L || grepl("\t", first_lines[[1]])) {
+    return(readr::read_delim(
+      file,
+      delim = "\t",
+      na = c("n/a", "NA", "N/A", ""),
+      show_col_types = FALSE
+    ))
+  }
+
+  readr::read_table(
+    file,
+    na = c("n/a", "NA", "N/A", ""),
+    show_col_types = FALSE
+  )
+}
+
 
 #' Read event files from a BIDS project
 #'
@@ -291,7 +311,7 @@ read_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session
       event_data <- vector("list", length(evs))
       for (k in seq_along(evs)) {
         df <- tryCatch({
-          readr::read_delim(evs[k], delim = "\t", na = c("n/a", "NA", "N/A", ""))
+          .bidser_read_events_table(evs[k])
         }, error = function(e) {
           warning("Failed to read event file: ", evs[k], " - ", e$message)
           NULL

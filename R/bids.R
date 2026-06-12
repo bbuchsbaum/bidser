@@ -1622,7 +1622,7 @@ load_all_events.bids_project <- function(x, subid=".*", task=".*", run=".*", ses
   df_list <- Map(function(fn_abs, fn_label) {
     meta <- parse_metadata(fn_label)
     dfx <- tryCatch({
-      readr::read_delim(fn_abs, delim = "\t", na = c("n/a", "NA"), show_col_types = FALSE)
+      .bidser_read_events_table(fn_abs)
     }, error = function(e) {
       warning("Failed to read file: ", fn_label, " - ", e$message)
       return(NULL)
