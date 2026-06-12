@@ -102,33 +102,9 @@ tryCatch({
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })
-#> Rows: 158 Columns: 8
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: "\t"
-#> chr (1): trial_type
-#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 156 Columns: 8
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: "\t"
-#> chr (1): trial_type
-#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 149 Columns: 8
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: "\t"
-#> chr (1): trial_type
-#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> [1] "/tmp/RtmplJsUFS/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
-#> [2] "/tmp/RtmplJsUFS/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
-#> [3] "/tmp/RtmplJsUFS/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
+#> [1] "/tmp/RtmppT8QFZ/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
+#> [2] "/tmp/RtmppT8QFZ/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
+#> [3] "/tmp/RtmppT8QFZ/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
 # }
 # \donttest{
 tryCatch({
@@ -161,30 +137,6 @@ tryCatch({
 })
 #> [1] "Subject 01 has 3 functional scans"
 #> [1] "Subject 01 has 3 event files"
-#> Rows: 158 Columns: 8
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: "\t"
-#> chr (1): trial_type
-#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 156 Columns: 8
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: "\t"
-#> chr (1): trial_type
-#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-#> Rows: 149 Columns: 8
-#> ── Column specification ────────────────────────────────────────────────────────
-#> Delimiter: "\t"
-#> chr (1): trial_type
-#> dbl (7): onset, duration, cash_demean, control_pumps_demean, explode_demean,...
-#> 
-#> ℹ Use `spec()` to retrieve the full column specification for this data.
-#> ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 #> [1] "Event data structure:"
 #> # A tibble: 3 × 5
 #> # Groups:   .task, .session, .run, .subid [3]

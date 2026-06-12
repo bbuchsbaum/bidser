@@ -339,7 +339,7 @@ tryCatch({
 #> 
 #> Timing:
 #>   Archive creation: 0.0 seconds
-#>   Total time: 4.9 seconds
+#>   Total time: 4.8 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 10.00 MB
 #> 
@@ -373,7 +373,7 @@ tryCatch({
 #> 
 #> Timing:
 #>   Archive creation: 0.0 seconds
-#>   Total time: 0.1 seconds
+#>   Total time: 0.0 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 10.00 MB
 #> 
