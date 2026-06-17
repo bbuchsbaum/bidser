@@ -35,8 +35,12 @@
 #' - `"outliers"`: outlier/censoring covariates including
 #'   `framewise_displacement`, `rmsd` (if present), `motion_outlier_*`, and
 #'   `non_steady_state_outlier*`.
-#' - `"dvars"`: DVARS family: `dvars`, `std_dvars`, `non_std_dvars`,
+#' - `"dvars"`: standardized DVARS only (`std_dvars`). This avoids pairing raw
+#'   and standardized DVARS by default, which can create collinear nuisance
+#'   regressors in downstream models.
+#' - `"dvars_family"`: full DVARS family: `dvars`, `std_dvars`, `non_std_dvars`,
 #'   `vx_wisestd_dvars` (resolved to whichever names exist in your dataset).
+#' - `"raw_dvars"`: raw DVARS only (`dvars`).
 #' - `"fd"`: framewise displacement only (`framewise_displacement`).
 #'
 #' @param name Character. The name of the convenience set (see list above).
@@ -82,7 +86,7 @@ confound_set <- function(name, n = NULL) {
     "non_steady_state_outlier"
   )
 
-  dvars <- c("dvars", "std_dvars", "non_std_dvars", "vx_wisestd_dvars")
+  dvars_family <- c("dvars", "std_dvars", "non_std_dvars", "vx_wisestd_dvars")
 
   sets <- list(
     motion6  = base_motion,
@@ -99,7 +103,9 @@ confound_set <- function(name, n = NULL) {
     # include underscore and no-underscore variants (cosine_00 vs cosine00)
     cosine    = c("cosine_*", "cosine*"),
     outliers  = c("framewise_displacement", "rmsd", "motion_outlier_*", "non_steady_state_outlier*"),
-    dvars     = dvars,
+    dvars     = "std_dvars",
+    dvars_family = dvars_family,
+    raw_dvars = "dvars",
     fd        = "framewise_displacement"
   )
 
@@ -127,7 +133,7 @@ list_confound_sets <- function() {
     set = c(
       "motion6", "motion12", "motion24",
       "global3", "9p", "36p", "acompcor", "tcompcor", "compcor",
-      "cosine", "outliers", "dvars", "fd"
+      "cosine", "outliers", "dvars", "dvars_family", "raw_dvars", "fd"
     ),
     description = c(
       "Rigid-body motion (6 params)",
@@ -141,7 +147,9 @@ list_confound_sets <- function() {
       "Both anatomical and temporal CompCor (use n to limit)",
       "Discrete cosine basis regressors",
       "FD/RMSD, motion spike regressors, and nonsteady-state outliers",
-      "DVARS family (dvars, std_dvars, non_std_dvars, vx_wisestd_dvars)",
+      "Standardized DVARS only",
+      "Full DVARS family (dvars, std_dvars, non_std_dvars, vx_wisestd_dvars)",
+      "Raw DVARS only",
       "Framewise displacement only"
     ),
     stringsAsFactors = FALSE
