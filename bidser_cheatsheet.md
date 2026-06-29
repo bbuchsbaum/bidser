@@ -235,7 +235,8 @@ content of MethodOrVariantClass appropriately. \*/
 - Use
   [`read_confounds()`](https://bbuchsbaum.github.io/bidser/reference/read_confounds.md)
   to read confound tables (optionally select variables via `cvars`,
-  e.g., `DEFAULT_CVARS`).
+  e.g., `confound_set("motion24")` or
+  `confound_strategy("pcabasic80")`).
 - Use `read_func_scans()` and `read_preproc_scans()` to load 4D image
   data (requires `neuroim2`).
 - Use
@@ -245,9 +246,10 @@ content of MethodOrVariantClass appropriately. \*/
   task?=”.*”, run?=“.*”, session?=”.*”, …) \| Read event files as nested
   tibble -\> tib @m read_confounds\[bids_project\|mock_bids_project\]
   (subid?=“.*”, task?=”.*”, session?=“.*”, run?=”.*”,
-  cvars?=DEFAULT_CVARS, npcs?=-1, perc_var?=-1, nest?=TRUE, …) \| Read
-  confound tables -\> tib
-  - cvars : chr (constants: DEFAULT_CVARS) Confound variables to select.
+  cvars?=confound_set(“legacy_default”), npcs?=-1, perc_var?=-1,
+  nest?=TRUE, …) \| Read confound tables -\> tib
+  - cvars : chr Confound variables to select; use
+    confound_set()/confound_strategy() helpers.
   - nest : lgl (constants: TRUE, FALSE) Return nested tibble. @f
     load_all_events (x, subid?=“.*”, task?=”.*”, run?=“.*”,
     session?=”.*”, full_path?=TRUE, …) \| Read and combine all event
@@ -339,16 +341,25 @@ content of MethodOrVariantClass appropriately. \*/
 
 ------------------------------------------------------------------------
 
-## 7. Exported Data Objects (Constants & Choices)
+## 7. Confound Variable Selection Helpers
 
 ### Usage:
 
-- Use `DEFAULT_CVARS` for standard confound variable selection in
-  [`read_confounds()`](https://bbuchsbaum.github.io/bidser/reference/read_confounds.md).
-- Use `CVARS_ALIASES` for mapping canonical confound names to fMRIPrep
-  column names. @d DEFAULT_CVARS \| Standard confound variable names for
-  fMRIPrep -\> chr @d CVARS_ALIASES \| Mapping of canonical confound
-  variable names to fMRIPrep column aliases -\> lst
+- Use `confound_set(name, n)` for named, version-robust confound groups
+  (e.g., `"motion24"`, `"36p"`, `"compcor"`, `"legacy_default"`).
+- Use `confound_strategy(name, ...)` for PCA + raw denoising strategies
+  (e.g., `"pcabasic80"`).
+- Use
+  [`list_confound_sets()`](https://bbuchsbaum.github.io/bidser/reference/list_confound_sets.md)
+  and
+  [`list_confound_strategies()`](https://bbuchsbaum.github.io/bidser/reference/list_confound_strategies.md)
+  to discover available options. @f confound_set (name, n?=NULL) \|
+  Named, version-robust confound variable set -\> chr @f
+  confound_strategy (name?=NULL, pca_vars?=NULL, raw_vars?=NULL,
+  perc_var?=-1, npcs?=-1) \| PCA + raw confound denoising strategy -\>
+  confound_strategy @f list_confound_sets () \| Available confound sets
+  and descriptions -\> data.frame @f list_confound_strategies () \|
+  Available confound strategies and descriptions -\> data.frame
 
 ------------------------------------------------------------------------
 

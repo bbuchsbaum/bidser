@@ -83,6 +83,17 @@ Available sets (case-insensitive):
 
 - `"fd"`: framewise displacement only (`framewise_displacement`).
 
+- `"legacy_default"`: the 26 canonical confound names historically used
+  as the
+  [`read_confounds()`](https://bbuchsbaum.github.io/bidser/reference/read_confounds.md)
+  default (motion6 + CSF/WM + `global_signal` + DVARS family +
+  `framewise_displacement` + the first six anatomical and temporal
+  CompCor components). This is the stable public handle for code that
+  previously relied on the unexported `bidser:::DEFAULT_CVARS2`; it is
+  *not* equivalent to
+  [`confound_strategy()`](https://bbuchsbaum.github.io/bidser/reference/confound_strategy.md)`("pcabasic80")`
+  (see Details there).
+
 ## Examples
 
 ``` r

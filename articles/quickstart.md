@@ -577,9 +577,9 @@ When you need absolute paths for analysis tools:
 
 full_paths <- func_scans(proj, subid = "01", full_path = TRUE)
 full_paths
-#> [1] "/tmp/RtmpjA24wS/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
-#> [2] "/tmp/RtmpjA24wS/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
-#> [3] "/tmp/RtmpjA24wS/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
+#> [1] "/tmp/RtmpxOc4lt/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
+#> [2] "/tmp/RtmpxOc4lt/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
+#> [3] "/tmp/RtmpxOc4lt/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
 
 all(file.exists(full_paths))
 #> [1] TRUE

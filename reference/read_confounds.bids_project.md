@@ -12,7 +12,7 @@ read_confounds(
   task = ".*",
   session = ".*",
   run = ".*",
-  cvars = DEFAULT_CVARS,
+  cvars = confound_set("legacy_default"),
   npcs = -1,
   perc_var = -1,
   nest = TRUE,
@@ -47,13 +47,18 @@ read_confounds(
 
 - cvars:
 
-  The names of the confound variables to select. Defaults to
-  `DEFAULT_CVARS`. Canonical names such as `"csf"` are automatically
-  mapped to any matching column names found in the dataset using
-  `CVARS_ALIASES`. You can also pass convenience sets from
+  The confound variables to select. Defaults to
+  `confound_set("legacy_default")`, the historical 26-name default
+  (motion6 + CSF/WM + global signal + DVARS family + framewise
+  displacement + first six anatomical and temporal CompCor components).
+  Canonical names such as `"csf"` are automatically mapped to any
+  matching column names found in the dataset using the internal alias
+  table. You can also pass convenience sets from
   [`confound_set()`](https://bbuchsbaum.github.io/bidser/reference/confound_set.md),
-  e.g., `confound_set("motion24")`, or wildcard patterns like
-  `"cosine_*"`, `"motion_outlier_*"`, or `"a_comp_cor_*[6]"`.
+  e.g., `confound_set("motion24")`, a denoising strategy from
+  [`confound_strategy()`](https://bbuchsbaum.github.io/bidser/reference/confound_strategy.md),
+  or wildcard patterns like `"cosine_*"`, `"motion_outlier_*"`, or
+  `"a_comp_cor_*[6]"`.
 
 - npcs:
 
@@ -95,6 +100,28 @@ object includes a `pca` attribute with per-run loadings and variance
 used by [`plot()`](https://rdrr.io/r/graphics/plot.default.html).
 Dropped or flagged confounds are stored in the `confound_diagnostics`
 attribute.
+
+## Details
+
+For new analyses, the recommended modern default is the built-in
+denoising strategy `confound_strategy("pcabasic80")` (PCA of motion24 +
+aCompCor + tCompCor + CSF + WM retaining 80\\ with raw cosine regressors
+appended). Note this is *not* equivalent to the `cvars` default
+`confound_set("legacy_default")`: the strategy uses motion24 (not
+motion6) and *all* CompCor components (not the first six), and omits the
+global signal, DVARS, and framewise-displacement regressors. Use
+[`list_confound_sets()`](https://bbuchsbaum.github.io/bidser/reference/list_confound_sets.md)
+and
+[`list_confound_strategies()`](https://bbuchsbaum.github.io/bidser/reference/list_confound_strategies.md)
+to discover the available options.
+
+## See also
+
+[`confound_set`](https://bbuchsbaum.github.io/bidser/reference/confound_set.md),
+[`confound_strategy`](https://bbuchsbaum.github.io/bidser/reference/confound_strategy.md),
+[`list_confound_sets`](https://bbuchsbaum.github.io/bidser/reference/list_confound_sets.md),
+[`list_confound_strategies`](https://bbuchsbaum.github.io/bidser/reference/list_confound_strategies.md),
+[`confound_files`](https://bbuchsbaum.github.io/bidser/reference/confound_files-method.md)
 
 ## Examples
 

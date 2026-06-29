@@ -108,6 +108,12 @@ family if provided).</p></li>
 <li><p><code>"dvars"</code>: DVARS family: <code>dvars</code>, <code>std_dvars</code>, <code>non_std_dvars</code>,
 <code>vx_wisestd_dvars</code> (resolved to whichever names exist in your dataset).</p></li>
 <li><p><code>"fd"</code>: framewise displacement only (<code>framewise_displacement</code>).</p></li>
+<li><p><code>"legacy_default"</code>: the 26 canonical confound names historically used as
+the <code><a href="read_confounds.html">read_confounds()</a></code> default (motion6 + CSF/WM + <code>global_signal</code> + DVARS
+family + <code>framewise_displacement</code> + the first six anatomical and temporal
+CompCor components). This is the stable public handle for code that
+previously relied on the unexported <code>bidser:::DEFAULT_CVARS2</code>; it is <em>not</em>
+equivalent to <code><a href="confound_strategy.html">confound_strategy()</a></code><code>("pcabasic80")</code> (see Details there).</p></li>
 </ul></div>
 
     <div class="section level2">

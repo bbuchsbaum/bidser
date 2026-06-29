@@ -2,6 +2,25 @@
 
 ## bidser 0.4.0
 
+- Add `confound_set("legacy_default")`, a public, version-robust handle
+  for the 26 canonical confound names historically exposed only as the
+  unexported `bidser:::DEFAULT_CVARS2`. Code that depended on
+  `bidser:::DEFAULT_CVARS2` should switch to
+  `confound_set("legacy_default")`, which returns the identical set.
+  `DEFAULT_CVARS2` is retained (unexported) for now but is superseded.
+- Express the
+  [`read_confounds()`](https://bbuchsbaum.github.io/bidser/reference/read_confounds.md)
+  `cvars` default via `confound_set("legacy_default")` and remove the
+  internal `DEFAULT_CVARS` constant. The default now resolves through
+  canonical confound names; the set of columns returned for a no-`cvars`
+  call is unchanged in practice on fMRIPrep outputs.
+  [`?read_confounds`](https://bbuchsbaum.github.io/bidser/reference/read_confounds.md)
+  now documents the recommended modern default
+  `confound_strategy("pcabasic80")` (noting it is *not* equivalent to
+  the legacy default) and cross-references the
+  [`confound_set()`](https://bbuchsbaum.github.io/bidser/reference/confound_set.md)/[`confound_strategy()`](https://bbuchsbaum.github.io/bidser/reference/confound_strategy.md)/[`list_confound_sets()`](https://bbuchsbaum.github.io/bidser/reference/list_confound_sets.md)/
+  [`list_confound_strategies()`](https://bbuchsbaum.github.io/bidser/reference/list_confound_strategies.md)
+  helpers.
 - Change `read_preproc_scans()` to return a file-ordered list of
   `NeuroVec` objects, one per matched preprocessed scan, instead of
   collapsing multiple files into a single container.

@@ -89,10 +89,10 @@
 <div class="section level3">
 <h3 id="usage-2">Usage:<a class="anchor" aria-label="anchor" href="#usage-2"></a></h3>
 <ul><li>Use <code><a href="reference/read_events.html">read_events()</a></code>, <code><a href="reference/load_all_events-method.html">load_all_events()</a></code> to read event files as nested or flat tibbles.</li>
-<li>Use <code><a href="reference/read_confounds.html">read_confounds()</a></code> to read confound tables (optionally select variables via <code>cvars</code>, e.g., <code>DEFAULT_CVARS</code>).</li>
+<li>Use <code><a href="reference/read_confounds.html">read_confounds()</a></code> to read confound tables (optionally select variables via <code>cvars</code>, e.g., <code>confound_set("motion24")</code> or <code>confound_strategy("pcabasic80")</code>).</li>
 <li>Use <code>read_func_scans()</code> and <code>read_preproc_scans()</code> to load 4D image data (requires <code>neuroim2</code>).</li>
-<li>Use <code><a href="reference/read_sidecar.html">read_sidecar()</a></code> to extract metadata from JSON sidecars. @m read_events[bids_project|mock_bids_project] (subid?=“.<em>”, task?=”.</em>”, run?=“.<em>”, session?=”.</em>”, …) | Read event files as nested tibble -&gt; tib @m read_confounds[bids_project|mock_bids_project] (subid?=“.<em>”, task?=”.</em>”, session?=“.<em>”, run?=”.</em>”, cvars?=DEFAULT_CVARS, npcs?=-1, perc_var?=-1, nest?=TRUE, …) | Read confound tables -&gt; tib
-<ul><li>cvars : chr (constants: DEFAULT_CVARS) Confound variables to select.</li>
+<li>Use <code><a href="reference/read_sidecar.html">read_sidecar()</a></code> to extract metadata from JSON sidecars. @m read_events[bids_project|mock_bids_project] (subid?=“.<em>”, task?=”.</em>”, run?=“.<em>”, session?=”.</em>”, …) | Read event files as nested tibble -&gt; tib @m read_confounds[bids_project|mock_bids_project] (subid?=“.<em>”, task?=”.</em>”, session?=“.<em>”, run?=”.</em>”, cvars?=confound_set(“legacy_default”), npcs?=-1, perc_var?=-1, nest?=TRUE, …) | Read confound tables -&gt; tib
+<ul><li>cvars : chr Confound variables to select; use confound_set()/confound_strategy() helpers.</li>
 <li>nest : lgl (constants: TRUE, FALSE) Return nested tibble. @f load_all_events (x, subid?=“.<em>”, task?=”.</em>”, run?=“.<em>”, session?=”.</em>”, full_path?=TRUE, …) | Read and combine all event files -&gt; tib @f read_func_scans (x, mask, mode?=“normal”, subid?=“^sub-.<em>”, task?=”.</em>”, run?=“.*“, modality?=”bold”, …) | Read 4D functional scans -&gt; obj</li>
 <li>mode : chr (constants: “normal”, “bigvec”) File reading mode. @f read_preproc_scans (x, mask?=NULL, mode?=“normal”, subid?=“^sub-.<em>”, task?=”.</em>”, run?=“.<em>”, modality?=”bold”, …) | Read preprocessed scans -&gt; obj @f read_sidecar (x, subid?=”.</em>”, task?=“.<em>”, run?=”.</em>”, session?=“.<em>”, modality?=”bold”, full_path?=TRUE, …) | Read JSON sidecar metadata -&gt; tib @f get_repetition_time (x, subid, task, run?=”.</em>”, session?=“.*“, …) | Get TR from sidecar JSON -&gt; dbl</li>
 </ul></li>
@@ -129,11 +129,12 @@
 </ul><hr></div>
 </div>
 <div class="section level2">
-<h2 id="id_7-exported-data-objects-constants--choices">7. Exported Data Objects (Constants &amp; Choices)<a class="anchor" aria-label="anchor" href="#id_7-exported-data-objects-constants--choices"></a></h2>
+<h2 id="id_7-confound-variable-selection-helpers">7. Confound Variable Selection Helpers<a class="anchor" aria-label="anchor" href="#id_7-confound-variable-selection-helpers"></a></h2>
 <div class="section level3">
 <h3 id="usage-6">Usage:<a class="anchor" aria-label="anchor" href="#usage-6"></a></h3>
-<ul><li>Use <code>DEFAULT_CVARS</code> for standard confound variable selection in <code><a href="reference/read_confounds.html">read_confounds()</a></code>.</li>
-<li>Use <code>CVARS_ALIASES</code> for mapping canonical confound names to fMRIPrep column names. @d DEFAULT_CVARS | Standard confound variable names for fMRIPrep -&gt; chr @d CVARS_ALIASES | Mapping of canonical confound variable names to fMRIPrep column aliases -&gt; lst</li>
+<ul><li>Use <code>confound_set(name, n)</code> for named, version-robust confound groups (e.g., <code>"motion24"</code>, <code>"36p"</code>, <code>"compcor"</code>, <code>"legacy_default"</code>).</li>
+<li>Use <code>confound_strategy(name, ...)</code> for PCA + raw denoising strategies (e.g., <code>"pcabasic80"</code>).</li>
+<li>Use <code><a href="reference/list_confound_sets.html">list_confound_sets()</a></code> and <code><a href="reference/list_confound_strategies.html">list_confound_strategies()</a></code> to discover available options. @f confound_set (name, n?=NULL) | Named, version-robust confound variable set -&gt; chr @f confound_strategy (name?=NULL, pca_vars?=NULL, raw_vars?=NULL, perc_var?=-1, npcs?=-1) | PCA + raw confound denoising strategy -&gt; confound_strategy @f list_confound_sets () | Available confound sets and descriptions -&gt; data.frame @f list_confound_strategies () | Available confound strategies and descriptions -&gt; data.frame</li>
 </ul><hr></div>
 </div>
 <div class="section level2">
