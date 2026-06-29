@@ -38,7 +38,14 @@
 #' - `"dvars"`: DVARS family: `dvars`, `std_dvars`, `non_std_dvars`,
 #'   `vx_wisestd_dvars` (resolved to whichever names exist in your dataset).
 #' - `"fd"`: framewise displacement only (`framewise_displacement`).
+#' - `"legacy_default"`: the 26 canonical confound names historically used as
+#'   the `read_confounds()` default (motion6 + CSF/WM + `global_signal` + DVARS
+#'   family + `framewise_displacement` + the first six anatomical and temporal
+#'   CompCor components). This is the stable public handle for code that
+#'   previously relied on the unexported `bidser:::DEFAULT_CVARS2`; it is *not*
+#'   equivalent to [confound_strategy()]`("pcabasic80")` (see Details there).
 #'
+
 #' @param name Character. The name of the convenience set (see list above).
 #' @param n Optional integer used by CompCor sets to limit the number of
 #'   components (e.g., first 5 or 6). Ignored for other sets.
@@ -100,7 +107,11 @@ confound_set <- function(name, n = NULL) {
     cosine    = c("cosine_*", "cosine*"),
     outliers  = c("framewise_displacement", "rmsd", "motion_outlier_*", "non_steady_state_outlier*"),
     dvars     = dvars,
-    fd        = "framewise_displacement"
+    fd        = "framewise_displacement",
+    # Canonical names historically exposed as the unexported DEFAULT_CVARS2 and
+    # used as the read_confounds() default. Sourced from CVARS_ALIASES so the
+    # set and DEFAULT_CVARS2 cannot drift apart.
+    legacy_default = names(CVARS_ALIASES)
   )
 
   if (!nm %in% names(sets)) {
@@ -127,7 +138,7 @@ list_confound_sets <- function() {
     set = c(
       "motion6", "motion12", "motion24",
       "global3", "9p", "36p", "acompcor", "tcompcor", "compcor",
-      "cosine", "outliers", "dvars", "fd"
+      "cosine", "outliers", "dvars", "fd", "legacy_default"
     ),
     description = c(
       "Rigid-body motion (6 params)",
@@ -142,7 +153,8 @@ list_confound_sets <- function() {
       "Discrete cosine basis regressors",
       "FD/RMSD, motion spike regressors, and nonsteady-state outliers",
       "DVARS family (dvars, std_dvars, non_std_dvars, vx_wisestd_dvars)",
-      "Framewise displacement only"
+      "Framewise displacement only",
+      "Legacy read_confounds() default = former DEFAULT_CVARS2 (26 canonical names)"
     ),
     stringsAsFactors = FALSE
   )

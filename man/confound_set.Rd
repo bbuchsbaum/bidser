@@ -59,6 +59,12 @@ family if provided).
 \item \code{"dvars"}: DVARS family: \code{dvars}, \code{std_dvars}, \code{non_std_dvars},
 \code{vx_wisestd_dvars} (resolved to whichever names exist in your dataset).
 \item \code{"fd"}: framewise displacement only (\code{framewise_displacement}).
+\item \code{"legacy_default"}: the 26 canonical confound names historically used as
+the \code{read_confounds()} default (motion6 + CSF/WM + \code{global_signal} + DVARS
+family + \code{framewise_displacement} + the first six anatomical and temporal
+CompCor components). This is the stable public handle for code that
+previously relied on the unexported \code{bidser:::DEFAULT_CVARS2}; it is \emph{not}
+equivalent to \code{\link[=confound_strategy]{confound_strategy()}}\code{("pcabasic80")} (see Details there).
 }
 }
 \examples{

@@ -6,22 +6,21 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/bbuchsbaum/bidser/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/bbuchsbaum/bidser/actions/workflows/R-CMD-check.yaml)
-[![pkgdown](https://github.com/bbuchsbaum/bidser/actions/workflows/pkgdown.yaml/badge.svg)](https://bbuchsbaum.github.io/bidser/)
 [![Codecov test
 coverage](https://codecov.io/gh/bbuchsbaum/bidser/branch/master/graph/badge.svg)](https://app.codecov.io/gh/bbuchsbaum/bidser?branch=master)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/bidser)](https://CRAN.R-project.org/package=bidser)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
 [BIDS](https://bids.neuroimaging.io/) in R – (it’s a start!)
 
 The goal of bidser is to make working with the BIDS neuroimaging format
-convenient in R. Currently there is support for MRI data and some
-support for some [fmriprep](https://fmriprep.org/en/stable/)
-derivatives.
+convenient in R. Current support is strongest for MRI datasets, with
+explicit query helpers, metadata inheritance, derivative pipeline
+discovery, and compatibility-oriented support for
+[fmriprep](https://fmriprep.org/en/stable/) workflows.
 
 ## Installation
 
@@ -36,13 +35,27 @@ devtools::install_github("bbuchsbaum/bidser")
 
 See <https://bbuchsbaum.github.io/bidser/articles/quickstart.html>
 
-## Citation
+## fMRIPrep confounds
 
-If you use bidser in published work, please cite:
+`read_confounds()` selects nuisance regressors from fMRIPrep confound
+tables. Rather than hand-listing version-specific column names, use the
+high-level, version-robust helpers:
 
-Buchsbaum, B. (2026). *bidser: Work with Brain Imaging Data Structure (BIDS) Projects*. R package version 0.4.0. <https://github.com/bbuchsbaum/bidser>
+``` r
+# Named, version-robust sets (resolve to whatever columns your dataset has)
+read_confounds(proj, cvars = confound_set("motion24"))
+read_confounds(proj, cvars = confound_set("36p"))
 
-<!-- albersdown:theme-note:start -->
-## Albers theme
-This package uses the albersdown theme. Existing vignette theme hooks are replaced so `albers.css` and local `albers.js` render consistently on CRAN and GitHub Pages. The defaults are configured via `params$family` and `params$preset` (family = 'red', preset = 'homage'). The pkgdown site uses `template: { package: albersdown }` together with generated `pkgdown/extra.css` and `pkgdown/extra.js` so the theme is linked and activated on site pages.
-<!-- albersdown:theme-note:end -->
+# PCA + raw denoising strategies (recommended modern default)
+read_confounds(proj, cvars = confound_strategy("pcabasic80"))
+
+# Discover what is available
+list_confound_sets()
+list_confound_strategies()
+```
+
+Code that previously reached into the unexported
+`bidser:::DEFAULT_CVARS2` should switch to the stable public handle
+`confound_set("legacy_default")`, which returns the identical 26-name
+set. See `?read_confounds`, `?confound_set`, and the
+*confounds-and-variables* vignette for details.

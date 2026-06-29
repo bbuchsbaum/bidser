@@ -51,6 +51,21 @@ test_that("list_confound_sets returns a data.frame with expected columns", {
   expect_s3_class(df, "data.frame")
   expect_true(all(c("set", "description") %in% names(df)))
   expect_true("9p" %in% df$set)
+  expect_true("legacy_default" %in% df$set)
+})
+
+test_that("confound_set('legacy_default') is the public handle for DEFAULT_CVARS2", {
+  legacy <- confound_set("legacy_default")
+  expect_equal(length(legacy), 26)
+  # Stable public handle must stay byte-identical to the unexported constant
+  # that external code reaches for via bidser:::DEFAULT_CVARS2.
+  expect_identical(legacy, bidser:::DEFAULT_CVARS2)
+  expect_identical(legacy, names(bidser:::CVARS_ALIASES))
+  expect_true(all(c("csf", "white_matter", "global_signal",
+                    "framewise_displacement",
+                    "a_comp_cor_00", "t_comp_cor_05",
+                    "trans_x", "rot_z") %in% legacy))
+  expect_true(confound_set("LEGACY_DEFAULT") |> identical(legacy))
 })
 
 
@@ -228,4 +243,31 @@ test_that("read_confounds with confound_set still works", {
   # Should have 6 motion columns plus metadata
   data_cols <- setdiff(names(conf), c("participant_id", "task", "run", "session"))
   expect_equal(length(data_cols), 6)
+})
+
+
+test_that("read_confounds default cvars resolves canonical names to old-style columns", {
+  setup <- create_rich_confounds_proj()
+  on.exit(unlink(setup$path, recursive = TRUE, force = TRUE), add = TRUE)
+
+  # No explicit cvars: exercises the new default confound_set("legacy_default").
+  # The mock dataset uses old fMRIPrep column names, so this also verifies the
+  # canonical default resolves back through the alias table.
+  conf_default <- read_confounds(setup$proj, nest = FALSE)
+  expect_s3_class(conf_default, "tbl_df")
+  expect_equal(nrow(conf_default), setup$n)
+
+  data_cols <- setdiff(names(conf_default),
+                       c("participant_id", "task", "run", "session"))
+  # Motion, global, FD and CompCor present in the mock should all resolve.
+  expect_true(all(c("CSF", "WhiteMatter", "GlobalSignal",
+                    "FramewiseDisplacement",
+                    "X", "Y", "Z", "RotX", "RotY", "RotZ",
+                    "aCompCor00", "tCompCor00") %in% data_cols))
+
+  # Passing the explicit public handle must match the implicit default exactly.
+  conf_explicit <- read_confounds(setup$proj,
+                                  cvars = confound_set("legacy_default"),
+                                  nest = FALSE)
+  expect_identical(names(conf_default), names(conf_explicit))
 })

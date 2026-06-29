@@ -288,12 +288,6 @@ brain_mask.bids_project <- function(x, subid, ...) {
 }
 
 
-DEFAULT_CVARS <- c("CSF", "WhiteMatter", "GlobalSignal", "stdDVARS", "non.stdDVARS",
-                   "vx.wisestdDVARS", "FramewiseDisplacement", "tCompCor00", "tCompCor01", "tCompCor02",
-                   "tCompCor03", "tCompCor04", "tCompCor05", "aCompCor00", "aCompCor01",
-                   "aCompCor02", "aCompCor03", "aCompCor04", "aCompCor05", "X", "Y", "Z",
-                   "RotX", "RotY", "RotZ")
-
 # canonical confound variables and their possible aliases across fmriprep versions
 CVARS_ALIASES <- list(
   csf = c("CSF", "csf"),
@@ -325,7 +319,10 @@ CVARS_ALIASES <- list(
   rot_z = c("RotZ", "rot_z")
 )
 
-# DEPRECATED: use `CVARS_ALIASES` instead
+# Superseded: the public handle is `confound_set("legacy_default")`, which
+# returns this same vector. `DEFAULT_CVARS2` is retained (unexported) so that
+# existing code reaching in via `bidser:::DEFAULT_CVARS2` keeps working; new
+# code should use `confound_set("legacy_default")`. See issue #72.
 DEFAULT_CVARS2 <- names(CVARS_ALIASES)
 
 
@@ -521,12 +518,25 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #' @param session Session regex
 #' @param run Run regex. If the run identifier cannot be extracted from
 #'   the filename, the run value defaults to "1".
-#' @param cvars The names of the confound variables to select. Defaults to \code{DEFAULT_CVARS}.
-#'   Canonical names such as \code{"csf"} are automatically mapped to any
-#'   matching column names found in the dataset using \code{CVARS_ALIASES}.
-#'   You can also pass convenience sets from \code{confound_set()}, e.g.,
-#'   \code{confound_set("motion24")}, or wildcard patterns like
-#'   \code{"cosine_*"}, \code{"motion_outlier_*"}, or \code{"a_comp_cor_*[6]"}.
+#' @param cvars The confound variables to select. Defaults to
+#'   \code{confound_set("legacy_default")}, the historical 26-name default
+#'   (motion6 + CSF/WM + global signal + DVARS family + framewise displacement +
+#'   first six anatomical and temporal CompCor components). Canonical names such
+#'   as \code{"csf"} are automatically mapped to any matching column names found
+#'   in the dataset using the internal alias table. You can also pass convenience
+#'   sets from \code{\link{confound_set}()}, e.g., \code{confound_set("motion24")},
+#'   a denoising strategy from \code{\link{confound_strategy}()}, or wildcard
+#'   patterns like \code{"cosine_*"}, \code{"motion_outlier_*"}, or
+#'   \code{"a_comp_cor_*[6]"}.
+#' @details For new analyses, the recommended modern default is the built-in
+#'   denoising strategy \code{confound_strategy("pcabasic80")}
+#'   (PCA of motion24 + aCompCor + tCompCor + CSF + WM retaining 80\% variance,
+#'   with raw cosine regressors appended). Note this is \emph{not} equivalent to
+#'   the \code{cvars} default \code{confound_set("legacy_default")}: the strategy
+#'   uses motion24 (not motion6) and \emph{all} CompCor components (not the first
+#'   six), and omits the global signal, DVARS, and framewise-displacement
+#'   regressors. Use \code{\link{list_confound_sets}()} and
+#'   \code{\link{list_confound_strategies}()} to discover the available options.
 #' @param npcs Perform PCA reduction on confounds and return \code{npcs} PCs.
 #' @param perc_var Perform PCA reduction to retain \code{perc_var}% variance.
 #' @param nest If TRUE, nests confound tables by subject/task/session/run.
@@ -575,9 +585,12 @@ confound_files.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 #'   message("Example requires derivatives dataset with confounds: ", e$message)
 #' })
 #' }
+#' @seealso \code{\link{confound_set}}, \code{\link{confound_strategy}},
+#'   \code{\link{list_confound_sets}}, \code{\link{list_confound_strategies}},
+#'   \code{\link{confound_files}}
 #' @export
 read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", run=".*",
-                                        cvars=DEFAULT_CVARS, npcs=-1, perc_var=-1,
+                                        cvars=confound_set("legacy_default"), npcs=-1, perc_var=-1,
                                         nest=TRUE, clean="zero_variance",
                                         na_action = "leave", ...) {
   if (!inherits(x, "bids_project")) {
