@@ -4,10 +4,18 @@
 \alias{read_events}
 \title{Read Event Files from a BIDS Project}
 \usage{
-read_events(x, ...)
+read_events(x, subid = ".*", task = ".*", run = ".*", session = ".*", ...)
 }
 \arguments{
 \item{x}{The object to read events from (typically a \code{bids_project}).}
+
+\item{subid}{Regex pattern to match subject IDs. Default is \code{".*"}.}
+
+\item{task}{Regex pattern to match tasks. Default is \code{".*"}.}
+
+\item{run}{Regex pattern to match runs. Default is \code{".*"}.}
+
+\item{session}{Regex pattern to match sessions. Default is \code{".*"}.}
 
 \item{...}{Additional arguments passed to methods.}
 }
@@ -15,8 +23,11 @@ read_events(x, ...)
 A nested tibble with columns:
 \itemize{
 \item \code{.task}: Task name
+\item \code{.session}: Session ID
 \item \code{.run}: Run number
 \item \code{.subid}: Subject ID
+\item \code{task}, \code{session}, \code{run}, \code{participant_id}: bare aliases for the
+legacy dotted metadata columns
 \item \code{data}: Nested column containing the event data
 If no matching data is found, returns an empty tibble with appropriate columns.
 }

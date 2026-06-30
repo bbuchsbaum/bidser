@@ -4,10 +4,44 @@
 \alias{read_confounds}
 \title{Read Confound Files from a BIDS Project}
 \usage{
-read_confounds(x, ...)
+read_confounds(
+  x,
+  subid = ".*",
+  task = ".*",
+  session = ".*",
+  run = ".*",
+  cvars = confound_set("legacy_default"),
+  npcs = -1,
+  perc_var = -1,
+  nest = TRUE,
+  clean = "zero_variance",
+  na_action = "leave",
+  ...
+)
 }
 \arguments{
 \item{x}{The object to read confounds from (typically a \code{bids_project}).}
+
+\item{subid}{Regex to match subject IDs. Default is \code{".*"}.}
+
+\item{task}{Regex to match tasks. Default is \code{".*"}.}
+
+\item{session}{Regex to match sessions. Default is \code{".*"}.}
+
+\item{run}{Regex to match runs. Default is \code{".*"}.}
+
+\item{cvars}{Character vector of confound variable names to select.}
+
+\item{npcs}{Integer. Perform PCA reduction and return this many PCs.}
+
+\item{perc_var}{Numeric. Perform PCA reduction to retain this percentage of
+variance.}
+
+\item{nest}{Logical. If \code{TRUE}, nest confound tables by subject/task/session/run.}
+
+\item{clean}{Confound cleaning operations passed to methods.}
+
+\item{na_action}{How methods should handle missing numeric confound values.}
 
 \item{...}{Additional arguments passed to methods, including:
 \itemize{

@@ -97,6 +97,25 @@ test_that("query_files tibble fallback preserves full_path", {
   expect_equal(rows$type, "func")
 })
 
+test_that("search_files falls back to filesystem for regex-only unmatched files", {
+  root <- tempfile("bidser_regex_fallback_")
+  dir.create(file.path(root, "sub-01", "func"), recursive = TRUE)
+  on.exit(unlink(root, recursive = TRUE), add = TRUE)
+
+  writeLines(
+    '{"Name":"RegexFallback","BIDSVersion":"1.8.0"}',
+    file.path(root, "dataset_description.json")
+  )
+  writeLines("participant_id\nsub-01", file.path(root, "participants.tsv"))
+  file.create(file.path(root, "sub-01", "func", "sub-01_task-rest_run-01_bold.nii.gz"))
+  file.create(file.path(root, "sub-01", "func", "sub-01_task-rest_run-01_desc-brain_mask.nii.gz"))
+
+  proj <- bids_project(root, index = "none")
+
+  mask <- search_files(proj, regex = "mask", full_path = FALSE)
+  expect_equal(mask, "sub-01/func/sub-01_task-rest_run-01_desc-brain_mask.nii.gz")
+})
+
 test_that("load_all_events reads relative labels from any working directory", {
   root <- make_regression_bids(with_event = TRUE)
   on.exit(unlink(root, recursive = TRUE), add = TRUE)
@@ -148,6 +167,10 @@ test_that("read_events accepts tab and whitespace-delimited event files", {
   for (task in names(event_lines)) {
     events <- read_events(proj, task = paste0("^", task, "$"))
     expect_equal(nrow(events), 1L)
+    expect_true(all(c("participant_id", "task", "run", "session") %in% names(events)))
+    expect_equal(events$participant_id, "01")
+    expect_equal(events$task, task)
+    expect_equal(events$run, "01")
     expect_true(all(c("onset", "duration", "trial_type") %in% names(events$data[[1]])))
     expect_equal(events$data[[1]]$onset, c(0, 2))
     expect_equal(events$data[[1]]$duration, c(1, 1))

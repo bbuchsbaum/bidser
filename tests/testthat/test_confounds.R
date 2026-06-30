@@ -42,6 +42,14 @@ test_that("confound_set acompcor respects n", {
   expect_equal(acc_all, "a_comp_cor_*")
 })
 
+test_that("confound_set dvars defaults to one standardized DVARS column", {
+  expect_equal(confound_set("dvars"), "std_dvars")
+  expect_equal(confound_set("std_dvars"), "std_dvars")
+  expect_equal(confound_set("raw_dvars"), "dvars")
+  expect_equal(confound_set("non_std_dvars"), "non_std_dvars")
+  expect_equal(confound_set("vx_wisestd_dvars"), "vx_wisestd_dvars")
+})
+
 test_that("confound_set errors on unknown set", {
   expect_error(confound_set("nonexistent"), "Unknown confound set")
 })
@@ -162,8 +170,19 @@ create_rich_confounds_proj <- function() {
                        file.path(temp_dir, "dataset_description.json"),
                        auto_unbox = TRUE)
   dir.create(file.path(temp_dir, "sub-01"))
-  conf_dir <- file.path(temp_dir, "derivatives", "fmriprep", "sub-01", "func")
+  deriv_root <- file.path(temp_dir, "derivatives", "fmriprep")
+  conf_dir <- file.path(deriv_root, "sub-01", "func")
   dir.create(conf_dir, recursive = TRUE)
+  jsonlite::write_json(
+    list(
+      Name = "fMRIPrep",
+      BIDSVersion = "1.7.0",
+      DatasetType = "derivative",
+      GeneratedBy = list(list(Name = "fMRIPrep"))
+    ),
+    file.path(deriv_root, "dataset_description.json"),
+    auto_unbox = TRUE
+  )
 
   n <- 20
   set.seed(42)
@@ -243,6 +262,45 @@ test_that("read_confounds with confound_set still works", {
   # Should have 6 motion columns plus metadata
   data_cols <- setdiff(names(conf), c("participant_id", "task", "run", "session"))
   expect_equal(length(data_cols), 6)
+})
+
+test_that("read_confounds with confound_set('dvars') selects one DVARS variant", {
+  temp_dir <- tempfile("bids_dvars_")
+  dir.create(temp_dir)
+  on.exit(unlink(temp_dir, recursive = TRUE, force = TRUE), add = TRUE)
+
+  readr::write_tsv(tibble::tibble(participant_id = "01"),
+                   file.path(temp_dir, "participants.tsv"))
+  jsonlite::write_json(list(Name = "DvarsTest", BIDSVersion = "1.8.0"),
+                       file.path(temp_dir, "dataset_description.json"),
+                       auto_unbox = TRUE)
+  deriv_root <- file.path(temp_dir, "derivatives", "fmriprep")
+  conf_dir <- file.path(deriv_root, "sub-01", "func")
+  dir.create(conf_dir, recursive = TRUE)
+  jsonlite::write_json(
+    list(
+      Name = "fMRIPrep",
+      BIDSVersion = "1.8.0",
+      DatasetType = "derivative",
+      GeneratedBy = list(list(Name = "fMRIPrep"))
+    ),
+    file.path(deriv_root, "dataset_description.json"),
+    auto_unbox = TRUE
+  )
+  readr::write_tsv(
+    tibble::tibble(
+      dvars = c(1, 2, 3),
+      std_dvars = c(0.1, 0.2, 0.3),
+      non_std_dvars = c(10, 20, 30)
+    ),
+    file.path(conf_dir, "sub-01_task-rest_run-01_desc-confounds_timeseries.tsv")
+  )
+
+  proj <- bids_project(temp_dir, fmriprep = TRUE)
+  conf <- read_confounds(proj, cvars = confound_set("dvars"), nest = FALSE)
+  data_cols <- setdiff(names(conf), c("participant_id", "task", "run", "session"))
+
+  expect_equal(data_cols, "std_dvars")
 })
 
 

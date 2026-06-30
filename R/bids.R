@@ -1368,6 +1368,53 @@ key_match <- function(default=FALSE, ...) {
   }
 }
 
+.bidser_filesystem_search <- function(x, regex = ".*", full_path = FALSE,
+                                      strict = TRUE, filters = list()) {
+  if (is.null(x$path) || !dir.exists(x$path)) {
+    return(NULL)
+  }
+
+  filters <- .bidser_normalize_filter_names(filters)
+  rel_paths <- list.files(x$path, recursive = TRUE, full.names = FALSE,
+                          all.files = FALSE, no.. = TRUE)
+  if (length(rel_paths) == 0) {
+    return(NULL)
+  }
+  rel_paths <- gsub("\\\\", "/", rel_paths)
+  rel_paths <- rel_paths[file.exists(file.path(x$path, rel_paths)) &
+                           !dir.exists(file.path(x$path, rel_paths))]
+  rel_paths <- rel_paths[stringr::str_detect(basename(rel_paths), regex)]
+  if (length(rel_paths) == 0) {
+    return(NULL)
+  }
+
+  keep <- vapply(rel_paths, function(rel) {
+    parsed <- .bidser_parse_entities_from_path(rel)
+    encoded <- tryCatch(encode(basename(rel)), error = function(e) NULL)
+    if (is.null(encoded)) {
+      encoded <- list()
+    }
+    entities <- utils::modifyList(parsed, encoded, keep.null = TRUE)
+
+    all(vapply(names(filters), function(key) {
+      val <- entities[[key]]
+      if (is.null(val) || length(val) == 0 || is.na(val)) {
+        return(!isTRUE(strict))
+      }
+      stringr::str_detect(as.character(val[[1]]), as.character(filters[[key]]))
+    }, logical(1)))
+  }, logical(1))
+
+  ret <- unique(rel_paths[keep])
+  if (length(ret) == 0) {
+    return(NULL)
+  }
+  if (isTRUE(full_path)) {
+    ret <- file.path(x$path, ret)
+  }
+  as.vector(ret)
+}
+
 
 #' Search for files in a BIDS project
 #' 
@@ -1528,7 +1575,13 @@ search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRU
   ret <- x$bids_tree$Get(extract_relative_path, filterFun = filter_fun, simplify = FALSE)
   
   if (length(ret) == 0) {
-    return(NULL)
+    return(.bidser_filesystem_search(
+      x,
+      regex = regex,
+      full_path = full_path,
+      strict = strict,
+      filters = search_params
+    ))
   }
   
   # Ensure ret is a character vector of unique paths

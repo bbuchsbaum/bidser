@@ -145,6 +145,42 @@ event_files.bids_project <- function(x, subid=".*", task=".*", run=".*", session
   )
 }
 
+.bidser_event_empty_result <- function() {
+  tibble::tibble(
+    .task = character(0),
+    .session = character(0),
+    .run = character(0),
+    .subid = character(0),
+    task = character(0),
+    session = character(0),
+    run = character(0),
+    participant_id = character(0),
+    data = list()
+  )
+}
+
+.bidser_add_event_metadata_aliases <- function(x) {
+  if (!inherits(x, "data.frame")) {
+    return(x)
+  }
+  if (".task" %in% names(x) && !"task" %in% names(x)) {
+    x$task <- x$.task
+  }
+  if (".session" %in% names(x) && !"session" %in% names(x)) {
+    x$session <- x$.session
+  }
+  if (".run" %in% names(x) && !"run" %in% names(x)) {
+    x$run <- x$.run
+  }
+  if (".subid" %in% names(x) && !"participant_id" %in% names(x)) {
+    x$participant_id <- x$.subid
+  }
+
+  preferred <- c(".task", ".session", ".run", ".subid",
+                 "task", "session", "run", "participant_id", "data")
+  x[, c(intersect(preferred, names(x)), setdiff(names(x), preferred)), drop = FALSE]
+}
+
 
 #' Read event files from a BIDS project
 #'
@@ -220,13 +256,7 @@ read_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session
   }
   
   # Create empty result tibble with correct structure
-  empty_result <- tibble::tibble(
-    .task = character(0),
-    .session = character(0),
-    .run = character(0),
-    .subid = character(0),
-    data = list()
-  )
+  empty_result <- .bidser_event_empty_result()
   
   # Get matching participants
   participants_vec <- participants(x)
@@ -353,5 +383,5 @@ read_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session
     return(empty_result)
   }
   
-  final_result
+  .bidser_add_event_metadata_aliases(final_result)
 }

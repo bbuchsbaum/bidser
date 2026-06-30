@@ -305,6 +305,74 @@
   entities
 }
 
+#' Parse BIDS entities from paths into a tibble
+#'
+#' `bids_entities()` is the vectorized counterpart to [encode()]. It accepts a
+#' character vector of full paths or bare filenames and returns one row per
+#' input path with the union of parsed BIDS entity columns.
+#'
+#' @param paths Character vector of paths or filenames.
+#' @param include_path Logical. If `TRUE` (default), include a `.path` column
+#'   containing the original input.
+#' @param coerce Logical. If `TRUE` (default), coerce numeric BIDS entities such
+#'   as `run` and `echo` to integer when possible.
+#' @return A tibble with one row per input path. Missing entities are `NA`.
+#' @export
+#' @examples
+#' bids_entities(c(
+#'   "sub-01_task-rest_run-01_bold.nii.gz",
+#'   "sub-01_task-rest_run-02_bold.nii.gz"
+#' ))
+bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
+  if (missing(paths)) {
+    stop("`paths` must be supplied.")
+  }
+  paths <- as.character(paths)
+
+  rows <- lapply(paths, function(path) {
+    parsed <- .bidser_parse_entities_from_path(path)
+    encoded <- tryCatch(encode(basename(path)), error = function(e) NULL)
+    if (is.null(encoded)) {
+      encoded <- list()
+    }
+    utils::modifyList(parsed, encoded, keep.null = TRUE)
+  })
+
+  entity_names <- unique(unlist(lapply(rows, names), use.names = FALSE))
+  if (length(entity_names) == 0) {
+    out <- tibble::tibble(.rows = seq_along(paths))
+    out$.rows <- NULL
+  } else {
+    out <- tibble::as_tibble(setNames(lapply(entity_names, function(nm) {
+      vapply(rows, function(row) {
+        val <- row[[nm]]
+        if (is.null(val) || length(val) == 0) {
+          NA_character_
+        } else {
+          as.character(val[[1]])
+        }
+      }, character(1))
+    }), entity_names))
+  }
+
+  if (isTRUE(coerce) && nrow(out) > 0) {
+    integer_entities <- intersect(c("run", "echo"), names(out))
+    for (nm in integer_entities) {
+      vals <- out[[nm]]
+      finite_vals <- vals[!is.na(vals)]
+      if (length(finite_vals) == 0 || all(grepl("^[0-9]+$", finite_vals))) {
+        out[[nm]] <- as.integer(vals)
+      }
+    }
+  }
+
+  if (isTRUE(include_path)) {
+    out <- dplyr::bind_cols(tibble::tibble(.path = paths), out)
+  }
+
+  out
+}
+
 #' @keywords internal
 #' @noRd
 .bidser_extract_extension <- function(path) {

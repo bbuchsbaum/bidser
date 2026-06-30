@@ -35,8 +35,12 @@
 #' - `"outliers"`: outlier/censoring covariates including
 #'   `framewise_displacement`, `rmsd` (if present), `motion_outlier_*`, and
 #'   `non_steady_state_outlier*`.
-#' - `"dvars"`: DVARS family: `dvars`, `std_dvars`, `non_std_dvars`,
-#'   `vx_wisestd_dvars` (resolved to whichever names exist in your dataset).
+#' - `"dvars"`: standardized DVARS only (`std_dvars`). This avoids selecting
+#'   multiple DVARS variants that can be collinear in fMRIPrep outputs.
+#' - `"std_dvars"`: standardized DVARS (`std_dvars`).
+#' - `"raw_dvars"`: raw/non-standardized DVARS (`dvars`).
+#' - `"non_std_dvars"`: explicit non-standardized DVARS.
+#' - `"vx_wisestd_dvars"`: voxel-wise standardized DVARS.
 #' - `"fd"`: framewise displacement only (`framewise_displacement`).
 #' - `"legacy_default"`: the 26 canonical confound names historically used as
 #'   the `read_confounds()` default (motion6 + CSF/WM + `global_signal` + DVARS
@@ -89,8 +93,6 @@ confound_set <- function(name, n = NULL) {
     "non_steady_state_outlier"
   )
 
-  dvars <- c("dvars", "std_dvars", "non_std_dvars", "vx_wisestd_dvars")
-
   sets <- list(
     motion6  = base_motion,
     motion12 = c(base_motion, deriv),
@@ -106,7 +108,11 @@ confound_set <- function(name, n = NULL) {
     # include underscore and no-underscore variants (cosine_00 vs cosine00)
     cosine    = c("cosine_*", "cosine*"),
     outliers  = c("framewise_displacement", "rmsd", "motion_outlier_*", "non_steady_state_outlier*"),
-    dvars     = dvars,
+    dvars     = "std_dvars",
+    std_dvars = "std_dvars",
+    raw_dvars = "dvars",
+    non_std_dvars = "non_std_dvars",
+    vx_wisestd_dvars = "vx_wisestd_dvars",
     fd        = "framewise_displacement",
     # Canonical names historically exposed as the unexported DEFAULT_CVARS2 and
     # used as the read_confounds() default. Sourced from CVARS_ALIASES so the
@@ -138,7 +144,8 @@ list_confound_sets <- function() {
     set = c(
       "motion6", "motion12", "motion24",
       "global3", "9p", "36p", "acompcor", "tcompcor", "compcor",
-      "cosine", "outliers", "dvars", "fd", "legacy_default"
+      "cosine", "outliers", "dvars", "std_dvars", "raw_dvars",
+      "non_std_dvars", "vx_wisestd_dvars", "fd", "legacy_default"
     ),
     description = c(
       "Rigid-body motion (6 params)",
@@ -152,7 +159,11 @@ list_confound_sets <- function() {
       "Both anatomical and temporal CompCor (use n to limit)",
       "Discrete cosine basis regressors",
       "FD/RMSD, motion spike regressors, and nonsteady-state outliers",
-      "DVARS family (dvars, std_dvars, non_std_dvars, vx_wisestd_dvars)",
+      "Standardized DVARS only (std_dvars)",
+      "Standardized DVARS only (std_dvars)",
+      "Raw/non-standardized DVARS (dvars)",
+      "Explicit non-standardized DVARS (non_std_dvars)",
+      "Voxel-wise standardized DVARS (vx_wisestd_dvars)",
       "Framewise displacement only",
       "Legacy read_confounds() default = former DEFAULT_CVARS2 (26 canonical names)"
     ),

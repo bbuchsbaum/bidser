@@ -257,10 +257,14 @@ test_that("Event reading works on mock BIDS project", {
   expect_gt(nrow(events_sub1), 0) # Expect one row for the sub-01 run
 
   # Check metadata columns in the *outer* tibble
-  expect_named(events_sub1, c(".subid", ".task", ".run", ".session", "data"), ignore.order = TRUE)
+  expect_true(all(c(".subid", ".task", ".run", ".session", "data",
+                    "participant_id", "task", "run", "session") %in% names(events_sub1)))
   expect_equal(events_sub1$.subid[[1]], "01") # Access first element
   expect_equal(events_sub1$.task[[1]], "taskA")
   expect_equal(events_sub1$.run[[1]], "01")
+  expect_equal(events_sub1$participant_id[[1]], "01")
+  expect_equal(events_sub1$task[[1]], "taskA")
+  expect_equal(events_sub1$run[[1]], "01")
   # Check session is NA or correct value if applicable
   expect_true(is.na(events_sub1$.session[[1]]) || is.character(events_sub1$.session[[1]]))
 

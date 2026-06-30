@@ -72,6 +72,27 @@ test_that(".bidser_parse_entities_from_path returns list with kind for single-to
   expect_null(ent$subid)
 })
 
+test_that("bids_entities parses a vector of paths into typed rows", {
+  paths <- c(
+    "/tmp/ds/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz",
+    "/tmp/ds/sub-02/ses-A/func/sub-02_ses-A_task-nback_run-02_echo-1_bold.nii.gz",
+    "/tmp/ds/sub-03/anat/sub-03_T1w.nii.gz"
+  )
+
+  ent <- bids_entities(paths)
+
+  expect_s3_class(ent, "tbl_df")
+  expect_equal(nrow(ent), length(paths))
+  expect_true(all(c(".path", "subid", "session", "task", "run", "echo", "kind") %in% names(ent)))
+  expect_equal(ent$.path, paths)
+  expect_equal(ent$subid, c("01", "02", "03"))
+  expect_equal(ent$session, c(NA, "A", NA))
+  expect_equal(ent$task, c("rest", "nback", NA))
+  expect_equal(ent$run, c(1L, 2L, NA_integer_))
+  expect_equal(ent$echo, c(NA_integer_, 1L, NA_integer_))
+  expect_equal(ent$kind, c("bold", "bold", "T1w"))
+})
+
 # ---------------------------------------------------------------------------
 # .bidser_extract_extension
 # ---------------------------------------------------------------------------

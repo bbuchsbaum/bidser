@@ -290,12 +290,19 @@ confound_files <- function (x, ...) {
 #' returns a nested tibble for easy data manipulation.
 #'
 #' @param x The object to read events from (typically a `bids_project`).
+#' @param subid Regex pattern to match subject IDs. Default is `".*"`.
+#' @param task Regex pattern to match tasks. Default is `".*"`.
+#' @param run Regex pattern to match runs. Default is `".*"`.
+#' @param session Regex pattern to match sessions. Default is `".*"`.
 #' @param ... Additional arguments passed to methods.
 #'
 #' @return A nested tibble with columns:
 #'   - `.task`: Task name
+#'   - `.session`: Session ID
 #'   - `.run`: Run number
 #'   - `.subid`: Subject ID
+#'   - `task`, `session`, `run`, `participant_id`: bare aliases for the
+#'     legacy dotted metadata columns
 #'   - `data`: Nested column containing the event data
 #'   If no matching data is found, returns an empty tibble with appropriate columns.
 #'
@@ -333,7 +340,8 @@ confound_files <- function (x, ...) {
 #' })
 #' }
 #' @export
-read_events <- function(x, ...) {
+read_events <- function(x, subid = ".*", task = ".*", run = ".*",
+                        session = ".*", ...) {
   UseMethod("read_events")
 }
 
@@ -347,6 +355,17 @@ read_events <- function(x, ...) {
 #' and return either nested or flat tibbles.
 #'
 #' @param x The object to read confounds from (typically a `bids_project`).
+#' @param subid Regex to match subject IDs. Default is `".*"`.
+#' @param task Regex to match tasks. Default is `".*"`.
+#' @param session Regex to match sessions. Default is `".*"`.
+#' @param run Regex to match runs. Default is `".*"`.
+#' @param cvars Character vector of confound variable names to select.
+#' @param npcs Integer. Perform PCA reduction and return this many PCs.
+#' @param perc_var Numeric. Perform PCA reduction to retain this percentage of
+#'   variance.
+#' @param nest Logical. If `TRUE`, nest confound tables by subject/task/session/run.
+#' @param clean Confound cleaning operations passed to methods.
+#' @param na_action How methods should handle missing numeric confound values.
 #' @param ... Additional arguments passed to methods, including:
 #'   - `subid`: Regex to match subject IDs (default: ".*")
 #'   - `task`: Regex to match tasks (default: ".*")
@@ -407,7 +426,10 @@ read_events <- function(x, ...) {
 #' })
 #' }
 #' @export
-read_confounds <- function(x, ...) {
+read_confounds <- function(x, subid = ".*", task = ".*", session = ".*",
+                           run = ".*", cvars = confound_set("legacy_default"),
+                           npcs = -1, perc_var = -1, nest = TRUE,
+                           clean = "zero_variance", na_action = "leave", ...) {
   UseMethod("read_confounds")
 }
 

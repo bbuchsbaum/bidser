@@ -1451,13 +1451,7 @@ read_events.mock_bids_project <- function(x, subid = ".*", task = ".*", run = ".
   if (is.null(relative_event_paths) || length(relative_event_paths) == 0) {
     # inform is noisy, return empty tibble quietly unless verbose option added
     # rlang::inform("No matching event files found in the mock project.")
-    return(tibble::tibble(
-        .subid = character(),
-        .task = character(),
-        .run = character(),
-        .session = character(),
-        data = list()
-        ))
+    return(.bidser_event_empty_result())
   }
 
   all_event_data <- list()
@@ -1518,10 +1512,7 @@ read_events.mock_bids_project <- function(x, subid = ".*", task = ".*", run = ".
   if (length(all_event_data) == 0) {
      # inform is noisy
      # rlang::inform("No event data could be loaded for the matching files.")
-     return(tibble::tibble(
-         .subid = character(), .task = character(), .run = character(),
-         .session = character(), data = list()
-       ))
+     return(.bidser_event_empty_result())
   }
 
   # Combine all data frames
@@ -1558,15 +1549,16 @@ read_events.mock_bids_project <- function(x, subid = ".*", task = ".*", run = ".
                if(col=="data") nested_df[[col]] <- list() else nested_df[[col]] <- NA_character_
            }
        }
-       # Reorder columns
+      # Reorder columns
        nested_df <- nested_df %>% dplyr::select(dplyr::all_of(std_cols))
+       nested_df <- .bidser_add_event_metadata_aliases(nested_df)
 
   } else {
        rlang::warn("Could not determine grouping variables for nesting event data.")
        nested_df <- tibble::tibble(data = list(final_df)) # Fallback
   }
 
-  return(nested_df)
+  .bidser_add_event_metadata_aliases(nested_df)
 }
 
 

@@ -56,8 +56,12 @@ family if provided).
 \item \code{"outliers"}: outlier/censoring covariates including
 \code{framewise_displacement}, \code{rmsd} (if present), \verb{motion_outlier_*}, and
 \verb{non_steady_state_outlier*}.
-\item \code{"dvars"}: DVARS family: \code{dvars}, \code{std_dvars}, \code{non_std_dvars},
-\code{vx_wisestd_dvars} (resolved to whichever names exist in your dataset).
+\item \code{"dvars"}: standardized DVARS only (\code{std_dvars}). This avoids selecting
+multiple DVARS variants that can be collinear in fMRIPrep outputs.
+\item \code{"std_dvars"}: standardized DVARS (\code{std_dvars}).
+\item \code{"raw_dvars"}: raw/non-standardized DVARS (\code{dvars}).
+\item \code{"non_std_dvars"}: explicit non-standardized DVARS.
+\item \code{"vx_wisestd_dvars"}: voxel-wise standardized DVARS.
 \item \code{"fd"}: framewise displacement only (\code{framewise_displacement}).
 \item \code{"legacy_default"}: the 26 canonical confound names historically used as
 the \code{read_confounds()} default (motion6 + CSF/WM + \code{global_signal} + DVARS

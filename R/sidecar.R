@@ -203,6 +203,96 @@ get_repetition_time <- function(x, subid, task, run=".*", session=".*", ...) {
   }
 }
 
+.bidser_n_volumes_file <- function(path) {
+  if (!file.exists(path)) {
+    stop("File not found: ", path, call. = FALSE)
+  }
+  rlang::check_installed("RNifti", reason = "to read NIfTI headers for n_volumes().")
+
+  hdr <- tryCatch(
+    RNifti::niftiHeader(path),
+    error = function(e) {
+      stop("Could not read NIfTI header for `", path, "`: ", e$message, call. = FALSE)
+    }
+  )
+  dims <- hdr$dim
+  if (is.null(dims) || length(dims) < 5L || is.na(dims[[1]]) || dims[[1]] < 4L) {
+    return(1L)
+  }
+  nvol <- as.integer(dims[[5]])
+  if (is.na(nvol) || nvol < 1L) 1L else nvol
+}
+
+#' Get the number of volumes in functional scans
+#'
+#' Reads the NIfTI header for one or more BOLD files and returns the 4th data
+#' dimension, i.e. the number of time points/volumes in each scan.
+#'
+#' @param x A character vector of NIfTI paths, or a `bids_project` object.
+#' @param ... Additional arguments passed to methods.
+#' @return For character input, a named integer vector with one value per path.
+#'   For `bids_project` input, a named integer vector by default, or a tibble
+#'   when `as_tibble = TRUE`.
+#' @export
+#' @examples
+#' \dontrun{
+#' n_volumes("sub-01_task-rest_bold.nii.gz")
+#' n_volumes(proj, subid = "01", task = "rest")
+#' }
+n_volumes <- function(x, ...) {
+  UseMethod("n_volumes")
+}
+
+#' @rdname n_volumes
+#' @export
+n_volumes.character <- function(x, ...) {
+  paths <- as.character(x)
+  out <- vapply(paths, .bidser_n_volumes_file, integer(1))
+  names(out) <- paths
+  out
+}
+
+#' @rdname n_volumes
+#' @param subid Regex pattern to match subject IDs.
+#' @param task Regex pattern to match task names.
+#' @param run Regex pattern to match run IDs.
+#' @param session Regex pattern to match session IDs.
+#' @param scope Scan source. `"raw"` uses [func_scans()], while
+#'   `"derivatives"` uses [preproc_scans()].
+#' @param as_tibble If `TRUE`, return `.path`, parsed entities, and `nvols`.
+#' @export
+n_volumes.bids_project <- function(x, subid = ".*", task = ".*", run = ".*",
+                                   session = ".*",
+                                   scope = c("raw", "derivatives"),
+                                   as_tibble = FALSE, ...) {
+  scope <- match.arg(scope)
+  dots <- list(...)
+  dots$full_path <- TRUE
+
+  scans <- if (identical(scope, "raw")) {
+    do.call(func_scans, c(list(x = x, subid = subid, task = task,
+                              run = run, session = session), dots))
+  } else {
+    do.call(preproc_scans, c(list(x = x, subid = subid, task = task,
+                                  run = run, session = session), dots))
+  }
+
+  if (is.null(scans) || length(scans) == 0) {
+    if (isTRUE(as_tibble)) {
+      return(tibble::tibble(.path = character(0), nvols = integer(0)))
+    }
+    return(stats::setNames(integer(0), character(0)))
+  }
+
+  vols <- n_volumes(scans)
+  if (isTRUE(as_tibble)) {
+    out <- bids_entities(scans, include_path = TRUE)
+    out$nvols <- unname(vols)
+    return(out)
+  }
+  vols
+}
+
 
 #' Infer TR (Repetition Time) from a BOLD file or sidecar
 #'
