@@ -2,6 +2,29 @@
 
 ## bidser 0.4.0
 
+- Add
+  [`bids_entities()`](https://bbuchsbaum.github.io/bidser/reference/bids_entities.md)
+  for vectorized path-to-entity parsing, returning one typed tibble row
+  per path.
+- Add
+  [`n_volumes()`](https://bbuchsbaum.github.io/bidser/reference/n_volumes.md)
+  for reading functional scan volume counts from NIfTI headers, with a
+  `bids_project` method for raw or preprocessed scan discovery.
+- Make
+  [`search_files()`](https://bbuchsbaum.github.io/bidser/reference/search_files.md)
+  fall back to a filesystem regex scan when the parsed BIDS tree has no
+  match, so ad hoc regex searches can find valid but currently unparsed
+  files such as masks.
+- Expose common filtering arguments on the
+  [`read_events()`](https://bbuchsbaum.github.io/bidser/reference/read_events.md)
+  and
+  [`read_confounds()`](https://bbuchsbaum.github.io/bidser/reference/read_confounds.md)
+  generics, and have
+  [`read_events()`](https://bbuchsbaum.github.io/bidser/reference/read_events.md)
+  return bare metadata aliases alongside the legacy dotted columns.
+- Change `confound_set("dvars")` to select only `std_dvars`, with
+  explicit `std_dvars`, `raw_dvars`, `non_std_dvars`, and
+  `vx_wisestd_dvars` selectors for callers that want a specific variant.
 - Add `confound_set("legacy_default")`, a public, version-robust handle
   for the 26 canonical confound names historically exposed only as the
   unexported `bidser:::DEFAULT_CVARS2`. Code that depended on

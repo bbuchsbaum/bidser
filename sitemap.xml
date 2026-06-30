@@ -19,6 +19,7 @@
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/as_bids_uri.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_check_compliance.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_datatype_spec.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_entities.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_heatmap.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_index.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_parser.html</loc></url>
@@ -82,6 +83,7 @@
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/list_pack_bids.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/load_all_events-method.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/mask_files.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/n_volumes.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/pack_bids.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/parse-method.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/parse_with_regex.html</loc></url>

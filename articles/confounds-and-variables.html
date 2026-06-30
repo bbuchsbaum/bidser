@@ -89,7 +89,7 @@ vignette runs without network access.</p>
 <code class="sourceCode R"><span><span class="va">proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">temp_dir</span>, fmriprep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">proj</span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">BIDS Project Summary</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Project Name: </span> <span style="color: #00BBBB; font-weight: bold;">bids_confounds_vignette_56765358c277</span> </span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Project Name: </span> <span style="color: #00BBBB; font-weight: bold;">bids_confounds_vignette_55ce47b299d0</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Participants (n): </span> <span style="color: #00BB00; font-weight: bold;">2</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Participants Source: </span> <span style="color: #BBBB00;">file</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Tasks: </span> <span style="color: #BBBB00;">nback, rest</span> </span></span>
@@ -110,21 +110,25 @@ ships with. These are curated variable lists that match common denoising
 strategies from the fMRI literature.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/list_confound_sets.html">list_confound_sets</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt;               set</span></span>
-<span><span class="co">#&gt; 1         motion6</span></span>
-<span><span class="co">#&gt; 2        motion12</span></span>
-<span><span class="co">#&gt; 3        motion24</span></span>
-<span><span class="co">#&gt; 4         global3</span></span>
-<span><span class="co">#&gt; 5              9p</span></span>
-<span><span class="co">#&gt; 6             36p</span></span>
-<span><span class="co">#&gt; 7        acompcor</span></span>
-<span><span class="co">#&gt; 8        tcompcor</span></span>
-<span><span class="co">#&gt; 9         compcor</span></span>
-<span><span class="co">#&gt; 10         cosine</span></span>
-<span><span class="co">#&gt; 11       outliers</span></span>
-<span><span class="co">#&gt; 12          dvars</span></span>
-<span><span class="co">#&gt; 13             fd</span></span>
-<span><span class="co">#&gt; 14 legacy_default</span></span>
+<span><span class="co">#&gt;                 set</span></span>
+<span><span class="co">#&gt; 1           motion6</span></span>
+<span><span class="co">#&gt; 2          motion12</span></span>
+<span><span class="co">#&gt; 3          motion24</span></span>
+<span><span class="co">#&gt; 4           global3</span></span>
+<span><span class="co">#&gt; 5                9p</span></span>
+<span><span class="co">#&gt; 6               36p</span></span>
+<span><span class="co">#&gt; 7          acompcor</span></span>
+<span><span class="co">#&gt; 8          tcompcor</span></span>
+<span><span class="co">#&gt; 9           compcor</span></span>
+<span><span class="co">#&gt; 10           cosine</span></span>
+<span><span class="co">#&gt; 11         outliers</span></span>
+<span><span class="co">#&gt; 12            dvars</span></span>
+<span><span class="co">#&gt; 13        std_dvars</span></span>
+<span><span class="co">#&gt; 14        raw_dvars</span></span>
+<span><span class="co">#&gt; 15    non_std_dvars</span></span>
+<span><span class="co">#&gt; 16 vx_wisestd_dvars</span></span>
+<span><span class="co">#&gt; 17               fd</span></span>
+<span><span class="co">#&gt; 18   legacy_default</span></span>
 <span><span class="co">#&gt;                                                                     description</span></span>
 <span><span class="co">#&gt; 1                                                  Rigid-body motion (6 params)</span></span>
 <span><span class="co">#&gt; 2                                               Motion + first derivatives (12)</span></span>
@@ -137,9 +141,13 @@ strategies from the fMRI literature.</p>
 <span><span class="co">#&gt; 9                         Both anatomical and temporal CompCor (use n to limit)</span></span>
 <span><span class="co">#&gt; 10                                             Discrete cosine basis regressors</span></span>
 <span><span class="co">#&gt; 11               FD/RMSD, motion spike regressors, and nonsteady-state outliers</span></span>
-<span><span class="co">#&gt; 12             DVARS family (dvars, std_dvars, non_std_dvars, vx_wisestd_dvars)</span></span>
-<span><span class="co">#&gt; 13                                                  Framewise displacement only</span></span>
-<span><span class="co">#&gt; 14 Legacy read_confounds() default = former DEFAULT_CVARS2 (26 canonical names)</span></span></code></pre></div>
+<span><span class="co">#&gt; 12                                          Standardized DVARS only (std_dvars)</span></span>
+<span><span class="co">#&gt; 13                                          Standardized DVARS only (std_dvars)</span></span>
+<span><span class="co">#&gt; 14                                           Raw/non-standardized DVARS (dvars)</span></span>
+<span><span class="co">#&gt; 15                              Explicit non-standardized DVARS (non_std_dvars)</span></span>
+<span><span class="co">#&gt; 16                             Voxel-wise standardized DVARS (vx_wisestd_dvars)</span></span>
+<span><span class="co">#&gt; 17                                                  Framewise displacement only</span></span>
+<span><span class="co">#&gt; 18 Legacy read_confounds() default = former DEFAULT_CVARS2 (26 canonical names)</span></span></code></pre></div>
 <p>Each set is a named collection of confound variable names. You can
 inspect what a set contains:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -296,12 +304,12 @@ nested tibbles:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">events</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_events.html">read_events</a></span><span class="op">(</span><span class="va">proj</span>, task <span class="op">=</span> <span class="st">"nback"</span><span class="op">)</span></span>
 <span><span class="va">events</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 9</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Groups:   .task, .session, .run, .subid [2]</span></span></span>
-<span><span class="co">#&gt;   .subid .session .run  .task data             </span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>           </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    nback <span style="color: #949494;">&lt;tibble [40 × 5]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 02     <span style="color: #BB0000;">NA</span>       01    nback <span style="color: #949494;">&lt;tibble [40 × 5]&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt;   .task .session .run  .subid task  session run   participant_id data    </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> nback <span style="color: #BB0000;">NA</span>       01    01     nback <span style="color: #BB0000;">NA</span>      01    01             <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> nback <span style="color: #BB0000;">NA</span>       01    02     nback <span style="color: #BB0000;">NA</span>      01    02             <span style="color: #949494;">&lt;tibble&gt;</span></span></span></code></pre></div>
 <p>Unnest to get a flat trial table:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">trials</span> <span class="op">&lt;-</span> <span class="va">events</span> <span class="op">|&gt;</span></span>
@@ -399,7 +407,7 @@ run-level coverage:</p>
 <code class="sourceCode R"><span><span class="va">report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_report.html">bids_report</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span>
 <span><span class="va">report</span></span>
 <span><span class="co">#&gt; BIDS Report</span></span>
-<span><span class="co">#&gt; Project: bids_confounds_vignette_56765358c277 </span></span>
+<span><span class="co">#&gt; Project: bids_confounds_vignette_55ce47b299d0 </span></span>
 <span><span class="co">#&gt; Participants source: file </span></span>
 <span><span class="co">#&gt; Subjects: 2 </span></span>
 <span><span class="co">#&gt; Sessions: 0 </span></span>

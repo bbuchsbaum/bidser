@@ -178,20 +178,20 @@ cat("Found", length(event_file_paths), "event files\n")
 # Read event data into a nested data frame
 events_data <- read_events(proj)
 events_data
-#> # A tibble: 48 × 5
+#> # A tibble: 48 × 9
 #> # Groups:   .task, .session, .run, .subid [48]
-#>    .subid .session .run  .task                 data              
-#>    <chr>  <chr>    <chr> <chr>                 <list>            
-#>  1 01     NA       01    balloonanalogrisktask <tibble [158 × 9]>
-#>  2 01     NA       02    balloonanalogrisktask <tibble [156 × 9]>
-#>  3 01     NA       03    balloonanalogrisktask <tibble [149 × 9]>
-#>  4 02     NA       01    balloonanalogrisktask <tibble [185 × 9]>
-#>  5 02     NA       02    balloonanalogrisktask <tibble [184 × 9]>
-#>  6 02     NA       03    balloonanalogrisktask <tibble [186 × 9]>
-#>  7 03     NA       01    balloonanalogrisktask <tibble [150 × 9]>
-#>  8 03     NA       02    balloonanalogrisktask <tibble [169 × 9]>
-#>  9 03     NA       03    balloonanalogrisktask <tibble [175 × 9]>
-#> 10 04     NA       01    balloonanalogrisktask <tibble [166 × 9]>
+#>    .task       .session .run  .subid task  session run   participant_id data    
+#>    <chr>       <chr>    <chr> <chr>  <chr> <chr>   <chr> <chr>          <list>  
+#>  1 balloonana… NA       01    01     ball… NA      01    01             <tibble>
+#>  2 balloonana… NA       02    01     ball… NA      02    01             <tibble>
+#>  3 balloonana… NA       03    01     ball… NA      03    01             <tibble>
+#>  4 balloonana… NA       01    02     ball… NA      01    02             <tibble>
+#>  5 balloonana… NA       02    02     ball… NA      02    02             <tibble>
+#>  6 balloonana… NA       03    02     ball… NA      03    02             <tibble>
+#>  7 balloonana… NA       01    03     ball… NA      01    03             <tibble>
+#>  8 balloonana… NA       02    03     ball… NA      02    03             <tibble>
+#>  9 balloonana… NA       03    03     ball… NA      03    03             <tibble>
+#> 10 balloonana… NA       01    04     ball… NA      01    04             <tibble>
 #> # ℹ 38 more rows
 ```
 
@@ -205,24 +205,26 @@ first_subject_events <- events_data %>%
   unnest(cols = c(data))
 
 head(first_subject_events)
-#> # A tibble: 6 × 13
+#> # A tibble: 6 × 17
 #> # Groups:   .task, .session, .run, .subid [1]
-#>   .subid .session .run  .task              onset duration trial_type cash_demean
-#>   <chr>  <chr>    <chr> <chr>              <dbl>    <dbl> <chr>            <dbl>
-#> 1 01     NA       01    balloonanalogris…  0.061    0.772 pumps_dem…          NA
-#> 2 01     NA       01    balloonanalogris…  4.96     0.772 pumps_dem…          NA
-#> 3 01     NA       01    balloonanalogris…  7.18     0.772 pumps_dem…          NA
-#> 4 01     NA       01    balloonanalogris… 10.4      0.772 pumps_dem…          NA
-#> 5 01     NA       01    balloonanalogris… 13.4      0.772 pumps_dem…          NA
-#> 6 01     NA       01    balloonanalogris… 16.8      0.772 explode_d…          NA
-#> # ℹ 5 more variables: control_pumps_demean <dbl>, explode_demean <dbl>,
-#> #   pumps_demean <dbl>, response_time <dbl>, .file <chr>
+#>   .task .session .run  .subid task  session run   participant_id  onset duration
+#>   <chr> <chr>    <chr> <chr>  <chr> <chr>   <chr> <chr>           <dbl>    <dbl>
+#> 1 ball… NA       01    01     ball… NA      01    01              0.061    0.772
+#> 2 ball… NA       01    01     ball… NA      01    01              4.96     0.772
+#> 3 ball… NA       01    01     ball… NA      01    01              7.18     0.772
+#> 4 ball… NA       01    01     ball… NA      01    01             10.4      0.772
+#> 5 ball… NA       01    01     ball… NA      01    01             13.4      0.772
+#> 6 ball… NA       01    01     ball… NA      01    01             16.8      0.772
+#> # ℹ 7 more variables: trial_type <chr>, cash_demean <dbl>,
+#> #   control_pumps_demean <dbl>, explode_demean <dbl>, pumps_demean <dbl>,
+#> #   response_time <dbl>, .file <chr>
 names(first_subject_events)
-#>  [1] ".subid"               ".session"             ".run"                
-#>  [4] ".task"                "onset"                "duration"            
-#>  [7] "trial_type"           "cash_demean"          "control_pumps_demean"
-#> [10] "explode_demean"       "pumps_demean"         "response_time"       
-#> [13] ".file"
+#>  [1] ".task"                ".session"             ".run"                
+#>  [4] ".subid"               "task"                 "session"             
+#>  [7] "run"                  "participant_id"       "onset"               
+#> [10] "duration"             "trial_type"           "cash_demean"         
+#> [13] "control_pumps_demean" "explode_demean"       "pumps_demean"        
+#> [16] "response_time"        ".file"
 ```
 
 ### Analyzing Event Data
@@ -340,18 +342,18 @@ cat("Subject 01:", length(sub01_scans), "functional scans\n")
 # Get event files for this subject
 sub01_events <- subject_01$events()
 cat("Subject 01:", length(sub01_events), "event files\n")
-#> Subject 01: 5 event files
+#> Subject 01: 9 event files
 
 # Read event data for this subject
 sub01_event_data <- subject_01$events()
 sub01_event_data
-#> # A tibble: 3 × 5
+#> # A tibble: 3 × 9
 #> # Groups:   .task, .session, .run, .subid [3]
-#>   .subid .session .run  .task                 data              
-#>   <chr>  <chr>    <chr> <chr>                 <list>            
-#> 1 01     NA       01    balloonanalogrisktask <tibble [158 × 9]>
-#> 2 01     NA       02    balloonanalogrisktask <tibble [156 × 9]>
-#> 3 01     NA       03    balloonanalogrisktask <tibble [149 × 9]>
+#>   .task        .session .run  .subid task  session run   participant_id data    
+#>   <chr>        <chr>    <chr> <chr>  <chr> <chr>   <chr> <chr>          <list>  
+#> 1 balloonanal… NA       01    01     ball… NA      01    01             <tibble>
+#> 2 balloonanal… NA       02    01     ball… NA      02    01             <tibble>
+#> 3 balloonanal… NA       03    01     ball… NA      03    01             <tibble>
 ```
 
 This approach is particularly useful when you’re doing subject-level
@@ -368,9 +370,9 @@ for (subj_id in subjects_to_analyze) {
   cat(sprintf("Subject %s: %d scans, %d event files\n",
               subj_id, length(scans), length(events)))
 }
-#> Subject 01: 3 scans, 5 event files
-#> Subject 02: 3 scans, 5 event files
-#> Subject 03: 3 scans, 5 event files
+#> Subject 01: 3 scans, 9 event files
+#> Subject 02: 3 scans, 9 event files
+#> Subject 03: 3 scans, 9 event files
 ```
 
 The subject interface makes it easy to write analysis pipelines that
@@ -577,9 +579,9 @@ When you need absolute paths for analysis tools:
 
 full_paths <- func_scans(proj, subid = "01", full_path = TRUE)
 full_paths
-#> [1] "/tmp/RtmpxOc4lt/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
-#> [2] "/tmp/RtmpxOc4lt/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
-#> [3] "/tmp/RtmpxOc4lt/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
+#> [1] "/tmp/RtmptkHMgI/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
+#> [2] "/tmp/RtmptkHMgI/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
+#> [3] "/tmp/RtmptkHMgI/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
 
 all(file.exists(full_paths))
 #> [1] TRUE

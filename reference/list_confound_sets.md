@@ -18,21 +18,25 @@ A data.frame with columns `set` and `description`.
 
 ``` r
 list_confound_sets()
-#>               set
-#> 1         motion6
-#> 2        motion12
-#> 3        motion24
-#> 4         global3
-#> 5              9p
-#> 6             36p
-#> 7        acompcor
-#> 8        tcompcor
-#> 9         compcor
-#> 10         cosine
-#> 11       outliers
-#> 12          dvars
-#> 13             fd
-#> 14 legacy_default
+#>                 set
+#> 1           motion6
+#> 2          motion12
+#> 3          motion24
+#> 4           global3
+#> 5                9p
+#> 6               36p
+#> 7          acompcor
+#> 8          tcompcor
+#> 9           compcor
+#> 10           cosine
+#> 11         outliers
+#> 12            dvars
+#> 13        std_dvars
+#> 14        raw_dvars
+#> 15    non_std_dvars
+#> 16 vx_wisestd_dvars
+#> 17               fd
+#> 18   legacy_default
 #>                                                                     description
 #> 1                                                  Rigid-body motion (6 params)
 #> 2                                               Motion + first derivatives (12)
@@ -45,7 +49,11 @@ list_confound_sets()
 #> 9                         Both anatomical and temporal CompCor (use n to limit)
 #> 10                                             Discrete cosine basis regressors
 #> 11               FD/RMSD, motion spike regressors, and nonsteady-state outliers
-#> 12             DVARS family (dvars, std_dvars, non_std_dvars, vx_wisestd_dvars)
-#> 13                                                  Framewise displacement only
-#> 14 Legacy read_confounds() default = former DEFAULT_CVARS2 (26 canonical names)
+#> 12                                          Standardized DVARS only (std_dvars)
+#> 13                                          Standardized DVARS only (std_dvars)
+#> 14                                           Raw/non-standardized DVARS (dvars)
+#> 15                              Explicit non-standardized DVARS (non_std_dvars)
+#> 16                             Voxel-wise standardized DVARS (vx_wisestd_dvars)
+#> 17                                                  Framewise displacement only
+#> 18 Legacy read_confounds() default = former DEFAULT_CVARS2 (26 canonical names)
 ```

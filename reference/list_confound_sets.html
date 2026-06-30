@@ -60,21 +60,25 @@ usable with <code><a href="confound_set.html">confound_set()</a></code>.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">list_confound_sets</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               set</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1         motion6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2        motion12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3        motion24</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4         global3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5              9p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6             36p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7        acompcor</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8        tcompcor</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9         compcor</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10         cosine</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11       outliers</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12          dvars</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13             fd</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14 legacy_default</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 set</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1           motion6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2          motion12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3          motion24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4           global3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                9p</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6               36p</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7          acompcor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8          tcompcor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9           compcor</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10           cosine</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11         outliers</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12            dvars</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13        std_dvars</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14        raw_dvars</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15    non_std_dvars</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 vx_wisestd_dvars</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17               fd</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18   legacy_default</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                                     description</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1                                                  Rigid-body motion (6 params)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2                                               Motion + first derivatives (12)</span>
@@ -87,9 +91,13 @@ usable with <code><a href="confound_set.html">confound_set()</a></code>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 9                         Both anatomical and temporal CompCor (use n to limit)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10                                             Discrete cosine basis regressors</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 11               FD/RMSD, motion spike regressors, and nonsteady-state outliers</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12             DVARS family (dvars, std_dvars, non_std_dvars, vx_wisestd_dvars)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13                                                  Framewise displacement only</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14 Legacy read_confounds() default = former DEFAULT_CVARS2 (26 canonical names)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12                                          Standardized DVARS only (std_dvars)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13                                          Standardized DVARS only (std_dvars)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14                                           Raw/non-standardized DVARS (dvars)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15                              Explicit non-standardized DVARS (non_std_dvars)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16                             Voxel-wise standardized DVARS (vx_wisestd_dvars)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17                                                  Framewise displacement only</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 Legacy read_confounds() default = former DEFAULT_CVARS2 (26 canonical names)</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

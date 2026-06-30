@@ -102,9 +102,9 @@ tryCatch({
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })
-#> [1] "/tmp/RtmpysvU6h/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
-#> [2] "/tmp/RtmpysvU6h/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
-#> [3] "/tmp/RtmpysvU6h/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
+#> [1] "/tmp/RtmppCnvEl/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
+#> [2] "/tmp/RtmppCnvEl/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
+#> [3] "/tmp/RtmppCnvEl/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
 # }
 # \donttest{
 tryCatch({
@@ -138,13 +138,13 @@ tryCatch({
 #> [1] "Subject 01 has 3 functional scans"
 #> [1] "Subject 01 has 3 event files"
 #> [1] "Event data structure:"
-#> # A tibble: 3 × 5
+#> # A tibble: 3 × 9
 #> # Groups:   .task, .session, .run, .subid [3]
-#>   .subid .session .run  .task                 data              
-#>   <chr>  <chr>    <chr> <chr>                 <list>            
-#> 1 01     NA       01    balloonanalogrisktask <tibble [158 × 9]>
-#> 2 01     NA       02    balloonanalogrisktask <tibble [156 × 9]>
-#> 3 01     NA       03    balloonanalogrisktask <tibble [149 × 9]>
+#>   .task        .session .run  .subid task  session run   participant_id data    
+#>   <chr>        <chr>    <chr> <chr>  <chr> <chr>   <chr> <chr>          <list>  
+#> 1 balloonanal… NA       01    01     ball… NA      01    01             <tibble>
+#> 2 balloonanal… NA       02    01     ball… NA      02    01             <tibble>
+#> 3 balloonanal… NA       03    01     ball… NA      03    01             <tibble>
 # }
 # \donttest{
 # Create a subject interface

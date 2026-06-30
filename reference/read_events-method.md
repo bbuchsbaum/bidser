@@ -57,9 +57,9 @@ evt_data[["sub-01/func/sub-01_task-rest_run-01_events.tsv"]] <-
 mock <- create_mock_bids("EventTest", parts, fs, event_data = evt_data)
 events <- read_events(mock)
 print(events)
-#> # A tibble: 1 × 5
+#> # A tibble: 1 × 9
 #> # Groups:   .subid, .task, .run, .session [1]
-#>   .subid .task .run  .session data            
-#>   <chr>  <chr> <chr> <chr>    <list>          
-#> 1 01     rest  01    NA       <tibble [3 × 3]>
+#>   .task .session .run  .subid task  session run   participant_id data    
+#>   <chr> <chr>    <chr> <chr>  <chr> <chr>   <chr> <chr>          <list>  
+#> 1 rest  NA       01    01     rest  NA      01    01             <tibble>
 ```

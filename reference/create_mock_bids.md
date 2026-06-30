@@ -161,18 +161,19 @@ print(event_files(mock_proj, subid = "02", session = "test"))
 # Read the injected event data
 events_sub1 <- read_events(mock_proj, subid = "01")
 print(events_sub1)
-#> # A tibble: 1 × 5
+#> # A tibble: 1 × 9
 #> # Groups:   .subid, .task, .run, .session [1]
-#>   .subid .task .run  .session data            
-#>   <chr>  <chr> <chr> <chr>    <list>          
-#> 1 01     taskA 01    NA       <tibble [2 × 3]>
+#>   .task .session .run  .subid task  session run   participant_id data    
+#>   <chr> <chr>    <chr> <chr>  <chr> <chr>   <chr> <chr>          <list>  
+#> 1 taskA NA       01    01     taskA NA      01    01             <tibble>
 if (nrow(events_sub1) > 0) print(tidyr::unnest(events_sub1, cols = data))
-#> # A tibble: 2 × 7
+#> # A tibble: 2 × 11
 #> # Groups:   .subid, .task, .run, .session [1]
-#>   .subid .task .run  .session onset duration trial_type
-#>   <chr>  <chr> <chr> <chr>    <dbl>    <dbl> <chr>     
-#> 1 01     taskA 01    NA           1      0.5 condA     
-#> 2 01     taskA 01    NA           5      0.5 condB     
+#>   .task .session .run  .subid task  session run   participant_id onset duration
+#>   <chr> <chr>    <chr> <chr>  <chr> <chr>   <chr> <chr>          <dbl>    <dbl>
+#> 1 taskA NA       01    01     taskA NA      01    01                 1      0.5
+#> 2 taskA NA       01    01     taskA NA      01    01                 5      0.5
+#> # ℹ 1 more variable: trial_type <chr>
 
 # Search for derivatives
 print(search_files(mock_proj, suffix = "preproc_bold.nii.gz"))

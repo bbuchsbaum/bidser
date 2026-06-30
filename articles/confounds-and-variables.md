@@ -26,7 +26,7 @@ vignette runs without network access.
 proj <- bids_project(temp_dir, fmriprep = TRUE)
 proj
 #> BIDS Project Summary 
-#> Project Name:  bids_confounds_vignette_56765358c277 
+#> Project Name:  bids_confounds_vignette_55ce47b299d0 
 #> Participants (n):  2 
 #> Participants Source:  file 
 #> Tasks:  nback, rest 
@@ -50,21 +50,25 @@ strategies from the fMRI literature.
 ``` r
 
 list_confound_sets()
-#>               set
-#> 1         motion6
-#> 2        motion12
-#> 3        motion24
-#> 4         global3
-#> 5              9p
-#> 6             36p
-#> 7        acompcor
-#> 8        tcompcor
-#> 9         compcor
-#> 10         cosine
-#> 11       outliers
-#> 12          dvars
-#> 13             fd
-#> 14 legacy_default
+#>                 set
+#> 1           motion6
+#> 2          motion12
+#> 3          motion24
+#> 4           global3
+#> 5                9p
+#> 6               36p
+#> 7          acompcor
+#> 8          tcompcor
+#> 9           compcor
+#> 10           cosine
+#> 11         outliers
+#> 12            dvars
+#> 13        std_dvars
+#> 14        raw_dvars
+#> 15    non_std_dvars
+#> 16 vx_wisestd_dvars
+#> 17               fd
+#> 18   legacy_default
 #>                                                                     description
 #> 1                                                  Rigid-body motion (6 params)
 #> 2                                               Motion + first derivatives (12)
@@ -77,9 +81,13 @@ list_confound_sets()
 #> 9                         Both anatomical and temporal CompCor (use n to limit)
 #> 10                                             Discrete cosine basis regressors
 #> 11               FD/RMSD, motion spike regressors, and nonsteady-state outliers
-#> 12             DVARS family (dvars, std_dvars, non_std_dvars, vx_wisestd_dvars)
-#> 13                                                  Framewise displacement only
-#> 14 Legacy read_confounds() default = former DEFAULT_CVARS2 (26 canonical names)
+#> 12                                          Standardized DVARS only (std_dvars)
+#> 13                                          Standardized DVARS only (std_dvars)
+#> 14                                           Raw/non-standardized DVARS (dvars)
+#> 15                              Explicit non-standardized DVARS (non_std_dvars)
+#> 16                             Voxel-wise standardized DVARS (vx_wisestd_dvars)
+#> 17                                                  Framewise displacement only
+#> 18 Legacy read_confounds() default = former DEFAULT_CVARS2 (26 canonical names)
 ```
 
 Each set is a named collection of confound variable names. You can
@@ -265,12 +273,12 @@ returns them as nested tibbles:
 
 events <- read_events(proj, task = "nback")
 events
-#> # A tibble: 2 × 5
+#> # A tibble: 2 × 9
 #> # Groups:   .task, .session, .run, .subid [2]
-#>   .subid .session .run  .task data             
-#>   <chr>  <chr>    <chr> <chr> <list>           
-#> 1 01     NA       01    nback <tibble [40 × 5]>
-#> 2 02     NA       01    nback <tibble [40 × 5]>
+#>   .task .session .run  .subid task  session run   participant_id data    
+#>   <chr> <chr>    <chr> <chr>  <chr> <chr>   <chr> <chr>          <list>  
+#> 1 nback NA       01    01     nback NA      01    01             <tibble>
+#> 2 nback NA       01    02     nback NA      01    02             <tibble>
 ```
 
 Unnest to get a flat trial table:
@@ -391,7 +399,7 @@ checks, pipeline discovery, and run-level coverage:
 report <- bids_report(proj)
 report
 #> BIDS Report
-#> Project: bids_confounds_vignette_56765358c277 
+#> Project: bids_confounds_vignette_55ce47b299d0 
 #> Participants source: file 
 #> Subjects: 2 
 #> Sessions: 0 

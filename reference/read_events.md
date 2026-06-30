@@ -9,7 +9,7 @@ manipulation.
 ## Usage
 
 ``` r
-read_events(x, ...)
+read_events(x, subid = ".*", task = ".*", run = ".*", session = ".*", ...)
 ```
 
 ## Arguments
@@ -17,6 +17,22 @@ read_events(x, ...)
 - x:
 
   The object to read events from (typically a `bids_project`).
+
+- subid:
+
+  Regex pattern to match subject IDs. Default is `".*"`.
+
+- task:
+
+  Regex pattern to match tasks. Default is `".*"`.
+
+- run:
+
+  Regex pattern to match runs. Default is `".*"`.
+
+- session:
+
+  Regex pattern to match sessions. Default is `".*"`.
 
 - ...:
 
@@ -28,9 +44,14 @@ A nested tibble with columns:
 
 - `.task`: Task name
 
+- `.session`: Session ID
+
 - `.run`: Run number
 
 - `.subid`: Subject ID
+
+- `task`, `session`, `run`, `participant_id`: bare aliases for the
+  legacy dotted metadata columns
 
 - `data`: Nested column containing the event data If no matching data is
   found, returns an empty tibble with appropriate columns.

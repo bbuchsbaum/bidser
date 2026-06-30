@@ -142,9 +142,9 @@ Returns NULL if the subject is not found in the project.</p>
 <span class="r-in"><span><span class="op">}</span>, error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Example requires internet connection: "</span>, <span class="va">e</span><span class="op">$</span><span class="va">message</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/tmp/RtmpysvU6h/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "/tmp/RtmpysvU6h/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "/tmp/RtmpysvU6h/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "/tmp/RtmppCnvEl/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "/tmp/RtmppCnvEl/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "/tmp/RtmppCnvEl/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="op">{</span></span></span>
@@ -178,13 +178,13 @@ Returns NULL if the subject is not found in the project.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Subject 01 has 3 functional scans"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Subject 01 has 3 event files"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Event data structure:"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 5</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 9</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Groups:   .task, .session, .run, .subid [3]</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .subid .session .run  .task                 data              </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [158 × 9]&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 01     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [156 × 9]&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 01     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [149 × 9]&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .task        .session .run  .subid task  session run   participant_id data    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> balloonanal… <span style="color: #BB0000;">NA</span>       01    01     ball… <span style="color: #BB0000;">NA</span>      01    01             <span style="color: #949494;">&lt;tibble&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> balloonanal… <span style="color: #BB0000;">NA</span>       02    01     ball… <span style="color: #BB0000;">NA</span>      02    01             <span style="color: #949494;">&lt;tibble&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> balloonanal… <span style="color: #BB0000;">NA</span>       03    01     ball… <span style="color: #BB0000;">NA</span>      03    01             <span style="color: #949494;">&lt;tibble&gt;</span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Create a subject interface</span></span></span>

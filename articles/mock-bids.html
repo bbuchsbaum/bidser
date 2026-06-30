@@ -140,7 +140,7 @@ later.</p>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Datatypes: </span> <span style="color: #00BB00;">func</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Suffixes: </span> <span style="color: #00BB00;">nii.gz, tsv</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">BIDS Keys: </span> <span style="color: #BBBB00;">(none)</span> </span></span>
-<span><span class="co">#&gt; Path:  /tmp/Rtmpm6lZek/bidser-mock-6c0d6ad001</span></span>
+<span><span class="co">#&gt; Path:  /tmp/Rtmpp5kp95/bidser-mock-6b6771fa3b11</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">mock_dir</span>, <span class="st">"participants.tsv"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>You can inspect the resulting layout immediately with
@@ -197,12 +197,13 @@ readers work the same way they do on a real project.</p>
 <span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="va">data</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">subject_events</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 7</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 11</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Groups:   .subid, .task, .run, .session [1]</span></span></span>
-<span><span class="co">#&gt;   .subid .task .run  .session onset duration trial_type</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 01     rest  01    <span style="color: #BB0000;">NA</span>           0        1 cue       </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 01     rest  01    <span style="color: #BB0000;">NA</span>          12        1 target</span></span>
+<span><span class="co">#&gt;   .task .session .run  .subid task  session run   participant_id onset duration</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> rest  <span style="color: #BB0000;">NA</span>       01    01     rest  <span style="color: #BB0000;">NA</span>      01    01                 0        1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> rest  <span style="color: #BB0000;">NA</span>       01    01     rest  <span style="color: #BB0000;">NA</span>      01    01                12        1</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: trial_type &lt;chr&gt;</span></span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">subject_events</span><span class="op">)</span> <span class="op">==</span> <span class="fl">2L</span>,</span>

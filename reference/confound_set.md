@@ -77,9 +77,17 @@ Available sets (case-insensitive):
   `framewise_displacement`, `rmsd` (if present), `motion_outlier_*`, and
   `non_steady_state_outlier*`.
 
-- `"dvars"`: DVARS family: `dvars`, `std_dvars`, `non_std_dvars`,
-  `vx_wisestd_dvars` (resolved to whichever names exist in your
-  dataset).
+- `"dvars"`: standardized DVARS only (`std_dvars`). This avoids
+  selecting multiple DVARS variants that can be collinear in fMRIPrep
+  outputs.
+
+- `"std_dvars"`: standardized DVARS (`std_dvars`).
+
+- `"raw_dvars"`: raw/non-standardized DVARS (`dvars`).
+
+- `"non_std_dvars"`: explicit non-standardized DVARS.
+
+- `"vx_wisestd_dvars"`: voxel-wise standardized DVARS.
 
 - `"fd"`: framewise displacement only (`framewise_displacement`).
 

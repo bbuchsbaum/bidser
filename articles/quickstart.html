@@ -257,20 +257,20 @@ fMRI analysis.</p>
 <span><span class="co"># Read event data into a nested data frame</span></span>
 <span><span class="va">events_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_events.html">read_events</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span>
 <span><span class="va">events_data</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 48 × 5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 48 × 9</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Groups:   .task, .session, .run, .subid [48]</span></span></span>
-<span><span class="co">#&gt;    .subid .session .run  .task                 data              </span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>            </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [158 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 01     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [156 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 01     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [149 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 02     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [185 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 02     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [184 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 02     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [186 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 03     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [150 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 03     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [169 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 03     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [175 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 04     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [166 × 9]&gt;</span></span></span>
+<span><span class="co">#&gt;    .task       .session .run  .subid task  session run   participant_id data    </span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> balloonana… <span style="color: #BB0000;">NA</span>       01    01     ball… <span style="color: #BB0000;">NA</span>      01    01             <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> balloonana… <span style="color: #BB0000;">NA</span>       02    01     ball… <span style="color: #BB0000;">NA</span>      02    01             <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> balloonana… <span style="color: #BB0000;">NA</span>       03    01     ball… <span style="color: #BB0000;">NA</span>      03    01             <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> balloonana… <span style="color: #BB0000;">NA</span>       01    02     ball… <span style="color: #BB0000;">NA</span>      01    02             <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> balloonana… <span style="color: #BB0000;">NA</span>       02    02     ball… <span style="color: #BB0000;">NA</span>      02    02             <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> balloonana… <span style="color: #BB0000;">NA</span>       03    02     ball… <span style="color: #BB0000;">NA</span>      03    02             <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> balloonana… <span style="color: #BB0000;">NA</span>       01    03     ball… <span style="color: #BB0000;">NA</span>      01    03             <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> balloonana… <span style="color: #BB0000;">NA</span>       02    03     ball… <span style="color: #BB0000;">NA</span>      02    03             <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> balloonana… <span style="color: #BB0000;">NA</span>       03    03     ball… <span style="color: #BB0000;">NA</span>      03    03             <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> balloonana… <span style="color: #BB0000;">NA</span>       01    04     ball… <span style="color: #BB0000;">NA</span>      01    04             <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 38 more rows</span></span></span></code></pre></div>
 <p>Let’s explore the event data structure:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -280,24 +280,26 @@ fMRI analysis.</p>
 <span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">first_subject_events</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 13</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 17</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Groups:   .task, .session, .run, .subid [1]</span></span></span>
-<span><span class="co">#&gt;   .subid .session .run  .task              onset duration trial_type cash_demean</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris…  0.061    0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris…  4.96     0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris…  7.18     0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris… 10.4      0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris… 13.4      0.772 pumps_dem…          <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogris… 16.8      0.772 explode_d…          <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5 more variables: control_pumps_demean &lt;dbl&gt;, explode_demean &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   pumps_demean &lt;dbl&gt;, response_time &lt;dbl&gt;, .file &lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt;   .task .session .run  .subid task  session run   participant_id  onset duration</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> ball… <span style="color: #BB0000;">NA</span>       01    01     ball… <span style="color: #BB0000;">NA</span>      01    01              0.061    0.772</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> ball… <span style="color: #BB0000;">NA</span>       01    01     ball… <span style="color: #BB0000;">NA</span>      01    01              4.96     0.772</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> ball… <span style="color: #BB0000;">NA</span>       01    01     ball… <span style="color: #BB0000;">NA</span>      01    01              7.18     0.772</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> ball… <span style="color: #BB0000;">NA</span>       01    01     ball… <span style="color: #BB0000;">NA</span>      01    01             10.4      0.772</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> ball… <span style="color: #BB0000;">NA</span>       01    01     ball… <span style="color: #BB0000;">NA</span>      01    01             13.4      0.772</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> ball… <span style="color: #BB0000;">NA</span>       01    01     ball… <span style="color: #BB0000;">NA</span>      01    01             16.8      0.772</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 7 more variables: trial_type &lt;chr&gt;, cash_demean &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   control_pumps_demean &lt;dbl&gt;, explode_demean &lt;dbl&gt;, pumps_demean &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   response_time &lt;dbl&gt;, .file &lt;chr&gt;</span></span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">first_subject_events</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] ".subid"               ".session"             ".run"                </span></span>
-<span><span class="co">#&gt;  [4] ".task"                "onset"                "duration"            </span></span>
-<span><span class="co">#&gt;  [7] "trial_type"           "cash_demean"          "control_pumps_demean"</span></span>
-<span><span class="co">#&gt; [10] "explode_demean"       "pumps_demean"         "response_time"       </span></span>
-<span><span class="co">#&gt; [13] ".file"</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] ".task"                ".session"             ".run"                </span></span>
+<span><span class="co">#&gt;  [4] ".subid"               "task"                 "session"             </span></span>
+<span><span class="co">#&gt;  [7] "run"                  "participant_id"       "onset"               </span></span>
+<span><span class="co">#&gt; [10] "duration"             "trial_type"           "cash_demean"         </span></span>
+<span><span class="co">#&gt; [13] "control_pumps_demean" "explode_demean"       "pumps_demean"        </span></span>
+<span><span class="co">#&gt; [16] "response_time"        ".file"</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="analyzing-event-data">Analyzing Event Data<a class="anchor" aria-label="anchor" href="#analyzing-event-data"></a>
 </h3>
@@ -403,18 +405,18 @@ for that subject.</p>
 <span><span class="co"># Get event files for this subject</span></span>
 <span><span class="va">sub01_events</span> <span class="op">&lt;-</span> <span class="va">subject_01</span><span class="op">$</span><span class="fu">events</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Subject 01:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sub01_events</span><span class="op">)</span>, <span class="st">"event files\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Subject 01: 5 event files</span></span>
+<span><span class="co">#&gt; Subject 01: 9 event files</span></span>
 <span></span>
 <span><span class="co"># Read event data for this subject</span></span>
 <span><span class="va">sub01_event_data</span> <span class="op">&lt;-</span> <span class="va">subject_01</span><span class="op">$</span><span class="fu">events</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">sub01_event_data</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 9</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Groups:   .task, .session, .run, .subid [3]</span></span></span>
-<span><span class="co">#&gt;   .subid .session .run  .task                 data              </span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>            </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 01     <span style="color: #BB0000;">NA</span>       01    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [158 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 01     <span style="color: #BB0000;">NA</span>       02    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [156 × 9]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 01     <span style="color: #BB0000;">NA</span>       03    balloonanalogrisktask <span style="color: #949494;">&lt;tibble [149 × 9]&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt;   .task        .session .run  .subid task  session run   participant_id data    </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> balloonanal… <span style="color: #BB0000;">NA</span>       01    01     ball… <span style="color: #BB0000;">NA</span>      01    01             <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> balloonanal… <span style="color: #BB0000;">NA</span>       02    01     ball… <span style="color: #BB0000;">NA</span>      02    01             <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> balloonanal… <span style="color: #BB0000;">NA</span>       03    01     ball… <span style="color: #BB0000;">NA</span>      03    01             <span style="color: #949494;">&lt;tibble&gt;</span></span></span></code></pre></div>
 <p>This approach is particularly useful when you’re doing subject-level
 analyses:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -427,9 +429,9 @@ analyses:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Subject %s: %d scans, %d event files\n"</span>,</span>
 <span>              <span class="va">subj_id</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">scans</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">events</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt; Subject 01: 3 scans, 5 event files</span></span>
-<span><span class="co">#&gt; Subject 02: 3 scans, 5 event files</span></span>
-<span><span class="co">#&gt; Subject 03: 3 scans, 5 event files</span></span></code></pre></div>
+<span><span class="co">#&gt; Subject 01: 3 scans, 9 event files</span></span>
+<span><span class="co">#&gt; Subject 02: 3 scans, 9 event files</span></span>
+<span><span class="co">#&gt; Subject 03: 3 scans, 9 event files</span></span></code></pre></div>
 <p>The subject interface makes it easy to write analysis pipelines that
 iterate over subjects without manually constructing filters:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
@@ -621,9 +623,9 @@ workflows:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">full_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">"01"</span>, full_path <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">full_paths</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpxOc4lt/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
-<span><span class="co">#&gt; [2] "/tmp/RtmpxOc4lt/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
-<span><span class="co">#&gt; [3] "/tmp/RtmpxOc4lt/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmptkHMgI/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [2] "/tmp/RtmptkHMgI/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [3] "/tmp/RtmptkHMgI/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">full_paths</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>

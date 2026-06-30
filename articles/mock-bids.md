@@ -83,7 +83,7 @@ mock_proj
 #> Datatypes:  func 
 #> Suffixes:  nii.gz, tsv 
 #> BIDS Keys:  (none) 
-#> Path:  /tmp/Rtmpm6lZek/bidser-mock-6c0d6ad001
+#> Path:  /tmp/Rtmpp5kp95/bidser-mock-6b6771fa3b11
 
 stopifnot(file.exists(file.path(mock_dir, "participants.tsv")))
 ```
@@ -150,12 +150,13 @@ subject_events <- read_events(mock_proj, subid = "01") %>%
   unnest(cols = data)
 
 subject_events
-#> # A tibble: 2 × 7
+#> # A tibble: 2 × 11
 #> # Groups:   .subid, .task, .run, .session [1]
-#>   .subid .task .run  .session onset duration trial_type
-#>   <chr>  <chr> <chr> <chr>    <dbl>    <dbl> <chr>     
-#> 1 01     rest  01    NA           0        1 cue       
-#> 2 01     rest  01    NA          12        1 target
+#>   .task .session .run  .subid task  session run   participant_id onset duration
+#>   <chr> <chr>    <chr> <chr>  <chr> <chr>   <chr> <chr>          <dbl>    <dbl>
+#> 1 rest  NA       01    01     rest  NA      01    01                 0        1
+#> 2 rest  NA       01    01     rest  NA      01    01                12        1
+#> # ℹ 1 more variable: trial_type <chr>
 
 stopifnot(
   nrow(subject_events) == 2L,

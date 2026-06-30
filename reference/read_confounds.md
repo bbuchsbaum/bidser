@@ -10,7 +10,20 @@ nested or flat tibbles.
 ## Usage
 
 ``` r
-read_confounds(x, ...)
+read_confounds(
+  x,
+  subid = ".*",
+  task = ".*",
+  session = ".*",
+  run = ".*",
+  cvars = confound_set("legacy_default"),
+  npcs = -1,
+  perc_var = -1,
+  nest = TRUE,
+  clean = "zero_variance",
+  na_action = "leave",
+  ...
+)
 ```
 
 ## Arguments
@@ -18,6 +31,46 @@ read_confounds(x, ...)
 - x:
 
   The object to read confounds from (typically a `bids_project`).
+
+- subid:
+
+  Regex to match subject IDs. Default is `".*"`.
+
+- task:
+
+  Regex to match tasks. Default is `".*"`.
+
+- session:
+
+  Regex to match sessions. Default is `".*"`.
+
+- run:
+
+  Regex to match runs. Default is `".*"`.
+
+- cvars:
+
+  Character vector of confound variable names to select.
+
+- npcs:
+
+  Integer. Perform PCA reduction and return this many PCs.
+
+- perc_var:
+
+  Numeric. Perform PCA reduction to retain this percentage of variance.
+
+- nest:
+
+  Logical. If `TRUE`, nest confound tables by subject/task/session/run.
+
+- clean:
+
+  Confound cleaning operations passed to methods.
+
+- na_action:
+
+  How methods should handle missing numeric confound values.
 
 - ...:
 

@@ -10,6 +10,8 @@
   : Basic BIDS Compliance Checks
 - [`bids_datatype_spec()`](https://bbuchsbaum.github.io/bidser/reference/bids_datatype_spec.md)
   : Build a custom BIDS datatype spec
+- [`bids_entities()`](https://bbuchsbaum.github.io/bidser/reference/bids_entities.md)
+  : Parse BIDS entities from paths into a tibble
 - [`bids_heatmap()`](https://bbuchsbaum.github.io/bidser/reference/bids_heatmap.md)
   : Create a specialized heatmap visualization of BIDS data
 - [`bids_index()`](https://bbuchsbaum.github.io/bidser/reference/bids_index.md)
@@ -119,6 +121,8 @@
   : Load All Event Files
 - [`mask_files()`](https://bbuchsbaum.github.io/bidser/reference/mask_files.md)
   : Query Mask Files from a BIDS Project
+- [`n_volumes()`](https://bbuchsbaum.github.io/bidser/reference/n_volumes.md)
+  : Get the number of volumes in functional scans
 - [`pack_bids()`](https://bbuchsbaum.github.io/bidser/reference/pack_bids.md)
   : Pack BIDS Project with Stub or Downsampled Imaging Files
 - [`parse()`](https://bbuchsbaum.github.io/bidser/reference/parse-method.md)
