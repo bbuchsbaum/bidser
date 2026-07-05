@@ -22,6 +22,8 @@
   conversions and repeated tree searches with leaf-specific extractors, by using
   vectorized manifest row construction, and by trimming parser/directory-listing
   overhead in constructor hot paths.
+* Further speed up indexed `query_files()` by avoiding per-query manifest
+  re-finalization and by applying indexed filters with a single logical mask.
 * Add `tools/benchmark-pybids-parity.R`, a repeatable local harness for
   comparing bidser construction/query timings and basic file-count parity
   against the vendored pybids checkout via `uv`.

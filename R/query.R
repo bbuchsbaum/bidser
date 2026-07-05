@@ -459,6 +459,24 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
 
 #' @keywords internal
 #' @noRd
+.bidser_detect_any <- function(values, patterns) {
+  values <- as.character(values)
+  patterns <- as.character(patterns %||% character(0))
+  if (length(values) == 0L || length(patterns) == 0L) {
+    return(rep(FALSE, length(values)))
+  }
+
+  out <- rep(FALSE, length(values))
+  for (pattern in patterns) {
+    hit <- grepl(pattern, values, perl = TRUE)
+    hit[is.na(hit)] <- FALSE
+    out <- out | hit
+  }
+  out
+}
+
+#' @keywords internal
+#' @noRd
 .bidser_query_rows_set_full_path <- function(x, rows, full_path) {
   if (!isTRUE(full_path) || is.null(rows) || nrow(rows) == 0 || !"path" %in% names(rows)) {
     return(rows)
@@ -499,6 +517,97 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
 
 #' @keywords internal
 #' @noRd
+.bidser_path_pipelines <- function(x, rel_paths) {
+  derivative_reg <- .bidser_derivative_registry(x)
+  if (nrow(derivative_reg) == 0L || length(rel_paths) == 0L) {
+    return(rep(NA_character_, length(rel_paths)))
+  }
+
+  vapply(rel_paths, function(rel_path) {
+    for (i in seq_len(nrow(derivative_reg))) {
+      root <- derivative_reg$root[[i]]
+      prefix <- paste0(root, "/")
+      if (identical(rel_path, root) || startsWith(rel_path, prefix)) {
+        return(derivative_reg$pipeline[[i]])
+      }
+    }
+    NA_character_
+  }, character(1), USE.NAMES = FALSE)
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_index_rows_base <- function(x, rel_paths, file_info = NULL) {
+  rel_paths <- as.character(rel_paths %||% character(0))
+  rel_paths <- rel_paths[nzchar(rel_paths)]
+  if (length(rel_paths) == 0L) {
+    return(data.table::data.table())
+  }
+
+  if (is.null(file_info)) {
+    file_info <- file.info(file.path(x$path, rel_paths))
+  }
+  pipelines <- .bidser_path_pipelines(x, rel_paths)
+
+  data.table::data.table(
+    path = rel_paths,
+    file = basename(rel_paths),
+    scope = ifelse(is.na(pipelines), "raw", "derivatives"),
+    pipeline = pipelines,
+    extension = vapply(rel_paths, .bidser_extract_extension, character(1), USE.NAMES = FALSE),
+    datatype = vapply(rel_paths, .bidser_extract_datatype, character(1), USE.NAMES = FALSE),
+    size = as.numeric(file_info$size),
+    file_mtime = as.numeric(file_info$mtime)
+  )
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_index_rows_from_tree <- function(x) {
+  fields <- .bidser_index_entity_fields()
+  rows <- x$bids_tree$Get(function(node) {
+    rel_path <- .bidser_node_relative_path(node)
+    c(
+      list(path = rel_path),
+      setNames(lapply(fields, function(field) {
+        val <- if (identical(field, "type")) {
+          .bidser_extract_datatype(rel_path)
+        } else {
+          node[[field]]
+        }
+        if ((is.null(val) || length(val) == 0L) && field %in% c("acq", "ce", "rec")) {
+          alias <- switch(field,
+            acq = "acquisition",
+            ce = "contrast",
+            rec = "reconstruction"
+          )
+          val <- node[[alias]]
+        }
+        if (is.null(val) || length(val) == 0L) {
+          NA_character_
+        } else {
+          as.character(val[[1L]])
+        }
+      }), fields)
+    )
+  }, filterFun = function(node) {
+    isTRUE(node$isLeaf)
+  }, simplify = FALSE)
+
+  if (length(rows) == 0L) {
+    return(data.table::data.table())
+  }
+
+  rel_paths <- vapply(rows, function(row) row$path, character(1), USE.NAMES = FALSE)
+  dt <- .bidser_index_rows_base(x, rel_paths)
+  for (field in fields) {
+    dt[[field]] <- vapply(rows, function(row) row[[field]], character(1), USE.NAMES = FALSE)
+  }
+  dt
+}
+
+#' @keywords internal
+#' @noRd
 .bidser_index_rows_from_paths <- function(x, rel_paths) {
   rel_paths <- unique(as.character(rel_paths %||% character(0)))
   rel_paths <- vapply(rel_paths, function(p) {
@@ -514,35 +623,7 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
     .bidser_index_entities_from_path(x, p)
   })
   fields <- .bidser_index_entity_fields()
-  derivative_reg <- .bidser_derivative_registry(x)
-  has_derivatives <- nrow(derivative_reg) > 0L
-
-  path_pipeline <- function(rel_path) {
-    if (!has_derivatives) {
-      return(NA_character_)
-    }
-    for (i in seq_len(nrow(derivative_reg))) {
-      root <- derivative_reg$root[[i]]
-      prefix <- paste0(root, "/")
-      if (identical(rel_path, root) || startsWith(rel_path, prefix)) {
-        return(derivative_reg$pipeline[[i]])
-      }
-    }
-    NA_character_
-  }
-
-  pipelines <- vapply(rel_paths, path_pipeline, character(1), USE.NAMES = FALSE)
-
-  dt <- data.table::data.table(
-    path = rel_paths,
-    file = basename(rel_paths),
-    scope = ifelse(is.na(pipelines), "raw", "derivatives"),
-    pipeline = pipelines,
-    extension = vapply(rel_paths, .bidser_extract_extension, character(1), USE.NAMES = FALSE),
-    datatype = vapply(rel_paths, .bidser_extract_datatype, character(1), USE.NAMES = FALSE),
-    size = as.numeric(file_info$size),
-    file_mtime = as.numeric(file_info$mtime)
-  )
+  dt <- .bidser_index_rows_base(x, rel_paths, file_info = file_info)
 
   for (field in fields) {
     dt[[field]] <- vapply(entity_rows, function(entity_info) {
@@ -576,31 +657,27 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
                                           match_mode = c("regex", "exact", "glob"),
                                           raw_filters = list()) {
   match_mode <- match.arg(match_mode)
-  rows <- .bidser_finalize_manifest_dt(rows)
+  if (!data.table::is.data.table(rows) ||
+      !all(.bidser_manifest_colnames() %in% names(rows))) {
+    rows <- .bidser_finalize_manifest_dt(rows)
+  }
   if (nrow(rows) == 0) {
     return(rows)
   }
 
-  rows <- rows[stringr::str_detect(rows$file, regex), ]
-  if (nrow(rows) == 0) {
-    return(rows)
-  }
+  keep <- .bidser_detect_any(rows$file, regex)
 
   if (!identical(scope, "all")) {
-    rows <- rows[rows$scope == scope, ]
+    keep <- keep & rows$scope == scope
   }
   if (!is.null(pipeline)) {
     pipeline_vals <- as.character(pipeline)
-    rows <- rows[!is.na(rows$pipeline) & rows$pipeline %in% pipeline_vals, ]
-  }
-  if (nrow(rows) == 0) {
-    return(rows)
+    keep <- keep & !is.na(rows$pipeline) & rows$pipeline %in% pipeline_vals
   }
 
   for (nm in names(filters)) {
     if (!nm %in% names(rows)) {
-      rows <- rows[0]
-      break
+      return(rows[0])
     }
 
     vals <- rows[[nm]]
@@ -610,21 +687,17 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
       present & as.character(vals) %in% as.character(raw_filters[[nm]])
     } else {
       pattern <- filters[[nm]]
-      present & stringr::str_detect(as.character(vals), pattern)
+      present & .bidser_detect_any(vals, pattern)
     }
 
     if (isTRUE(require_entity)) {
-      keep <- matches
+      keep <- keep & matches
     } else {
-      keep <- matches | !present
-    }
-
-    rows <- rows[keep, ]
-    if (nrow(rows) == 0) {
-      break
+      keep <- keep & (matches | !present)
     }
   }
 
+  rows <- rows[keep, ]
   if (nrow(rows) == 0) {
     return(rows)
   }

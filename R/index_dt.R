@@ -384,12 +384,7 @@
 #' @keywords internal
 #' @noRd
 .bidser_build_manifest_dt <- function(x) {
-  rel_paths <- .bidser_list_indexed_paths(x)
-  if (length(rel_paths) == 0) {
-    return(.bidser_empty_manifest_dt())
-  }
-
-  .bidser_finalize_manifest_dt(.bidser_index_rows_from_paths(x, rel_paths), copy = FALSE)
+  .bidser_finalize_manifest_dt(.bidser_index_rows_from_tree(x), copy = FALSE)
 }
 
 #' @keywords internal

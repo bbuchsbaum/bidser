@@ -150,6 +150,45 @@ test_that("fast tree leaf extraction matches generic search surface", {
   expect_true(all(basename(generic_paths) %in% proj$tbl$name))
 })
 
+test_that("tree-derived manifest rows match path-derived manifest rows", {
+  fixture <- create_index_extensions_fixture()
+  on.exit(unlink(fixture, recursive = TRUE, force = TRUE), add = TRUE)
+
+  proj <- bids_project(fixture, derivatives = "auto", index = "none")
+  paths <- bidser:::.bidser_list_indexed_paths(proj)
+
+  path_rows <- bidser:::.bidser_finalize_manifest_dt(
+    bidser:::.bidser_index_rows_from_paths(proj, paths)
+  )
+  tree_rows <- bidser:::.bidser_finalize_manifest_dt(
+    bidser:::.bidser_index_rows_from_tree(proj)
+  )
+
+  data.table::setorder(path_rows, path)
+  data.table::setorder(tree_rows, path)
+  expect_equal(as.data.frame(tree_rows), as.data.frame(path_rows), ignore_attr = TRUE)
+})
+
+test_that("indexed full-path queries do not mutate the cached manifest", {
+  fixture <- create_index_extensions_fixture()
+  on.exit(unlink(fixture, recursive = TRUE, force = TRUE), add = TRUE)
+
+  proj <- bids_project(fixture, derivatives = "auto")
+  before <- bidser:::.bidser_get_session_index_state(proj)$manifest$path
+
+  full_hits <- query_files(
+    proj,
+    regex = "bold[.]nii[.]gz$",
+    scope = "all",
+    full_path = TRUE
+  )
+  after <- bidser:::.bidser_get_session_index_state(proj)$manifest$path
+
+  expect_true(all(grepl(paste0("^", normalizePath(fixture)), full_hits)))
+  expect_equal(after, before)
+  expect_false(any(grepl(paste0("^", normalizePath(fixture)), after)))
+})
+
 test_that("index persistence failures warn with context and keep session cache", {
   fixture <- create_index_extensions_fixture()
   on.exit(unlink(fixture, recursive = TRUE, force = TRUE), add = TRUE)

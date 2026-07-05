@@ -316,18 +316,34 @@ list_files_github <- function(user, repo, subdir="") {
 
 #' @keywords internal
 #' @noRd
-get_sessions <- function(path, sid) {
-  subject_dir <- file.path(path, sid)
-  if (!dir.exists(subject_dir)) {
-    return(list())
+.bidser_child_dir_names <- function(path) {
+  if (!dir.exists(path)) {
+    return(character(0))
   }
-  dnames <- basename(list.dirs(subject_dir, recursive = FALSE, full.names = TRUE))
+  basename(list.dirs(path, recursive = FALSE, full.names = TRUE))
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_sessions_from_child_dirs <- function(dnames) {
   ret <- grepl("^ses-", dnames)
   if (any(ret)) {
     dnames[ret]
   } else {
     list()
   }
+}
+
+#' @keywords internal
+#' @noRd
+get_sessions <- function(path, sid) {
+  .bidser_sessions_from_child_dirs(.bidser_child_dir_names(file.path(path, sid)))
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_datatypes_in_dirs <- function(datatype_entries, dnames) {
+  Filter(function(dt) dt$folder %in% dnames, datatype_entries)
 }
 
 #' @keywords internal
@@ -509,44 +525,26 @@ descend <- function(node, path, ftype, parser) {
   node <- add_node(node, ftype, folder=ftype)
 
   datatype_dir <- file.path(path, ftype)
-  if (dir.exists(datatype_dir)) {
-    fnames <- list.files(datatype_dir, recursive = FALSE, full.names = FALSE)
-    
-    # Debug info to see which files we're attempting to parse
-    # message("Processing ", length(fnames), " files in ", ftype, " folder at ", path)
-    
-    for (fname in fnames) {
-      # Try to parse the filename using the provided parser
-      mat <- parse(parser, fname)
-      
-      if (!is.null(mat)) {
-        # The parser matched the file - extract the results
-        keep <- sapply(mat$result, function(x) !is.null(x) && length(x) > 0)
-        res <- mat$result[keep]
-        
-        # Ensure 'kind' attribute is always set when dealing with func files
-        if (ftype == "func" && !is.null(res$suffix)) {
-          # For func files with .nii or .nii.gz extension but no explicit kind
-          if (grepl("nii(\\.gz)?$", res$suffix) && 
-              (is.null(res$kind) || is.na(res$kind) || res$kind == "")) {
-            # Explicitly set kind to "bold" for functional MRI files
-            res$kind <- "bold"
-          }
+  fnames <- list.files(datatype_dir, recursive = FALSE, full.names = FALSE)
+
+  for (fname in fnames) {
+    mat <- parse(parser, fname)
+
+    if (!is.null(mat)) {
+      keep <- sapply(mat$result, function(x) !is.null(x) && length(x) > 0)
+      res <- mat$result[keep]
+
+      if (ftype == "func" && !is.null(res$suffix)) {
+        if (grepl("nii(\\.gz)?$", res$suffix) &&
+            (is.null(res$kind) || is.na(res$kind) || res$kind == "")) {
+          res$kind <- "bold"
         }
-        
-        # Create a new node for this file using parsed attributes
-        args <- c(list(fname), res)
-        n <- do.call(Node$new, args)
-        
-        # Add file path for reference
-        n$relative_path <- file.path(ftype, fname)
-        
-        # Add the file node to the parent folder node
-        node$AddChildNode(n)
-      } else {
-        # Parser didn't match - could add warning or debug info here
-        # message("Could not parse file: ", fname, " in ", ftype, " folder")
       }
+
+      args <- c(list(fname), res)
+      n <- do.call(Node$new, args)
+      n$relative_path <- file.path(ftype, fname)
+      node$AddChildNode(n)
     }
   }
   
@@ -733,7 +731,13 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmripre
 
   for (sdir in sdirs) {
     # Check if subject exists in raw data or derivatives
-    has_raw_data <- file.exists(paste0(path, "/", sdir))
+    raw_subject_dir <- file.path(path, sdir)
+    has_raw_data <- dir.exists(raw_subject_dir)
+    raw_subject_dirs <- if (has_raw_data) {
+      .bidser_child_dir_names(raw_subject_dir)
+    } else {
+      character(0)
+    }
     derivative_rows <- deriv_info[file.exists(file.path(path, deriv_info$root, sdir)), , drop = FALSE]
     has_derivatives_data <- nrow(derivative_rows) > 0
     
@@ -762,7 +766,11 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmripre
     # Get sessions from raw data if it exists, otherwise from the default derivative root
     default_deriv_root <- if (has_derivatives_data) derivative_rows$root[[1]] else NULL
     sessions_path <- if (has_raw_data) path else file.path(path, default_deriv_root)
-    sessions <- get_sessions(sessions_path, sdir)
+    sessions <- if (has_raw_data) {
+      .bidser_sessions_from_child_dirs(raw_subject_dirs)
+    } else {
+      get_sessions(sessions_path, sdir)
+    }
 
     if (length(sessions) > 0) {
       has_sessions <- TRUE
@@ -771,11 +779,9 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmripre
         if (has_raw_data) {
           snode <- add_node(node, sess, session=gsub("ses-", "", sess))
           sess_base <- paste0(path, "/", sdir, "/", sess)
-          for (dt in raw_dts) {
-            # Only descend when the datatype folder actually exists (preserves tree identity)
-            if (dir.exists(file.path(sess_base, dt$folder))) {
-              descend(snode, sess_base, dt$folder, dt$parser_fn)
-            }
+          sess_dirs <- .bidser_child_dir_names(sess_base)
+          for (dt in .bidser_datatypes_in_dirs(raw_dts, sess_dirs)) {
+            descend(snode, sess_base, dt$folder, dt$parser_fn)
           }
         }
 
@@ -786,10 +792,9 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmripre
             prepnode <- derivative_subject_nodes[[root]]
             snode_prepped <- add_node(prepnode, sess, session=gsub("ses-", "", sess))
             sess_base <- file.path(path, root, sdir, sess)
-            for (dt in deriv_dts) {
-              if (dir.exists(file.path(sess_base, dt$folder))) {
-                descend(snode_prepped, sess_base, dt$folder, dt$parser_fn)
-              }
+            sess_dirs <- .bidser_child_dir_names(sess_base)
+            for (dt in .bidser_datatypes_in_dirs(deriv_dts, sess_dirs)) {
+              descend(snode_prepped, sess_base, dt$folder, dt$parser_fn)
             }
           }
         }
@@ -798,10 +803,8 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmripre
       # No sessions - process directly
       if (has_raw_data) {
         sub_base <- paste0(path, "/", sdir)
-        for (dt in raw_dts) {
-          if (dir.exists(file.path(sub_base, dt$folder))) {
-            descend(node, sub_base, dt$folder, dt$parser_fn)
-          }
+        for (dt in .bidser_datatypes_in_dirs(raw_dts, raw_subject_dirs)) {
+          descend(node, sub_base, dt$folder, dt$parser_fn)
         }
       }
 
@@ -810,10 +813,9 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmripre
           root <- derivative_rows$root[[k]]
           prepnode <- derivative_subject_nodes[[root]]
           sub_base <- file.path(path, root, sdir)
-          for (dt in deriv_dts) {
-            if (dir.exists(file.path(sub_base, dt$folder))) {
-              descend(prepnode, sub_base, dt$folder, dt$parser_fn)
-            }
+          sub_dirs <- .bidser_child_dir_names(sub_base)
+          for (dt in .bidser_datatypes_in_dirs(deriv_dts, sub_dirs)) {
+            descend(prepnode, sub_base, dt$folder, dt$parser_fn)
           }
         }
       }
