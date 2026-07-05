@@ -20,7 +20,6 @@ filename parsing, and a `data.tree` representation of the BIDS hierarchy. See th
    (Oracle-first)** rule for ecosystem lookups. Everything below is a summary or
    an agent-specific addition, not a replacement.
 2. Skim `README.md` and `bidser_cheatsheet.md` for the public API surface.
-3. Check open work with `bd list` (see *Issue tracking* below) before starting.
 
 ## Common commands
 
@@ -59,28 +58,8 @@ Notes for agents:
   `search_files()` / `use_index = "never"` fallback should return the same
   results for the same arguments.
 
-## Issue tracking (beads)
-
-This repo tracks work with **beads** (`bd`), a git-native issue tracker; issues
-live in `.beads/` and have IDs like `bidser-fik`. See `.beads/README.md` for the
-tool overview.
-
-```bash
-bd list                        # open issues
-bd show <id>                   # e.g. bd show bidser-fik
-bd create "Short description"  # file new work
-bd update <id> --status in_progress
-bd update <id> --status done
-bd ready                       # issues ready to work (deps met)
-```
-
-Reference the issue ID in the commit that closes it (e.g. "Close bidser-drn").
-If `bd sync` is unavailable in the installed CLI, a normal `git push` still
-publishes the JSONL changes.
-
 ## Git & PR hygiene
 
 - Commit or push only when asked. Don't commit directly to `master` for
   substantial work — branch first.
-- Keep `.beads/issues.jsonl` changes together with the code they describe.
 - Confirm outward-facing or hard-to-reverse actions before taking them.
