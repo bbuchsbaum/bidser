@@ -1,51 +1,77 @@
 # AGENTS.md
 
-## Oracle-First Rule
+Guidance for AI coding agents working in the **bidser** repository. This
+is the tool-agnostic entry point; the detailed, authoritative project
+instructions live in
+**[CLAUDE.md](https://bbuchsbaum.github.io/bidser/CLAUDE.md)** and apply
+to every agent regardless of which tool you are — read it first.
 
-This package participates in the EcoOracle ecosystem.
+## What this is
 
-Before searching code across ecosystem repos or writing exploratory
-scripts:
+`bidser` is an R package (currently v0.4.0) for reading, validating, and
+querying [BIDS](https://bids.neuroimaging.io/)-formatted neuroimaging
+datasets, including fMRIPrep derivatives. It uses S3 classes, parser
+combinators (Combin8R) for filename parsing, and a `data.tree`
+representation of the BIDS hierarchy. See the “Architecture Overview” in
+[CLAUDE.md](https://bbuchsbaum.github.io/bidser/CLAUDE.md) for the
+component map.
 
-1.  Break the task into 2-6 “How do I …?” subquestions.
-2.  Query `eco_howto(query)` for each subquestion.
-3.  Query `eco_symbol("pkg::fn")` for key functions.
-4.  Stitch returned `recipe` snippets before falling back to source
-    spelunking.
-5.  Use `eco_packages()` and `eco_where_used()` for discovery and
-    cross-package usage.
+## Start here
 
-## Landing the Plane (Session Completion)
+1.  **Read [CLAUDE.md](https://bbuchsbaum.github.io/bidser/CLAUDE.md)**
+    — the canonical instructions: dev commands, architecture, key design
+    patterns, dependencies, and the **EcoOracle (Oracle-first)** rule
+    for ecosystem lookups. Everything below is a summary or an
+    agent-specific addition, not a replacement.
+2.  Skim `README.md` and `bidser_cheatsheet.md` for the public API
+    surface.
 
-**When ending a work session**, you MUST complete ALL steps below. Work
-is NOT complete until `git push` succeeds.
+## Common commands
 
-**MANDATORY WORKFLOW:**
+Detailed versions are in
+[CLAUDE.md](https://bbuchsbaum.github.io/bidser/CLAUDE.html#development-commands).
+The essentials, run from an R session at the repo root:
 
-1.  **File issues for remaining work** - Create issues for anything that
-    needs follow-up
+``` r
 
-2.  **Run quality gates** (if code changed) - Tests, linters, builds
+devtools::load_all()                       # fast iteration (preferred over install)
+devtools::test()                           # run all tests
+testthat::test_file("tests/testthat/test_query_files.R")  # one file
+devtools::test(filter = "query_files")     # tests matching a pattern
+devtools::document()                       # regenerate man/ from roxygen
+devtools::check()                          # R CMD check
+covr::package_coverage()                   # test coverage
+```
 
-3.  **Update issue status** - Close finished work, update in-progress
-    items
+Notes for agents: - Prefer `devtools::load_all(".")` for verifying
+internal changes — it avoids the install step. Reinstall
+(`devtools::install(quick = TRUE)`) only when a test needs a newly
+*exported* symbol. - After editing roxygen comments, run
+`devtools::document()` and commit the regenerated `man/*.Rd` and
+`NAMESPACE`. - Edited R files are auto-formatted by an `air`-based hook;
+do not hand-reformat.
 
-4.  **PUSH TO REMOTE** - This is MANDATORY:
+## Conventions & quality bar
 
-    ``` bash
-    git pull --rebase
-    bd sync
-    git push
-    git status  # MUST show "up to date with origin"
-    ```
+- **CRAN-clean is the target.** `R CMD check` and
+  [`lintr::lint_package()`](https://lintr.r-lib.org/reference/lint.html)
+  should be clean; R-universe runs lintr as a quality gate.
+- **Verify before claiming done.** Run the tests / check / build and
+  cite the result. Evidence over assertion.
+- **Never weaken a test to make it pass.** If a test surfaces a bug in
+  library code, fix the library. If a test is genuinely wrong, say so
+  explicitly.
+- Match the surrounding code: S3 dispatch, tibble-returning queries,
+  tidyverse idioms, and regex-based filtering are the house style.
+- Keep the two query paths in sync:
+  [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
+  (indexed) and its
+  [`search_files()`](https://bbuchsbaum.github.io/bidser/reference/search_files.md)
+  / `use_index = "never"` fallback should return the same results for
+  the same arguments.
 
-5.  **Clean up** - Clear stashes, prune remote branches
+## Git & PR hygiene
 
-6.  **Verify** - All changes committed AND pushed
-
-7.  **Hand off** - Provide context for next session
-
-**CRITICAL RULES:** - Work is NOT complete until `git push` succeeds -
-NEVER stop before pushing - that leaves work stranded locally - NEVER
-say “ready to push when you are” - YOU must push - If push fails,
-resolve and retry until it succeeds
+- Commit or push only when asked. Don’t commit directly to `master` for
+  substantial work — branch first.
+- Confirm outward-facing or hard-to-reverse actions before taking them.

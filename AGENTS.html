@@ -41,35 +41,46 @@
 
 <div id="agentsmd" class="section level1">
 
+<p>Guidance for AI coding agents working in the <strong>bidser</strong> repository. This is the tool-agnostic entry point; the detailed, authoritative project instructions live in <strong><a href="./CLAUDE.html">CLAUDE.md</a></strong> and apply to every agent regardless of which tool you are — read it first.</p>
 <div class="section level2">
-<h2 id="oracle-first-rule">Oracle-First Rule<a class="anchor" aria-label="anchor" href="#oracle-first-rule"></a></h2>
-<p>This package participates in the EcoOracle ecosystem.</p>
-<p>Before searching code across ecosystem repos or writing exploratory scripts:</p>
-<ol style="list-style-type: decimal"><li>Break the task into 2-6 “How do I …?” subquestions.</li>
-<li>Query <code>eco_howto(query)</code> for each subquestion.</li>
-<li>Query <code>eco_symbol("pkg::fn")</code> for key functions.</li>
-<li>Stitch returned <code>recipe</code> snippets before falling back to source spelunking.</li>
-<li>Use <code>eco_packages()</code> and <code>eco_where_used()</code> for discovery and cross-package usage.</li>
+<h2 id="what-this-is">What this is<a class="anchor" aria-label="anchor" href="#what-this-is"></a></h2>
+<p><code>bidser</code> is an R package (currently v0.4.0) for reading, validating, and querying <a href="https://bids.neuroimaging.io/" class="external-link">BIDS</a>-formatted neuroimaging datasets, including fMRIPrep derivatives. It uses S3 classes, parser combinators (Combin8R) for filename parsing, and a <code>data.tree</code> representation of the BIDS hierarchy. See the “Architecture Overview” in <a href="./CLAUDE.html">CLAUDE.md</a> for the component map.</p>
+</div>
+<div class="section level2">
+<h2 id="start-here">Start here<a class="anchor" aria-label="anchor" href="#start-here"></a></h2>
+<ol style="list-style-type: decimal"><li>
+<strong>Read <a href="./CLAUDE.html">CLAUDE.md</a></strong> — the canonical instructions: dev commands, architecture, key design patterns, dependencies, and the <strong>EcoOracle (Oracle-first)</strong> rule for ecosystem lookups. Everything below is a summary or an agent-specific addition, not a replacement.</li>
+<li>Skim <code>README.md</code> and <code>bidser_cheatsheet.md</code> for the public API surface.</li>
 </ol></div>
 <div class="section level2">
-<h2 id="landing-the-plane-session-completion">Landing the Plane (Session Completion)<a class="anchor" aria-label="anchor" href="#landing-the-plane-session-completion"></a></h2>
-<p><strong>When ending a work session</strong>, you MUST complete ALL steps below. Work is NOT complete until <code>git push</code> succeeds.</p>
-<p><strong>MANDATORY WORKFLOW:</strong></p>
-<ol style="list-style-type: decimal"><li><p><strong>File issues for remaining work</strong> - Create issues for anything that needs follow-up</p></li>
-<li><p><strong>Run quality gates</strong> (if code changed) - Tests, linters, builds</p></li>
-<li><p><strong>Update issue status</strong> - Close finished work, update in-progress items</p></li>
-<li>
-<p><strong>PUSH TO REMOTE</strong> - This is MANDATORY:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">git</span> pull <span class="at">--rebase</span></span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="ex">bd</span> sync</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">git</span> push</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">git</span> status  <span class="co"># MUST show "up to date with origin"</span></span></code></pre></div>
-</li>
-<li><p><strong>Clean up</strong> - Clear stashes, prune remote branches</p></li>
-<li><p><strong>Verify</strong> - All changes committed AND pushed</p></li>
-<li><p><strong>Hand off</strong> - Provide context for next session</p></li>
-</ol><p><strong>CRITICAL RULES:</strong> - Work is NOT complete until <code>git push</code> succeeds - NEVER stop before pushing - that leaves work stranded locally - NEVER say “ready to push when you are” - YOU must push - If push fails, resolve and retry until it succeeds</p>
+<h2 id="common-commands">Common commands<a class="anchor" aria-label="anchor" href="#common-commands"></a></h2>
+<p>Detailed versions are in <a href="./CLAUDE.html#development-commands">CLAUDE.md</a>. The essentials, run from an R session at the repo root:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">load_all</span><span class="op">(</span><span class="op">)</span>                       <span class="co"># fast iteration (preferred over install)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span>                           <span class="co"># run all tests</span></span>
+<span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_file.html" class="external-link">test_file</a></span><span class="op">(</span><span class="st">"tests/testthat/test_query_files.R"</span><span class="op">)</span>  <span class="co"># one file</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span>filter <span class="op">=</span> <span class="st">"query_files"</span><span class="op">)</span>     <span class="co"># tests matching a pattern</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">document</span><span class="op">(</span><span class="op">)</span>                       <span class="co"># regenerate man/ from roxygen</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span><span class="op">)</span>                          <span class="co"># R CMD check</span></span>
+<span><span class="fu">covr</span><span class="fu">::</span><span class="fu"><a href="http://covr.r-lib.org/reference/package_coverage.html" class="external-link">package_coverage</a></span><span class="op">(</span><span class="op">)</span>                   <span class="co"># test coverage</span></span></code></pre></div>
+<p>Notes for agents: - Prefer <code>devtools::load_all(".")</code> for verifying internal changes — it avoids the install step. Reinstall (<code>devtools::install(quick = TRUE)</code>) only when a test needs a newly <em>exported</em> symbol. - After editing roxygen comments, run <code>devtools::document()</code> and commit the regenerated <code>man/*.Rd</code> and <code>NAMESPACE</code>. - Edited R files are auto-formatted by an <code>air</code>-based hook; do not hand-reformat.</p>
 </div>
+<div class="section level2">
+<h2 id="conventions--quality-bar">Conventions &amp; quality bar<a class="anchor" aria-label="anchor" href="#conventions--quality-bar"></a></h2>
+<ul><li>
+<strong>CRAN-clean is the target.</strong> <code>R CMD check</code> and <code><a href="https://lintr.r-lib.org/reference/lint.html" class="external-link">lintr::lint_package()</a></code> should be clean; R-universe runs lintr as a quality gate.</li>
+<li>
+<strong>Verify before claiming done.</strong> Run the tests / check / build and cite the result. Evidence over assertion.</li>
+<li>
+<strong>Never weaken a test to make it pass.</strong> If a test surfaces a bug in library code, fix the library. If a test is genuinely wrong, say so explicitly.</li>
+<li>Match the surrounding code: S3 dispatch, tibble-returning queries, tidyverse idioms, and regex-based filtering are the house style.</li>
+<li>Keep the two query paths in sync: <code><a href="reference/query_files.html">query_files()</a></code> (indexed) and its <code><a href="reference/search_files.html">search_files()</a></code> / <code>use_index = "never"</code> fallback should return the same results for the same arguments.</li>
+</ul></div>
+<div class="section level2">
+<h2 id="git--pr-hygiene">Git &amp; PR hygiene<a class="anchor" aria-label="anchor" href="#git--pr-hygiene"></a></h2>
+<ul><li>Commit or push only when asked. Don’t commit directly to <code>master</code> for substantial work — branch first.</li>
+<li>Confirm outward-facing or hard-to-reverse actions before taking them.</li>
+</ul></div>
 </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
