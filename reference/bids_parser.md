@@ -16,8 +16,8 @@ A BIDS parser object that can parse various types of BIDS files
 
 ## Details
 
-This parser tries to match against various known parsers (anat, func,
-fmriprep anat/func).
+This parser tries to match against various known parsers (func, anat,
+dwi, fmriprep anat/func).
 
 ## Examples
 

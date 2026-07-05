@@ -24,7 +24,7 @@ A character vector of datatype names.
 
 ``` r
 list_datatypes()
-#> [1] "func"     "anat"     "fmap"     "funcprep" "anatprep"
+#> [1] "func"     "anat"     "fmap"     "dwi"      "funcprep" "anatprep"
 list_datatypes(scope = "raw")
-#> [1] "func" "anat" "fmap"
+#> [1] "func" "anat" "fmap" "dwi" 
 ```

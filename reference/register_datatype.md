@@ -2,9 +2,9 @@
 
 Adds a new datatype to the bidser runtime registry so that
 [`bids_project`](https://bbuchsbaum.github.io/bidser/reference/bids_project.md)
-will scan and parse its folder. The five built-in datatypes (`"func"`,
-`"anat"`, `"fmap"`, `"funcprep"`, `"anatprep"`) can only be overwritten
-by passing `overwrite = TRUE`.
+will scan and parse its folder. The six built-in datatypes (`"func"`,
+`"anat"`, `"fmap"`, `"dwi"`, `"funcprep"`, `"anatprep"`) can only be
+overwritten by passing `overwrite = TRUE`.
 
 ## Usage
 

@@ -20,6 +20,22 @@
   also now honours `index = "none"` and prefers each project’s own
   construction-time snapshot, so two project objects sharing a path no
   longer perturb each other’s query results.
+- Add raw DWI files as a built-in datatype, so
+  [`bids_project()`](https://bbuchsbaum.github.io/bidser/reference/bids_project.md)
+  and
+  [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
+  index `dwi/` files (`.nii.gz`, `.nii`, `.json`, `.bval`, `.bvec`)
+  without user-side
+  [`register_datatype()`](https://bbuchsbaum.github.io/bidser/reference/register_datatype.md)
+  setup.
+- Speed up index construction by deriving manifest/sidecar entities
+  directly from paths and by lazily ingesting JSON sidecar contents only
+  when metadata APIs need them. This keeps query-oriented project
+  construction focused on the file manifest while preserving indexed
+  metadata inheritance on demand.
+- Add `tools/benchmark-pybids-parity.R`, a repeatable local harness for
+  comparing bidser construction/query timings and basic file-count
+  parity against the vendored pybids checkout via `uv`.
 
 ## bidser 0.4.0
 
