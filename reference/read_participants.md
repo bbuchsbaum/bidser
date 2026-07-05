@@ -38,7 +38,7 @@ tryCatch({
   print(pt)
   # Example datasets are cached; leave the cache in place.
 }, error = function(e) message("Example requires internet: ", e$message))
-#> <bids_participants> /tmp/RtmpAeWxn6/bids_example_ds001/participants.tsv (16 rows x 3 cols, sidecar: yes)
+#> <bids_participants> /tmp/RtmpI8k2SA/bids_example_ds001/participants.tsv (16 rows x 3 cols, sidecar: yes)
 #> # A tibble: 16 × 3
 #>    participant_id sex     age
 #>  * <chr>          <chr> <dbl>
