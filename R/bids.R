@@ -1430,7 +1430,12 @@ key_match <- function(default=FALSE, ...) {
 
     all(vapply(names(filters), function(key) {
       val <- entities[[key]]
+      wildcard_missing_ok <- length(filters[[key]]) == 1L &&
+        identical(as.character(filters[[key]]), ".*")
       if (is.null(val) || length(val) == 0 || is.na(val)) {
+        if (isTRUE(wildcard_missing_ok)) {
+          return(TRUE)
+        }
         return(!isTRUE(strict))
       }
       stringr::str_detect(as.character(val[[1]]), as.character(filters[[key]]))

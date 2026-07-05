@@ -18,6 +18,10 @@
   file-count parity surface is now 142/142 against vendored pybids.
 * Make indexed `query_files()` honour `strict = TRUE` for missing entity filters,
   so broad subject/task queries do not accidentally include root layout files.
+* Fix wildcard entity filters such as `task = ".*"` in fallback/no-index
+  `query_files()` calls so they match indexed query semantics, and remove the
+  unused tree-derived manifest builder left behind by the filesystem-backed
+  manifest path.
 * Add raw DWI files as a built-in datatype, so `bids_project()` and
   `query_files()` index `dwi/` files (`.nii.gz`, `.nii`, `.json`, `.bval`,
   `.bvec`) without user-side `register_datatype()` setup.

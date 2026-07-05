@@ -563,51 +563,6 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
 
 #' @keywords internal
 #' @noRd
-.bidser_index_rows_from_tree <- function(x) {
-  fields <- .bidser_index_entity_fields()
-  rows <- x$bids_tree$Get(function(node) {
-    rel_path <- .bidser_node_relative_path(node)
-    c(
-      list(path = rel_path),
-      setNames(lapply(fields, function(field) {
-        val <- if (identical(field, "type")) {
-          .bidser_extract_datatype(rel_path)
-        } else {
-          node[[field]]
-        }
-        if ((is.null(val) || length(val) == 0L) && field %in% c("acq", "ce", "rec")) {
-          alias <- switch(field,
-            acq = "acquisition",
-            ce = "contrast",
-            rec = "reconstruction"
-          )
-          val <- node[[alias]]
-        }
-        if (is.null(val) || length(val) == 0L) {
-          NA_character_
-        } else {
-          as.character(val[[1L]])
-        }
-      }), fields)
-    )
-  }, filterFun = function(node) {
-    isTRUE(node$isLeaf)
-  }, simplify = FALSE)
-
-  if (length(rows) == 0L) {
-    return(data.table::data.table())
-  }
-
-  rel_paths <- vapply(rows, function(row) row$path, character(1), USE.NAMES = FALSE)
-  dt <- .bidser_index_rows_base(x, rel_paths)
-  for (field in fields) {
-    dt[[field]] <- vapply(rows, function(row) row[[field]], character(1), USE.NAMES = FALSE)
-  }
-  dt
-}
-
-#' @keywords internal
-#' @noRd
 .bidser_index_rows_from_paths <- function(x, rel_paths) {
   rel_paths <- unique(as.character(rel_paths %||% character(0)))
   rel_paths <- vapply(rel_paths, function(p) {

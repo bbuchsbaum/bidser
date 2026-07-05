@@ -160,15 +160,9 @@ test_that("filesystem manifest includes tree leaves and pybids-style layout file
   proj <- bids_project(fixture, derivatives = "none", index = "none")
 
   manifest_paths <- sort(bidser:::.bidser_list_indexed_paths(proj))
-  tree_paths <- sort(proj$bids_tree$Get(
-    bidser:::.bidser_node_relative_path,
-    filterFun = function(node) isTRUE(node$isLeaf),
-    simplify = FALSE
-  ) |> unlist(use.names = FALSE))
   generic_paths <- sort(search_files(proj, regex = ".*", full_path = FALSE, strict = FALSE))
 
   expect_equal(generic_paths, manifest_paths)
-  expect_true(all(tree_paths %in% manifest_paths))
   expect_true(all(c(
     "CHANGES",
     "README",
@@ -177,40 +171,20 @@ test_that("filesystem manifest includes tree leaves and pybids-style layout file
     "task-rest_bold.json",
     "dwi.bval",
     "dwi.bvec",
+    "sub-01/dwi/sub-01_dwi.nii.gz",
+    "sub-01/func/sub-01_task-rest_run-01_bold.nii.gz",
+    "sub-01/func/sub-01_task-rest_run-01_events.tsv",
     "sub-01/sub-01_scans.tsv",
     "sub-01/func/sub-01_task-rest_run-01_events.json",
     "sub-01/dwi/sub-01"
   ) %in% manifest_paths))
   expect_false(any(startsWith(manifest_paths, "derivatives/")))
-  expect_equal(nrow(proj$tbl), length(tree_paths))
+  expect_true(nrow(proj$tbl) < length(manifest_paths))
   expect_setequal(
     names(proj$tbl),
     c("name", "type", "subid", "session", "task", "run", "modality", "suffix", "desc", "space")
   )
-  expect_true(all(basename(tree_paths) %in% proj$tbl$name))
-})
-
-test_that("tree-derived manifest rows match path-derived manifest rows", {
-  fixture <- create_index_extensions_fixture()
-  on.exit(unlink(fixture, recursive = TRUE, force = TRUE), add = TRUE)
-
-  proj <- bids_project(fixture, derivatives = "auto", index = "none")
-  paths <- proj$bids_tree$Get(
-    bidser:::.bidser_node_relative_path,
-    filterFun = function(node) isTRUE(node$isLeaf),
-    simplify = FALSE
-  ) |> unlist(use.names = FALSE)
-
-  path_rows <- bidser:::.bidser_finalize_manifest_dt(
-    bidser:::.bidser_index_rows_from_paths(proj, paths)
-  )
-  tree_rows <- bidser:::.bidser_finalize_manifest_dt(
-    bidser:::.bidser_index_rows_from_tree(proj)
-  )
-
-  data.table::setorder(path_rows, path)
-  data.table::setorder(tree_rows, path)
-  expect_equal(as.data.frame(tree_rows), as.data.frame(path_rows), ignore_attr = TRUE)
+  expect_false(any(c("README", "participants.tsv") %in% proj$tbl$name))
 })
 
 test_that("indexed query surface includes layout files without leaking entity filters", {
@@ -251,6 +225,20 @@ test_that("indexed query surface includes layout files without leaking entity fi
   task_rest <- query_files(proj, regex = ".*", task = "rest", scope = "raw")
   expect_true("task-rest_bold.json" %in% task_rest)
   expect_false(any(c("README", "participants.tsv") %in% task_rest))
+
+  task_any_indexed <- sort(query_files(proj, task = ".*", scope = "raw"))
+  task_any_fallback <- sort(query_files(
+    proj,
+    task = ".*",
+    scope = "raw",
+    use_index = "never"
+  ))
+  proj_none <- bids_project(fixture, derivatives = "none", index = "none")
+  task_any_index_none <- sort(query_files(proj_none, task = ".*", scope = "raw"))
+
+  expect_equal(task_any_fallback, task_any_indexed)
+  expect_equal(task_any_index_none, task_any_indexed)
+  expect_true(all(c("README", "participants.tsv") %in% task_any_indexed))
 
   no_session_bold <- query_files(
     proj,

@@ -291,19 +291,6 @@
 
 #' @keywords internal
 #' @noRd
-.bidser_node_relative_path <- function(node) {
-  parts <- as.character(node$path)
-  if (length(parts) > 2L && identical(parts[[2L]], "raw")) {
-    return(paste(parts[3L:length(parts)], collapse = "/"))
-  }
-  if (length(parts) > 1L) {
-    return(paste(parts[2L:length(parts)], collapse = "/"))
-  }
-  node$name
-}
-
-#' @keywords internal
-#' @noRd
 .bidser_list_indexed_paths <- function(x) {
   if (is.null(x$path) || !dir.exists(x$path)) {
     return(character(0))
