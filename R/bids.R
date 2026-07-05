@@ -1410,14 +1410,11 @@ key_match <- function(default=FALSE, ...) {
   }
 
   filters <- .bidser_normalize_filter_names(filters)
-  rel_paths <- list.files(x$path, recursive = TRUE, full.names = FALSE,
-                          all.files = FALSE, no.. = TRUE)
+  rel_paths <- .bidser_list_indexed_paths(x)
   if (length(rel_paths) == 0) {
     return(NULL)
   }
   rel_paths <- gsub("\\\\", "/", rel_paths)
-  rel_paths <- rel_paths[file.exists(file.path(x$path, rel_paths)) &
-                           !dir.exists(file.path(x$path, rel_paths))]
   rel_paths <- rel_paths[stringr::str_detect(basename(rel_paths), regex)]
   if (length(rel_paths) == 0) {
     return(NULL)
@@ -1608,20 +1605,23 @@ search_files.bids_project <- function(x, regex=".*", full_path=FALSE, strict=TRU
   }
   
   ret <- x$bids_tree$Get(extract_relative_path, filterFun = filter_fun, simplify = FALSE)
-  
-  if (length(ret) == 0) {
-    return(.bidser_filesystem_search(
+  ret <- unique(unname(unlist(ret)))
+
+  fs_ret <- if (length(split_f$formula_filters) == 0L) {
+    .bidser_filesystem_search(
       x,
       regex = regex,
-      full_path = full_path,
+      full_path = FALSE,
       strict = strict,
       filters = search_params
-    ))
+    )
+  } else {
+    NULL
   }
-  
-  # Ensure ret is a character vector of unique paths
-  # unlist can produce names, so unname it.
-  ret <- unique(unname(unlist(ret)))
+  ret <- unique(c(ret, fs_ret))
+  if (length(ret) == 0) {
+    return(NULL)
+  }
 
   if (full_path && !is.null(ret)) {
     # file.path(x$path, ret) might be problematic if x$path is NULL (for virtual projects)

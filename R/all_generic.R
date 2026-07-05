@@ -689,11 +689,9 @@ search_files <- function(x, ...) {
 #'   entities typically fail matching (except wildcard behavior in legacy paths).
 #' @param refresh If `FALSE` (default), reuse the index built when the project
 #'   was created without re-scanning the filesystem, which makes repeated
-#'   queries fast (comparable to an indexed lookup). Set `TRUE` to re-stat the
-#'   files known to the project and pick up changes to their contents or their
-#'   removal from disk. Newly *added* files are not detected by `refresh`
-#'   (the file list is fixed at construction); to see added files, rebuild the
-#'   project with [bids_project()].
+#'   queries fast (comparable to an indexed lookup). Set `TRUE` to re-scan the
+#'   manifest paths and re-stat files, picking up additions, content changes,
+#'   and removals without rebuilding the project object.
 #' @param ... Additional entity filters (e.g., `subid = "01"`, `task = "rest"`,
 #'   `extension = ".nii.gz"`, `datatype = "func"`).  The special filters
 #'   `extension` and `datatype` are handled post-hoc and support the same

@@ -305,17 +305,51 @@
 #' @keywords internal
 #' @noRd
 .bidser_list_indexed_paths <- function(x) {
-  ret <- x$bids_tree$Get(
-    .bidser_node_relative_path,
-    filterFun = function(node) {
-      isTRUE(node$isLeaf)
-    },
-    simplify = FALSE
-  )
-  if (length(ret) == 0) {
+  if (is.null(x$path) || !dir.exists(x$path)) {
     return(character(0))
   }
-  unique(unname(unlist(ret)))
+
+  rel_paths <- list.files(
+    x$path,
+    recursive = TRUE,
+    full.names = FALSE,
+    all.files = FALSE,
+    no.. = TRUE,
+    include.dirs = FALSE
+  )
+  if (length(rel_paths) == 0L) {
+    return(character(0))
+  }
+
+  rel_paths <- gsub("\\\\", "/", rel_paths)
+  abs_paths <- file.path(x$path, rel_paths)
+  rel_paths <- rel_paths[file.exists(abs_paths) & !dir.exists(abs_paths)]
+  if (length(rel_paths) == 0L) {
+    return(character(0))
+  }
+
+  derivative_roots <- .bidser_derivative_roots(x)
+  in_selected_derivative <- rep(FALSE, length(rel_paths))
+  if (length(derivative_roots) > 0L) {
+    for (root in derivative_roots) {
+      prefix <- paste0(root, "/")
+      in_selected_derivative <- in_selected_derivative |
+        rel_paths == root |
+        startsWith(rel_paths, prefix)
+    }
+  }
+
+  in_any_derivatives <- rel_paths == "derivatives" |
+    startsWith(rel_paths, "derivatives/")
+  in_models <- rel_paths == "models" | startsWith(rel_paths, "models/")
+  is_top_level_file <- !grepl("/", rel_paths, fixed = TRUE)
+  is_subject_file <- grepl("^sub-[^/]+/", rel_paths)
+
+  raw_file <- !in_any_derivatives & !in_models &
+    (is_top_level_file | is_subject_file)
+  keep <- raw_file | in_selected_derivative
+
+  unique(sort(rel_paths[keep]))
 }
 
 #' @keywords internal
@@ -384,7 +418,10 @@
 #' @keywords internal
 #' @noRd
 .bidser_build_manifest_dt <- function(x) {
-  .bidser_finalize_manifest_dt(.bidser_index_rows_from_tree(x), copy = FALSE)
+  .bidser_finalize_manifest_dt(
+    .bidser_index_rows_from_paths(x, .bidser_list_indexed_paths(x)),
+    copy = FALSE
+  )
 }
 
 #' @keywords internal

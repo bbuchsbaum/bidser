@@ -654,6 +654,7 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
                                           scope = "all",
                                           pipeline = NULL,
                                           full_path = FALSE,
+                                          strict = TRUE,
                                           match_mode = c("regex", "exact", "glob"),
                                           raw_filters = list()) {
   match_mode <- match.arg(match_mode)
@@ -690,7 +691,14 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
       present & .bidser_detect_any(vals, pattern)
     }
 
-    if (isTRUE(require_entity)) {
+    wildcard_missing_ok <- identical(match_mode, "regex") &&
+      nm %in% names(raw_filters) &&
+      length(raw_filters[[nm]]) == 1L &&
+      identical(as.character(raw_filters[[nm]]), ".*")
+
+    if (isTRUE(wildcard_missing_ok)) {
+      keep <- keep & (matches | !present)
+    } else if (isTRUE(require_entity) || isTRUE(strict)) {
       keep <- keep & matches
     } else {
       keep <- keep & (matches | !present)
@@ -840,6 +848,7 @@ query_files.bids_project <- function(x, regex = ".*", full_path = FALSE,
       scope = scope,
       pipeline = pipeline,
       full_path = full_path,
+      strict = strict,
       match_mode = match_mode,
       raw_filters = raw_filters
     )

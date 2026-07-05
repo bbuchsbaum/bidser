@@ -86,11 +86,9 @@ entities typically fail matching (except wildcard behavior in legacy paths).}
 
 \item{refresh}{If \code{FALSE} (default), reuse the index built when the project
 was created without re-scanning the filesystem, which makes repeated
-queries fast (comparable to an indexed lookup). Set \code{TRUE} to re-stat the
-files known to the project and pick up changes to their contents or their
-removal from disk. Newly \emph{added} files are not detected by \code{refresh}
-(the file list is fixed at construction); to see added files, rebuild the
-project with \code{\link[=bids_project]{bids_project()}}.}
+queries fast (comparable to an indexed lookup). Set \code{TRUE} to re-scan the
+manifest paths and re-stat files, picking up additions, content changes,
+and removals without rebuilding the project object.}
 }
 \value{
 A character vector of matching files, a tibble of indexed rows

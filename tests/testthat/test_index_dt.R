@@ -9,15 +9,36 @@ create_index_extensions_fixture <- function() {
     tibble::tibble(participant_id = "sub-01"),
     file.path(tmp, "participants.tsv")
   )
+  writeLines("Fixture README", file.path(tmp, "README"))
+  writeLines("Fixture changes", file.path(tmp, "CHANGES"))
+  file.create(file.path(tmp, "dwi.bval"))
+  file.create(file.path(tmp, "dwi.bvec"))
 
   jsonlite::write_json(
     list(Name = "IndexFixture", BIDSVersion = "1.8.0"),
     file.path(tmp, "dataset_description.json"),
     auto_unbox = TRUE
   )
+  jsonlite::write_json(
+    list(RepetitionTime = 2),
+    file.path(tmp, "task-rest_bold.json"),
+    auto_unbox = TRUE
+  )
 
   dir.create(file.path(tmp, "sub-01", "func"), recursive = TRUE)
+  dir.create(file.path(tmp, "sub-01", "dwi"), recursive = TRUE)
+  file.create(file.path(tmp, "sub-01", "dwi", "sub-01"))
+  file.create(file.path(tmp, "sub-01", "dwi", "sub-01_dwi.nii.gz"))
+  readr::write_tsv(
+    tibble::tibble(filename = "func/sub-01_task-rest_run-01_bold.nii.gz"),
+    file.path(tmp, "sub-01", "sub-01_scans.tsv")
+  )
   file.create(file.path(tmp, "sub-01", "func", "sub-01_task-rest_run-01_bold.nii.gz"))
+  jsonlite::write_json(
+    list(LongName = "Rest events"),
+    file.path(tmp, "sub-01", "func", "sub-01_task-rest_run-01_events.json"),
+    auto_unbox = TRUE
+  )
   readr::write_tsv(
     tibble::tibble(onset = 0, duration = 1, trial_type = "go"),
     file.path(tmp, "sub-01", "func", "sub-01_task-rest_run-01_events.tsv")
@@ -132,22 +153,41 @@ test_that("data.table-backed index state preserves query parity", {
   expect_equal(regex_indexed, regex_tree)
 })
 
-test_that("fast tree leaf extraction matches generic search surface", {
+test_that("filesystem manifest includes tree leaves and pybids-style layout files", {
   fixture <- create_index_extensions_fixture()
   on.exit(unlink(fixture, recursive = TRUE, force = TRUE), add = TRUE)
 
-  proj <- bids_project(fixture, derivatives = "auto", index = "none")
+  proj <- bids_project(fixture, derivatives = "none", index = "none")
 
-  fast_paths <- sort(bidser:::.bidser_list_indexed_paths(proj))
+  manifest_paths <- sort(bidser:::.bidser_list_indexed_paths(proj))
+  tree_paths <- sort(proj$bids_tree$Get(
+    bidser:::.bidser_node_relative_path,
+    filterFun = function(node) isTRUE(node$isLeaf),
+    simplify = FALSE
+  ) |> unlist(use.names = FALSE))
   generic_paths <- sort(search_files(proj, regex = ".*", full_path = FALSE, strict = FALSE))
 
-  expect_equal(fast_paths, generic_paths)
-  expect_equal(nrow(proj$tbl), length(generic_paths))
+  expect_equal(generic_paths, manifest_paths)
+  expect_true(all(tree_paths %in% manifest_paths))
+  expect_true(all(c(
+    "CHANGES",
+    "README",
+    "dataset_description.json",
+    "participants.tsv",
+    "task-rest_bold.json",
+    "dwi.bval",
+    "dwi.bvec",
+    "sub-01/sub-01_scans.tsv",
+    "sub-01/func/sub-01_task-rest_run-01_events.json",
+    "sub-01/dwi/sub-01"
+  ) %in% manifest_paths))
+  expect_false(any(startsWith(manifest_paths, "derivatives/")))
+  expect_equal(nrow(proj$tbl), length(tree_paths))
   expect_setequal(
     names(proj$tbl),
     c("name", "type", "subid", "session", "task", "run", "modality", "suffix", "desc", "space")
   )
-  expect_true(all(basename(generic_paths) %in% proj$tbl$name))
+  expect_true(all(basename(tree_paths) %in% proj$tbl$name))
 })
 
 test_that("tree-derived manifest rows match path-derived manifest rows", {
@@ -155,7 +195,11 @@ test_that("tree-derived manifest rows match path-derived manifest rows", {
   on.exit(unlink(fixture, recursive = TRUE, force = TRUE), add = TRUE)
 
   proj <- bids_project(fixture, derivatives = "auto", index = "none")
-  paths <- bidser:::.bidser_list_indexed_paths(proj)
+  paths <- proj$bids_tree$Get(
+    bidser:::.bidser_node_relative_path,
+    filterFun = function(node) isTRUE(node$isLeaf),
+    simplify = FALSE
+  ) |> unlist(use.names = FALSE)
 
   path_rows <- bidser:::.bidser_finalize_manifest_dt(
     bidser:::.bidser_index_rows_from_paths(proj, paths)
@@ -167,6 +211,77 @@ test_that("tree-derived manifest rows match path-derived manifest rows", {
   data.table::setorder(path_rows, path)
   data.table::setorder(tree_rows, path)
   expect_equal(as.data.frame(tree_rows), as.data.frame(path_rows), ignore_attr = TRUE)
+})
+
+test_that("indexed query surface includes layout files without leaking entity filters", {
+  fixture <- create_index_extensions_fixture()
+  on.exit(unlink(fixture, recursive = TRUE, force = TRUE), add = TRUE)
+
+  proj <- bids_project(fixture, derivatives = "none")
+
+  all_raw <- sort(query_files(proj, regex = ".*", scope = "raw"))
+  layout_files <- c(
+    "CHANGES",
+    "README",
+    "dataset_description.json",
+    "participants.tsv",
+    "task-rest_bold.json",
+    "dwi.bval",
+    "dwi.bvec",
+    "sub-01/sub-01_scans.tsv",
+    "sub-01/func/sub-01_task-rest_run-01_events.json",
+    "sub-01/dwi/sub-01"
+  )
+  expect_true(all(layout_files %in% all_raw))
+  expect_false(any(startsWith(all_raw, "derivatives/")))
+
+  sub01 <- query_files(proj, regex = ".*", subid = "01", scope = "raw")
+  expect_true("sub-01/sub-01_scans.tsv" %in% sub01)
+  expect_true("sub-01/func/sub-01_task-rest_run-01_events.json" %in% sub01)
+  expect_false(any(c(
+    "CHANGES",
+    "README",
+    "dataset_description.json",
+    "participants.tsv",
+    "task-rest_bold.json",
+    "dwi.bval",
+    "dwi.bvec"
+  ) %in% sub01))
+
+  task_rest <- query_files(proj, regex = ".*", task = "rest", scope = "raw")
+  expect_true("task-rest_bold.json" %in% task_rest)
+  expect_false(any(c("README", "participants.tsv") %in% task_rest))
+
+  no_session_bold <- query_files(
+    proj,
+    regex = "bold\\.nii\\.gz$",
+    session = ".*",
+    scope = "raw"
+  )
+  expect_equal(no_session_bold, "sub-01/func/sub-01_task-rest_run-01_bold.nii.gz")
+})
+
+test_that("refresh=TRUE detects newly added files in the filesystem manifest", {
+  fixture <- create_index_extensions_fixture()
+  on.exit(unlink(fixture, recursive = TRUE, force = TRUE), add = TRUE)
+
+  proj <- bids_project(fixture, derivatives = "none")
+  new_file <- file.path(
+    fixture, "sub-01", "func",
+    "sub-01_task-rest_run-02_events.json"
+  )
+  jsonlite::write_json(list(LongName = "New events"), new_file, auto_unbox = TRUE)
+
+  snapshot <- query_files(
+    proj, regex = "run-02_events\\.json$", task = "rest", scope = "raw"
+  )
+  expect_null(snapshot)
+
+  refreshed <- query_files(
+    proj, regex = "run-02_events\\.json$", task = "rest", scope = "raw",
+    refresh = TRUE
+  )
+  expect_equal(refreshed, "sub-01/func/sub-01_task-rest_run-02_events.json")
 })
 
 test_that("indexed full-path queries do not mutate the cached manifest", {

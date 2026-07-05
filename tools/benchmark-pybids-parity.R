@@ -73,7 +73,7 @@ run_bidser <- function(dataset, reps) {
       bids_project(dataset, derivatives = "none", index = "none")
     },
     count_fun = function(proj) {
-      nrow(flat_list(proj, full_path = FALSE))
+      length(bidser:::.bidser_list_indexed_paths(proj))
     }
   )
 
