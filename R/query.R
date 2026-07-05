@@ -267,9 +267,12 @@
   }
 
   fname <- basename(rel)
-  stem <- sub("\\.nii\\.gz$", "", fname, ignore.case = TRUE)
-  stem <- sub("\\.tsv\\.gz$", "", stem, ignore.case = TRUE)
-  stem <- sub("\\.(json|nii|tsv|csv|txt|h5|gii)$", "", stem, ignore.case = TRUE)
+  stem <- sub(
+    "\\.(nii\\.gz|tsv\\.gz|json|nii|tsv|csv|txt|h5|gii|bval|bvec)$",
+    "",
+    fname,
+    ignore.case = TRUE
+  )
 
   parts <- strsplit(stem, "_", fixed = TRUE)[[1]]
   if (length(parts) == 0L) {
@@ -496,34 +499,65 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
 
 #' @keywords internal
 #' @noRd
-.bidser_index_row_from_path <- function(x, rel_path) {
-  rel_path <- .bidser_to_relative_path(x$path, rel_path)
-  file_info <- file.info(file.path(x$path, rel_path))
-  entity_info <- .bidser_index_entities_from_path(x, rel_path)
-  fields <- c(
-    "subid", "session", "task", "run", "kind", "suffix", "type", "modality",
-    "acq", "ce", "dir", "rec", "echo", "space", "res", "desc", "label",
-    "variant", "from", "to", "target", "class", "mod", "hemi", "mode"
+.bidser_index_rows_from_paths <- function(x, rel_paths) {
+  rel_paths <- unique(as.character(rel_paths %||% character(0)))
+  rel_paths <- vapply(rel_paths, function(p) {
+    .bidser_to_relative_path(x$path, p)
+  }, character(1), USE.NAMES = FALSE)
+  rel_paths <- rel_paths[nzchar(rel_paths)]
+  if (length(rel_paths) == 0) {
+    return(data.table::data.table())
+  }
+
+  file_info <- file.info(file.path(x$path, rel_paths))
+  entity_rows <- lapply(rel_paths, function(p) {
+    .bidser_index_entities_from_path(x, p)
+  })
+  fields <- .bidser_index_entity_fields()
+  derivative_reg <- .bidser_derivative_registry(x)
+  has_derivatives <- nrow(derivative_reg) > 0L
+
+  path_pipeline <- function(rel_path) {
+    if (!has_derivatives) {
+      return(NA_character_)
+    }
+    for (i in seq_len(nrow(derivative_reg))) {
+      root <- derivative_reg$root[[i]]
+      prefix <- paste0(root, "/")
+      if (identical(rel_path, root) || startsWith(rel_path, prefix)) {
+        return(derivative_reg$pipeline[[i]])
+      }
+    }
+    NA_character_
+  }
+
+  pipelines <- vapply(rel_paths, path_pipeline, character(1), USE.NAMES = FALSE)
+
+  dt <- data.table::data.table(
+    path = rel_paths,
+    file = basename(rel_paths),
+    scope = ifelse(is.na(pipelines), "raw", "derivatives"),
+    pipeline = pipelines,
+    extension = vapply(rel_paths, .bidser_extract_extension, character(1), USE.NAMES = FALSE),
+    datatype = vapply(rel_paths, .bidser_extract_datatype, character(1), USE.NAMES = FALSE),
+    size = as.numeric(file_info$size),
+    file_mtime = as.numeric(file_info$mtime)
   )
 
-  row <- c(
-    list(
-      path = rel_path,
-      file = basename(rel_path),
-      scope = if (.bidser_is_derivative_path(x, rel_path)) "derivatives" else "raw",
-      pipeline = .bidser_path_pipeline(x, rel_path),
-      extension = .bidser_extract_extension(rel_path),
-      datatype = .bidser_extract_datatype(rel_path),
-      size = as.numeric(file_info$size),
-      file_mtime = as.numeric(file_info$mtime)
-    ),
-    setNames(lapply(fields, function(k) {
-      val <- entity_info[[k]]
+  for (field in fields) {
+    dt[[field]] <- vapply(entity_rows, function(entity_info) {
+      val <- entity_info[[field]]
       if (is.null(val) || length(val) == 0) NA_character_ else as.character(val[[1]])
-    }), fields)
-  )
+    }, character(1), USE.NAMES = FALSE)
+  }
 
-  tibble::as_tibble(row)
+  dt
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_index_row_from_path <- function(x, rel_path) {
+  tibble::as_tibble(.bidser_index_rows_from_paths(x, rel_path))
 }
 
 #' @keywords internal

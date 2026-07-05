@@ -132,6 +132,24 @@ test_that("data.table-backed index state preserves query parity", {
   expect_equal(regex_indexed, regex_tree)
 })
 
+test_that("fast tree leaf extraction matches generic search surface", {
+  fixture <- create_index_extensions_fixture()
+  on.exit(unlink(fixture, recursive = TRUE, force = TRUE), add = TRUE)
+
+  proj <- bids_project(fixture, derivatives = "auto", index = "none")
+
+  fast_paths <- sort(bidser:::.bidser_list_indexed_paths(proj))
+  generic_paths <- sort(search_files(proj, regex = ".*", full_path = FALSE, strict = FALSE))
+
+  expect_equal(fast_paths, generic_paths)
+  expect_equal(nrow(proj$tbl), length(generic_paths))
+  expect_setequal(
+    names(proj$tbl),
+    c("name", "type", "subid", "session", "task", "run", "modality", "suffix", "desc", "space")
+  )
+  expect_true(all(basename(generic_paths) %in% proj$tbl$name))
+})
+
 test_that("index persistence failures warn with context and keep session cache", {
   fixture <- create_index_extensions_fixture()
   on.exit(unlink(fixture, recursive = TRUE, force = TRUE), add = TRUE)

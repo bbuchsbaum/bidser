@@ -30,6 +30,7 @@ test_that("bids_project indexes raw DWI files by default", {
     proj,
     datatype = "dwi",
     kind = "dwi",
+    match_mode = "exact",
     scope = "raw",
     return = "tibble"
   )

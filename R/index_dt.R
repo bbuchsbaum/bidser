@@ -61,9 +61,13 @@
 
 #' @keywords internal
 #' @noRd
-.bidser_finalize_manifest_dt <- function(dt) {
+.bidser_finalize_manifest_dt <- function(dt, copy = TRUE) {
   cols <- .bidser_manifest_colnames()
-  dt <- data.table::as.data.table(data.table::copy(dt))
+  dt <- if (isTRUE(copy)) {
+    data.table::as.data.table(data.table::copy(dt))
+  } else {
+    data.table::as.data.table(dt)
+  }
   char_cols <- setdiff(cols, c("size", "file_mtime"))
 
   for (nm in setdiff(cols, names(dt))) {
@@ -91,9 +95,13 @@
 
 #' @keywords internal
 #' @noRd
-.bidser_finalize_sidecar_dt <- function(dt) {
+.bidser_finalize_sidecar_dt <- function(dt, copy = TRUE) {
   cols <- .bidser_sidecar_colnames()
-  dt <- data.table::as.data.table(data.table::copy(dt))
+  dt <- if (isTRUE(copy)) {
+    data.table::as.data.table(data.table::copy(dt))
+  } else {
+    data.table::as.data.table(dt)
+  }
   char_cols <- setdiff(cols, c("size", "file_mtime", "specificity", "data"))
 
   for (nm in setdiff(cols, names(dt))) {
@@ -123,8 +131,12 @@
 
 #' @keywords internal
 #' @noRd
-.bidser_finalize_resolved_meta_dt <- function(dt) {
-  dt <- data.table::as.data.table(data.table::copy(dt))
+.bidser_finalize_resolved_meta_dt <- function(dt, copy = TRUE) {
+  dt <- if (isTRUE(copy)) {
+    data.table::as.data.table(data.table::copy(dt))
+  } else {
+    data.table::as.data.table(dt)
+  }
   if (nrow(dt) == 0 && length(names(dt)) == 0) {
     return(.bidser_empty_resolved_meta_dt())
   }
@@ -218,14 +230,16 @@
 
 #' @keywords internal
 #' @noRd
-.bidser_make_index_state <- function(manifest, sidecars, resolved_meta = NULL) {
+.bidser_make_index_state <- function(manifest, sidecars, resolved_meta = NULL,
+                                     copy = TRUE) {
   list(
     backend = "data.table",
     version = .bidser_index_schema_version(),
-    manifest = .bidser_finalize_manifest_dt(manifest),
-    sidecars = .bidser_finalize_sidecar_dt(sidecars),
+    manifest = .bidser_finalize_manifest_dt(manifest, copy = copy),
+    sidecars = .bidser_finalize_sidecar_dt(sidecars, copy = copy),
     resolved_meta = .bidser_finalize_resolved_meta_dt(
-      resolved_meta %||% .bidser_empty_resolved_meta_dt()
+      resolved_meta %||% .bidser_empty_resolved_meta_dt(),
+      copy = copy
     )
   )
 }
@@ -277,8 +291,31 @@
 
 #' @keywords internal
 #' @noRd
+.bidser_node_relative_path <- function(node) {
+  parts <- as.character(node$path)
+  if (length(parts) > 2L && identical(parts[[2L]], "raw")) {
+    return(paste(parts[3L:length(parts)], collapse = "/"))
+  }
+  if (length(parts) > 1L) {
+    return(paste(parts[2L:length(parts)], collapse = "/"))
+  }
+  node$name
+}
+
+#' @keywords internal
+#' @noRd
 .bidser_list_indexed_paths <- function(x) {
-  search_files(x, regex = ".*", full_path = FALSE, strict = FALSE) %||% character(0)
+  ret <- x$bids_tree$Get(
+    .bidser_node_relative_path,
+    filterFun = function(node) {
+      isTRUE(node$isLeaf)
+    },
+    simplify = FALSE
+  )
+  if (length(ret) == 0) {
+    return(character(0))
+  }
+  unique(unname(unlist(ret)))
 }
 
 #' @keywords internal
@@ -352,8 +389,7 @@
     return(.bidser_empty_manifest_dt())
   }
 
-  rows <- lapply(rel_paths, function(p) data.table::as.data.table(.bidser_index_row_from_path(x, p)))
-  .bidser_finalize_manifest_dt(data.table::rbindlist(rows, fill = TRUE))
+  .bidser_finalize_manifest_dt(.bidser_index_rows_from_paths(x, rel_paths), copy = FALSE)
 }
 
 #' @keywords internal
@@ -396,10 +432,7 @@
   keep_dt <- manifest[manifest$path %in% keep_paths, ]
 
   rebuilt <- if (length(rebuild_paths) > 0) {
-    data.table::rbindlist(
-      lapply(rebuild_paths, function(p) data.table::as.data.table(.bidser_index_row_from_path(x, p))),
-      fill = TRUE
-    )
+    .bidser_index_rows_from_paths(x, rebuild_paths)
   } else {
     .bidser_empty_manifest_dt()
   }
@@ -520,7 +553,8 @@
       .bidser_build_sidecars_dt(x)
     } else {
       .bidser_empty_sidecar_dt()
-    }
+    },
+    copy = FALSE
   )
 }
 

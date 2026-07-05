@@ -18,6 +18,10 @@
   from paths and by lazily ingesting JSON sidecar contents only when metadata
   APIs need them. This keeps query-oriented project construction focused on the
   file manifest while preserving indexed metadata inheritance on demand.
+* Speed up `bids_project()` construction by replacing generic tree/table
+  conversions and repeated tree searches with leaf-specific extractors, by using
+  vectorized manifest row construction, and by trimming parser/directory-listing
+  overhead in constructor hot paths.
 * Add `tools/benchmark-pybids-parity.R`, a repeatable local harness for
   comparing bidser construction/query timings and basic file-count parity
   against the vendored pybids checkout via `uv`.

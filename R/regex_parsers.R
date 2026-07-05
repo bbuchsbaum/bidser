@@ -21,13 +21,13 @@ extract_bids_components <- function(filename, spec) {
   # multi-part suffixes such as .nii.gz and .lv.h5.
   base_name <- basename(filename)
   suffix_pattern <- paste0("\\.", .bidser_regex_escape(kind_suffix$suffix), "$")
-  base_name <- stringr::str_remove(base_name, suffix_pattern)
+  base_name <- sub(suffix_pattern, "", base_name, perl = TRUE)
 
   kind_pattern <- paste0("_", .bidser_regex_escape(kind_suffix$kind), "$")
-  if (!stringr::str_detect(base_name, kind_pattern)) {
+  if (!grepl(kind_pattern, base_name, perl = TRUE)) {
     return(NULL)
   }
-  entity_part <- stringr::str_remove(base_name, kind_pattern)
+  entity_part <- sub(kind_pattern, "", base_name, perl = TRUE)
   
   # Extract BIDS entities
   entities <- extract_bids_entities(entity_part, spec$keystruc)
@@ -64,11 +64,10 @@ extract_kind_and_suffix <- function(filename, kinds_spec) {
     }
     
     for (suffix in suffixes) {
-      # Create pattern to match _kind.suffix at the end
-      pattern <- sprintf("_%s\\%s$", kind, suffix)
-      if (stringr::str_detect(filename, pattern)) {
+      tail <- paste0("_", kind, suffix)
+      if (endsWith(filename, tail)) {
         # Extract the actual suffix (remove leading dot if present)
-        clean_suffix <- stringr::str_remove(suffix, "^\\.")
+        clean_suffix <- sub("^\\.", "", suffix)
         return(list(kind = kind, suffix = clean_suffix))
       }
     }

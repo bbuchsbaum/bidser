@@ -32,24 +32,26 @@ Construction scales at ~4.8 ms/file (data.tree build); a 30k-file fMRIPrep tree
 
 ### Follow-up benchmark harness (2026-07-05)
 
-`tools/benchmark-pybids-parity.R --reps 7` now compares the live checkout against
+`tools/benchmark-pybids-parity.R --reps 11` now compares the live checkout against
 the vendored pybids source through `uv run --with ./pybids`.
 
-| Operation | pybids 0.21.0.post0.dev67 | bidser after DWI + lazy sidecars |
+| Operation | pybids 0.21.0.post0.dev67 | bidser after DWI + constructor hot-path work |
 |---|---:|---:|
-| construct (no index) | 116 ms | 189 ms |
-| construct + build query index | n/a | 402 ms |
-| construct from cached index | n/a | 253 ms |
-| query subject=01 bold | 1.5 ms | 2.0 ms |
+| construct (no index) | 118 ms | **60 ms** |
+| construct + build query index | n/a | **92 ms** |
+| construct from cached index | n/a | **70 ms** |
+| query subject=01 bold | 1.3 ms | 2.0 ms |
 | query DWI | 1.2 ms | 2.0 ms |
 | indexed raw file count | 142 | 130 |
 
-The query surface is close enough that the next raw-speed target is construction,
-not query dispatch. Indexed construction improved by avoiding repeated generic
-filename parser calls and by deferring JSON sidecar ingestion until metadata APIs
-need it. Remaining quality/parity gap: bidser now indexes DWI files by default,
-but still omits pybids-visible root/scan metadata files, hence 130 vs 142 files
-on ds005.
+The query surface is close, and ds005 construction is now faster than pybids even
+when bidser also builds the query index. The improvement came from avoiding a
+generic `search_files()` tree walk during manifest construction, vectorizing
+manifest rows and file signatures, avoiding repeated finalization copies, using a
+leaf-specific `tbl` extractor instead of `data.tree::ToDataFrameTypeCol()`, and
+trimming parser/directory-listing overhead in constructor hot paths. Remaining
+quality/parity gap: bidser now indexes DWI files by default, but still omits
+pybids-visible root/scan metadata files, hence 130 vs 142 files on ds005.
 
 ## Parity map (what bidser already has)
 
@@ -83,20 +85,22 @@ cache — `query_files()` now prefers each project's own carried `index_state` s
 sibling project can't corrupt results; (b) `query_files()` now honours
 `index = "none"` and won't read a stale leftover RDS. Known limitation carried
 into Phase 1: `refresh = TRUE` cannot detect *newly added* files because the
-manifest's file list is derived from the construction-time `data.tree`
-(`.bidser_list_indexed_paths` → `search_files`). Phase 1's manifest-from-FS-walk
-removes this limitation for free.
+manifest's file list is still derived from the construction-time `data.tree`
+leaves. Phase 1's manifest-from-FS-walk removes this limitation for free.
 
-### Phase 1 — Construction performance (HIGH value, MEDIUM–HIGH risk)
-Goal: cut the 12× construction gap. Build the `data.table` manifest directly from
-a single recursive filesystem walk (`fs::dir_ls`) + vectorized entity parse,
-**decoupled from the data.tree**. Then either (a) build the `data.tree` lazily on
-first access by a tree-consuming accessor, or (b) reimplement the hot accessors
-(`func_scans`, `sessions`, `tasks`, `flat_list`, `preproc_scans`,
+### Phase 1 — Construction performance (PARTLY SHIPPED; HIGH value, MEDIUM–HIGH risk)
+The first construction-speed slice cut ds005 construction below pybids while
+preserving the public `bids_project` shape. Remaining Phase 1 work is now about
+correctness/completeness and scaling on larger trees: build the `data.table`
+manifest directly from a single recursive filesystem walk + vectorized entity
+parse, **decoupled from the data.tree**. Then either (a) build the `data.tree`
+lazily on first access by a tree-consuming accessor, or (b) reimplement the hot
+accessors (`func_scans`, `sessions`, `tasks`, `flat_list`, `preproc_scans`,
 `build_subject_graph`) on the manifest and demote the tree.
 - Risk: the `data.tree` is reached into directly by many methods — needs a careful
   audit and a fresh-context review pass before merge.
-- Target: ≤ ~0.5 ms/file construction, i.e. beat pybids.
+- Target: preserve the ds005 pybids construction win and close the 130-vs-142
+  file-count gap without regressing query timings.
 - Suggested: land (a) lazy tree first (lower risk), measure, then migrate
   accessors opportunistically.
 

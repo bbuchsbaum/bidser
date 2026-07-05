@@ -317,8 +317,12 @@ list_files_github <- function(user, repo, subdir="") {
 #' @keywords internal
 #' @noRd
 get_sessions <- function(path, sid) {
-  dnames <- basename(fs::dir_ls(paste0(path, "/", sid)))
-  ret <- str_detect(dnames, "ses-.*")
+  subject_dir <- file.path(path, sid)
+  if (!dir.exists(subject_dir)) {
+    return(list())
+  }
+  dnames <- basename(list.dirs(subject_dir, recursive = FALSE, full.names = TRUE))
+  ret <- grepl("^ses-", dnames)
   if (any(ret)) {
     dnames[ret]
   } else {
@@ -501,16 +505,12 @@ get_sessions <- function(path, sid) {
 #' @keywords internal
 #' @noRd
 descend <- function(node, path, ftype, parser) {
-  # List all files in the directory
-  dnames <- basename(fs::dir_ls(paste0(path)))
-  ret <- str_detect(dnames, ftype)
-  
   # Add the folder node (e.g., 'anat', 'func')
   node <- add_node(node, ftype, folder=ftype)
-  
-  if (any(ret)) {
-    # Get all files in the folder
-    fnames <- basename(fs::dir_ls(paste0(path, "/", ftype)))
+
+  datatype_dir <- file.path(path, ftype)
+  if (dir.exists(datatype_dir)) {
+    fnames <- list.files(datatype_dir, recursive = FALSE, full.names = FALSE)
     
     # Debug info to see which files we're attempting to parse
     # message("Processing ", length(fnames), " files in ", ftype, " folder at ", path)
@@ -564,6 +564,32 @@ add_node <- function(bids, name, ...) {
 #' @noRd
 add_file <- function(bids, name,...) {
   bids$AddChild(name, ...)
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_tree_tbl <- function(bids) {
+  cols <- c("name", "type", "subid", "session", "task", "run", "modality", "suffix", "desc", "space")
+  rows <- bids$Get(function(node) {
+    lapply(cols, function(nm) {
+      val <- node[[nm]]
+      if (is.null(val) || length(val) == 0L) {
+        NA_character_
+      } else {
+        as.character(val[[1L]])
+      }
+    })
+  }, filterFun = function(node) {
+    isTRUE(node$isLeaf)
+  }, simplify = FALSE)
+
+  if (length(rows) == 0L) {
+    return(tibble::as_tibble(setNames(rep(list(character(0)), length(cols)), cols)))
+  }
+
+  tibble::as_tibble(setNames(lapply(seq_along(cols), function(i) {
+    vapply(rows, function(row) row[[i]], character(1), USE.NAMES = FALSE)
+  }), cols))
 }
 
 
@@ -796,8 +822,7 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmripre
     # pb$tick()
   }
   
-  tbl <- tibble::as_tibble(data.tree::ToDataFrameTypeCol(bids, 'name', 'type', 'subid', 'session', 'task', 'run', 'modality', 'suffix', 'desc', 'space'))
-  tbl <- tbl %>% select(-starts_with("level_"))
+  tbl <- .bidser_tree_tbl(bids)
 
   legacy_prep_dir <- ""
   if (nrow(deriv_info) > 0 && (isTRUE(fmriprep) || identical(derivatives, "auto"))) {
