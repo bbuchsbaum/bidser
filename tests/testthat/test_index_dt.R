@@ -253,10 +253,14 @@ test_that("cached metadata is reused and invalidated when sidecars change", {
   on.exit(unlink(fixture$path, recursive = TRUE, force = TRUE), add = TRUE)
 
   proj <- bids_project(fixture$path)
+  state0 <- bidser:::.bidser_get_session_index_state(proj)
+  expect_equal(nrow(state0$sidecars), 0L)
+
   first <- get_metadata(proj, fixture$run1, inherit = TRUE)
   state1 <- bidser:::.bidser_get_session_index_state(proj)
 
   expect_equal(first$RepetitionTime, 2.0)
+  expect_true(nrow(state1$sidecars) >= 1)
   expect_true(nrow(state1$resolved_meta) >= 1)
 
   second <- get_metadata(proj, fixture$run1, inherit = TRUE)

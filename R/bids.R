@@ -837,7 +837,12 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmripre
   class(ret) <- "bids_project"
 
   if (identical(index, "auto")) {
-    state <- .bidser_load_cached_index_state(ret, refresh = TRUE, persist = TRUE)
+    state <- .bidser_load_cached_index_state(
+      ret,
+      refresh = TRUE,
+      persist = TRUE,
+      refresh_sidecars = FALSE
+    )
     if (!is.null(state)) {
       ret$index_state <- state
       ret$index <- .bidser_index_state_manifest_tibble(state)

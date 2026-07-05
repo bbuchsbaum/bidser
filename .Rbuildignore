@@ -45,3 +45,4 @@ repomix-output.xml
 ^vendor($|/)
 ^data-raw$
 ^\.planning$
+^tools/bench-results$

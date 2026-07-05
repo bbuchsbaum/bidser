@@ -306,15 +306,10 @@
   abs_path <- file.path(x$path, rel_path)
   info <- file.info(abs_path)
 
-  encoded <- tryCatch(encode(basename(rel_path)), error = function(e) NULL)
-  parsed <- .bidser_parse_entities_from_path(rel_path)
-  if (is.null(encoded)) {
-    encoded <- list()
-  }
-  all_info <- utils::modifyList(parsed, encoded, keep.null = TRUE)
+  all_info <- .bidser_index_entities_from_path(x, rel_path)
 
   entity_fields <- .bidser_index_entity_fields()
-  specificity <- length(setdiff(names(parsed), "kind"))
+  specificity <- length(setdiff(names(all_info), c("kind", "suffix", "type")))
   directory <- dirname(rel_path)
   if (identical(directory, ".")) {
     directory <- ""
@@ -518,22 +513,37 @@
 
 #' @keywords internal
 #' @noRd
-.bidser_build_index_state <- function(x) {
+.bidser_build_index_state <- function(x, include_sidecars = FALSE) {
   .bidser_make_index_state(
     manifest = .bidser_build_manifest_dt(x),
-    sidecars = .bidser_build_sidecars_dt(x)
+    sidecars = if (isTRUE(include_sidecars)) {
+      .bidser_build_sidecars_dt(x)
+    } else {
+      .bidser_empty_sidecar_dt()
+    }
   )
 }
 
 #' @keywords internal
 #' @noRd
-.bidser_refresh_index_state <- function(x, state) {
+.bidser_refresh_index_state <- function(x, state, refresh_sidecars = TRUE) {
   if (is.null(state) || !.bidser_is_index_state(state)) {
-    return(list(state = .bidser_build_index_state(x), changed = TRUE))
+    return(list(
+      state = .bidser_build_index_state(x, include_sidecars = refresh_sidecars),
+      changed = TRUE
+    ))
   }
 
   manifest_refresh <- .bidser_refresh_manifest_dt(x, state$manifest)
-  sidecar_refresh <- .bidser_refresh_sidecars_dt(x, state$sidecars)
+  sidecar_refresh <- if (isTRUE(refresh_sidecars)) {
+    .bidser_refresh_sidecars_dt(x, state$sidecars)
+  } else {
+    list(
+      sidecars = .bidser_finalize_sidecar_dt(state$sidecars),
+      changed = character(0),
+      deleted = character(0)
+    )
+  }
   changed <- length(manifest_refresh$changed) > 0 ||
     length(manifest_refresh$deleted) > 0 ||
     length(sidecar_refresh$changed) > 0 ||
@@ -619,7 +629,8 @@
 
 #' @keywords internal
 #' @noRd
-.bidser_load_cached_index_state <- function(x, refresh = FALSE, persist = FALSE) {
+.bidser_load_cached_index_state <- function(x, refresh = FALSE, persist = FALSE,
+                                            refresh_sidecars = TRUE) {
   state <- .bidser_get_session_index_state(x)
 
   if (is.null(state) && !is.null(x$index_path) && nzchar(x$index_path) && file.exists(x$index_path)) {
@@ -633,7 +644,11 @@
   }
 
   if (isTRUE(refresh)) {
-    refreshed <- .bidser_refresh_index_state(x, state)
+    refreshed <- .bidser_refresh_index_state(
+      x,
+      state,
+      refresh_sidecars = refresh_sidecars
+    )
     state <- refreshed$state
     if (isTRUE(persist) && isTRUE(refreshed$changed)) {
       .bidser_persist_index_state(x, state)
@@ -649,13 +664,19 @@
 
 #' @keywords internal
 #' @noRd
-.bidser_get_or_build_index_state <- function(x, persist = FALSE) {
-  state <- .bidser_load_cached_index_state(x, refresh = TRUE, persist = persist)
+.bidser_get_or_build_index_state <- function(x, persist = FALSE,
+                                             include_sidecars = FALSE) {
+  state <- .bidser_load_cached_index_state(
+    x,
+    refresh = TRUE,
+    persist = persist,
+    refresh_sidecars = include_sidecars
+  )
   if (!is.null(state)) {
     return(state)
   }
 
-  state <- .bidser_build_index_state(x)
+  state <- .bidser_build_index_state(x, include_sidecars = include_sidecars)
   if (isTRUE(persist)) {
     .bidser_persist_index_state(x, state)
   } else {

@@ -33,9 +33,9 @@ The \code{name} string, invisibly.
 }
 \description{
 Adds a new datatype to the bidser runtime registry so that
-\code{\link{bids_project}} will scan and parse its folder.  The five
+\code{\link{bids_project}} will scan and parse its folder.  The six
 built-in datatypes (\code{"func"}, \code{"anat"}, \code{"fmap"},
-\code{"funcprep"}, \code{"anatprep"}) can only be overwritten by passing
+\code{"dwi"}, \code{"funcprep"}, \code{"anatprep"}) can only be overwritten by passing
 \code{overwrite = TRUE}.
 }
 \examples{

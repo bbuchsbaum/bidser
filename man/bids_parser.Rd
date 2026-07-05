@@ -15,7 +15,8 @@ regex-based pattern matching instead of parser combinators.
 Create a parser for a generic BIDS file
 }
 \details{
-This parser tries to match against various known parsers (anat, func, fmriprep anat/func).
+This parser tries to match against various known parsers (func, anat, dwi,
+fmriprep anat/func).
 }
 \examples{
 # Create a generic BIDS parser

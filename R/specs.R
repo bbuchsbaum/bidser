@@ -116,6 +116,33 @@ anat_spec <- function() {
   ret
 }
 
+#' Create a spec table for "dwi" files
+#'
+#' @return A list containing `keystruc`, `kinds`, and `type` describing
+#'   diffusion-weighted imaging files.
+#' @keywords internal
+#' @noRd
+dwi_spec <- function() {
+  keystruc <- tibble::tribble(
+    ~name,            ~key, ~optional, ~pattern,         ~order,
+    "subid",          "sub", FALSE,    "[A-Za-z0-9]+",   1,
+    "session",        "ses", TRUE,     "[A-Za-z0-9]+",   2,
+    "acquisition",    "acq", TRUE,     "[A-Za-z0-9]+",   3,
+    "dir",            "dir", TRUE,     "[A-Za-z0-9]+",   4,
+    "reconstruction", "rec", TRUE,     "[A-Za-z0-9]+",   5,
+    "run",            "run", TRUE,     "[0-9]+",         6
+  )
+
+  kinds <- tibble::tribble(
+    ~kind, ~suffix,
+    "dwi", list(".nii.gz", ".nii", ".json", ".bval", ".bvec")
+  )
+
+  ret <- list(keystruc = keystruc, kinds = kinds, type = "dwi")
+  class(ret) <- c("dwi_spec", "parser_spec")
+  ret
+}
+
 
 #' Create a spec table for fMRIPrep "func" files
 #'

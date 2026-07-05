@@ -5,7 +5,8 @@
 
 #' Create a parser for a generic BIDS file
 #'
-#' This parser tries to match against various known parsers (anat, func, fmriprep anat/func).
+#' This parser tries to match against various known parsers (func, anat, dwi,
+#' fmriprep anat/func).
 #' @return A BIDS parser object that can parse various types of BIDS files
 #' @examples
 #' # Create a generic BIDS parser
@@ -20,6 +21,7 @@ bids_parser <- function() {
   # Create individual parsers
   anat_p <- anat_parser()
   func_p <- func_parser()
+  dwi_p <- dwi_parser()
   fmriprep_anat_p <- fmriprep_anat_parser()
   fmriprep_func_p <- fmriprep_func_parser()
   
@@ -31,6 +33,9 @@ bids_parser <- function() {
     if (!is.null(result)) return(result)
 
     result <- parse(anat_p, filename)
+    if (!is.null(result)) return(result)
+
+    result <- parse(dwi_p, filename)
     if (!is.null(result)) return(result)
 
     result <- parse(fmriprep_func_p, filename)
@@ -92,6 +97,19 @@ anat_parser <- function() {
   parser <- gen_parser(spec)
   ret <- list(parser = parser)
   class(ret) <- c("anat_parser", "parser")
+  ret
+}
+
+#' Diffusion MRI parser constructor
+#'
+#' @return A diffusion MRI BIDS parser object for parsing DWI files
+#' @keywords internal
+#' @noRd
+dwi_parser <- function() {
+  spec <- dwi_spec()
+  parser <- gen_parser(spec)
+  ret <- list(parser = parser)
+  class(ret) <- c("dwi_parser", "parser")
   ret
 }
 

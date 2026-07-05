@@ -80,13 +80,18 @@ bids_index <- function(x, rebuild = FALSE, persist = TRUE) {
   }
 
   if (!isTRUE(rebuild)) {
-    state <- .bidser_load_cached_index_state(x, refresh = TRUE, persist = persist)
+    state <- .bidser_load_cached_index_state(
+      x,
+      refresh = TRUE,
+      persist = persist,
+      refresh_sidecars = FALSE
+    )
     if (!is.null(state)) {
       return(.bidser_index_state_manifest_tibble(state))
     }
   }
 
-  state <- .bidser_build_index_state(x)
+  state <- .bidser_build_index_state(x, include_sidecars = FALSE)
   if (isTRUE(persist)) {
     .bidser_persist_index_state(x, state)
   } else {

@@ -30,6 +30,27 @@ Construction scales at ~4.8 ms/file (data.tree build); a 30k-file fMRIPrep tree
 ≈ **2.5 min** just to build the project object. The `data.table` index builds at
 ~0.42 ms/file (~10× faster).
 
+### Follow-up benchmark harness (2026-07-05)
+
+`tools/benchmark-pybids-parity.R --reps 7` now compares the live checkout against
+the vendored pybids source through `uv run --with ./pybids`.
+
+| Operation | pybids 0.21.0.post0.dev67 | bidser after DWI + lazy sidecars |
+|---|---:|---:|
+| construct (no index) | 116 ms | 189 ms |
+| construct + build query index | n/a | 402 ms |
+| construct from cached index | n/a | 253 ms |
+| query subject=01 bold | 1.5 ms | 2.0 ms |
+| query DWI | 1.2 ms | 2.0 ms |
+| indexed raw file count | 142 | 130 |
+
+The query surface is close enough that the next raw-speed target is construction,
+not query dispatch. Indexed construction improved by avoiding repeated generic
+filename parser calls and by deferring JSON sidecar ingestion until metadata APIs
+need it. Remaining quality/parity gap: bidser now indexes DWI files by default,
+but still omits pybids-visible root/scan metadata files, hence 130 vs 142 files
+on ds005.
+
 ## Parity map (what bidser already has)
 
 | pybids crown jewel | bidser status |

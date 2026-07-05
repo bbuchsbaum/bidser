@@ -9,11 +9,12 @@ context("register_datatype() extension point")
 # Built-in registration
 # ---------------------------------------------------------------------------
 
-test_that("five built-in datatypes are registered on load", {
+test_that("six built-in datatypes are registered on load", {
   nms <- list_datatypes()
   expect_true("func"     %in% nms)
   expect_true("anat"     %in% nms)
   expect_true("fmap"     %in% nms)
+  expect_true("dwi"      %in% nms)
   expect_true("funcprep" %in% nms)
   expect_true("anatprep" %in% nms)
 })
@@ -23,6 +24,7 @@ test_that("list_datatypes(scope='raw') returns only raw built-ins", {
   expect_true("func" %in% nms)
   expect_true("anat" %in% nms)
   expect_true("fmap" %in% nms)
+  expect_true("dwi" %in% nms)
   expect_false("funcprep" %in% nms)
   expect_false("anatprep" %in% nms)
 })
@@ -43,6 +45,21 @@ test_that("get_datatype_spec returns correct fields for 'func'", {
   expect_true(isTRUE(entry$builtin))
   expect_true(is.list(entry$spec))
   expect_true(is.list(entry$parser_fn))
+})
+
+test_that("DWI is a built-in raw datatype", {
+  entry <- get_datatype_spec("dwi")
+  expect_equal(entry$name, "dwi")
+  expect_equal(entry$folder, "dwi")
+  expect_equal(entry$scope, "raw")
+  expect_true(isTRUE(entry$builtin))
+
+  parsed_nii <- parse(entry$parser_fn, "sub-01_run-02_dwi.nii.gz")$result
+  parsed_bval <- parse(entry$parser_fn, "sub-01_run-02_dwi.bval")$result
+  expect_equal(parsed_nii$type, "dwi")
+  expect_equal(parsed_nii$kind, "dwi")
+  expect_equal(parsed_nii$suffix, "nii.gz")
+  expect_equal(parsed_bval$suffix, "bval")
 })
 
 test_that("get_datatype_spec errors for unknown name", {

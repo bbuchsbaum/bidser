@@ -285,6 +285,9 @@
   kv_parts <- parts[-length(parts)]
   for (token in kv_parts) {
     if (!grepl("-", token, fixed = TRUE)) {
+      if (is.null(entities$modality) && nzchar(token)) {
+        entities$modality <- token
+      }
       next
     }
 
@@ -300,6 +303,24 @@
       key
     )
     entities[[canonical_key]] <- val
+  }
+
+  entities
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_index_entities_from_path <- function(x, rel_path) {
+  rel_path <- .bidser_to_relative_path(x$path, rel_path)
+  entities <- .bidser_parse_entities_from_path(rel_path)
+  extension <- .bidser_extract_extension(rel_path)
+  datatype <- .bidser_extract_datatype(rel_path)
+
+  if (is.null(entities$suffix) && !is.na(extension) && nzchar(extension)) {
+    entities$suffix <- sub("^\\.", "", extension)
+  }
+  if (is.null(entities$type) && !is.na(datatype) && nzchar(datatype)) {
+    entities$type <- datatype
   }
 
   entities
@@ -478,14 +499,7 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
 .bidser_index_row_from_path <- function(x, rel_path) {
   rel_path <- .bidser_to_relative_path(x$path, rel_path)
   file_info <- file.info(file.path(x$path, rel_path))
-  encoded <- tryCatch(encode(basename(rel_path)), error = function(e) NULL)
-  parsed <- .bidser_parse_entities_from_path(rel_path)
-
-  if (is.null(encoded)) {
-    encoded <- list()
-  }
-
-  entity_info <- utils::modifyList(parsed, encoded, keep.null = TRUE)
+  entity_info <- .bidser_index_entities_from_path(x, rel_path)
   fields <- c(
     "subid", "session", "task", "run", "kind", "suffix", "type", "modality",
     "acq", "ce", "dir", "rec", "echo", "space", "res", "desc", "label",
@@ -603,7 +617,7 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
       return(NULL)
     }
 
-    refreshed <- .bidser_refresh_index_state(x, state)
+    refreshed <- .bidser_refresh_index_state(x, state, refresh_sidecars = FALSE)
     state <- refreshed$state
     if (isTRUE(persist) && isTRUE(refreshed$changed)) {
       .bidser_persist_index_state(x, state)
@@ -1011,7 +1025,12 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
 
   use_cached_index <- !identical(x$index_mode %||% "auto", "none")
   index_state <- if (use_cached_index) {
-    .bidser_load_cached_index_state(x, refresh = TRUE, persist = TRUE)
+    .bidser_load_cached_index_state(
+      x,
+      refresh = TRUE,
+      persist = TRUE,
+      refresh_sidecars = TRUE
+    )
   } else {
     NULL
   }

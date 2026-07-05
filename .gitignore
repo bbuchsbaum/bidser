@@ -24,3 +24,4 @@ pybids/
 .rcmdcheck_result.rds
 vendor/
 vignettes/*.html
+tools/bench-results/

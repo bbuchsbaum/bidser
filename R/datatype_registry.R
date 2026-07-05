@@ -24,7 +24,7 @@
 }
 
 # ---------------------------------------------------------------------------
-# Internal: register the 5 built-in datatypes (called from .onLoad)
+# Internal: register the 6 built-in datatypes (called from .onLoad)
 # ---------------------------------------------------------------------------
 
 #' @keywords internal
@@ -59,6 +59,13 @@
       scope     = "raw"
     ),
     list(
+      name      = "dwi",
+      spec      = dwi_spec(),
+      parser_fn = dwi_parser(),
+      folder    = "dwi",
+      scope     = "raw"
+    ),
+    list(
       name      = "funcprep",
       spec      = funcprepspec(),
       parser_fn = fmriprep_func_parser(),
@@ -90,9 +97,9 @@
 #' Register a custom BIDS datatype
 #'
 #' Adds a new datatype to the bidser runtime registry so that
-#' \code{\link{bids_project}} will scan and parse its folder.  The five
+#' \code{\link{bids_project}} will scan and parse its folder.  The six
 #' built-in datatypes (\code{"func"}, \code{"anat"}, \code{"fmap"},
-#' \code{"funcprep"}, \code{"anatprep"}) can only be overwritten by passing
+#' \code{"dwi"}, \code{"funcprep"}, \code{"anatprep"}) can only be overwritten by passing
 #' \code{overwrite = TRUE}.
 #'
 #' @param name A non-empty character string naming the datatype.
