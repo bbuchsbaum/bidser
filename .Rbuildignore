@@ -44,3 +44,4 @@ repomix-output.xml
 ^vignettes/.*\.html$
 ^vendor($|/)
 ^data-raw$
+^\.planning$

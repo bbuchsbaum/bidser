@@ -809,6 +809,8 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmripre
   }
   legacy_has_fmriprep <- nzchar(legacy_prep_dir)
   
+  project_index_path <- .bidser_project_index_path(path, index_path)
+
   ret <- list(name=project_name,
               part_df=part_df,
               bids_tree = bids,
@@ -824,7 +826,8 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmripre
               has_fmriprep=legacy_has_fmriprep,
               prep_dir=legacy_prep_dir,
               requested_fmriprep = isTRUE(fmriprep),
-              index_path = .bidser_project_index_path(path, index_path),
+              index_path = project_index_path,
+              index_session_key = .bidser_new_index_session_key(path, project_index_path),
               index = NULL,
               index_state = NULL,
               has_index = FALSE,

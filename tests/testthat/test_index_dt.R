@@ -164,6 +164,90 @@ test_that("index persistence failures warn with context and keep session cache",
   )))
 })
 
+test_that("query_files is a snapshot by default and refresh=TRUE re-scans", {
+  fixture <- create_index_extensions_fixture()
+  on.exit(unlink(fixture, recursive = TRUE, force = TRUE), add = TRUE)
+
+  proj <- bids_project(fixture, derivatives = "auto")
+
+  bold <- file.path(
+    fixture, "sub-01", "func", "sub-01_task-rest_run-01_bold.nii.gz"
+  )
+  before <- query_files(proj, regex = "bold\\.nii\\.gz$", task = "rest", scope = "raw")
+  expect_equal(length(before), 1L)
+
+  # Remove the raw run after construction.
+  file.remove(bold)
+
+  # Default query is a snapshot: it still reports the file known at construction.
+  snapshot <- query_files(proj, regex = "bold\\.nii\\.gz$", task = "rest", scope = "raw")
+  expect_equal(length(snapshot), 1L)
+
+  # refresh = TRUE re-stats known files and drops the one removed from disk.
+  refreshed <- query_files(
+    proj, regex = "bold\\.nii\\.gz$", task = "rest", scope = "raw",
+    refresh = TRUE
+  )
+  expect_equal(length(refreshed), 0L)
+
+  # The refreshed state is retained in this project's session cache, so later
+  # default queries do not resurrect the construction-time snapshot.
+  after_refresh <- query_files(
+    proj, regex = "bold\\.nii\\.gz$", task = "rest", scope = "raw"
+  )
+  expect_equal(length(after_refresh), 0L)
+})
+
+test_that("query_files uses the project's own snapshot, not a path-shared cache", {
+  # Regression: two project objects on the same path must not share live query
+  # state. A second project built with a narrower scope must not corrupt the
+  # first project's query results.
+  fixture <- create_index_extensions_fixture()
+  on.exit(unlink(fixture, recursive = TRUE, force = TRUE), add = TRUE)
+
+  proj_full <- bids_project(fixture, derivatives = "auto")
+  # Constructing a derivatives-free project on the same path persists a
+  # narrower manifest to the same RDS path.
+  proj_none <- bids_project(fixture, derivatives = "none")
+  invisible(proj_none)
+
+  # proj_full must still see its derivative files.
+  deriv_hits <- query_files(
+    proj_full, regex = "bold\\.nii\\.gz$", scope = "derivatives"
+  )
+  expect_true(length(deriv_hits) >= 1L)
+  expect_true(all(grepl("desc-preproc", deriv_hits)))
+
+  deriv_refresh_hits <- query_files(
+    proj_full, regex = "bold\\.nii\\.gz$", scope = "derivatives",
+    refresh = TRUE
+  )
+  expect_true(length(deriv_refresh_hits) >= 1L)
+  expect_true(all(grepl("desc-preproc", deriv_refresh_hits)))
+})
+
+test_that("query_files honours index = 'none' and ignores a stale index file", {
+  # Regression: an index='none' project must query the live tree, not a leftover
+  # RDS index written by an earlier index='auto' run on the same path.
+  fixture <- create_index_extensions_fixture()
+  on.exit(unlink(fixture, recursive = TRUE, force = TRUE), add = TRUE)
+
+  # Build and persist an index (writes path/.bidser_index.rds).
+  proj_auto <- bids_project(fixture, derivatives = "auto", index = "auto")
+  invisible(query_files(proj_auto, regex = "bold\\.nii\\.gz$"))
+
+  # Add a new raw run, then open the dataset with index = "none".
+  new_run <- file.path(
+    fixture, "sub-01", "func", "sub-01_task-rest_run-02_bold.nii.gz"
+  )
+  file.create(new_run)
+  proj_none <- bids_project(fixture, derivatives = "auto", index = "none")
+
+  hits <- query_files(proj_none, regex = "bold\\.nii\\.gz$", task = "rest", scope = "raw")
+  # The live tree includes both runs; a stale RDS would report only one.
+  expect_equal(length(hits), 2L)
+})
+
 test_that("cached metadata is reused and invalidated when sidecars change", {
   fixture <- create_index_inheritance_fixture()
   on.exit(unlink(fixture$path, recursive = TRUE, force = TRUE), add = TRUE)

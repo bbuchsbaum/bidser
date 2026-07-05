@@ -1,3 +1,17 @@
+# bidser (development version)
+
+* Make `query_files()` reuse the index built when the project was constructed
+  instead of re-scanning the filesystem on every call. Repeated queries are now
+  roughly two orders of magnitude faster (an indexed lookup rather than a full
+  `stat` of the dataset on each query). The project is treated as a snapshot:
+  reconstruct it with `bids_project()` to pick up files added, changed, or
+  removed on disk. The new `refresh = TRUE` argument to `query_files()` re-stats
+  the files known to the project to pick up content changes or removals without
+  a full rebuild (newly added files still require reconstruction).
+  `query_files()` also now honours `index = "none"` and prefers each project's
+  own construction-time snapshot, so two project objects sharing a path no
+  longer perturb each other's query results.
+
 # bidser 0.4.0
 
 * Add `bids_entities()` for vectorized path-to-entity parsing, returning one

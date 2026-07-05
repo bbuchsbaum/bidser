@@ -588,6 +588,41 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
   rows
 }
 
+#' @keywords internal
+#' @noRd
+.bidser_query_index_state <- function(x, refresh = FALSE, persist = TRUE) {
+  if (isTRUE(refresh)) {
+    state <- .bidser_get_session_index_state(x)
+    if (is.null(state) && .bidser_is_index_state(x$index_state)) {
+      state <- x$index_state
+    }
+    if (is.null(state)) {
+      state <- .bidser_load_cached_index_state(x, refresh = FALSE, persist = FALSE)
+    }
+    if (is.null(state)) {
+      return(NULL)
+    }
+
+    refreshed <- .bidser_refresh_index_state(x, state)
+    state <- refreshed$state
+    if (isTRUE(persist) && isTRUE(refreshed$changed)) {
+      .bidser_persist_index_state(x, state)
+    } else {
+      .bidser_set_session_index_state(x, state)
+    }
+    return(state)
+  }
+
+  if (.bidser_has_index_session_key(x)) {
+    .bidser_get_session_index_state(x) %||%
+      x$index_state %||%
+      .bidser_load_cached_index_state(x, refresh = FALSE, persist = FALSE)
+  } else {
+    x$index_state %||%
+      .bidser_load_cached_index_state(x, refresh = FALSE, persist = FALSE)
+  }
+}
+
 #' @export
 #' @rdname query_files
 query_files.bids_project <- function(x, regex = ".*", full_path = FALSE,
@@ -597,7 +632,8 @@ query_files.bids_project <- function(x, regex = ".*", full_path = FALSE,
                                      pipeline = NULL,
                                      return = c("paths", "tibble"),
                                      use_index = c("auto", "never"),
-                                     strict = TRUE, ...) {
+                                     strict = TRUE,
+                                     refresh = FALSE, ...) {
   match_mode <- match.arg(match_mode)
   scope <- match.arg(scope)
   return <- match.arg(return)
@@ -658,8 +694,17 @@ query_files.bids_project <- function(x, regex = ".*", full_path = FALSE,
 
   pipeline <- if (is.null(pipeline)) NULL else as.character(pipeline)
 
-  cached_state <- if (identical(use_index, "auto")) {
-    .bidser_load_cached_index_state(x, refresh = TRUE, persist = TRUE)
+  # Honour a project built with index = "none": it opted out of the persisted
+  # index, so queries use the in-memory tree rather than a (possibly stale or
+  # foreign) cached index file on the same path.
+  index_disabled <- identical(x$index_mode %||% "auto", "none")
+
+  cached_state <- if (identical(use_index, "auto") && !index_disabled) {
+    # Default fast path: reuse this project's construction-time index without
+    # re-scanning. `refresh = TRUE` re-stats known files and stores the refreshed
+    # state in this project's session cache, so later default queries do not
+    # resurrect the original carried snapshot.
+    .bidser_query_index_state(x, refresh = refresh, persist = TRUE)
   } else {
     NULL
   }
@@ -728,11 +773,14 @@ query_files.mock_bids_project <- function(x, regex = ".*", full_path = FALSE,
                                           pipeline = NULL,
                                           return = c("paths", "tibble"),
                                           use_index = c("auto", "never"),
-                                          strict = TRUE, ...) {
+                                          strict = TRUE,
+                                          refresh = FALSE, ...) {
   match_mode <- match.arg(match_mode)
   scope <- match.arg(scope)
   return <- match.arg(return)
   use_index <- match.arg(use_index)
+  # `refresh` is accepted for signature parity with the bids_project method;
+  # mock projects are in-memory, so there is no on-disk index to refresh.
 
   # Rescue formulas from positional slots (regex, full_path, strict) into dots_all
   dots_all <- list(...)

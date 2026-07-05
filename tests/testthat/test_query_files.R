@@ -20,6 +20,26 @@ make_query_mock_project <- function() {
   )
 }
 
+make_query_strict_project <- function() {
+  tmp <- tempfile("bidser_query_strict_")
+  dir.create(file.path(tmp, "sub-01", "anat"), recursive = TRUE)
+  dir.create(file.path(tmp, "sub-01", "func"), recursive = TRUE)
+  readr::write_tsv(
+    tibble::tibble(participant_id = "sub-01"),
+    file.path(tmp, "participants.tsv")
+  )
+  jsonlite::write_json(
+    list(Name = "QueryStrict", BIDSVersion = "1.8.0"),
+    file.path(tmp, "dataset_description.json"),
+    auto_unbox = TRUE
+  )
+  invisible(file.create(file.path(tmp, "sub-01", "anat", "sub-01_T1w.nii.gz")))
+  invisible(file.create(
+    file.path(tmp, "sub-01", "func", "sub-01_task-rest_bold.nii.gz")
+  ))
+  tmp
+}
+
 test_that("query_files supports exact and regex entity matching", {
   mock_proj <- make_query_mock_project()
 
@@ -107,4 +127,62 @@ test_that("query_files supports raw vs derivatives scope", {
   expect_true(length(deriv_hits) > 0)
   expect_true(all(!startsWith(raw_hits, paste0(mock_proj$prep_dir, "/"))))
   expect_true(all(startsWith(deriv_hits, paste0(mock_proj$prep_dir, "/"))))
+})
+
+test_that("query_files preserves positional strict argument for bids_project", {
+  fixture <- make_query_strict_project()
+  on.exit(unlink(fixture, recursive = TRUE, force = TRUE), add = TRUE)
+  proj <- bids_project(fixture, derivatives = "none", index = "none")
+
+  named <- query_files(
+    proj,
+    regex = "\\.nii\\.gz$",
+    task = "rest",
+    use_index = "never",
+    strict = FALSE
+  )
+  positional <- query_files(
+    proj,
+    "\\.nii\\.gz$",
+    FALSE,
+    "regex",
+    FALSE,
+    "all",
+    NULL,
+    "paths",
+    "never",
+    FALSE,
+    task = "rest"
+  )
+
+  expect_equal(sort(positional), sort(named))
+  expect_equal(length(positional), 2L)
+})
+
+test_that("query_files preserves positional strict argument for mock projects", {
+  mock_proj <- make_query_mock_project()
+
+  named <- query_files(
+    mock_proj,
+    regex = "\\.nii\\.gz$",
+    task = "taskA",
+    scope = "raw",
+    strict = FALSE
+  )
+  positional <- query_files(
+    mock_proj,
+    "\\.nii\\.gz$",
+    FALSE,
+    "regex",
+    FALSE,
+    "raw",
+    NULL,
+    "paths",
+    "auto",
+    FALSE,
+    task = "taskA"
+  )
+
+  expect_equal(sort(positional), sort(named))
+  expect_equal(length(positional), 2L)
 })

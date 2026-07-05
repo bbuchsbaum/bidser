@@ -148,7 +148,38 @@
 
 #' @keywords internal
 #' @noRd
+.bidser_new_index_session_key <- function(path, index_path = NULL) {
+  counter <- get0(
+    ".bidser_index_session_counter",
+    envir = bidser_pkg_env,
+    inherits = FALSE,
+    ifnotfound = 0L
+  )
+  counter <- as.integer(counter) + 1L
+  assign(".bidser_index_session_counter", counter, envir = bidser_pkg_env)
+
+  paste(
+    normalizePath(path, winslash = "/", mustWork = FALSE),
+    as.character(index_path %||% ""),
+    counter,
+    sep = "::"
+  )
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_has_index_session_key <- function(x) {
+  key <- x$index_session_key %||% ""
+  is.character(key) && length(key) == 1L && nzchar(key)
+}
+
+#' @keywords internal
+#' @noRd
 .bidser_index_cache_key <- function(x) {
+  if (.bidser_has_index_session_key(x)) {
+    return(x$index_session_key)
+  }
+
   paste(normalizePath(x$path, winslash = "/", mustWork = FALSE), x$index_path %||% "", sep = "::")
 }
 
