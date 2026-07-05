@@ -22,6 +22,7 @@ query_files(
   return = c("paths", "tibble"),
   use_index = c("auto", "never"),
   strict = TRUE,
+  refresh = FALSE,
   ...
 )
 
@@ -37,6 +38,7 @@ query_files(
   return = c("paths", "tibble"),
   use_index = c("auto", "never"),
   strict = TRUE,
+  refresh = FALSE,
   ...
 )
 ```
@@ -111,6 +113,17 @@ query_files(
 
   Passed through to search methods. If `TRUE`, missing queried entities
   typically fail matching (except wildcard behavior in legacy paths).
+
+- refresh:
+
+  If `FALSE` (default), reuse the index built when the project was
+  created without re-scanning the filesystem, which makes repeated
+  queries fast (comparable to an indexed lookup). Set `TRUE` to re-stat
+  the files known to the project and pick up changes to their contents
+  or their removal from disk. Newly *added* files are not detected by
+  `refresh` (the file list is fixed at construction); to see added
+  files, rebuild the project with
+  [`bids_project()`](https://bbuchsbaum.github.io/bidser/reference/bids_project.md).
 
 ## Value
 
