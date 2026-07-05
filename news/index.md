@@ -30,6 +30,11 @@
   [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
   honour `strict = TRUE` for missing entity filters, so broad
   subject/task queries do not accidentally include root layout files.
+- Fix wildcard entity filters such as `task = ".*"` in fallback/no-index
+  [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
+  calls so they match indexed query semantics, and remove the unused
+  tree-derived manifest builder left behind by the filesystem-backed
+  manifest path.
 - Add raw DWI files as a built-in datatype, so
   [`bids_project()`](https://bbuchsbaum.github.io/bidser/reference/bids_project.md)
   and

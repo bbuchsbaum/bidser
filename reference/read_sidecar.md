@@ -118,6 +118,5 @@ tryCatch({
 })
 #> No matching JSON sidecar files found.
 #> No matching JSON sidecar files found.
-#> No matching JSON sidecar files found.
 # }
 ```
