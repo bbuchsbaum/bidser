@@ -94,9 +94,9 @@ tryCatch({
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })
-#> [1] "/tmp/RtmpbKM311/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_events.tsv"
-#> [2] "/tmp/RtmpbKM311/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_events.tsv"
-#> [3] "/tmp/RtmpbKM311/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_events.tsv"
+#> [1] "/tmp/RtmpMUz4rM/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_events.tsv"
+#> [2] "/tmp/RtmpMUz4rM/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_events.tsv"
+#> [3] "/tmp/RtmpMUz4rM/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_events.tsv"
 # }
 # \donttest{
 # Get event files for a specific subject and task

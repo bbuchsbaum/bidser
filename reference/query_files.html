@@ -155,11 +155,9 @@ entities typically fail matching (except wildcard behavior in legacy paths).</p>
 <dt id="arg-refresh">refresh<a class="anchor" aria-label="anchor" href="#arg-refresh"></a></dt>
 <dd><p>If <code>FALSE</code> (default), reuse the index built when the project
 was created without re-scanning the filesystem, which makes repeated
-queries fast (comparable to an indexed lookup). Set <code>TRUE</code> to re-stat the
-files known to the project and pick up changes to their contents or their
-removal from disk. Newly <em>added</em> files are not detected by <code>refresh</code>
-(the file list is fixed at construction); to see added files, rebuild the
-project with <code><a href="bids_project.html">bids_project()</a></code>.</p></dd>
+queries fast (comparable to an indexed lookup). Set <code>TRUE</code> to re-scan the
+manifest paths and re-stat files, picking up additions, content changes,
+and removals without rebuilding the project object.</p></dd>
 
 </dl></div>
     <div class="section level2">

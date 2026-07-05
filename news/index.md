@@ -7,19 +7,29 @@
   reuse the index built when the project was constructed instead of
   re-scanning the filesystem on every call. Repeated queries are now
   roughly two orders of magnitude faster (an indexed lookup rather than
-  a full `stat` of the dataset on each query). The project is treated as
-  a snapshot: reconstruct it with
-  [`bids_project()`](https://bbuchsbaum.github.io/bidser/reference/bids_project.md)
-  to pick up files added, changed, or removed on disk. The new
-  `refresh = TRUE` argument to
-  [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
-  re-stats the files known to the project to pick up content changes or
-  removals without a full rebuild (newly added files still require
-  reconstruction).
+  a full `stat` of the dataset on each query). The default query surface
+  is a snapshot; use `refresh = TRUE` to re-scan the manifest and pick
+  up additions, content changes, and removals without rebuilding the
+  project object.
   [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
   also now honours `index = "none"` and prefers each project’s own
   construction-time snapshot, so two project objects sharing a path no
   longer perturb each other’s query results.
+- Build the query manifest from a direct filesystem path scan instead of
+  only the parsed data tree. This keeps bidser’s tree-focused accessors
+  intact while making
+  [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
+  and broad
+  [`search_files()`](https://bbuchsbaum.github.io/bidser/reference/search_files.md)
+  see pybids-visible layout files such as `README`, `CHANGES`,
+  `dataset_description.json`, `participants.tsv`, `*_scans.tsv`, JSON
+  sidecars, root `.bval`/`.bvec` files, and extensionless files under
+  subject datatypes. On `ds005`, the raw file-count parity surface is
+  now 142/142 against vendored pybids.
+- Make indexed
+  [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
+  honour `strict = TRUE` for missing entity filters, so broad
+  subject/task queries do not accidentally include root layout files.
 - Add raw DWI files as a built-in datatype, so
   [`bids_project()`](https://bbuchsbaum.github.io/bidser/reference/bids_project.md)
   and
