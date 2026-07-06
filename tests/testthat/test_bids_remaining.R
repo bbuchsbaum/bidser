@@ -212,7 +212,7 @@ test_that("func_scans returns scans and filters work", {
   expect_true(all(grepl("bold\\.nii\\.gz$", scans)))
 
   # full_path = TRUE (default) should give absolute paths
-  expect_true(all(grepl(normalizePath(tmp), scans, fixed = TRUE)))
+  expect_true(all(grepl(normalizePath(tmp, winslash = "/"), scans, fixed = TRUE)))
 })
 
 test_that("func_scans full_path=FALSE returns relative paths", {
@@ -224,7 +224,7 @@ test_that("func_scans full_path=FALSE returns relative paths", {
 
   expect_true(length(scans) >= 2)
   # Relative paths should NOT contain the temp directory
-  expect_false(any(grepl(normalizePath(tmp), scans, fixed = TRUE)))
+  expect_false(any(grepl(normalizePath(tmp, winslash = "/"), scans, fixed = TRUE)))
 })
 
 test_that("func_scans filters by subid", {
@@ -302,7 +302,7 @@ test_that("preproc_scans with full_path=TRUE returns absolute paths", {
   scans <- preproc_scans(proj, full_path = TRUE)
 
   expect_true(!is.null(scans))
-  expect_true(all(grepl(normalizePath(tmp), scans, fixed = TRUE)))
+  expect_true(all(grepl(normalizePath(tmp, winslash = "/"), scans, fixed = TRUE)))
 })
 
 # ===========================================================================

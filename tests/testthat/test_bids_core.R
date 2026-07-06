@@ -415,7 +415,7 @@ test_that("search_files returns full paths when requested", {
 
   expect_true(length(bold_files) > 0)
   # Full paths should start with the project path
-  expect_true(all(startsWith(bold_files, normalizePath(tmp))))
+  expect_true(all(startsWith(bold_files, normalizePath(tmp, winslash = "/"))))
 })
 
 test_that("search_files filters by subid", {
