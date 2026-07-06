@@ -1,6 +1,6 @@
 # Changelog
 
-## bidser (development version)
+## bidser 0.5.0
 
 - Make
   [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
