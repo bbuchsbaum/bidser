@@ -276,3 +276,46 @@ test_that("read_sidecar supports inheritance mode", {
   expect_equal(inherited$Manufacturer[[1]], "RootVendor")
   expect_equal(inherited$RepetitionTime[[1]], 2.0)
 })
+
+test_that("read_sidecar inherit=TRUE surfaces inherited-only metadata per scan", {
+  # ds001-shaped fixture: a subject with BOLD scans but no file-level JSON,
+  # only a task-level sidecar. inherit = FALSE finds nothing for the subject;
+  # inherit = TRUE resolves the inherited RepetitionTime for each scan.
+  tmp <- tempfile("bidser_inherit_only_")
+  dir.create(file.path(tmp, "sub-01", "func"), recursive = TRUE)
+  on.exit(unlink(tmp, recursive = TRUE, force = TRUE), add = TRUE)
+
+  readr::write_tsv(
+    tibble::tibble(participant_id = "sub-01"),
+    file.path(tmp, "participants.tsv")
+  )
+  jsonlite::write_json(
+    list(Name = "inherit-only", BIDSVersion = "1.8.0"),
+    file.path(tmp, "dataset_description.json"),
+    auto_unbox = TRUE
+  )
+  file.create(file.path(tmp, "sub-01", "func",
+                        "sub-01_task-rest_run-01_bold.nii.gz"))
+  file.create(file.path(tmp, "sub-01", "func",
+                        "sub-01_task-rest_run-02_bold.nii.gz"))
+  # Only a task-level sidecar (no subject/file-level JSON).
+  jsonlite::write_json(
+    list(RepetitionTime = 2, TaskName = "rest"),
+    file.path(tmp, "task-rest_bold.json"),
+    auto_unbox = TRUE
+  )
+
+  proj <- bids_project(tmp)
+
+  direct <- suppressMessages(
+    read_sidecar(proj, subid = "01", task = "rest", inherit = FALSE)
+  )
+  inherited <- read_sidecar(proj, subid = "01", task = "rest", inherit = TRUE)
+
+  # No file-level JSON exists for sub-01, so the direct read is empty ...
+  expect_equal(nrow(direct), 0)
+  # ... but inheritance resolves the task-level RepetitionTime for each scan.
+  expect_equal(nrow(inherited), 2)
+  expect_true(all(inherited$RepetitionTime == 2))
+  expect_setequal(inherited$.run, c("01", "02"))
+})

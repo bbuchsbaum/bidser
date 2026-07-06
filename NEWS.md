@@ -1,5 +1,12 @@
 # bidser 0.5.0
 
+* `read_sidecar(inherit = TRUE)` now anchors on the imaging scans matching the
+  query and resolves each scan's effective metadata via BIDS inheritance,
+  returning one row per scan. Previously it anchored on JSON sidecar *files*, so
+  an inheritance-aware query for a subject whose scans only had higher-level
+  (task/dataset) sidecars returned an empty tibble. `inherit = FALSE` is
+  unchanged (one row per JSON file).
+
 * Windows: normalize project and resolved paths with forward slashes
   (`winslash = "/"`) so full paths returned by `query_files(full_path = TRUE)`,
   `func_scans()`, `n_volumes()`, and `resolve_bids_uri()` use a consistent
