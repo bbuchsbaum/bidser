@@ -1,4 +1,4 @@
-# bidser (development version)
+# bidser 0.5.0
 
 * Make `query_files()` reuse the index built when the project was constructed
   instead of re-scanning the filesystem on every call. Repeated queries are now
