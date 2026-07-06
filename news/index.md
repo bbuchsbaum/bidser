@@ -2,6 +2,16 @@
 
 ## bidser 0.5.0
 
+- Windows: normalize project and resolved paths with forward slashes
+  (`winslash = "/"`) so full paths returned by
+  `query_files(full_path = TRUE)`,
+  [`func_scans()`](https://bbuchsbaum.github.io/bidser/reference/func_scans.md),
+  [`n_volumes()`](https://bbuchsbaum.github.io/bidser/reference/n_volumes.md),
+  and
+  [`resolve_bids_uri()`](https://bbuchsbaum.github.io/bidser/reference/resolve_bids_uri.md)
+  use a consistent separator instead of mixing `\` and `/`. Fixes
+  several `R CMD check` test failures on Windows.
+
 - Make
   [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
   reuse the index built when the project was constructed instead of
@@ -15,6 +25,7 @@
   also now honours `index = "none"` and prefers each project’s own
   construction-time snapshot, so two project objects sharing a path no
   longer perturb each other’s query results.
+
 - Build the query manifest from a direct filesystem path scan instead of
   only the parsed data tree. This keeps bidser’s tree-focused accessors
   intact while making
@@ -26,21 +37,25 @@
   sidecars, root `.bval`/`.bvec` files, and extensionless files under
   subject datatypes. On `ds005`, the raw file-count parity surface is
   now 142/142 against vendored pybids.
+
 - Make indexed
   [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
   honour `strict = TRUE` for missing entity filters, so broad
   subject/task queries do not accidentally include root layout files.
+
 - Fix wildcard entity filters such as `task = ".*"` in fallback/no-index
   [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
   calls so they match indexed query semantics, and remove the unused
   tree-derived manifest builder left behind by the filesystem-backed
   manifest path.
+
 - Fix `require_entity = TRUE` being silently ignored on the indexed
   [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
   path when an entity filter used the `.*` wildcard (e.g.
   `task = ".*"`). It now requires the entity to be present as
   documented, matching the non-indexed path, so entity-less files (such
   as anatomical scans, which lack `task`) are correctly excluded.
+
 - Add raw DWI files as a built-in datatype, so
   [`bids_project()`](https://bbuchsbaum.github.io/bidser/reference/bids_project.md)
   and
@@ -49,21 +64,25 @@
   without user-side
   [`register_datatype()`](https://bbuchsbaum.github.io/bidser/reference/register_datatype.md)
   setup.
+
 - Speed up index construction by deriving manifest/sidecar entities
   directly from paths and by lazily ingesting JSON sidecar contents only
   when metadata APIs need them. This keeps query-oriented project
   construction focused on the file manifest while preserving indexed
   metadata inheritance on demand.
+
 - Speed up
   [`bids_project()`](https://bbuchsbaum.github.io/bidser/reference/bids_project.md)
   construction by replacing generic tree/table conversions and repeated
   tree searches with leaf-specific extractors, by using vectorized
   manifest row construction, and by trimming parser/directory-listing
   overhead in constructor hot paths.
+
 - Further speed up indexed
   [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
   by avoiding per-query manifest re-finalization and by applying indexed
   filters with a single logical mask.
+
 - Add `tools/benchmark-pybids-parity.R`, a repeatable local harness for
   comparing bidser construction/query timings and basic file-count
   parity against the vendored pybids checkout via `uv`.
