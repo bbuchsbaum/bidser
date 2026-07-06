@@ -83,7 +83,7 @@ mock_proj
 #> Datatypes:  func 
 #> Suffixes:  nii.gz, tsv 
 #> BIDS Keys:  (none) 
-#> Path:  /tmp/RtmpGqAGgH/bidser-mock-6b62223fff1c
+#> Path:  /tmp/Rtmp6fTvDE/bidser-mock-6b6b6cb4f1c5
 
 stopifnot(file.exists(file.path(mock_dir, "participants.tsv")))
 ```

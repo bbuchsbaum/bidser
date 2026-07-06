@@ -263,63 +263,55 @@ trial_counts
 
 ## Working with Metadata Sidecars
 
-BIDS stores acquisition metadata in JSON sidecars. `bidser` now supports
-both direct sidecar reads and inheritance-aware resolution following the
-BIDS inheritance principle.
+BIDS stores acquisition metadata in JSON sidecars. `ds001` keeps its
+acquisition metadata in a single task-level sidecar
+(`task-balloonanalogrisktask_bold.json`) that every run shares, rather
+than one sidecar per BOLD file.
+[`read_sidecar()`](https://bbuchsbaum.github.io/bidser/reference/read_sidecar.md)
+reads the sidecar files that actually exist:
 
 ``` r
 
-# Read sidecar rows directly
+# Read the task-level sidecar directly
 direct_sidecars <- read_sidecar(
   proj,
-  subid = "01",
   task = "balloonanalogrisktask",
   inherit = FALSE
 )
 
 nrow(direct_sidecars)
-#> [1] 0
-names(direct_sidecars)
-#> character(0)
+#> [1] 1
+direct_sidecars %>% select(any_of(c("RepetitionTime", "TaskName")))
+#> # A tibble: 1 × 2
+#>   RepetitionTime TaskName                
+#>            <dbl> <chr>                   
+#> 1              2 balloon analog risk task
 ```
 
-If you want the effective metadata for a scan after applying inherited
-sidecars from parent locations, use
-[`get_metadata()`](https://bbuchsbaum.github.io/bidser/reference/get_metadata.md)
-or set `inherit = TRUE` in
-[`read_sidecar()`](https://bbuchsbaum.github.io/bidser/reference/read_sidecar.md):
+To get the *effective* metadata for a specific scan, use
+[`get_metadata()`](https://bbuchsbaum.github.io/bidser/reference/get_metadata.md).
+It follows the BIDS inheritance principle and walks up from the file to
+task- and dataset-level sidecars, so even though `sub-01` has no
+file-level JSON of its own, the task-level `RepetitionTime` is resolved
+for its BOLD run:
 
 ``` r
 
-# Resolve metadata for a specific BOLD file with inheritance
+# Resolve effective metadata for a specific BOLD file
 resolved_meta <- get_metadata(proj, bold_files[[1]], inherit = TRUE)
 
-sort(names(resolved_meta))[1:8]
-#> [1] "RepetitionTime" "TaskName"       NA               NA              
-#> [5] NA               NA               NA               NA
+names(resolved_meta)
+#> [1] "RepetitionTime" "TaskName"
 resolved_meta$RepetitionTime
 #> [1] 2
-
-# Inheritance-aware sidecar table
-inherited_sidecars <- read_sidecar(
-  proj,
-  subid = "01",
-  task = "balloonanalogrisktask",
-  inherit = TRUE
-)
-
-if (nrow(inherited_sidecars) > 0) {
-  inherited_sidecars %>%
-    select(any_of(c("file", "RepetitionTime")))
-} else {
-  inherited_sidecars
-}
-#> # A tibble: 0 × 0
 ```
 
-This is useful when the metadata you need lives in a task- or
-dataset-level JSON sidecar instead of the most specific file-level
-sidecar.
+Use
+[`read_sidecar()`](https://bbuchsbaum.github.io/bidser/reference/read_sidecar.md)
+when you want the sidecar files themselves, and
+[`get_metadata()`](https://bbuchsbaum.github.io/bidser/reference/get_metadata.md)
+when you want the metadata that applies to a particular scan after
+inheritance.
 
 ## Working with Individual Subjects
 
@@ -579,9 +571,9 @@ When you need absolute paths for analysis tools:
 
 full_paths <- func_scans(proj, subid = "01", full_path = TRUE)
 full_paths
-#> [1] "/tmp/Rtmpz1x1hJ/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
-#> [2] "/tmp/Rtmpz1x1hJ/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
-#> [3] "/tmp/Rtmpz1x1hJ/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
+#> [1] "/tmp/RtmpLh6l1I/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
+#> [2] "/tmp/RtmpLh6l1I/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
+#> [3] "/tmp/RtmpLh6l1I/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
 
 all(file.exists(full_paths))
 #> [1] TRUE

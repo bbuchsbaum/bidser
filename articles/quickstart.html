@@ -336,55 +336,43 @@ fMRI analysis.</p>
 <div class="section level2">
 <h2 id="working-with-metadata-sidecars">Working with Metadata Sidecars<a class="anchor" aria-label="anchor" href="#working-with-metadata-sidecars"></a>
 </h2>
-<p>BIDS stores acquisition metadata in JSON sidecars.
-<code>bidser</code> now supports both direct sidecar reads and
-inheritance-aware resolution following the BIDS inheritance
-principle.</p>
+<p>BIDS stores acquisition metadata in JSON sidecars. <code>ds001</code>
+keeps its acquisition metadata in a single task-level sidecar
+(<code>task-balloonanalogrisktask_bold.json</code>) that every run
+shares, rather than one sidecar per BOLD file.
+<code><a href="../reference/read_sidecar.html">read_sidecar()</a></code> reads the sidecar files that actually
+exist:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Read sidecar rows directly</span></span>
+<code class="sourceCode R"><span><span class="co"># Read the task-level sidecar directly</span></span>
 <span><span class="va">direct_sidecars</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_sidecar.html">read_sidecar</a></span><span class="op">(</span></span>
 <span>  <span class="va">proj</span>,</span>
-<span>  subid <span class="op">=</span> <span class="st">"01"</span>,</span>
 <span>  task <span class="op">=</span> <span class="st">"balloonanalogrisktask"</span>,</span>
 <span>  inherit <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">direct_sidecars</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">direct_sidecars</span><span class="op">)</span></span>
-<span><span class="co">#&gt; character(0)</span></span></code></pre></div>
-<p>If you want the effective metadata for a scan after applying
-inherited sidecars from parent locations, use
-<code><a href="../reference/get_metadata.html">get_metadata()</a></code> or set <code>inherit = TRUE</code> in
-<code><a href="../reference/read_sidecar.html">read_sidecar()</a></code>:</p>
+<span><span class="co">#&gt; [1] 1</span></span>
+<span><span class="va">direct_sidecars</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"RepetitionTime"</span>, <span class="st">"TaskName"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
+<span><span class="co">#&gt;   RepetitionTime TaskName                </span></span>
+<span><span class="co">#&gt;            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>              2 balloon analog risk task</span></span></code></pre></div>
+<p>To get the <em>effective</em> metadata for a specific scan, use
+<code><a href="../reference/get_metadata.html">get_metadata()</a></code>. It follows the BIDS inheritance principle
+and walks up from the file to task- and dataset-level sidecars, so even
+though <code>sub-01</code> has no file-level JSON of its own, the
+task-level <code>RepetitionTime</code> is resolved for its BOLD run:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Resolve metadata for a specific BOLD file with inheritance</span></span>
+<code class="sourceCode R"><span><span class="co"># Resolve effective metadata for a specific BOLD file</span></span>
 <span><span class="va">resolved_meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">proj</span>, <span class="va">bold_files</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, inherit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">resolved_meta</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span></span>
-<span><span class="co">#&gt; [1] "RepetitionTime" "TaskName"       NA               NA              </span></span>
-<span><span class="co">#&gt; [5] NA               NA               NA               NA</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">resolved_meta</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "RepetitionTime" "TaskName"</span></span>
 <span><span class="va">resolved_meta</span><span class="op">$</span><span class="va">RepetitionTime</span></span>
-<span><span class="co">#&gt; [1] 2</span></span>
-<span></span>
-<span><span class="co"># Inheritance-aware sidecar table</span></span>
-<span><span class="va">inherited_sidecars</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_sidecar.html">read_sidecar</a></span><span class="op">(</span></span>
-<span>  <span class="va">proj</span>,</span>
-<span>  subid <span class="op">=</span> <span class="st">"01"</span>,</span>
-<span>  task <span class="op">=</span> <span class="st">"balloonanalogrisktask"</span>,</span>
-<span>  inherit <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">inherited_sidecars</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">inherited_sidecars</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"file"</span>, <span class="st">"RepetitionTime"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>  <span class="va">inherited_sidecars</span></span>
-<span><span class="op">}</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 0 × 0</span></span></span></code></pre></div>
-<p>This is useful when the metadata you need lives in a task- or
-dataset-level JSON sidecar instead of the most specific file-level
-sidecar.</p>
+<span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
+<p>Use <code><a href="../reference/read_sidecar.html">read_sidecar()</a></code> when you want the sidecar files
+themselves, and <code><a href="../reference/get_metadata.html">get_metadata()</a></code> when you want the metadata
+that applies to a particular scan after inheritance.</p>
 </div>
 <div class="section level2">
 <h2 id="working-with-individual-subjects">Working with Individual Subjects<a class="anchor" aria-label="anchor" href="#working-with-individual-subjects"></a>
@@ -623,9 +611,9 @@ workflows:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">full_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">"01"</span>, full_path <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">full_paths</span></span>
-<span><span class="co">#&gt; [1] "/tmp/Rtmpz1x1hJ/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
-<span><span class="co">#&gt; [2] "/tmp/Rtmpz1x1hJ/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
-<span><span class="co">#&gt; [3] "/tmp/Rtmpz1x1hJ/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/RtmpLh6l1I/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [2] "/tmp/RtmpLh6l1I/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [3] "/tmp/RtmpLh6l1I/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">full_paths</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
