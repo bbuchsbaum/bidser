@@ -1,4 +1,4 @@
-# Work With Derivatives and Confounds
+# Discovering and Querying Derivatives
 
 When a BIDS project already has derivatives, the first job is usually
 not data loading. It is figuring out which pipeline produced which
@@ -84,7 +84,12 @@ which file suffix, which scope, and which pipeline.
 
 [`read_confounds()`](https://bbuchsbaum.github.io/bidser/reference/read_confounds.md)
 reads the derivative table and returns a tibble that stays indexed by
-subject, task, run, and session.
+subject, task, run, and session. This vignette shows just enough to
+sanity-check a pipeline; for confound *sets*, PCA *strategies*, and the
+run-level
+[`variables_table()`](https://bbuchsbaum.github.io/bidser/reference/variables_table.md)
+bridge into modeling, see
+[`vignette("confounds-and-variables")`](https://bbuchsbaum.github.io/bidser/articles/confounds-and-variables.md).
 
 ``` r
 
@@ -178,7 +183,7 @@ report <- bids_report(
 
 report
 #> BIDS Report
-#> Project: bidser-deriv-69d91120b05a 
+#> Project: bidser-deriv-6b0b602b7d4c 
 #> Participants source: file 
 #> Subjects: 1 
 #> Sessions: 0 
@@ -194,7 +199,9 @@ report
 
 Use
 [`vignette("quickstart")`](https://bbuchsbaum.github.io/bidser/articles/quickstart.md)
-for raw BIDS inspection and
+for raw BIDS inspection,
+[`vignette("confounds-and-variables")`](https://bbuchsbaum.github.io/bidser/articles/confounds-and-variables.md)
+for confound sets, PCA strategies, and run-level modeling tables, and
 [`vignette("mock-bids")`](https://bbuchsbaum.github.io/bidser/articles/mock-bids.md)
 when you need a fully local project for tests, demos, or packaging
 workflows.

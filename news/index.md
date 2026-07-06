@@ -35,6 +35,12 @@
   calls so they match indexed query semantics, and remove the unused
   tree-derived manifest builder left behind by the filesystem-backed
   manifest path.
+- Fix `require_entity = TRUE` being silently ignored on the indexed
+  [`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
+  path when an entity filter used the `.*` wildcard (e.g.
+  `task = ".*"`). It now requires the entity to be present as
+  documented, matching the non-indexed path, so entity-less files (such
+  as anatomical scans, which lack `task`) are correctly excluded.
 - Add raw DWI files as a built-in datatype, so
   [`bids_project()`](https://bbuchsbaum.github.io/bidser/reference/bids_project.md)
   and

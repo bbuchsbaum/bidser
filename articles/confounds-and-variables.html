@@ -34,7 +34,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/quickstart.html">Getting Started with bidser</a></li>
-    <li><a class="dropdown-item" href="../articles/derivatives.html">Work With Derivatives and Confounds</a></li>
+    <li><a class="dropdown-item" href="../articles/derivatives.html">Discovering and Querying Derivatives</a></li>
     <li><a class="dropdown-item" href="../articles/mock-bids.html">Create Mock BIDS Projects for Tests and Examples</a></li>
     <li><a class="dropdown-item" href="../articles/confounds-and-variables.html">Working with Confounds and Variables</a></li>
   </ul>
@@ -89,7 +89,7 @@ vignette runs without network access.</p>
 <code class="sourceCode R"><span><span class="va">proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">temp_dir</span>, fmriprep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">proj</span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">BIDS Project Summary</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Project Name: </span> <span style="color: #00BBBB; font-weight: bold;">bids_confounds_vignette_54dd41868443</span> </span></span>
+<span><span class="co">#&gt; <span style="font-weight: bold;">Project Name: </span> <span style="color: #00BBBB; font-weight: bold;">bids_confounds_vignette_55f8f31213e</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Participants (n): </span> <span style="color: #00BB00; font-weight: bold;">2</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Participants Source: </span> <span style="color: #BBBB00;">file</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Tasks: </span> <span style="color: #BBBB00;">nback, rest</span> </span></span>
@@ -407,7 +407,7 @@ run-level coverage:</p>
 <code class="sourceCode R"><span><span class="va">report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_report.html">bids_report</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span>
 <span><span class="va">report</span></span>
 <span><span class="co">#&gt; BIDS Report</span></span>
-<span><span class="co">#&gt; Project: bids_confounds_vignette_54dd41868443 </span></span>
+<span><span class="co">#&gt; Project: bids_confounds_vignette_55f8f31213e </span></span>
 <span><span class="co">#&gt; Participants source: file </span></span>
 <span><span class="co">#&gt; Subjects: 2 </span></span>
 <span><span class="co">#&gt; Sessions: 0 </span></span>
@@ -487,6 +487,15 @@ is a sketch that extracts design-ready data for each run:</p>
 your design matrix with <code><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix()</a></code>, and fit your model
 – all in native R tibbles with no intermediate file-path
 bookkeeping.</p>
+</div>
+<div class="section level2">
+<h2 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
+</h2>
+<p>For discovering and querying derivative pipelines (which produced
+which files, and how to target one), see
+<code><a href="../articles/derivatives.html">vignette("derivatives")</a></code>. For raw BIDS inspection and the
+<code><a href="../reference/query_files.html">query_files()</a></code> matching modes, start with
+<code><a href="../articles/quickstart.html">vignette("quickstart")</a></code>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

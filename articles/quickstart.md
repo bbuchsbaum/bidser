@@ -457,7 +457,7 @@ task_annotated <- query_files(
   scope = "raw"
 )
 cat("Files with an explicit task entity:", length(task_annotated), "\n")
-#> Files with an explicit task entity: 80
+#> Files with an explicit task entity: 48
 
 # Filter by extension and datatype directly
 json_files <- query_files(proj, extension = "\\.json$")
@@ -579,9 +579,9 @@ When you need absolute paths for analysis tools:
 
 full_paths <- func_scans(proj, subid = "01", full_path = TRUE)
 full_paths
-#> [1] "/tmp/Rtmpcgovh0/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
-#> [2] "/tmp/Rtmpcgovh0/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
-#> [3] "/tmp/Rtmpcgovh0/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
+#> [1] "/tmp/Rtmplrjl1i/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
+#> [2] "/tmp/Rtmplrjl1i/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
+#> [3] "/tmp/Rtmplrjl1i/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
 
 all(file.exists(full_paths))
 #> [1] TRUE

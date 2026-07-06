@@ -26,7 +26,7 @@ vignette runs without network access.
 proj <- bids_project(temp_dir, fmriprep = TRUE)
 proj
 #> BIDS Project Summary 
-#> Project Name:  bids_confounds_vignette_54dd41868443 
+#> Project Name:  bids_confounds_vignette_55f8f31213e 
 #> Participants (n):  2 
 #> Participants Source:  file 
 #> Tasks:  nback, rest 
@@ -399,7 +399,7 @@ checks, pipeline discovery, and run-level coverage:
 report <- bids_report(proj)
 report
 #> BIDS Report
-#> Project: bids_confounds_vignette_54dd41868443 
+#> Project: bids_confounds_vignette_55f8f31213e 
 #> Participants source: file 
 #> Subjects: 2 
 #> Sessions: 0 
@@ -492,3 +492,13 @@ design matrix with
 [`model.matrix()`](https://rdrr.io/r/stats/model.matrix.html), and fit
 your model – all in native R tibbles with no intermediate file-path
 bookkeeping.
+
+## Next steps
+
+For discovering and querying derivative pipelines (which produced which
+files, and how to target one), see
+[`vignette("derivatives")`](https://bbuchsbaum.github.io/bidser/articles/derivatives.md).
+For raw BIDS inspection and the
+[`query_files()`](https://bbuchsbaum.github.io/bidser/reference/query_files.md)
+matching modes, start with
+[`vignette("quickstart")`](https://bbuchsbaum.github.io/bidser/articles/quickstart.md).
