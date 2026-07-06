@@ -651,9 +651,14 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
       length(raw_filters[[nm]]) == 1L &&
       identical(as.character(raw_filters[[nm]]), ".*")
 
-    if (isTRUE(wildcard_missing_ok)) {
+    if (isTRUE(require_entity)) {
+      # `require_entity` always demands the entity be present, even for a
+      # wildcard value like ".*" (which then means "present, any value").
+      # It must take precedence over `wildcard_missing_ok`.
+      keep <- keep & matches
+    } else if (isTRUE(wildcard_missing_ok)) {
       keep <- keep & (matches | !present)
-    } else if (isTRUE(require_entity) || isTRUE(strict)) {
+    } else if (isTRUE(strict)) {
       keep <- keep & matches
     } else {
       keep <- keep & (matches | !present)

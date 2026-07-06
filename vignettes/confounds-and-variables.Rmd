@@ -433,6 +433,12 @@ From here you would unnest the events and confounds columns, build your design
 matrix with `model.matrix()`, and fit your model -- all in native R tibbles
 with no intermediate file-path bookkeeping.
 
+## Next steps
+
+For discovering and querying derivative pipelines (which produced which files,
+and how to target one), see `vignette("derivatives")`. For raw BIDS inspection
+and the `query_files()` matching modes, start with `vignette("quickstart")`.
+
 ```{r cleanup, include = FALSE}
 unlink(temp_dir, recursive = TRUE)
 ```

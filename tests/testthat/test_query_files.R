@@ -107,6 +107,37 @@ test_that("query_files require_entity enforces entity presence", {
   expect_null(strict_presence)
 })
 
+test_that("query_files require_entity + wildcard is honored on the indexed path", {
+  # Regression: on a real on-disk project the indexed query path must respect
+  # require_entity even when the entity value is the ".*" wildcard. Previously
+  # the wildcard "do not require" branch overrode require_entity, leaking files
+  # (e.g. anat T1w) that lack the requested entity.
+  fixture <- make_query_strict_project()
+  on.exit(unlink(fixture, recursive = TRUE, force = TRUE), add = TRUE)
+  proj <- bids_project(fixture, derivatives = "none")
+
+  indexed <- query_files(
+    proj,
+    regex = "\\.nii\\.gz$",
+    task = ".*",
+    require_entity = TRUE,
+    scope = "raw"
+  )
+  never <- query_files(
+    proj,
+    regex = "\\.nii\\.gz$",
+    task = ".*",
+    require_entity = TRUE,
+    scope = "raw",
+    use_index = "never"
+  )
+
+  # Only the func BOLD file carries a task entity; the anat T1w must be excluded.
+  expect_equal(indexed, "sub-01/func/sub-01_task-rest_bold.nii.gz")
+  # Indexed and non-indexed paths must agree.
+  expect_equal(sort(indexed), sort(never))
+})
+
 test_that("query_files supports raw vs derivatives scope", {
   mock_proj <- make_query_mock_project()
 

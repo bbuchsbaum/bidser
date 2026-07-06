@@ -1,5 +1,5 @@
 ---
-title: Work With Derivatives and Confounds
+title: Discovering and Querying Derivatives
 output:
   rmarkdown::html_vignette:
     toc: yes
@@ -15,7 +15,7 @@ resource_files:
 - albers.js
 
 vignette: |
-  %\VignetteIndexEntry{Work With Derivatives and Confounds}
+  %\VignetteIndexEntry{Discovering and Querying Derivatives}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -47,7 +47,9 @@ cat(sprintf(
 ```{r theme-setup, include = FALSE}
 if (requireNamespace("ggplot2", quietly = TRUE) &&
     requireNamespace("albersdown", quietly = TRUE)) {
-  if (requireNamespace("ggplot2", quietly = TRUE) && requireNamespace("albersdown", quietly = TRUE)) ggplot2::theme_set(albersdown::theme_albers(family = params$family, preset = params$preset))
+  ggplot2::theme_set(
+    albersdown::theme_albers(family = params$family, preset = params$preset)
+  )
 }
 
 suppressPackageStartupMessages({
@@ -185,7 +187,10 @@ suffix, which scope, and which pipeline.
 ## How do you read and check confounds?
 
 `read_confounds()` reads the derivative table and returns a tibble that stays
-indexed by subject, task, run, and session.
+indexed by subject, task, run, and session. This vignette shows just enough to
+sanity-check a pipeline; for confound *sets*, PCA *strategies*, and the
+run-level `variables_table()` bridge into modeling, see
+`vignette("confounds-and-variables")`.
 
 ```{r read-confounds}
 confounds_flat <- read_confounds(
@@ -261,8 +266,10 @@ report
 
 ## Next Steps
 
-Use `vignette("quickstart")` for raw BIDS inspection and `vignette("mock-bids")`
-when you need a fully local project for tests, demos, or packaging workflows.
+Use `vignette("quickstart")` for raw BIDS inspection,
+`vignette("confounds-and-variables")` for confound sets, PCA strategies, and
+run-level modeling tables, and `vignette("mock-bids")` when you need a fully
+local project for tests, demos, or packaging workflows.
 
 ```{r cleanup, include = FALSE}
 unlink(deriv_fixture, recursive = TRUE, force = TRUE)
