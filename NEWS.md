@@ -1,5 +1,11 @@
 # bidser 0.5.0
 
+* Windows: normalize project and resolved paths with forward slashes
+  (`winslash = "/"`) so full paths returned by `query_files(full_path = TRUE)`,
+  `func_scans()`, `n_volumes()`, and `resolve_bids_uri()` use a consistent
+  separator instead of mixing `\` and `/`. Fixes several `R CMD check` test
+  failures on Windows.
+
 * Make `query_files()` reuse the index built when the project was constructed
   instead of re-scanning the filesystem on every call. Repeated queries are now
   roughly two orders of magnitude faster (an indexed lookup rather than a full

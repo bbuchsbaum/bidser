@@ -107,8 +107,9 @@ test_that("resolve_bids_uri with empty dataset_name resolves to parent_directory
 
   u        <- bids_uri("bids::sub-01/anat/T1w.nii.gz")
   resolved <- resolve_bids_uri(u, desc)
-  # normalizePath(td) resolves macOS /var -> /private/var because td exists
-  expected <- file.path(normalizePath(td), "sub-01/anat/T1w.nii.gz")
+  # normalizePath(td) resolves macOS /var -> /private/var because td exists;
+  # winslash = "/" keeps the separator consistent with resolve_bids_uri() on Windows
+  expected <- file.path(normalizePath(td, winslash = "/"), "sub-01/anat/T1w.nii.gz")
   expect_equal(as.character(resolved), expected)
 })
 
@@ -134,8 +135,9 @@ test_that("resolve_bids_uri uses DatasetLinks for named dataset", {
 
   u        <- bids_uri("bids:deriv1:sub-01/anat/T1w.nii.gz")
   resolved <- resolve_bids_uri(u, desc)
-  # normalizePath(link_dir) resolves macOS /var -> /private/var because link_dir exists
-  expected <- file.path(normalizePath(link_dir), "sub-01/anat/T1w.nii.gz")
+  # normalizePath(link_dir) resolves macOS /var -> /private/var because link_dir exists;
+  # winslash = "/" keeps the separator consistent with resolve_bids_uri() on Windows
+  expected <- file.path(normalizePath(link_dir, winslash = "/"), "sub-01/anat/T1w.nii.gz")
   expect_equal(as.character(resolved), expected)
 })
 

@@ -287,9 +287,10 @@ test_that("indexed full-path queries do not mutate the cached manifest", {
   )
   after <- bidser:::.bidser_get_session_index_state(proj)$manifest$path
 
-  expect_true(all(grepl(paste0("^", normalizePath(fixture)), full_hits)))
+  fixture_prefix <- normalizePath(fixture, winslash = "/")
+  expect_true(all(startsWith(full_hits, fixture_prefix)))
   expect_equal(after, before)
-  expect_false(any(grepl(paste0("^", normalizePath(fixture)), after)))
+  expect_false(any(startsWith(after, fixture_prefix)))
 })
 
 test_that("index persistence failures warn with context and keep session cache", {

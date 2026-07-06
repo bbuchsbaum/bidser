@@ -96,8 +96,8 @@ bids_transform <- function(x, transformer, pipeline_name, ...) {
   
   for (infile in files_to_transform) {
     # Preserve directory structure relative to project root
-    rel_path <- gsub(paste0("^", normalizePath(x$path), .Platform$file.sep), "", 
-                     normalizePath(infile), fixed = TRUE)
+    rel_path <- gsub(paste0("^", normalizePath(x$path, winslash = "/"), "/"), "",
+                     normalizePath(infile, winslash = "/"), fixed = TRUE)
     
     # Find subject directory part for derivatives structure
     path_parts <- strsplit(rel_path, .Platform$file.sep)[[1]]
@@ -678,7 +678,10 @@ bids_project <- function(path=".", fmriprep=FALSE, prep_dir="derivatives/fmripre
   derivatives <- match.arg(derivatives)
   index <- match.arg(index)
   
-  path <- normalizePath(path)
+  # Use forward slashes so full paths built as file.path(x$path, rel) stay
+  # consistent across platforms (Windows normalizePath() defaults to
+  # backslashes, which would produce mixed separators downstream).
+  path <- normalizePath(path, winslash = "/")
 
   x_desc <- tryCatch(
     read_dataset_description(path),

@@ -124,7 +124,7 @@ resolve_bids_uri.bids_uri <- function(uri, description, ..., must_exist = FALSE)
     base_path <- description$parent_directory
     resolved  <- file.path(base_path, uri$relative_path)
     raw_res   <- resolved
-    resolved  <- normalizePath(resolved, mustWork = must_exist)
+    resolved  <- normalizePath(resolved, winslash = "/", mustWork = must_exist)
   } else {
     links <- description$fields$DatasetLinks
     if (is.null(links) || !uri$dataset_name %in% names(links)) {
@@ -149,10 +149,10 @@ resolve_bids_uri.bids_uri <- function(uri, description, ..., must_exist = FALSE)
     }
 
     # Normalise link_val first (resolves symlinks when dir exists)
-    link_val <- normalizePath(link_val, mustWork = FALSE)
+    link_val <- normalizePath(link_val, winslash = "/", mustWork = FALSE)
     resolved <- file.path(link_val, uri$relative_path)
     raw_res  <- resolved
-    resolved <- normalizePath(resolved, mustWork = must_exist)
+    resolved <- normalizePath(resolved, winslash = "/", mustWork = must_exist)
   }
 
   attr(resolved, "raw_resolution") <- raw_res
