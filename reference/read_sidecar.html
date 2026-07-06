@@ -103,8 +103,13 @@ This is matched against the 'kind' field in parsed BIDS filenames.</p></dd>
 
 
 <dt id="arg-inherit">inherit<a class="anchor" aria-label="anchor" href="#arg-inherit"></a></dt>
-<dd><p>If TRUE, resolve metadata using BIDS inheritance across parent
-sidecars. If FALSE (default), read each JSON sidecar directly.</p></dd>
+<dd><p>Controls what the function anchors on:</p><ul><li><p><code>FALSE</code> (default): read each matching JSON sidecar <em>file</em> directly. One
+row per JSON file; <code>file</code> is the JSON path.</p></li>
+<li><p><code>TRUE</code>: resolve <em>effective</em> metadata per matching imaging <em>scan</em> using
+BIDS inheritance (<code><a href="get_metadata.html">get_metadata()</a></code>). One row per matching data file;
+<code>file</code> is the scan path. This surfaces task- and dataset-level sidecars
+that apply to a scan even when it has no file-level JSON of its own.</p></li>
+</ul></dd>
 
 
 <dt id="arg-inherit-scope">inherit_scope<a class="anchor" aria-label="anchor" href="#arg-inherit-scope"></a></dt>
@@ -119,12 +124,13 @@ sidecars. If FALSE (default), read each JSON sidecar directly.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble with one row per JSON file. Columns include:</p><ul><li><p><code>file</code>: the JSON file path</p></li>
+    <p>A tibble with one row per matched file (a JSON sidecar when
+<code>inherit = FALSE</code>, an imaging scan when <code>inherit = TRUE</code>). Columns include:</p><ul><li><p><code>file</code>: the sidecar (or scan) file path</p></li>
 <li><p><code>.subid</code>: subject ID extracted from filename</p></li>
 <li><p><code>.session</code>: session ID extracted from filename (if present)</p></li>
 <li><p><code>.task</code>: task name extracted from filename (if present)</p></li>
 <li><p><code>.run</code>: run number extracted from filename (if present)</p></li>
-<li><p>Additional columns for each top-level key in the JSON files
+<li><p>Additional columns for each resolved top-level metadata key
 If no files are found, returns an empty tibble.</p></li>
 </ul></div>
 

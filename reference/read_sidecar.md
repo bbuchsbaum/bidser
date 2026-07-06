@@ -58,8 +58,17 @@ read_sidecar(
 
 - inherit:
 
-  If TRUE, resolve metadata using BIDS inheritance across parent
-  sidecars. If FALSE (default), read each JSON sidecar directly.
+  Controls what the function anchors on:
+
+  - `FALSE` (default): read each matching JSON sidecar *file* directly.
+    One row per JSON file; `file` is the JSON path.
+
+  - `TRUE`: resolve *effective* metadata per matching imaging *scan*
+    using BIDS inheritance
+    ([`get_metadata()`](https://bbuchsbaum.github.io/bidser/reference/get_metadata.md)).
+    One row per matching data file; `file` is the scan path. This
+    surfaces task- and dataset-level sidecars that apply to a scan even
+    when it has no file-level JSON of its own.
 
 - inherit_scope:
 
@@ -76,9 +85,11 @@ read_sidecar(
 
 ## Value
 
-A tibble with one row per JSON file. Columns include:
+A tibble with one row per matched file (a JSON sidecar when
+`inherit = FALSE`, an imaging scan when `inherit = TRUE`). Columns
+include:
 
-- `file`: the JSON file path
+- `file`: the sidecar (or scan) file path
 
 - `.subid`: subject ID extracted from filename
 
@@ -88,7 +99,7 @@ A tibble with one row per JSON file. Columns include:
 
 - `.run`: run number extracted from filename (if present)
 
-- Additional columns for each top-level key in the JSON files If no
+- Additional columns for each resolved top-level metadata key If no
   files are found, returns an empty tibble.
 
 ## Examples
