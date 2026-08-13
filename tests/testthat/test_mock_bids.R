@@ -88,6 +88,28 @@ test_that("Mock BIDS project can be created", {
   expect_equal(mock_proj$prep_dir, "derivatives/mockprep")
 })
 
+test_that("create_mock_bids supports an empty file structure", {
+  empty_structure <- tibble::tibble(
+    subid = character(),
+    datatype = character(),
+    suffix = character(),
+    fmriprep = logical()
+  )
+
+  mock_proj <- create_mock_bids(
+    project_name = "EmptyMock",
+    participants = "01",
+    file_structure = empty_structure
+  )
+
+  expect_s3_class(mock_proj, "mock_bids_project")
+  expect_equal(mock_proj$name, "EmptyMock")
+  expect_equal(nrow(mock_proj$tbl), 0L)
+  expect_identical(mock_proj$subjects, character())
+  expect_false(mock_proj$has_sessions)
+  expect_false(mock_proj$has_fmriprep)
+})
+
 test_that("create_mock_bids accepts shorthand suffixes for stub datasets", {
   td <- tempfile("mock-bids-shorthand-")
   dir.create(td, recursive = TRUE)

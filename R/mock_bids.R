@@ -522,7 +522,7 @@ create_mock_bids <- function(project_name,
   generated_event_paths <- character() # Keep track of event files defined
   generated_confound_paths <- character() # Keep track of confound files defined
 
-  for (i in 1:nrow(file_structure)) {
+  for (i in seq_len(nrow(file_structure))) {
     row <- file_structure[i, ]
 
     # Extract all potential BIDS entities from the row
@@ -689,9 +689,11 @@ create_mock_bids <- function(project_name,
     if (row$fmriprep) {
         prep_dir_parts <- strsplit(prep_dir,"/")[[1]]
         # Check if path_parts start with prep_dir_parts and remove them
-        if (length(path_parts) >= length(prep_dir_parts) &&
-            all(path_parts[1:length(prep_dir_parts)] == prep_dir_parts)) {
-            path_parts <- path_parts[-(1:length(prep_dir_parts))]
+        prep_dir_index <- seq_along(prep_dir_parts)
+        if (length(prep_dir_parts) > 0L &&
+            length(path_parts) >= length(prep_dir_parts) &&
+            all(path_parts[prep_dir_index] == prep_dir_parts)) {
+            path_parts <- path_parts[-prep_dir_index]
         }
     }
 
