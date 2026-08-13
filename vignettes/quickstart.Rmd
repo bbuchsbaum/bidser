@@ -95,8 +95,9 @@ ds001_path <- tryCatch(
 )
 if (is.null(ds001_path)) {
   knitr::knit_exit("Example dataset not available.")
+} else {
+  proj <- bids_project(ds001_path)
 }
-proj <- bids_project(ds001_path)
 ```
 
 ```{r}

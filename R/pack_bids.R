@@ -915,7 +915,7 @@ list_pack_bids <- function(archive_path, verbose = TRUE) {
     # We need to extract to temp dir to get file sizes
     temp_extract <- tempfile("bids_list_")
     dir.create(temp_extract)
-    on.exit(unlink(temp_extract, recursive = TRUE))
+    on.exit(unlink(temp_extract, recursive = TRUE), add = TRUE)
     
     untar(archive_path, exdir = temp_extract)
     

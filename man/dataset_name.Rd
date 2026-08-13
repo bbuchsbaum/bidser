@@ -20,3 +20,15 @@ A character scalar.
 \description{
 Get fields from a BIDS dataset description
 }
+\examples{
+desc_dir <- tempfile("bids-description-")
+dir.create(desc_dir)
+writeLines(
+  '{"Name":"Example Dataset","BIDSVersion":"1.9.0","DatasetType":"raw"}',
+  file.path(desc_dir, "dataset_description.json")
+)
+desc <- read_dataset_description(desc_dir)
+dataset_name(desc)
+dataset_type(desc)
+unlink(desc_dir, recursive = TRUE)
+}
