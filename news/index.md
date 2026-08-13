@@ -2,6 +2,17 @@
 
 ## bidser 0.5.0
 
+CRAN release: 2026-07-06
+
+- Allow
+  [`create_mock_bids()`](https://bbuchsbaum.github.io/bidser/reference/create_mock_bids.md)
+  to construct an empty project when `file_structure` has the required
+  columns but zero rows.
+
+- Make the quickstart vignette exit cleanly when its example dataset
+  cannot be downloaded, instead of passing a missing path to
+  [`bids_project()`](https://bbuchsbaum.github.io/bidser/reference/bids_project.md).
+
 - `read_sidecar(inherit = TRUE)` now anchors on the imaging scans
   matching the query and resolves each scan’s effective metadata via
   BIDS inheritance, returning one row per scan. Previously it anchored
