@@ -1424,12 +1424,7 @@ key_match <- function(default=FALSE, ...) {
   }
 
   keep <- vapply(rel_paths, function(rel) {
-    parsed <- .bidser_parse_entities_from_path(rel)
-    encoded <- tryCatch(encode(basename(rel)), error = function(e) NULL)
-    if (is.null(encoded)) {
-      encoded <- list()
-    }
-    entities <- utils::modifyList(parsed, encoded, keep.null = TRUE)
+    entities <- .bidser_entities_from_path(rel)
 
     all(vapply(names(filters), function(key) {
       val <- entities[[key]]

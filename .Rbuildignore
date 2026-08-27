@@ -41,7 +41,7 @@ repomix-output.xml
 ^\.rcmdcheck_result\.rds$
 ^vendor$
 ^vendor/
-^vignettes/.*\.html$
+^vignettes/(confounds-and-variables|derivatives|mock-bids|quickstart)\.html$
 ^vendor($|/)
 ^data-raw$
 ^\.planning$

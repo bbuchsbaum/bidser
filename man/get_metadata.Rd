@@ -10,6 +10,7 @@ get_metadata(
   file,
   inherit = TRUE,
   scope = c("auto", "raw", "derivatives", "all"),
+  provenance = FALSE,
   ...
 )
 
@@ -18,6 +19,7 @@ get_metadata(
   file,
   inherit = TRUE,
   scope = c("auto", "raw", "derivatives", "all"),
+  provenance = FALSE,
   ...
 )
 }
@@ -36,10 +38,16 @@ get_metadata(
 \item \code{"all"}: allow full project ancestry
 }}
 
+\item{provenance}{If \code{TRUE}, return \code{list(metadata = ..., sources = ...)},
+where \code{sources} records the ordered sidecar paths, inheritance levels,
+precedence, and fields used to resolve the effective metadata. The default
+\code{FALSE} preserves the historical metadata-list return value.}
+
 \item{...}{Additional arguments for methods.}
 }
 \value{
-A named list of metadata fields.
+A named list of metadata fields, or a metadata/provenance object when
+\code{provenance = TRUE}.
 }
 \description{
 Retrieves JSON metadata for a target BIDS file. When \code{inherit = TRUE}, this

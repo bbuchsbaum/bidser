@@ -17,6 +17,9 @@ as \code{run} and \code{echo} to integer when possible.}
 }
 \value{
 A tibble with one row per input path. Missing entities are \code{NA}.
+In addition to BIDS entities, rows include \code{extension} (the complete file
+extension, including compound extensions such as \code{.nii.gz}) and \code{datatype}
+when it can be inferred from a registered datatype folder.
 }
 \description{
 \code{bids_entities()} is the vectorized counterpart to \code{\link[=encode]{encode()}}. It accepts a
