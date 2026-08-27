@@ -102,9 +102,9 @@ tryCatch({
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })
-#> [1] "/tmp/Rtmplt9gpa/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
-#> [2] "/tmp/Rtmplt9gpa/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
-#> [3] "/tmp/Rtmplt9gpa/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
+#> [1] "/tmp/Rtmphl7dxT/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
+#> [2] "/tmp/Rtmphl7dxT/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
+#> [3] "/tmp/Rtmphl7dxT/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
 # }
 # \donttest{
 tryCatch({
