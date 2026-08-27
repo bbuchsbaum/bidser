@@ -787,8 +787,13 @@ query_files <- function(x, ...) {
 #'   - `"raw"`: raw data inheritance
 #'   - `"derivatives"`: derivatives inheritance
 #'   - `"all"`: allow full project ancestry
+#' @param provenance If `TRUE`, return `list(metadata = ..., sources = ...)`,
+#'   where `sources` records the ordered sidecar paths, inheritance levels,
+#'   precedence, and fields used to resolve the effective metadata. The default
+#'   `FALSE` preserves the historical metadata-list return value.
 #' @param ... Additional arguments for methods.
-#' @return A named list of metadata fields.
+#' @return A named list of metadata fields, or a metadata/provenance object when
+#'   `provenance = TRUE`.
 #' @export
 #' @rdname get_metadata
 #' @examples
@@ -801,7 +806,9 @@ query_files <- function(x, ...) {
 #'   # Example datasets are cached; leave the cache in place.
 #' }, error = function(e) message("Example requires internet: ", e$message))
 #' }
-get_metadata <- function(x, file, inherit = TRUE, scope = c("auto", "raw", "derivatives", "all"), ...) {
+get_metadata <- function(x, file, inherit = TRUE,
+                         scope = c("auto", "raw", "derivatives", "all"),
+                         provenance = FALSE, ...) {
   UseMethod("get_metadata", x)
 }
 

@@ -141,6 +141,44 @@ test_that("get_metadata applies inheritance with nearest-file precedence", {
   expect_equal(meta$FlipAngle, 90)
 })
 
+test_that("get_metadata exposes deterministic field-level provenance", {
+  fixture <- create_inheritance_fixture()
+  on.exit(unlink(fixture$path, recursive = TRUE, force = TRUE), add = TRUE)
+
+  proj <- bids_project(fixture$path)
+  result <- get_metadata(
+    proj, fixture$run1, inherit = TRUE, provenance = TRUE
+  )
+
+  expect_named(result, c("metadata", "sources"))
+  expect_equal(result$metadata$RepetitionTime, 2.0)
+  expect_true(length(result$sources) >= 3L)
+  expect_identical(
+    vapply(result$sources, `[[`, integer(1), "precedence"),
+    seq_along(result$sources)
+  )
+  expect_true(all(vapply(result$sources, function(source) {
+    all(c("path", "inheritance_level", "precedence", "fields") %in% names(source))
+  }, logical(1))))
+  expect_true(all(vapply(result$sources, function(source) {
+    !grepl("^/", source$path)
+  }, logical(1))))
+
+  rt_sources <- result$sources[vapply(result$sources, function(source) {
+    "RepetitionTime" %in% source$fields
+  }, logical(1))]
+  winner <- rt_sources[[which.max(vapply(
+    rt_sources, `[[`, integer(1), "precedence"
+  ))]]
+  expect_equal(winner$inheritance_level, "run")
+  expect_match(winner$path, "run-01_bold[.]json$")
+
+  repeated <- get_metadata(
+    proj, fixture$run1, inherit = TRUE, provenance = TRUE
+  )
+  expect_identical(repeated, result)
+})
+
 test_that("get_metadata falls back to less specific sidecars when run-level is absent", {
   fixture <- create_inheritance_fixture()
   on.exit(unlink(fixture$path, recursive = TRUE, force = TRUE), add = TRUE)

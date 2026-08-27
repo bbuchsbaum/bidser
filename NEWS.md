@@ -1,3 +1,14 @@
+# bidser 0.5.1
+
+* Parse `.lna.h5` as one compound extension and derive entities, extension,
+  datatype, and type through the same path for `bids_entities()`, persisted
+  indexes, indexed queries, and filesystem fallback. Compound extensions are
+  extensible with `options(bidser.compound_extensions = ...)`, and datatype
+  folder recognition now follows the runtime datatype registry.
+* Add `get_metadata(..., provenance = TRUE)` as a backward-compatible public
+  mode returning effective metadata plus the ordered sidecar path, inheritance
+  level, precedence, and field coverage used to resolve it.
+
 # bidser 0.5.0
 
 * Allow `create_mock_bids()` to construct an empty project when

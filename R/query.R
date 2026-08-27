@@ -267,12 +267,12 @@
   }
 
   fname <- basename(rel)
-  stem <- sub(
-    "\\.(nii\\.gz|tsv\\.gz|json|nii|tsv|csv|txt|h5|gii|bval|bvec)$",
-    "",
-    fname,
-    ignore.case = TRUE
-  )
+  extension <- .bidser_extract_extension(fname)
+  stem <- if (nzchar(extension)) {
+    substr(fname, 1L, nchar(fname) - nchar(extension))
+  } else {
+    fname
+  }
 
   parts <- strsplit(stem, "_", fixed = TRUE)[[1]]
   if (length(parts) == 0L) {
@@ -311,22 +311,47 @@
   entities
 }
 
+#' Build the canonical path-derived entity record
+#'
+#' This is the single derivation boundary shared by the public entity parser,
+#' filesystem fallback, and persisted index. `suffix` retains bidser's legacy
+#' meaning (the filename extension without its leading dot); `kind` is the BIDS
+#' suffix and `extension` is the complete filename extension.
+#'
+#' @keywords internal
+#' @noRd
+.bidser_entities_from_path <- function(path) {
+  parsed <- .bidser_parse_entities_from_path(path)
+  encoded <- tryCatch(encode(basename(path)), error = function(e) NULL)
+  if (is.null(encoded)) {
+    encoded <- list()
+  }
+
+  # Generic path parsing is authoritative for the filename/path entities. The
+  # registered parser may contribute richer legacy names such as `acquisition`.
+  entities <- utils::modifyList(encoded, parsed, keep.null = TRUE)
+  extension <- .bidser_extract_extension(path)
+  datatype <- .bidser_extract_datatype(path)
+
+  if (is.null(entities$suffix) && nzchar(extension)) {
+    entities$suffix <- sub("^\\.", "", extension)
+  }
+  entities$extension <- if (nzchar(extension)) extension else NA_character_
+  entities$datatype <- datatype
+  if (!is.na(datatype) && nzchar(datatype)) {
+    entities$type <- datatype
+  } else if (is.null(entities$type)) {
+    entities$type <- NA_character_
+  }
+
+  entities
+}
+
 #' @keywords internal
 #' @noRd
 .bidser_index_entities_from_path <- function(x, rel_path) {
   rel_path <- .bidser_to_relative_path(x$path, rel_path)
-  entities <- .bidser_parse_entities_from_path(rel_path)
-  extension <- .bidser_extract_extension(rel_path)
-  datatype <- .bidser_extract_datatype(rel_path)
-
-  if (is.null(entities$suffix) && !is.na(extension) && nzchar(extension)) {
-    entities$suffix <- sub("^\\.", "", extension)
-  }
-  if (is.null(entities$type) && !is.na(datatype) && nzchar(datatype)) {
-    entities$type <- datatype
-  }
-
-  entities
+  .bidser_entities_from_path(rel_path)
 }
 
 #' Parse BIDS entities from paths into a tibble
@@ -341,6 +366,9 @@
 #' @param coerce Logical. If `TRUE` (default), coerce numeric BIDS entities such
 #'   as `run` and `echo` to integer when possible.
 #' @return A tibble with one row per input path. Missing entities are `NA`.
+#'   In addition to BIDS entities, rows include `extension` (the complete file
+#'   extension, including compound extensions such as `.nii.gz` and `.lna.h5`)
+#'   and `datatype` when it can be inferred from a registered datatype folder.
 #' @export
 #' @examples
 #' bids_entities(c(
@@ -354,12 +382,7 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
   paths <- as.character(paths)
 
   rows <- lapply(paths, function(path) {
-    parsed <- .bidser_parse_entities_from_path(path)
-    encoded <- tryCatch(encode(basename(path)), error = function(e) NULL)
-    if (is.null(encoded)) {
-      encoded <- list()
-    }
-    utils::modifyList(parsed, encoded, keep.null = TRUE)
+    .bidser_entities_from_path(path)
   })
 
   entity_names <- unique(unlist(lapply(rows, names), use.names = FALSE))
@@ -401,8 +424,29 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
 #' @noRd
 .bidser_extract_extension <- function(path) {
   fname <- basename(path)
-  if (grepl("\\.nii\\.gz$", fname, ignore.case = TRUE)) return(".nii.gz")
-  if (grepl("\\.tsv\\.gz$", fname, ignore.case = TRUE)) return(".tsv.gz")
+  registered <- tryCatch({
+    reg <- .bidser_get_registry()
+    unlist(lapply(reg$datatypes, function(entry) {
+      kinds <- entry$spec$kinds
+      if (is.null(kinds) || !"suffix" %in% names(kinds)) {
+        return(character(0))
+      }
+      unlist(kinds$suffix, use.names = FALSE)
+    }), use.names = FALSE)
+  }, error = function(e) character(0))
+  configured <- getOption("bidser.compound_extensions", character(0))
+  extensions <- unique(c(".lna.h5", configured, registered, ".nii.gz", ".tsv.gz"))
+  extensions <- as.character(extensions)
+  extensions <- extensions[!is.na(extensions) & nzchar(extensions)]
+  extensions <- ifelse(startsWith(extensions, "."), extensions, paste0(".", extensions))
+  extensions <- extensions[order(nchar(extensions), decreasing = TRUE)]
+
+  lower_fname <- tolower(fname)
+  for (extension in extensions) {
+    if (endsWith(lower_fname, tolower(extension))) {
+      return(tolower(extension))
+    }
+  }
   m <- regmatches(fname, regexpr("\\.[^.]+$", fname))
   if (length(m) == 1L) m else ""
 }
@@ -411,8 +455,13 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
 #' @noRd
 .bidser_extract_datatype <- function(path) {
   pieces <- strsplit(gsub("\\\\", "/", as.character(path)), "/", fixed = TRUE)[[1]]
-  known <- c("anat", "func", "fmap", "dwi", "perf", "meg", "eeg", "ieeg", "beh", "pet", "micr")
-  found <- intersect(pieces, known)
+  registered <- tryCatch({
+    reg <- .bidser_get_registry()
+    vapply(reg$datatypes, function(entry) as.character(entry$folder[[1]]), character(1))
+  }, error = function(e) character(0))
+  standard <- c("anat", "func", "fmap", "dwi", "perf", "meg", "eeg", "ieeg", "beh", "pet", "micr")
+  known <- unique(c(registered, standard))
+  found <- pieces[pieces %in% known]
   if (length(found) > 0) found[[length(found)]] else NA_character_
 }
 
@@ -537,7 +586,7 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
 
 #' @keywords internal
 #' @noRd
-.bidser_index_rows_base <- function(x, rel_paths, file_info = NULL) {
+.bidser_index_rows_base <- function(x, rel_paths, file_info = NULL, entity_rows = NULL) {
   rel_paths <- as.character(rel_paths %||% character(0))
   rel_paths <- rel_paths[nzchar(rel_paths)]
   if (length(rel_paths) == 0L) {
@@ -547,6 +596,9 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
   if (is.null(file_info)) {
     file_info <- file.info(file.path(x$path, rel_paths))
   }
+  if (is.null(entity_rows)) {
+    entity_rows <- lapply(rel_paths, .bidser_entities_from_path)
+  }
   pipelines <- .bidser_path_pipelines(x, rel_paths)
 
   data.table::data.table(
@@ -554,8 +606,8 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
     file = basename(rel_paths),
     scope = ifelse(is.na(pipelines), "raw", "derivatives"),
     pipeline = pipelines,
-    extension = vapply(rel_paths, .bidser_extract_extension, character(1), USE.NAMES = FALSE),
-    datatype = vapply(rel_paths, .bidser_extract_datatype, character(1), USE.NAMES = FALSE),
+    extension = vapply(entity_rows, function(record) record$extension[[1]], character(1)),
+    datatype = vapply(entity_rows, function(record) record$datatype[[1]], character(1)),
     size = as.numeric(file_info$size),
     file_mtime = as.numeric(file_info$mtime)
   )
@@ -578,7 +630,9 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
     .bidser_index_entities_from_path(x, p)
   })
   fields <- .bidser_index_entity_fields()
-  dt <- .bidser_index_rows_base(x, rel_paths, file_info = file_info)
+  dt <- .bidser_index_rows_base(
+    x, rel_paths, file_info = file_info, entity_rows = entity_rows
+  )
 
   for (field in fields) {
     dt[[field]] <- vapply(entity_rows, function(entity_info) {
@@ -1071,12 +1125,51 @@ query_files.mock_bids_project <- function(x, regex = ".*", full_path = FALSE,
   }, logical(1)))
 }
 
+#' @keywords internal
+#' @noRd
+.bidser_metadata_inheritance_level <- function(path) {
+  entities <- .bidser_parse_entities_from_path(path)
+  if (!is.null(entities$run)) return("run")
+  if (!is.null(entities$acq) || !is.null(entities$acquisition)) {
+    return("acquisition")
+  }
+  if (!is.null(entities$task)) return("task")
+  datatype <- .bidser_extract_datatype(path)
+  if (!is.na(datatype)) return("datatype")
+  if (!is.null(entities$session)) return("session")
+  if (!is.null(entities$subid)) return("subject")
+  "dataset"
+}
+
+#' @keywords internal
+#' @noRd
+.bidser_metadata_result <- function(metadata, source_records, provenance) {
+  if (!isTRUE(provenance)) return(metadata)
+  source_records <- source_records[vapply(source_records, function(source) {
+    length(names(source$data)) > 0L
+  }, logical(1))]
+  sources <- lapply(seq_along(source_records), function(i) {
+    source <- source_records[[i]]
+    list(
+      path = source$path,
+      inheritance_level = .bidser_metadata_inheritance_level(source$path),
+      precedence = as.integer(i),
+      fields = sort(names(source$data))
+    )
+  })
+  list(metadata = metadata, sources = sources)
+}
+
 #' @export
 #' @rdname get_metadata
 get_metadata.bids_project <- function(x, file, inherit = TRUE,
-                                      scope = c("auto", "raw", "derivatives", "all"), ...) {
+                                      scope = c("auto", "raw", "derivatives", "all"),
+                                      provenance = FALSE, ...) {
   if (missing(file) || !is.character(file) || length(file) != 1L || !nzchar(file)) {
     stop("`file` must be a single non-empty character path.")
+  }
+  if (!is.logical(provenance) || length(provenance) != 1L || is.na(provenance)) {
+    stop("`provenance` must be TRUE or FALSE.")
   }
 
   file_abs <- if (.bidser_is_absolute_path(file)) {
@@ -1122,7 +1215,7 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
     }
 
     if (!file.exists(json_path)) {
-      return(list())
+      return(.bidser_metadata_result(list(), list(), provenance))
     }
 
     direct_meta <- NULL
@@ -1144,16 +1237,23 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
     }
 
     if (is.null(direct_meta) || !is.list(direct_meta)) {
-      return(list())
+      return(.bidser_metadata_result(list(), list(), provenance))
     }
-    return(direct_meta)
+    return(.bidser_metadata_result(
+      direct_meta,
+      list(list(
+        path = .bidser_to_relative_path(x$path, json_path),
+        data = direct_meta
+      )),
+      provenance
+    ))
   }
 
   resolved_scope <- .bidser_resolve_metadata_scope(x, file_rel, scope = scope)
   scope_root <- .bidser_metadata_scope_root(x, resolved_scope)
   target_dir <- dirname(file_abs)
 
-  if (!is.null(index_state)) {
+  if (!is.null(index_state) && !isTRUE(provenance)) {
     cached <- .bidser_lookup_resolved_meta(index_state, file_rel, resolved_scope)
     if (!is.null(cached)) {
       return(cached)
@@ -1162,7 +1262,7 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
 
   ancestry <- .bidser_ancestor_chain(target_dir, scope_root)
   if (length(ancestry) == 0) {
-    return(list())
+    return(.bidser_metadata_result(list(), list(), provenance))
   }
 
   candidates <- list()
@@ -1187,6 +1287,7 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
       ord <- order(candidate_depth, candidate_specificity, candidate_paths)
       deps <- character(0)
       merged <- list()
+      source_records <- list()
       for (i in ord) {
         idx <- candidate_idx[[i]]
         candidate_meta <- sidecars$data[[idx]]
@@ -1195,6 +1296,9 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
         }
         merged <- utils::modifyList(merged, candidate_meta, keep.null = TRUE)
         deps <- c(deps, sidecars$path[[idx]])
+        source_records[[length(source_records) + 1L]] <- list(
+          path = sidecars$path[[idx]], data = candidate_meta
+        )
       }
 
       index_state <- .bidser_store_resolved_meta(
@@ -1205,7 +1309,7 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
         deps = unique(deps)
       )
       .bidser_set_session_index_state(x, index_state)
-      return(merged)
+      return(.bidser_metadata_result(merged, source_records, provenance))
     }
   }
 
@@ -1231,7 +1335,7 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
   }
 
   if (length(candidates) == 0) {
-    return(list())
+    return(.bidser_metadata_result(list(), list(), provenance))
   }
 
   ord <- order(
@@ -1243,6 +1347,7 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
 
   merged <- list()
   deps <- character(0)
+  source_records <- list()
   for (cand in candidates) {
     candidate_meta <- tryCatch(
       jsonlite::read_json(cand$path, simplifyVector = TRUE),
@@ -1257,6 +1362,9 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
     }
     merged <- utils::modifyList(merged, candidate_meta, keep.null = TRUE)
     deps <- c(deps, cand$rel_path)
+    source_records[[length(source_records) + 1L]] <- list(
+      path = cand$rel_path, data = candidate_meta
+    )
   }
 
   if (!is.null(index_state)) {
@@ -1270,5 +1378,5 @@ get_metadata.bids_project <- function(x, file, inherit = TRUE,
     .bidser_set_session_index_state(x, index_state)
   }
 
-  merged
+  .bidser_metadata_result(merged, source_records, provenance)
 }
