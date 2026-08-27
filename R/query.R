@@ -367,8 +367,8 @@
 #'   as `run` and `echo` to integer when possible.
 #' @return A tibble with one row per input path. Missing entities are `NA`.
 #'   In addition to BIDS entities, rows include `extension` (the complete file
-#'   extension, including compound extensions such as `.nii.gz` and `.lna.h5`)
-#'   and `datatype` when it can be inferred from a registered datatype folder.
+#'   extension, including compound extensions such as `.nii.gz`) and `datatype`
+#'   when it can be inferred from a registered datatype folder.
 #' @export
 #' @examples
 #' bids_entities(c(
@@ -435,7 +435,10 @@ bids_entities <- function(paths, include_path = TRUE, coerce = TRUE) {
     }), use.names = FALSE)
   }, error = function(e) character(0))
   configured <- getOption("bidser.compound_extensions", character(0))
-  extensions <- unique(c(".lna.h5", configured, registered, ".nii.gz", ".tsv.gz"))
+  # Compatibility extensions are accepted as file-shape hints; they are not
+  # declarations that the corresponding format is part of the BIDS standard.
+  compatibility <- ".lna.h5"
+  extensions <- unique(c(compatibility, configured, registered, ".nii.gz", ".tsv.gz"))
   extensions <- as.character(extensions)
   extensions <- extensions[!is.na(extensions) & nzchar(extensions)]
   extensions <- ifelse(startsWith(extensions, "."), extensions, paste0(".", extensions))

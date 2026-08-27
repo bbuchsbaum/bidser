@@ -40,6 +40,8 @@ Suggests:
     scales,
     knitr,
     rmarkdown,
+    ragg,
+    systemfonts,
     testthat,
     covr,
     lintr,

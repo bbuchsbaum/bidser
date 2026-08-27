@@ -1,10 +1,11 @@
 # bidser 0.5.1
 
-* Parse `.lna.h5` as one compound extension and derive entities, extension,
-  datatype, and type through the same path for `bids_entities()`, persisted
-  indexes, indexed queries, and filesystem fallback. Compound extensions are
-  extensible with `options(bidser.compound_extensions = ...)`, and datatype
-  folder recognition now follows the runtime datatype registry.
+* Derive entities, extension, datatype, and type through the same path for
+  `bids_entities()`, persisted indexes, indexed queries, and filesystem
+  fallback. Compound extensions are extensible with
+  `options(bidser.compound_extensions = ...)`, and datatype folder recognition
+  now follows the runtime datatype registry. For exchange compatibility,
+  `.lna.h5` is also recognized as a compound extension.
 * Add `get_metadata(..., provenance = TRUE)` as a backward-compatible public
   mode returning effective metadata plus the ordered sidecar path, inheritance
   level, precedence, and field coverage used to resolve it.
