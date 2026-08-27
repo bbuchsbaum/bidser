@@ -12,6 +12,7 @@ get_metadata(
   file,
   inherit = TRUE,
   scope = c("auto", "raw", "derivatives", "all"),
+  provenance = FALSE,
   ...
 )
 
@@ -21,6 +22,7 @@ get_metadata(
   file,
   inherit = TRUE,
   scope = c("auto", "raw", "derivatives", "all"),
+  provenance = FALSE,
   ...
 )
 ```
@@ -51,13 +53,21 @@ get_metadata(
 
   - `"all"`: allow full project ancestry
 
+- provenance:
+
+  If `TRUE`, return `list(metadata = ..., sources = ...)`, where
+  `sources` records the ordered sidecar paths, inheritance levels,
+  precedence, and fields used to resolve the effective metadata. The
+  default `FALSE` preserves the historical metadata-list return value.
+
 - ...:
 
   Additional arguments for methods.
 
 ## Value
 
-A named list of metadata fields.
+A named list of metadata fields, or a metadata/provenance object when
+`provenance = TRUE`.
 
 ## Details
 

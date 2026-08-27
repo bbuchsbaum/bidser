@@ -11,7 +11,7 @@ input path with the union of parsed BIDS entity columns."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">bidser</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,7 +75,10 @@ as <code>run</code> and <code>echo</code> to integer when possible.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble with one row per input path. Missing entities are <code>NA</code>.</p>
+    <p>A tibble with one row per input path. Missing entities are <code>NA</code>.
+In addition to BIDS entities, rows include <code>extension</code> (the complete file
+extension, including compound extensions such as <code>.nii.gz</code>) and <code>datatype</code>
+when it can be inferred from a registered datatype folder.</p>
     </div>
 
     <div class="section level2">
@@ -84,11 +87,11 @@ as <code>run</code> and <code>echo</code> to integer when possible.</p></dd>
 <span class="r-in"><span>  <span class="st">"sub-01_task-rest_run-01_bold.nii.gz"</span>,</span></span>
 <span class="r-in"><span>  <span class="st">"sub-01_task-rest_run-02_bold.nii.gz"</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   .path                               kind  subid task    run suffix type </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> sub-01_task-rest_run-01_bold.nii.gz bold  01    rest      1 nii.gz func </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> sub-01_task-rest_run-02_bold.nii.gz bold  01    rest      2 nii.gz func </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 9</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .path                  subid task    run kind  suffix type  extension datatype</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> sub-01_task-rest_run-… 01    rest      1 bold  nii.gz func  .nii.gz   <span style="color: #BB0000;">NA</span>      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> sub-01_task-rest_run-… 01    rest      2 bold  nii.gz func  .nii.gz   <span style="color: #BB0000;">NA</span>      </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

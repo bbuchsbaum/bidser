@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bidser</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,6 +39,11 @@
       <small>Source: <a href="https://github.com/bbuchsbaum/bidser/blob/master/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.1" id="bidser-051">bidser 0.5.1<a class="anchor" aria-label="anchor" href="#bidser-051"></a></h2>
+<ul><li>Derive entities, extension, datatype, and type through the same path for <code><a href="../reference/bids_entities.html">bids_entities()</a></code>, persisted indexes, indexed queries, and filesystem fallback. Compound extensions are extensible with <code>options(bidser.compound_extensions = ...)</code>, and datatype folder recognition now follows the runtime datatype registry. For exchange compatibility, <code>.lna.h5</code> is also recognized as a compound extension.</li>
+<li>Add <code>get_metadata(..., provenance = TRUE)</code> as a backward-compatible public mode returning effective metadata plus the ordered sidecar path, inheritance level, precedence, and field coverage used to resolve it.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.0" id="bidser-050">bidser 0.5.0<a class="anchor" aria-label="anchor" href="#bidser-050"></a></h2><p class="text-muted">CRAN release: 2026-07-06</p>
 <ul><li><p>Allow <code><a href="../reference/create_mock_bids.html">create_mock_bids()</a></code> to construct an empty project when <code>file_structure</code> has the required columns but zero rows.</p></li>

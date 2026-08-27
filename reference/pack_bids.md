@@ -211,7 +211,7 @@ tryCatch({
 #> 
 #> Timing:
 #>   Archive creation: 0.0 seconds
-#>   Total time: 0.1 seconds
+#>   Total time: 0.0 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 1.00 MB
 #> 
@@ -246,7 +246,7 @@ tryCatch({
 #> 
 #> Timing:
 #>   Archive creation: 0.0 seconds
-#>   Total time: 0.1 seconds
+#>   Total time: 0.0 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 10.00 MB
 #> 
@@ -295,7 +295,7 @@ tryCatch({
 #> 
 #> Timing:
 #>   Archive creation: 0.0 seconds
-#>   Total time: 0.1 seconds
+#>   Total time: 0.2 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 10.00 MB
 #> Using parallel processing with 2 cores for downsampling
@@ -328,7 +328,7 @@ tryCatch({
 #> Downsampling complete:
 #>   Successfully downsampled: 0 files
 #>   Created stubs for 80 files (downsampling failed)
-#>   Time taken: 4.2 seconds
+#>   Time taken: 3.4 seconds
 #> 
 #> Creating archive...
 #> 
@@ -339,7 +339,7 @@ tryCatch({
 #> 
 #> Timing:
 #>   Archive creation: 0.0 seconds
-#>   Total time: 4.5 seconds
+#>   Total time: 3.8 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 10.00 MB
 #> 
@@ -407,7 +407,7 @@ tryCatch({
 #> 
 #> Timing:
 #>   Archive creation: 0.0 seconds
-#>   Total time: 0.1 seconds
+#>   Total time: 0.0 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 10.00 MB
 #> 

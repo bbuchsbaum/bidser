@@ -11,7 +11,7 @@ specific to more specific locations."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">bidser</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,6 +57,7 @@ specific to more specific locations.</p>
 <span>  <span class="va">file</span>,</span>
 <span>  inherit <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  scope <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"raw"</span>, <span class="st">"derivatives"</span>, <span class="st">"all"</span><span class="op">)</span>,</span>
+<span>  provenance <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -66,6 +67,7 @@ specific to more specific locations.</p>
 <span>  <span class="va">file</span>,</span>
 <span>  inherit <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  scope <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"raw"</span>, <span class="st">"derivatives"</span>, <span class="st">"all"</span><span class="op">)</span>,</span>
+<span>  provenance <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -94,13 +96,21 @@ specific to more specific locations.</p>
 </ul></dd>
 
 
+<dt id="arg-provenance">provenance<a class="anchor" aria-label="anchor" href="#arg-provenance"></a></dt>
+<dd><p>If <code>TRUE</code>, return <code>list(metadata = ..., sources = ...)</code>,
+where <code>sources</code> records the ordered sidecar paths, inheritance levels,
+precedence, and fields used to resolve the effective metadata. The default
+<code>FALSE</code> preserves the historical metadata-list return value.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments for methods.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A named list of metadata fields.</p>
+    <p>A named list of metadata fields, or a metadata/provenance object when
+<code>provenance = TRUE</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>

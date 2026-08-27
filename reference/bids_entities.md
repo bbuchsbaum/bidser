@@ -30,7 +30,10 @@ bids_entities(paths, include_path = TRUE, coerce = TRUE)
 
 ## Value
 
-A tibble with one row per input path. Missing entities are `NA`.
+A tibble with one row per input path. Missing entities are `NA`. In
+addition to BIDS entities, rows include `extension` (the complete file
+extension, including compound extensions such as `.nii.gz`) and
+`datatype` when it can be inferred from a registered datatype folder.
 
 ## Examples
 
@@ -39,9 +42,9 @@ bids_entities(c(
   "sub-01_task-rest_run-01_bold.nii.gz",
   "sub-01_task-rest_run-02_bold.nii.gz"
 ))
-#> # A tibble: 2 × 7
-#>   .path                               kind  subid task    run suffix type 
-#>   <chr>                               <chr> <chr> <chr> <int> <chr>  <chr>
-#> 1 sub-01_task-rest_run-01_bold.nii.gz bold  01    rest      1 nii.gz func 
-#> 2 sub-01_task-rest_run-02_bold.nii.gz bold  01    rest      2 nii.gz func 
+#> # A tibble: 2 × 9
+#>   .path                  subid task    run kind  suffix type  extension datatype
+#>   <chr>                  <chr> <chr> <int> <chr> <chr>  <chr> <chr>     <chr>   
+#> 1 sub-01_task-rest_run-… 01    rest      1 bold  nii.gz func  .nii.gz   NA      
+#> 2 sub-01_task-rest_run-… 01    rest      2 bold  nii.gz func  .nii.gz   NA      
 ```
