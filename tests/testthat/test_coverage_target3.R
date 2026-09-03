@@ -163,7 +163,7 @@ test_that("bids_summary, compliance, and load_all_events cover edge branches", {
   proj_ev <- bids_project(ev)
   expect_warning(
     loaded <- load_all_events(proj_ev),
-    "Failed to read|No valid event|.*",
+    "Failed to read|No valid event|.*"
   )
   expect_true(is.data.frame(loaded) || is.null(loaded) || inherits(loaded, "tbl_df"))
 })
