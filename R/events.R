@@ -5,8 +5,11 @@
     session = "(^|/)ses-([^/]+)(/|_|$)",
     task = "(^|_)task-([^_/]+)(_|$)",
     run = "(^|_)run-([^_/]+)(_|$)",
-    stop("Unknown event entity: ", entity)
+    NULL
   )
+  if (is.null(pattern)) {
+    stop("Unknown event entity: ", entity)
+  }
   match <- regexec(pattern, path, perl = TRUE)
   value <- regmatches(path, match)[[1]]
   if (length(value) >= 3) value[[3]] else NA_character_
