@@ -230,7 +230,7 @@ plot_bids <- function(x, interactive = TRUE, color_scheme = "viridis",
   # Create plots based on the selected visualization mode
   if (visualization_mode == "heatmap") {
     # Create just the heatmap visualization
-    tryCatch({
+    combined_plot <- tryCatch({
       bids_heatmap(
         x,
         interactive = interactive,
@@ -240,10 +240,10 @@ plot_bids <- function(x, interactive = TRUE, color_scheme = "viridis",
     }, error = function(e) {
       warning("Error creating heatmap visualization: ", e$message)
       # Return an empty plot with error message
-      return(ggplot2::ggplot() + 
-             ggplot2::annotate("text", x = 0, y = 0, 
+      ggplot2::ggplot() +
+             ggplot2::annotate("text", x = 0, y = 0,
                      label = paste("Error creating heatmap:", e$message)) +
-             ggplot2::theme_void())
+             ggplot2::theme_void()
     })
   } else if (visualization_mode == "complete") {
     # Create a complete set of visualizations including the heatmap
@@ -1500,7 +1500,25 @@ create_virtual_bids_project <- function(name = "Virtual Project",
     runif(1) < 0.8
   }
   
-  # Build the file structure data frame
+  # Build the file structure data frame with a stable column set so raw and
+  # derivative rows can be rbind'ed safely.
+  empty_row <- function(...) {
+    args <- list(...)
+    defaults <- list(
+      subid = NA_character_,
+      session = NA,
+      datatype = NA_character_,
+      task = NA,
+      run = NA,
+      suffix = NA_character_,
+      fmriprep = FALSE,
+      space = NA_character_,
+      desc = NA_character_
+    )
+    defaults[names(args)] <- args
+    as.data.frame(defaults, stringsAsFactors = FALSE)
+  }
+
   for (sub in subjects) {
     # Remove "sub-" prefix for the data frame
     sub_id <- gsub("^sub-", "", sub)
@@ -1510,15 +1528,12 @@ create_virtual_bids_project <- function(name = "Virtual Project",
         # Add anatomical files
         for (mod in modalities) {
           if (mod %in% c("T1w", "T2w") && should_include()) {
-            file_structure <- rbind(file_structure, data.frame(
+            file_structure <- rbind(file_structure, empty_row(
               subid = sub_id,
               session = ses,
               datatype = "anat",
-              task = NA,
-              run = NA,
               suffix = paste0(mod, ".nii.gz"),
-              fmriprep = FALSE,
-              stringsAsFactors = FALSE
+              fmriprep = FALSE
             ))
           }
         }
@@ -1527,15 +1542,14 @@ create_virtual_bids_project <- function(name = "Virtual Project",
         for (task in tasks) {
           for (run in runs) {
             if ("bold" %in% modalities && should_include()) {
-              file_structure <- rbind(file_structure, data.frame(
+              file_structure <- rbind(file_structure, empty_row(
                 subid = sub_id,
                 session = ses,
                 datatype = "func",
                 task = task,
                 run = run,
                 suffix = "bold.nii.gz",
-                fmriprep = FALSE,
-                stringsAsFactors = FALSE
+                fmriprep = FALSE
               ))
             }
           }
@@ -1546,7 +1560,7 @@ create_virtual_bids_project <- function(name = "Virtual Project",
           for (task in tasks) {
             for (run in runs) {
               if (should_include()) {
-                file_structure <- rbind(file_structure, data.frame(
+                file_structure <- rbind(file_structure, empty_row(
                   subid = sub_id,
                   session = ses,
                   datatype = "func",
@@ -1555,8 +1569,7 @@ create_virtual_bids_project <- function(name = "Virtual Project",
                   suffix = "bold.nii.gz",
                   fmriprep = TRUE,
                   space = "MNI152NLin2009cAsym",
-                  desc = "preproc",
-                  stringsAsFactors = FALSE
+                  desc = "preproc"
                 ))
               }
             }
@@ -1568,15 +1581,12 @@ create_virtual_bids_project <- function(name = "Virtual Project",
       # Add anatomical files
       for (mod in modalities) {
         if (mod %in% c("T1w", "T2w") && should_include()) {
-          file_structure <- rbind(file_structure, data.frame(
+          file_structure <- rbind(file_structure, empty_row(
             subid = sub_id,
             session = NA,
             datatype = "anat",
-            task = NA,
-            run = NA,
             suffix = paste0(mod, ".nii.gz"),
-            fmriprep = FALSE,
-            stringsAsFactors = FALSE
+            fmriprep = FALSE
           ))
         }
       }
@@ -1585,15 +1595,14 @@ create_virtual_bids_project <- function(name = "Virtual Project",
       for (task in tasks) {
         for (run in runs) {
           if ("bold" %in% modalities && should_include()) {
-            file_structure <- rbind(file_structure, data.frame(
+            file_structure <- rbind(file_structure, empty_row(
               subid = sub_id,
               session = NA,
               datatype = "func",
               task = task,
               run = run,
               suffix = "bold.nii.gz",
-              fmriprep = FALSE,
-              stringsAsFactors = FALSE
+              fmriprep = FALSE
             ))
           }
         }
@@ -1604,7 +1613,7 @@ create_virtual_bids_project <- function(name = "Virtual Project",
         for (task in tasks) {
           for (run in runs) {
             if (should_include()) {
-              file_structure <- rbind(file_structure, data.frame(
+              file_structure <- rbind(file_structure, empty_row(
                 subid = sub_id,
                 session = NA,
                 datatype = "func",
@@ -1613,8 +1622,7 @@ create_virtual_bids_project <- function(name = "Virtual Project",
                 suffix = "bold.nii.gz",
                 fmriprep = TRUE,
                 space = "MNI152NLin2009cAsym",
-                desc = "preproc",
-                stringsAsFactors = FALSE
+                desc = "preproc"
               ))
             }
           }
