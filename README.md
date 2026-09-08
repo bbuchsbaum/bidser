@@ -5,41 +5,87 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/bbuchsbaum/bidser/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/bbuchsbaum/bidser/actions/workflows/R-CMD-check.yaml)
-[![Codecov test
-coverage](https://codecov.io/gh/bbuchsbaum/bidser/branch/master/graph/badge.svg)](https://app.codecov.io/gh/bbuchsbaum/bidser?branch=master)
-[![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/bidser)](https://CRAN.R-project.org/package=bidser)
+[![R-CMD-check](https://github.com/bbuchsbaum/bidser/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/bbuchsbaum/bidser/actions/workflows/R-CMD-check.yaml)
+[![pkgdown](https://github.com/bbuchsbaum/bidser/actions/workflows/pkgdown.yaml/badge.svg)](https://bbuchsbaum.github.io/bidser/)
+[![Codecov test
+coverage](https://codecov.io/gh/bbuchsbaum/bidser/branch/master/graph/badge.svg)](https://app.codecov.io/gh/bbuchsbaum/bidser?branch=master)
 <!-- badges: end -->
 
-[BIDS](https://bids.neuroimaging.io/) in R – (it’s a start!)
+**bidser** reads and queries [BIDS](https://bids.neuroimaging.io/)
+(Brain Imaging Data Structure) neuroimaging projects in R: locate
+subjects, sessions, tasks, and files; resolve sidecar metadata; discover
+derivative pipelines; and extract fMRIPrep confounds.
 
-The goal of bidser is to make working with the BIDS neuroimaging format
-convenient in R. Current support is strongest for MRI datasets, with
-explicit query helpers, metadata inheritance, derivative pipeline
-discovery, and compatibility-oriented support for
-[fmriprep](https://fmriprep.org/en/stable/) workflows.
+[Documentation](https://bbuchsbaum.github.io/bidser/) · [Getting
+started](https://bbuchsbaum.github.io/bidser/articles/quickstart.html) ·
+[Derivatives](https://bbuchsbaum.github.io/bidser/articles/derivatives.html)
+·
+[Confounds](https://bbuchsbaum.github.io/bidser/articles/confounds-and-variables.html)
+· [API reference](https://bbuchsbaum.github.io/bidser/reference/) ·
+[Changelog](NEWS.md)
 
 ## Installation
 
-Install the development version from [GitHub](https://github.com/) with:
+Install the released version from CRAN:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("bbuchsbaum/bidser")
+install.packages("bidser")
 ```
 
-## Example
+Or the development version from GitHub:
 
-See <https://bbuchsbaum.github.io/bidser/articles/quickstart.html>
+``` r
+# install.packages("remotes")
+remotes::install_github("bbuchsbaum/bidser")
+```
+
+CRAN currently publishes 0.5.0; this repository is at 0.5.1.
+
+## Quick start
+
+Build an offline mock project (no Suggests packages or downloads), then
+query it with the public entry points `participants()`, `tasks()`, and
+`func_scans()`. Point the same helpers at a real tree via
+`bids_project()`:
+
+``` r
+library(bidser)
+
+proj <- create_mock_bids(
+  project_name = "demo",
+  participants = c("01", "02"),
+  file_structure = data.frame(
+    subid = c("01", "02"),
+    datatype = "func",
+    task = "rest",
+    run = "01",
+    suffix = "bold.nii.gz",
+    fmriprep = FALSE,
+    stringsAsFactors = FALSE
+  )
+)
+
+participants(proj)
+#> [1] "01" "02"
+tasks(proj)
+#> [1] "rest"
+func_scans(proj, full_path = FALSE)
+#> [1] "sub-01/func/sub-01_task-rest_run-01_bold.nii.gz"
+#> [2] "sub-02/func/sub-02_task-rest_run-01_bold.nii.gz"
+```
+
+Related APIs include `read_events()`, `query_files()`, `get_metadata()`,
+and `derivative_pipelines()`. For a downloaded example dataset see
+[Getting
+started](https://bbuchsbaum.github.io/bidser/articles/quickstart.html).
 
 ## fMRIPrep confounds
 
 `read_confounds()` selects nuisance regressors from fMRIPrep confound
-tables. Rather than hand-listing version-specific column names, use the
-high-level, version-robust helpers:
+tables. Prefer the public, version-robust helpers over hand-listed
+column names:
 
 ``` r
 # Named, version-robust sets (resolve to whatever columns your dataset has)
@@ -57,5 +103,5 @@ list_confound_strategies()
 Code that previously reached into the unexported
 `bidser:::DEFAULT_CVARS2` should switch to the stable public handle
 `confound_set("legacy_default")`, which returns the identical 26-name
-set. See `?read_confounds`, `?confound_set`, and the
-*confounds-and-variables* vignette for details.
+set. See `?read_confounds`, `?confound_set`, and the [confounds
+vignette](https://bbuchsbaum.github.io/bidser/articles/confounds-and-variables.html).
