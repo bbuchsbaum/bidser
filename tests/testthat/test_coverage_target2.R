@@ -190,6 +190,7 @@ test_that("get_example_bids_dataset covers offline and mocked zip extraction", {
   ))
   old_wd <- getwd()
   setwd(staging)
+  on.exit(setwd(old_wd), add = TRUE)
   utils::zip(
     zipfile = zip_file,
     files = "bids-examples-master",
