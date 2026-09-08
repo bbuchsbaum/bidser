@@ -626,31 +626,38 @@ reference</a> · <a href="NEWS.md">Changelog</a></p>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;bbuchsbaum/bidser&quot;</span>)</span></code></pre></div>
 <p>CRAN currently publishes 0.5.0; this repository is at 0.5.1.</p>
 <h2 id="quick-start">Quick start</h2>
-<p>Load a BIDS project and query functional scans with the public entry
-points <code>bids_project()</code>, <code>participants()</code>,
-<code>tasks()</code>, and <code>func_scans()</code>:</p>
+<p>Build an offline mock project (no Suggests packages or downloads),
+then query it with the public entry points <code>participants()</code>,
+<code>tasks()</code>, and <code>func_scans()</code>. Point the same
+helpers at a real tree via <code>bids_project()</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(bidser)</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>ds_path <span class="ot">&lt;-</span> <span class="fu">get_example_bids_dataset</span>(<span class="st">&quot;ds001&quot;</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>proj <span class="ot">&lt;-</span> <span class="fu">bids_project</span>(ds_path)</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="fu">participants</span>(proj)</span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;01&quot; &quot;02&quot; &quot;03&quot; &quot;04&quot; &quot;05&quot; &quot;06&quot; &quot;07&quot; &quot;08&quot; &quot;09&quot; &quot;10&quot; &quot;11&quot; &quot;12&quot; &quot;13&quot; &quot;14&quot; &quot;15&quot;</span></span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; [16] &quot;16&quot;</span></span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="fu">tasks</span>(proj)</span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;balloonanalogrisktask&quot;</span></span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">func_scans</span>(proj, <span class="at">full_path =</span> <span class="cn">FALSE</span>))</span>
-<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; [1] &quot;sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz&quot;</span></span>
-<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; [2] &quot;sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz&quot;</span></span>
-<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; [3] &quot;sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz&quot;</span></span>
-<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; [4] &quot;sub-02/func/sub-02_task-balloonanalogrisktask_run-01_bold.nii.gz&quot;</span></span>
-<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; [5] &quot;sub-02/func/sub-02_task-balloonanalogrisktask_run-02_bold.nii.gz&quot;</span></span>
-<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; [6] &quot;sub-02/func/sub-02_task-balloonanalogrisktask_run-03_bold.nii.gz&quot;</span></span></code></pre></div>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>proj <span class="ot">&lt;-</span> <span class="fu">create_mock_bids</span>(</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">project_name =</span> <span class="st">&quot;demo&quot;</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">participants =</span> <span class="fu">c</span>(<span class="st">&quot;01&quot;</span>, <span class="st">&quot;02&quot;</span>),</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="at">file_structure =</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>    <span class="at">subid =</span> <span class="fu">c</span>(<span class="st">&quot;01&quot;</span>, <span class="st">&quot;02&quot;</span>),</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>    <span class="at">datatype =</span> <span class="st">&quot;func&quot;</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>    <span class="at">task =</span> <span class="st">&quot;rest&quot;</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>    <span class="at">run =</span> <span class="st">&quot;01&quot;</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>    <span class="at">suffix =</span> <span class="st">&quot;bold.nii.gz&quot;</span>,</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>    <span class="at">fmriprep =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>    <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>  )</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>)</span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="fu">participants</span>(proj)</span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; [1] &quot;01&quot; &quot;02&quot;</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="fu">tasks</span>(proj)</span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; [1] &quot;rest&quot;</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="fu">func_scans</span>(proj, <span class="at">full_path =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; [1] &quot;sub-01/func/sub-01_task-rest_run-01_bold.nii.gz&quot;</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; [2] &quot;sub-02/func/sub-02_task-rest_run-01_bold.nii.gz&quot;</span></span></code></pre></div>
 <p>Related APIs include <code>read_events()</code>,
-<code>query_files()</code>, <code>get_metadata()</code>,
-<code>derivative_pipelines()</code>, and <code>create_mock_bids()</code>
-for offline fixtures. See the vignettes linked above for worked
-examples.</p>
+<code>query_files()</code>, <code>get_metadata()</code>, and
+<code>derivative_pipelines()</code>. For a downloaded example dataset
+see <a href="https://bbuchsbaum.github.io/bidser/articles/quickstart.html">Getting
+started</a>.</p>
 <h2 id="fmriprep-confounds">fMRIPrep confounds</h2>
 <p><code>read_confounds()</code> selects nuisance regressors from
 fMRIPrep confound tables. Prefer the public, version-robust helpers over

@@ -55,23 +55,35 @@ CRAN currently publishes 0.5.0; this repository is at 0.5.1.
 
 ## Quick start
 
-Load a BIDS project and query functional scans with the public entry points
-`bids_project()`, `participants()`, `tasks()`, and `func_scans()`:
+Build an offline mock project (no Suggests packages or downloads), then query
+it with the public entry points `participants()`, `tasks()`, and
+`func_scans()`. Point the same helpers at a real tree via `bids_project()`:
 
 ```{r}
 library(bidser)
 
-ds_path <- get_example_bids_dataset("ds001")
-proj <- bids_project(ds_path)
+proj <- create_mock_bids(
+  project_name = "demo",
+  participants = c("01", "02"),
+  file_structure = data.frame(
+    subid = c("01", "02"),
+    datatype = "func",
+    task = "rest",
+    run = "01",
+    suffix = "bold.nii.gz",
+    fmriprep = FALSE,
+    stringsAsFactors = FALSE
+  )
+)
 
 participants(proj)
 tasks(proj)
-head(func_scans(proj, full_path = FALSE))
+func_scans(proj, full_path = FALSE)
 ```
 
-Related APIs include `read_events()`, `query_files()`, `get_metadata()`,
-`derivative_pipelines()`, and `create_mock_bids()` for offline fixtures.
-See the vignettes linked above for worked examples.
+Related APIs include `read_events()`, `query_files()`, `get_metadata()`, and
+`derivative_pipelines()`. For a downloaded example dataset see
+[Getting started](https://bbuchsbaum.github.io/bidser/articles/quickstart.html).
 
 ## fMRIPrep confounds
 

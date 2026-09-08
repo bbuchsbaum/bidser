@@ -45,33 +45,41 @@ CRAN currently publishes 0.5.0; this repository is at 0.5.1.
 
 ## Quick start
 
-Load a BIDS project and query functional scans with the public entry
-points `bids_project()`, `participants()`, `tasks()`, and
-`func_scans()`:
+Build an offline mock project (no Suggests packages or downloads), then
+query it with the public entry points `participants()`, `tasks()`, and
+`func_scans()`. Point the same helpers at a real tree via
+`bids_project()`:
 
 ``` r
 library(bidser)
 
-ds_path <- get_example_bids_dataset("ds001")
-proj <- bids_project(ds_path)
+proj <- create_mock_bids(
+  project_name = "demo",
+  participants = c("01", "02"),
+  file_structure = data.frame(
+    subid = c("01", "02"),
+    datatype = "func",
+    task = "rest",
+    run = "01",
+    suffix = "bold.nii.gz",
+    fmriprep = FALSE,
+    stringsAsFactors = FALSE
+  )
+)
 
 participants(proj)
-#>  [1] "01" "02" "03" "04" "05" "06" "07" "08" "09" "10" "11" "12" "13" "14" "15"
-#> [16] "16"
+#> [1] "01" "02"
 tasks(proj)
-#> [1] "balloonanalogrisktask"
-head(func_scans(proj, full_path = FALSE))
-#> [1] "sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
-#> [2] "sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
-#> [3] "sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
-#> [4] "sub-02/func/sub-02_task-balloonanalogrisktask_run-01_bold.nii.gz"
-#> [5] "sub-02/func/sub-02_task-balloonanalogrisktask_run-02_bold.nii.gz"
-#> [6] "sub-02/func/sub-02_task-balloonanalogrisktask_run-03_bold.nii.gz"
+#> [1] "rest"
+func_scans(proj, full_path = FALSE)
+#> [1] "sub-01/func/sub-01_task-rest_run-01_bold.nii.gz"
+#> [2] "sub-02/func/sub-02_task-rest_run-01_bold.nii.gz"
 ```
 
 Related APIs include `read_events()`, `query_files()`, `get_metadata()`,
-`derivative_pipelines()`, and `create_mock_bids()` for offline fixtures.
-See the vignettes linked above for worked examples.
+and `derivative_pipelines()`. For a downloaded example dataset see
+[Getting
+started](https://bbuchsbaum.github.io/bidser/articles/quickstart.html).
 
 ## fMRIPrep confounds
 
