@@ -1,5 +1,18 @@
 # Changelog
 
+## bidser 0.5.2
+
+- Resolve raw `events.tsv` files through the BIDS Inheritance Principle
+  when an exact indexed match is unavailable. The most-specific
+  compatible event file now takes precedence, and derivative,
+  source-data, code, and stimulus trees are excluded from raw-event
+  discovery.
+  [`read_events()`](https://bbuchsbaum.github.io/bidser/reference/read_events.md)
+  preserves a literal queried session for an inherited event file that
+  omits that entity.
+- Declare the R 4.1 minimum already required by the package’s
+  native-pipe syntax.
+
 ## bidser 0.5.1
 
 - Derive entities, extension, datatype, and type through the same path

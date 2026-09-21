@@ -6,7 +6,11 @@ information for task-based functional MRI data, including onset times,
 durations, and trial types.
 
 Finds event files matching the given subject, task, run, and session
-criteria.
+criteria. When no exact query match exists, filesystem fallback applies
+BIDS inheritance: a candidate may omit an entity, but any entity it
+specifies must match the requested target. For a constrained query, the
+most-specific compatible candidate takes precedence over a less-specific
+inherited file.
 
 ## Usage
 
@@ -94,9 +98,9 @@ tryCatch({
 }, error = function(e) {
   message("Example requires internet connection: ", e$message)
 })
-#> [1] "/tmp/RtmpOqnTsa/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_events.tsv"
-#> [2] "/tmp/RtmpOqnTsa/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_events.tsv"
-#> [3] "/tmp/RtmpOqnTsa/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_events.tsv"
+#> [1] "/tmp/RtmpZ1YWZI/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_events.tsv"
+#> [2] "/tmp/RtmpZ1YWZI/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_events.tsv"
+#> [3] "/tmp/RtmpZ1YWZI/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_events.tsv"
 # }
 # \donttest{
 # Get event files for a specific subject and task

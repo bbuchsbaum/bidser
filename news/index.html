@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bidser</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,6 +39,11 @@
       <small>Source: <a href="https://github.com/bbuchsbaum/bidser/blob/master/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.2" id="bidser-052">bidser 0.5.2<a class="anchor" aria-label="anchor" href="#bidser-052"></a></h2>
+<ul><li>Resolve raw <code>events.tsv</code> files through the BIDS Inheritance Principle when an exact indexed match is unavailable. The most-specific compatible event file now takes precedence, and derivative, source-data, code, and stimulus trees are excluded from raw-event discovery. <code><a href="../reference/read_events.html">read_events()</a></code> preserves a literal queried session for an inherited event file that omits that entity.</li>
+<li>Declare the R 4.1 minimum already required by the package’s native-pipe syntax.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.1" id="bidser-051">bidser 0.5.1<a class="anchor" aria-label="anchor" href="#bidser-051"></a></h2>
 <ul><li>Derive entities, extension, datatype, and type through the same path for <code><a href="../reference/bids_entities.html">bids_entities()</a></code>, persisted indexes, indexed queries, and filesystem fallback. Compound extensions are extensible with <code>options(bidser.compound_extensions = ...)</code>, and datatype folder recognition now follows the runtime datatype registry. For exchange compatibility, <code>.lna.h5</code> is also recognized as a compound extension.</li>
