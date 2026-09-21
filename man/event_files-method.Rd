@@ -55,6 +55,10 @@ that match specified criteria. Event files in BIDS contain trial information for
 task-based functional MRI data, including onset times, durations, and trial types.
 
 Finds event files matching the given subject, task, run, and session criteria.
+When no exact query match exists, filesystem fallback applies BIDS
+inheritance: a candidate may omit an entity, but any entity it specifies
+must match the requested target. For a constrained query, the most-specific
+compatible candidate takes precedence over a less-specific inherited file.
 }
 \examples{
 \donttest{

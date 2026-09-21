@@ -20,9 +20,47 @@
     return(TRUE)
   }
   if (is.null(value) || length(value) == 0 || is.na(value)) {
-    return(FALSE)
+    # A missing entity is inherited from the target BOLD file. A specified
+    # candidate entity must still match, so inheritance cannot cross subjects,
+    # sessions, tasks, or runs.
+    return(TRUE)
   }
   grepl(pattern, value)
+}
+
+.bidser_event_specificity <- function(path, subid, task, run, session) {
+  entities <- c("subid", "session", "task", "run")
+  patterns <- list(subid = subid, session = session, task = task, run = run)
+  values <- vapply(entities, function(entity) {
+    .bidser_event_path_entity(path, entity)
+  }, character(1))
+
+  # A candidate is more specific only for entities the caller has actually
+  # constrained. Wildcard queries deliberately retain all compatible files.
+  constrained <- vapply(patterns, function(pattern) {
+    !is.null(pattern) && length(pattern) == 1L && !is.na(pattern) && !identical(pattern, ".*")
+  }, logical(1))
+  sum(constrained & !is.na(values))
+}
+
+.bidser_event_query_literal <- function(pattern) {
+  if (is.null(pattern) || length(pattern) != 1L || is.na(pattern) ||
+      identical(pattern, ".*")) {
+    return(NA_character_)
+  }
+
+  value <- as.character(pattern)
+  if (startsWith(value, "^")) {
+    value <- substring(value, 2L)
+  }
+  if (endsWith(value, "$")) {
+    value <- substr(value, 1L, nchar(value) - 1L)
+  }
+
+  if (!nzchar(value) || grepl("[^[:alnum:]_-]", value)) {
+    return(NA_character_)
+  }
+  value
 }
 
 .bidser_event_files_from_filesystem <- function(x, subid, task, run, session, full_path) {
@@ -42,7 +80,7 @@
   }
 
   rel <- sub(paste0("^", gsub("([\\^$.|?*+(){}\\[\\]\\\\])", "\\\\\\1", x$path), "/?"), "", files)
-  raw_file <- grepl("^sub-[^/]+/", rel)
+  raw_file <- !grepl("^(derivatives|sourcedata|code|stimuli)(/|$)", rel)
   if (!any(raw_file)) {
     return(NULL)
   }
@@ -61,12 +99,27 @@
     return(NULL)
   }
 
+  matched_rel <- rel[keep]
+  specificity <- vapply(matched_rel, .bidser_event_specificity, numeric(1),
+                        subid = subid, task = task, run = run, session = session)
+  # BIDS permits shared task events, but a more specific compatible events
+  # file overrides a less-specific inherited candidate for a selected target.
+  # When no entity was constrained, preserve the historical all-files query.
+  if (any(specificity > 0)) {
+    keep_indices <- which(keep)
+    keep[keep_indices[specificity < max(specificity)]] <- FALSE
+  }
+
   unique(if (isTRUE(full_path)) files[keep] else rel[keep])
 }
 
 #' Retrieve event files from a BIDS project
 #' 
 #' Finds event files matching the given subject, task, run, and session criteria.
+#' When no exact query match exists, filesystem fallback applies BIDS
+#' inheritance: a candidate may omit an entity, but any entity it specifies
+#' must match the requested target. For a constrained query, the most-specific
+#' compatible candidate takes precedence over a less-specific inherited file.
 #'
 #' @param x A \code{bids_project} object.
 #' @param subid Regex pattern to match subject IDs. Default is ".*" (all subjects).
@@ -111,6 +164,11 @@ event_files.bids_project <- function(x, subid=".*", task=".*", run=".*", session
       strict = TRUE,  # Require that all queried keys exist in matched files
       ...
     )
+    if (!is.null(ret)) {
+      ret <- ret[!grepl(
+        "(^|/)(derivatives|sourcedata|code|stimuli)(/|$)", gsub("\\\\", "/", ret)
+      )]
+    }
     if (!is.null(ret) && length(ret) > 0) {
       return(ret)
     }
@@ -291,6 +349,7 @@ read_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session
   
   # Parser for extracting run info
   p <- func_parser()
+  inherited_session <- .bidser_event_query_literal(session)
   
   # Process each task and subject combination
   results <- vector("list", length(selected_tasks))
@@ -336,7 +395,7 @@ read_events.bids_project <- function(x, subid=".*", task=".*", run=".*", session
         sessions[k] <- if (!is.null(parsed) && !is.null(parsed$result$session)) {
           parsed$result$session
         } else {
-          NA_character_
+          inherited_session
         }
       }
       
