@@ -60,26 +60,55 @@
 </h1></div>
 <!-- badges: start -->
 
-<p><a href="https://bids.neuroimaging.io/" class="external-link">BIDS</a> in R – (it’s a start!)</p>
-<p>The goal of bidser is to make working with the BIDS neuroimaging format convenient in R. Current support is strongest for MRI datasets, with explicit query helpers, metadata inheritance, derivative pipeline discovery, and compatibility-oriented support for <a href="https://fmriprep.org/en/stable/" class="external-link">fmriprep</a> workflows.</p>
+<p><strong>bidser</strong> reads and queries <a href="https://bids.neuroimaging.io/" class="external-link">BIDS</a> (Brain Imaging Data Structure) neuroimaging projects in R: locate subjects, sessions, tasks, and files; resolve sidecar metadata; discover derivative pipelines; and extract fMRIPrep confounds.</p>
+<p><a href="https://bbuchsbaum.github.io/bidser/">Documentation</a> · <a href="https://bbuchsbaum.github.io/bidser/articles/quickstart.html">Getting started</a> · <a href="https://bbuchsbaum.github.io/bidser/articles/derivatives.html">Derivatives</a> · <a href="https://bbuchsbaum.github.io/bidser/articles/confounds-and-variables.html">Confounds</a> · <a href="https://bbuchsbaum.github.io/bidser/reference/">API reference</a> · <a href="NEWS.html">Changelog</a></p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Install the development version from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<p>Install the released version from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"bbuchsbaum/bidser"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"bidser"</span><span class="op">)</span></span></code></pre></div>
+<p>Or the development version from GitHub:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"bbuchsbaum/bidser"</span><span class="op">)</span></span></code></pre></div>
+<p>CRAN currently publishes 0.5.0; this repository is at 0.5.1.</p>
 </div>
 <div class="section level2">
-<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+<h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
-<p>See <a href="https://bbuchsbaum.github.io/bidser/articles/quickstart.html" class="uri">https://bbuchsbaum.github.io/bidser/articles/quickstart.html</a></p>
+<p>Build an offline mock project (no Suggests packages or downloads), then query it with the public entry points <code><a href="reference/participants-method.html">participants()</a></code>, <code><a href="reference/tasks-method.html">tasks()</a></code>, and <code><a href="reference/func_scans.html">func_scans()</a></code>. Point the same helpers at a real tree via <code><a href="reference/bids_project.html">bids_project()</a></code>:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bbuchsbaum/bidser" class="external-link">bidser</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/create_mock_bids.html">create_mock_bids</a></span><span class="op">(</span></span>
+<span>  project_name <span class="op">=</span> <span class="st">"demo"</span>,</span>
+<span>  participants <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"01"</span>, <span class="st">"02"</span><span class="op">)</span>,</span>
+<span>  file_structure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>    subid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"01"</span>, <span class="st">"02"</span><span class="op">)</span>,</span>
+<span>    datatype <span class="op">=</span> <span class="st">"func"</span>,</span>
+<span>    task <span class="op">=</span> <span class="st">"rest"</span>,</span>
+<span>    run <span class="op">=</span> <span class="st">"01"</span>,</span>
+<span>    suffix <span class="op">=</span> <span class="st">"bold.nii.gz"</span>,</span>
+<span>    fmriprep <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>    stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/participants-method.html">participants</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "01" "02"</span></span>
+<span><span class="fu"><a href="reference/tasks-method.html">tasks</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "rest"</span></span>
+<span><span class="fu"><a href="reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, full_path <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "sub-01/func/sub-01_task-rest_run-01_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [2] "sub-02/func/sub-02_task-rest_run-01_bold.nii.gz"</span></span></code></pre></div>
+<p>Related APIs include <code><a href="reference/read_events.html">read_events()</a></code>, <code><a href="reference/query_files.html">query_files()</a></code>, <code><a href="reference/get_metadata.html">get_metadata()</a></code>, and <code><a href="reference/derivative_pipelines.html">derivative_pipelines()</a></code>. For a downloaded example dataset see <a href="https://bbuchsbaum.github.io/bidser/articles/quickstart.html">Getting started</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="fmriprep-confounds">fMRIPrep confounds<a class="anchor" aria-label="anchor" href="#fmriprep-confounds"></a>
 </h2>
-<p><code><a href="reference/read_confounds.html">read_confounds()</a></code> selects nuisance regressors from fMRIPrep confound tables. Rather than hand-listing version-specific column names, use the high-level, version-robust helpers:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<p><code><a href="reference/read_confounds.html">read_confounds()</a></code> selects nuisance regressors from fMRIPrep confound tables. Prefer the public, version-robust helpers over hand-listed column names:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Named, version-robust sets (resolve to whatever columns your dataset has)</span></span>
 <span><span class="fu"><a href="reference/read_confounds.html">read_confounds</a></span><span class="op">(</span><span class="va">proj</span>, cvars <span class="op">=</span> <span class="fu"><a href="reference/confound_set.html">confound_set</a></span><span class="op">(</span><span class="st">"motion24"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/read_confounds.html">read_confounds</a></span><span class="op">(</span><span class="va">proj</span>, cvars <span class="op">=</span> <span class="fu"><a href="reference/confound_set.html">confound_set</a></span><span class="op">(</span><span class="st">"36p"</span><span class="op">)</span><span class="op">)</span></span>
@@ -90,7 +119,7 @@
 <span><span class="co"># Discover what is available</span></span>
 <span><span class="fu"><a href="reference/list_confound_sets.html">list_confound_sets</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/list_confound_strategies.html">list_confound_strategies</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>Code that previously reached into the unexported <code>bidser:::DEFAULT_CVARS2</code> should switch to the stable public handle <code>confound_set("legacy_default")</code>, which returns the identical 26-name set. See <code><a href="reference/read_confounds.html">?read_confounds</a></code>, <code><a href="reference/confound_set.html">?confound_set</a></code>, and the <em>confounds-and-variables</em> vignette for details.</p>
+<p>Code that previously reached into the unexported <code>bidser:::DEFAULT_CVARS2</code> should switch to the stable public handle <code>confound_set("legacy_default")</code>, which returns the identical 26-name set. See <code><a href="reference/read_confounds.html">?read_confounds</a></code>, <code><a href="reference/confound_set.html">?confound_set</a></code>, and the <a href="https://bbuchsbaum.github.io/bidser/articles/confounds-and-variables.html">confounds vignette</a>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -134,10 +163,10 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/bbuchsbaum/bidser/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/bbuchsbaum/bidser/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://app.codecov.io/gh/bbuchsbaum/bidser?branch=master" class="external-link"><img src="https://codecov.io/gh/bbuchsbaum/bidser/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
-<li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
 <li><a href="https://CRAN.R-project.org/package=bidser" class="external-link"><img src="https://www.r-pkg.org/badges/version/bidser" alt="CRAN status"></a></li>
+<li><a href="https://github.com/bbuchsbaum/bidser/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/bbuchsbaum/bidser/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://bbuchsbaum.github.io/bidser/"><img src="https://github.com/bbuchsbaum/bidser/actions/workflows/pkgdown.yaml/badge.svg" alt="pkgdown"></a></li>
+<li><a href="https://app.codecov.io/gh/bbuchsbaum/bidser?branch=master" class="external-link"><img src="https://codecov.io/gh/bbuchsbaum/bidser/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
 </ul>
 </div>
 
