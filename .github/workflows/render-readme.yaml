@@ -2,6 +2,7 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
+    branches: [main, master]
     paths:
       - "README.Rmd"
   workflow_dispatch:
@@ -43,4 +44,4 @@ jobs:
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add README.md
           git diff --staged --quiet || git commit -m 'Re-build README.Rmd'
-          git push origin 
+          git push origin
