@@ -7,7 +7,7 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
-name: R-CMD-check
+name: R-CMD-check.yaml
 
 permissions: read-all
 
@@ -50,4 +50,21 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")' 
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
+
+  # Publish a single check run named "R-CMD-check" so portfolio / branch
+  # protection matchers that look up that check name can see the matrix
+  # result. Matrix legs keep their OS/R display names unchanged.
+  r-cmd-check-status:
+    name: R-CMD-check
+    if: always()
+    needs: [R-CMD-check]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require full matrix success
+        run: |
+          result="${{ needs.R-CMD-check.result }}"
+          echo "R-CMD-check matrix result: ${result}"
+          if [ "${result}" != "success" ]; then
+            exit 1
+          fi
