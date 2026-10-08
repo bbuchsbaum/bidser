@@ -51,7 +51,7 @@ Or the development version from GitHub:
 remotes::install_github("bbuchsbaum/bidser")
 ```
 
-CRAN currently publishes 0.5.0; this repository is at 0.5.1.
+CRAN and this repository are both at 0.5.2.
 
 ## Quick start
 
