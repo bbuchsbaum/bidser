@@ -26,7 +26,7 @@ vignette runs without network access.
 proj <- bids_project(temp_dir, fmriprep = TRUE)
 proj
 #> BIDS Project Summary 
-#> Project Name:  bids_confounds_vignette_55f175032549 
+#> Project Name:  bids_confounds_vignette_564a2d6ce6d0 
 #> Participants (n):  2 
 #> Participants Source:  file 
 #> Tasks:  nback, rest 
@@ -399,12 +399,12 @@ checks, pipeline discovery, and run-level coverage:
 report <- bids_report(proj)
 report
 #> BIDS Report
-#> Project: bids_confounds_vignette_55f175032549 
+#> Project: bids_confounds_vignette_564a2d6ce6d0 
 #> Participants source: file 
 #> Subjects: 2 
 #> Sessions: 0 
 #> Tasks: nback, rest 
-#> Total runs: 2 
+#> Total runs: 4 
 #> Compliance: passed 
 #> Index: available 
 #> Pipelines: fmriprep 
@@ -427,11 +427,11 @@ rdata$summary
 #> # A tibble: 2 × 2
 #>   task  n_runs
 #>   <chr>  <int>
-#> 1 nback      1
-#> 2 rest       1
+#> 1 nback      2
+#> 2 rest       2
 #> 
 #> $total_runs
-#> [1] 2
+#> [1] 4
 rdata$run_coverage
 #> # A tibble: 4 × 7
 #>   .subid .session .task .run  n_scans n_events n_confound_rows

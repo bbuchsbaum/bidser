@@ -3,7 +3,7 @@
 testing and demonstration without requiring actual data files. Can optionally
 create a "stub" directory structure on disk.'><meta property="og:description" content='Generates an in-memory representation of a BIDS project, suitable for
 testing and demonstration without requiring actual data files. Can optionally
-create a "stub" directory structure on disk.'></head><body>
+create a "stub" directory structure on disk.'><link href="../albers.css" rel="stylesheet"><script>window.albersdownDefaults = window.albersdownDefaults || { family: "red", preset: "homage", style: "minimal" };</script><script src="../albers.js"></script></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -11,7 +11,7 @@ create a "stub" directory structure on disk.'></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">bidser</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -105,14 +105,19 @@ with a <code>suffix</code> like "events.tsv".</p></dd>
 <dd><p>A named list where names are relative paths of
 confound TSV files within the derivatives directory and values are
 their <code>tibble</code> or <code>data.frame</code> content. Paths must match files defined
-in <code>file_structure</code>.</p></dd>
+in <code>file_structure</code>. When <code>create_stub = TRUE</code>, these tables are written
+to disk as tab-separated files.</p></dd>
 
 
 <dt id="arg-create-stub">create_stub<a class="anchor" aria-label="anchor" href="#arg-create-stub"></a></dt>
 <dd><p>Logical (default <code>FALSE</code>). If <code>TRUE</code>, write a stub BIDS
-directory structure to disk at <code>stub_path</code>. Zero-byte files are created
-except for <code>participants.tsv</code>, <code>dataset_description.json</code>, and <code>events.tsv</code>
-files specified in <code>event_data</code>.</p></dd>
+directory structure to disk at <code>stub_path</code>. Files are created with
+content for <code>participants.tsv</code>, <code>dataset_description.json</code>, <code>events.tsv</code>
+files supplied in <code>event_data</code>, and confound files supplied in
+<code>confound_data</code>; all other files are zero-byte placeholders. If any
+<code>file_structure</code> row has <code>fmriprep = TRUE</code>, a derivative
+<code>dataset_description.json</code> (with <code>DatasetType = "derivative"</code> and
+<code>GeneratedBy</code>) is also written to <code>prep_dir</code>.</p></dd>
 
 
 <dt id="arg-stub-path">stub_path<a class="anchor" aria-label="anchor" href="#arg-stub-path"></a></dt>

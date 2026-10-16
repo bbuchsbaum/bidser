@@ -11,7 +11,7 @@ Number of sessions (if applicable)
 Available tasks and the number of runs per task
 Total number of runs
 
-"></head><body>
+"><link href="../albers.css" rel="stylesheet"><script>window.albersdownDefaults = window.albersdownDefaults || { family: "red", preset: "homage", style: "minimal" };</script><script src="../albers.js"></script></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -19,7 +19,7 @@ Total number of runs
 
     <a class="navbar-brand me-2" href="../index.html">bidser</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.2.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,7 +48,7 @@ Total number of runs
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Summarize a BIDS dataset</h1>
-      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/bidser/blob/master/R/all_generic.R" class="external-link"><code>R/all_generic.R</code></a>, <a href="https://github.com/bbuchsbaum/bidser/blob/master/R/bids.R" class="external-link"><code>R/bids.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/bbuchsbaum/bidser/blob/master/R/bids.R" class="external-link"><code>R/bids.R</code></a></small>
       <div class="d-none name"><code>bids_summary.Rd</code></div>
     </div>
 
@@ -61,9 +61,7 @@ Total number of runs
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bids_summary</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">bids_summary</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">bids_summary</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -76,12 +74,20 @@ Total number of runs
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list containing summary statistics about the BIDS dataset</p>
-<p>A list with summary information:</p><ul><li><p><code>n_subjects</code>: number of participants</p></li>
+    <p>A list with summary information:</p><ul><li><p><code>n_subjects</code>: number of participants</p></li>
 <li><p><code>n_sessions</code>: number of sessions (if any), otherwise NULL</p></li>
-<li><p><code>tasks</code>: a data frame with <code>task</code> and <code>n_runs</code> columns</p></li>
-<li><p><code>total_runs</code>: total number of runs across the dataset</p></li>
+<li><p><code>tasks</code>: a tibble with columns <code>task</code> and <code>n_runs</code>, where <code>n_runs</code> is
+the total number of runs of that task across all subjects and sessions</p></li>
+<li><p><code>total_runs</code>: total number of runs across the dataset (the sum of
+<code>tasks$n_runs</code>)</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>A run is one raw BOLD acquisition (<code>*_bold.nii[.gz]</code>), identified by its
+subject, session, task, <code>acq</code>, <code>ce</code>, <code>rec</code>, <code>dir</code>, and <code>run</code> entities.
+Multi-echo or magnitude/phase files from the same acquisition count as one
+run. Derivatives, events files, and sidecars are not counted.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -90,9 +96,6 @@ Total number of runs
 <span class="r-in"><span>  <span class="va">ds001_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_example_bids_dataset.html">get_example_bids_dataset</a></span><span class="op">(</span><span class="st">"ds001"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">ds001_path</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu">bids_summary</span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  </span></span>
-<span class="r-in"><span>  <span class="co"># Clean up</span></span></span>
-<span class="r-in"><span>  <span class="co"># Example datasets are cached; leave the cache in place.</span></span></span>
 <span class="r-in"><span><span class="op">}</span>, error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Example requires internet connection: "</span>, <span class="va">e</span><span class="op">$</span><span class="va">message</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>

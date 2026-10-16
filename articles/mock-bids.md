@@ -83,7 +83,7 @@ mock_proj
 #> Datatypes:  func 
 #> Suffixes:  nii.gz, tsv 
 #> BIDS Keys:  (none) 
-#> Path:  /tmp/RtmpF4g2AL/bidser-mock-6b8733cc3b93
+#> Path:  /tmp/RtmpReDPbo/bidser-mock-6be13f6414f
 
 stopifnot(file.exists(file.path(mock_dir, "participants.tsv")))
 ```
@@ -210,18 +210,18 @@ archive_contents %>%
   head()
 #>                                                                                              file
 #> 1                                                               RestMock/dataset_description.json
-#> 2                   RestMock/derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz
-#> 3 RestMock/derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_desc-confounds_timeseries.tsv
-#> 4                                                                       RestMock/participants.tsv
-#> 5                                        RestMock/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz
-#> 6                                         RestMock/sub-01/func/sub-01_task-rest_run-01_events.tsv
+#> 2                                          RestMock/derivatives/mockprep/dataset_description.json
+#> 3                   RestMock/derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz
+#> 4 RestMock/derivatives/mockprep/sub-01/func/sub-01_task-rest_run-01_desc-confounds_timeseries.tsv
+#> 5                                                                       RestMock/participants.tsv
+#> 6                                        RestMock/sub-01/func/sub-01_task-rest_run-01_bold.nii.gz
 #>           type is_stub
 #> 1         json   FALSE
-#> 2 imaging_stub    TRUE
-#> 3          tsv   FALSE
+#> 2         json   FALSE
+#> 3 imaging_stub    TRUE
 #> 4          tsv   FALSE
-#> 5 imaging_stub    TRUE
-#> 6          tsv   FALSE
+#> 5          tsv   FALSE
+#> 6 imaging_stub    TRUE
 
 archive_contents %>%
   summarise(
@@ -230,7 +230,7 @@ archive_contents %>%
     n_tsv = sum(type == "tsv")
   )
 #>   n_files n_stubs n_tsv
-#> 1       8       3     4
+#> 1       9       3     4
 
 stopifnot(
   file.exists(packed),

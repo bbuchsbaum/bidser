@@ -56,7 +56,7 @@ tryCatch({
 #> Subjects: 16 
 #> Sessions: 0 
 #> Tasks: balloonanalogrisktask 
-#> Total runs: 3 
+#> Total runs: 48 
 #> Compliance: passed 
 #> Index: available 
 #> Indexed runs: 48 

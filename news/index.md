@@ -1,6 +1,42 @@
 # Changelog
 
+## bidser (development version)
+
+- [`bids_summary()`](https://bbuchsbaum.github.io/bidser/reference/bids_summary.md)
+  now counts runs correctly: `total_runs` is the number of raw BOLD runs
+  in the dataset, and `tasks$n_runs` is the number of runs of each task
+  across all subjects and sessions. Previously both counted distinct run
+  labels per task and included non-BOLD files, so 4 subjects x 3 runs
+  reported 3 instead of 12. Multi-echo files from one acquisition count
+  once ([\#80](https://github.com/bbuchsbaum/bidser/issues/80)).
+- [`read_confounds()`](https://bbuchsbaum.github.io/bidser/reference/read_confounds.md)
+  (and
+  [`variables_table()`](https://bbuchsbaum.github.io/bidser/reference/variables_table.md),
+  which calls it) no longer prints readr’s column-specification message
+  for every confound file
+  ([\#81](https://github.com/bbuchsbaum/bidser/issues/81)).
+- `create_mock_bids(create_stub = TRUE)` now writes a derivative
+  `dataset_description.json` (`DatasetType = "derivative"`,
+  `GeneratedBy`) under `prep_dir` when the file structure includes
+  derivative files, so the stub opens with
+  `bids_project(..., fmriprep = TRUE)` without warnings
+  ([\#82](https://github.com/bbuchsbaum/bidser/issues/82)).
+- [`bids_check_compliance()`](https://bbuchsbaum.github.io/bidser/reference/bids_check_compliance.md)
+  and
+  [`bids_summary()`](https://bbuchsbaum.github.io/bidser/reference/bids_summary.md)
+  each have a single definition again. Unused
+  [`UseMethod()`](https://rdrr.io/r/base/UseMethod.html) generics in
+  `R/all_generic.R` (one advertising a `schema_version` default of
+  `"1.10.1"`, which bidser does not ship) were removed, so the help
+  pages show one usage, the actual default (`"1.10.0"`), and the full
+  return value. The
+  [`create_mock_bids()`](https://bbuchsbaum.github.io/bidser/reference/create_mock_bids.md)
+  help now states that `confound_data` tables are written to the stub
+  ([\#83](https://github.com/bbuchsbaum/bidser/issues/83)).
+
 ## bidser 0.5.2
+
+CRAN release: 2026-09-27
 
 - Resolve raw `events.tsv` files through the BIDS Inheritance Principle
   when an exact indexed match is unavailable. The most-specific

@@ -60,14 +60,19 @@ create_mock_bids(
   A named list where names are relative paths of confound TSV files
   within the derivatives directory and values are their `tibble` or
   `data.frame` content. Paths must match files defined in
-  `file_structure`.
+  `file_structure`. When `create_stub = TRUE`, these tables are written
+  to disk as tab-separated files.
 
 - create_stub:
 
   Logical (default `FALSE`). If `TRUE`, write a stub BIDS directory
-  structure to disk at `stub_path`. Zero-byte files are created except
-  for `participants.tsv`, `dataset_description.json`, and `events.tsv`
-  files specified in `event_data`.
+  structure to disk at `stub_path`. Files are created with content for
+  `participants.tsv`, `dataset_description.json`, `events.tsv` files
+  supplied in `event_data`, and confound files supplied in
+  `confound_data`; all other files are zero-byte placeholders. If any
+  `file_structure` row has `fmriprep = TRUE`, a derivative
+  `dataset_description.json` (with `DatasetType = "derivative"` and
+  `GeneratedBy`) is also written to `prep_dir`.
 
 - stub_path:
 

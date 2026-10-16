@@ -89,10 +89,10 @@ bids_summary(proj)
 #> # A tibble: 1 × 2
 #>   task                  n_runs
 #>   <chr>                  <int>
-#> 1 balloonanalogrisktask      3
+#> 1 balloonanalogrisktask     48
 #> 
 #> $total_runs
-#> [1] 3
+#> [1] 48
 ```
 
 ### Finding Files by Type
@@ -571,9 +571,9 @@ When you need absolute paths for analysis tools:
 
 full_paths <- func_scans(proj, subid = "01", full_path = TRUE)
 full_paths
-#> [1] "/tmp/RtmpSGiXtw/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
-#> [2] "/tmp/RtmpSGiXtw/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
-#> [3] "/tmp/RtmpSGiXtw/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
+#> [1] "/tmp/RtmprTtQNn/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
+#> [2] "/tmp/RtmprTtQNn/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
+#> [3] "/tmp/RtmprTtQNn/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
 
 all(file.exists(full_paths))
 #> [1] TRUE
