@@ -343,11 +343,16 @@ reconstruct_node_path <- function(node, prep_dir = "derivatives/fmriprep") {
 #' @param confound_data A named list where names are relative paths of
 #'   confound TSV files within the derivatives directory and values are
 #'   their `tibble` or `data.frame` content. Paths must match files defined
-#'   in `file_structure`.
+#'   in `file_structure`. When `create_stub = TRUE`, these tables are written
+#'   to disk as tab-separated files.
 #' @param create_stub Logical (default `FALSE`). If `TRUE`, write a stub BIDS
-#'   directory structure to disk at `stub_path`. Zero-byte files are created
-#'   except for `participants.tsv`, `dataset_description.json`, and `events.tsv`
-#'   files specified in `event_data`.
+#'   directory structure to disk at `stub_path`. Files are created with
+#'   content for `participants.tsv`, `dataset_description.json`, `events.tsv`
+#'   files supplied in `event_data`, and confound files supplied in
+#'   `confound_data`; all other files are zero-byte placeholders. If any
+#'   `file_structure` row has `fmriprep = TRUE`, a derivative
+#'   `dataset_description.json` (with `DatasetType = "derivative"` and
+#'   `GeneratedBy`) is also written to `prep_dir`.
 #' @param stub_path Character string, the path where the stub directory will be
 #'   created. Required if `create_stub = TRUE`.
 #' @param prep_dir Character string, the path relative to the root for derivatives
@@ -795,6 +800,24 @@ create_mock_bids <- function(project_name,
     }, error = function(e) {
         warn(paste("Failed to write dataset_description.json stub:", e$message))
     })
+
+    # Derivative datasets need their own dataset_description.json so the stub
+    # round-trips through bids_project(..., fmriprep = TRUE) without warnings.
+    if (has_fmriprep) {
+      deriv_desc_path <- file.path(actual_stub_path, prep_dir, "dataset_description.json")
+      deriv_desc <- list(
+        Name = paste(project_name, basename(prep_dir), "derivatives"),
+        BIDSVersion = desc$BIDSVersion %||% "1.7.0",
+        DatasetType = "derivative",
+        GeneratedBy = list(list(Name = "bidser::create_mock_bids"))
+      )
+      tryCatch({
+        fs::dir_create(fs::path_dir(deriv_desc_path))
+        jsonlite::write_json(deriv_desc, deriv_desc_path, auto_unbox = TRUE, pretty = TRUE)
+      }, error = function(e) {
+        warn(paste("Failed to write derivative dataset_description.json stub:", e$message))
+      })
+    }
 
     # Get leaf nodes first
     leaf_nodes <- data.tree::Traverse(bids_tree, 

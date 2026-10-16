@@ -661,7 +661,7 @@ read_confounds.bids_project <- function(x, subid=".*", task=".*", session=".*", 
 
       # Read table
       dfx <- tryCatch({
-        readr::read_tsv(fn, na=c("n/a", "NA"))
+        readr::read_tsv(fn, na = c("n/a", "NA"), show_col_types = FALSE, progress = FALSE)
       }, error=function(e) {
         warning("Unable to read file: ", fn, " Error: ", e$message)
         return(NULL)

@@ -42,12 +42,17 @@ with a \code{suffix} like "events.tsv".}
 \item{confound_data}{A named list where names are relative paths of
 confound TSV files within the derivatives directory and values are
 their \code{tibble} or \code{data.frame} content. Paths must match files defined
-in \code{file_structure}.}
+in \code{file_structure}. When \code{create_stub = TRUE}, these tables are written
+to disk as tab-separated files.}
 
 \item{create_stub}{Logical (default \code{FALSE}). If \code{TRUE}, write a stub BIDS
-directory structure to disk at \code{stub_path}. Zero-byte files are created
-except for \code{participants.tsv}, \code{dataset_description.json}, and \code{events.tsv}
-files specified in \code{event_data}.}
+directory structure to disk at \code{stub_path}. Files are created with
+content for \code{participants.tsv}, \code{dataset_description.json}, \code{events.tsv}
+files supplied in \code{event_data}, and confound files supplied in
+\code{confound_data}; all other files are zero-byte placeholders. If any
+\code{file_structure} row has \code{fmriprep = TRUE}, a derivative
+\code{dataset_description.json} (with \code{DatasetType = "derivative"} and
+\code{GeneratedBy}) is also written to \code{prep_dir}.}
 
 \item{stub_path}{Character string, the path where the stub directory will be
 created. Required if \code{create_stub = TRUE}.}

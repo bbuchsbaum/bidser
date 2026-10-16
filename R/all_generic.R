@@ -853,53 +853,6 @@ load_all_events <- function(x, ...) {
   UseMethod("load_all_events")
 }
 
-#' Summarize a BIDS dataset
-#'
-#' @param x A bids_project object
-#' @return A list containing summary statistics about the BIDS dataset
-#' @export
-#' @examples
-#' \donttest{
-#' tryCatch({
-#'   ds001_path <- get_example_bids_dataset("ds001")
-#'   proj <- bids_project(ds001_path)
-#'   summary <- bids_summary(proj)
-#'   
-#'   # Clean up
-#'   # Example datasets are cached; leave the cache in place.
-#' }, error = function(e) {
-#'   message("Example requires internet connection: ", e$message)
-#' })
-#' }
-bids_summary <- function(x) {
-  UseMethod("bids_summary")
-}
-
-#' Basic BIDS Compliance Checks
-#'
-#' @param x A bids_project object
-#' @param schema_check Logical. Whether to run schema validation (default \code{TRUE}).
-#' @param schema_version Character. BIDS schema version to use (default \code{"1.10.1"}).
-#' @return A list with compliance check results including \code{passed}, \code{issues},
-#'   \code{warnings}, \code{participants_source}, and \code{schema_checked}.
-#' @export
-#' @examples
-#' \donttest{
-#' tryCatch({
-#'   ds001_path <- get_example_bids_dataset("ds001")
-#'   proj <- bids_project(ds001_path)
-#'   compliance <- bids_check_compliance(proj)
-#'
-#'   # Clean up
-#'   # Example datasets are cached; leave the cache in place.
-#' }, error = function(e) {
-#'   message("Example requires internet connection: ", e$message)
-#' })
-#' }
-bids_check_compliance <- function(x, schema_check = TRUE, schema_version = "1.10.1") {
-  UseMethod("bids_check_compliance")
-}
-
 #' Access a single subject from a BIDS project
 #'
 #' `bids_subject` returns a lightweight interface with helper functions

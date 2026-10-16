@@ -1,3 +1,24 @@
+# bidser (development version)
+
+* `bids_summary()` now counts runs correctly: `total_runs` is the number of
+  raw BOLD runs in the dataset, and `tasks$n_runs` is the number of runs of
+  each task across all subjects and sessions. Previously both counted distinct
+  run labels per task and included non-BOLD files, so 4 subjects x 3 runs
+  reported 3 instead of 12. Multi-echo files from one acquisition count once
+  (#80).
+* `read_confounds()` (and `variables_table()`, which calls it) no longer prints
+  readr's column-specification message for every confound file (#81).
+* `create_mock_bids(create_stub = TRUE)` now writes a derivative
+  `dataset_description.json` (`DatasetType = "derivative"`, `GeneratedBy`)
+  under `prep_dir` when the file structure includes derivative files, so the
+  stub opens with `bids_project(..., fmriprep = TRUE)` without warnings (#82).
+* `bids_check_compliance()` and `bids_summary()` each have a single
+  definition again. Unused `UseMethod()` generics in `R/all_generic.R` (one
+  advertising a `schema_version` default of `"1.10.1"`, which bidser does not
+  ship) were removed, so the help pages show one usage, the actual default
+  (`"1.10.0"`), and the full return value. The `create_mock_bids()` help now
+  states that `confound_data` tables are written to the stub (#83).
+
 # bidser 0.5.2
 
 * Resolve raw `events.tsv` files through the BIDS Inheritance Principle when

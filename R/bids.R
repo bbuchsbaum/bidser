@@ -1743,13 +1743,30 @@ load_all_events.bids_project <- function(x, subid=".*", task=".*", run=".*", ses
 #' - Available tasks and the number of runs per task
 #' - Total number of runs
 #'
+#' A run is one raw BOLD acquisition (`*_bold.nii[.gz]`), identified by its
+#' subject, session, task, `acq`, `ce`, `rec`, `dir`, and `run` entities.
+#' Multi-echo or magnitude/phase files from the same acquisition count as one
+#' run. Derivatives, events files, and sidecars are not counted.
+#'
 #' @param x A \code{bids_project} object.
 #' @return A list with summary information:
 #'   - `n_subjects`: number of participants
 #'   - `n_sessions`: number of sessions (if any), otherwise NULL
-#'   - `tasks`: a data frame with `task` and `n_runs` columns
-#'   - `total_runs`: total number of runs across the dataset
+#'   - `tasks`: a tibble with columns `task` and `n_runs`, where `n_runs` is
+#'     the total number of runs of that task across all subjects and sessions
+#'   - `total_runs`: total number of runs across the dataset (the sum of
+#'     `tasks$n_runs`)
 #'
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   summary <- bids_summary(proj)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
 #' @importFrom dplyr group_by summarize n distinct
 #' @importFrom tibble as_tibble
 #' @export
@@ -1764,35 +1781,20 @@ bids_summary <- function(x) {
     sess <- sessions(x)
   }
   
-  # Tasks and runs
-  # Assuming x$tbl has columns: subid, session, task, run
-  # Count runs per task
-  # Some datasets may have no runs or tasks columns populated, so guard checks:
-  tbl <- x$tbl
-  if (!"task" %in% names(tbl)) {
-    # If no tasks at all, empty summary
+  # Tasks and runs: a run is one raw BOLD acquisition, identified by its
+  # (subject, session, task, acq, ce, rec, dir, run) entities. Echo/part
+  # variants of the same acquisition count once; derivatives, events, and
+  # sidecars are not runs.
+  runs <- .bold_run_table(x)
+  if (nrow(runs) == 0) {
     tasks_df <- tibble::tibble(task = character(0), n_runs = integer(0))
-    total_runs <- 0
   } else {
-    # Count how many runs per task:
-    # If run is missing or always NA, treat each file as a run
-    # If run is present, count unique run values:
-    if ("run" %in% names(tbl)) {
-      tasks_df <- tbl %>%
-        dplyr::filter(!is.na(task)) %>%
-        dplyr::group_by(task) %>%
-        dplyr::summarize(n_runs = dplyr::n_distinct(run, na.rm=TRUE), .groups = "drop")
-    } else {
-      # If no run column, count occurrences of task as runs:
-      tasks_df <- tbl %>%
-        dplyr::filter(!is.na(task)) %>%
-        dplyr::group_by(task) %>%
-        dplyr::summarize(n_runs = n(), .groups = "drop")
-    }
-    
-    total_runs <- sum(tasks_df$n_runs)
+    tasks_df <- runs %>%
+      dplyr::count(.data$task, name = "n_runs") %>%
+      dplyr::mutate(n_runs = as.integer(.data$n_runs))
   }
-  
+  total_runs <- sum(tasks_df$n_runs)
+
   # Return a list summary
   list(
     n_subjects = n_subs,
@@ -1802,22 +1804,84 @@ bids_summary <- function(x) {
   )
 }
 
+
+#' Distinct raw BOLD runs in a project
+#'
+#' @param x A `bids_project`.
+#' @return A tibble with one row per distinct run and columns `subid`,
+#'   `session`, `task`, `acq`, `ce`, `rec`, `dir`, `run`.
+#' @keywords internal
+#' @noRd
+.bold_run_table <- function(x) {
+  keys <- c("subid", "session", "task", "acq", "ce", "rec", "dir", "run")
+  empty <- tibble::as_tibble(
+    stats::setNames(rep(list(character(0)), length(keys)), keys)
+  )
+  raw <- x$bids_tree$children$raw
+  if (is.null(raw)) {
+    return(empty)
+  }
+  leaves <- data.tree::Traverse(raw, filterFun = function(z) {
+    z$isLeaf && !is.null(z$task) && !is.na(z$task) &&
+      identical(as.character(z$kind), "bold") &&
+      str_detect_null(z$suffix, "nii(\\.gz)?$")
+  })
+  if (length(leaves) == 0) {
+    return(empty)
+  }
+  get1 <- function(node, key) {
+    val <- node[[key]]
+    if (is.null(val) || length(val) == 0) NA_character_ else as.character(val[[1]])
+  }
+  rows <- lapply(leaves, function(node) {
+    tibble::as_tibble(stats::setNames(
+      lapply(keys, function(k) get1(node, k)), keys
+    ))
+  })
+  dplyr::distinct(dplyr::bind_rows(rows))
+}
+
 #' Basic BIDS Compliance Checks
 #'
-#' This function performs a simple, lightweight check of common BIDS requirements:
-#' - Checks that `participants.tsv` and `dataset_description.json` exist at the root.
-#' - Ensures all subject directories begin with `sub-`.
-#' - If sessions are present, ensures that session directories begin with `ses-`.
+#' Performs a lightweight check of common BIDS requirements:
+#' - `dataset_description.json` must exist at the dataset root (an issue if
+#'   missing).
+#' - `participants.tsv`, `README`/`README.md`, and `CHANGES` are recommended
+#'   (a warning if missing).
+#' - Every participant must have a `sub-<label>` directory.
+#' - If sessions are present, session directories must be named
+#'   `ses-<label>`.
+#' - Optionally, file names are checked against the vendored BIDS schema
+#'   (see [bids_schema()]); mismatches are reported as warnings.
 #'
-#' Note: This is not a full BIDS validator. For complete validation, use the 
+#' This is not a full BIDS validator. For complete validation, use the
 #' official BIDS validator.
 #'
 #' @param x A \code{bids_project} object.
+#' @param schema_check Logical. Whether to run schema validation (default
+#'   \code{TRUE}). If the requested schema version is not available, schema
+#'   validation is skipped and \code{schema_checked} is \code{FALSE}.
+#' @param schema_version Character. BIDS schema version to use (default
+#'   \code{"1.10.0"}, the version vendored with bidser; see
+#'   [bids_schema_versions()]).
 #'
 #' @return A list with:
-#'   - `passed` (logical): TRUE if all checks passed, FALSE otherwise.
-#'   - `issues` (character vector): Descriptions of any issues found.
+#'   - `passed` (logical): `TRUE` if no issues were found.
+#'   - `issues` (character): descriptions of failed requirements.
+#'   - `warnings` (character): missing recommended files and schema warnings.
+#'   - `participants_source` (character): where participant IDs came from.
+#'   - `schema_checked` (logical): whether schema validation ran.
 #'
+#' @examples
+#' \donttest{
+#' tryCatch({
+#'   ds001_path <- get_example_bids_dataset("ds001")
+#'   proj <- bids_project(ds001_path)
+#'   compliance <- bids_check_compliance(proj)
+#' }, error = function(e) {
+#'   message("Example requires internet connection: ", e$message)
+#' })
+#' }
 #' @export
 bids_check_compliance <- function(x, schema_check = TRUE, schema_version = "1.10.0") {
   issues <- character(0)
