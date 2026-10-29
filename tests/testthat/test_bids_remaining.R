@@ -662,6 +662,22 @@ test_that(".bidser_load_participants_df non-strict appends extra subjects", {
   expect_true("sub-02" %in% all_ids)
 })
 
+test_that(".bidser_load_participants_df allows columns containing spaces", {
+  load_parts <- bidser:::.bidser_load_participants_df
+  tmp <- tempfile("bidser_commasep_")
+  dir.create(tmp, recursive = TRUE)
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
+
+  readr::write_tsv(
+    tibble::tibble(
+      participant_id = c("sub-01", "sub-02"),
+      species = c("homo sapiens", "rattus norvegicus")
+    ),
+    file.path(tmp, "participants.tsv")
+  )
+  testthat::expect_no_error(load_parts(tmp))
+})
+
 # ===========================================================================
 # 14. .bidser_normalize_subject_dirs (internal)
 # ===========================================================================
