@@ -194,3 +194,25 @@ test_that("bids_check_compliance allows sparse session coverage", {
   expect_false(any(grepl("Session directory not found", chk$issues)))
   expect_true(chk$passed)
 })
+
+test_that("bids_project preserves spaces in participant metadata", {
+  root <- make_regression_bids()
+  on.exit(unlink(root, recursive = TRUE), add = TRUE)
+
+  writeLines(
+    c(
+      "participant_id\tspecies\tgroup\tage",
+      "sub-01\thomo sapiens\thealthy control\t29"
+    ),
+    file.path(root, "participants.tsv")
+  )
+
+  proj <- bids_project(root, index = "none")
+
+  expect_equal(nrow(proj$part_df), 1L)
+  expect_named(proj$part_df, c("participant_id", "species", "group", "age"))
+  expect_identical(proj$part_df$participant_id, "sub-01")
+  expect_identical(proj$part_df$species, "homo sapiens")
+  expect_identical(proj$part_df$group, "healthy control")
+  expect_equal(proj$part_df$age, 29)
+})
