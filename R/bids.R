@@ -449,6 +449,7 @@ get_sessions <- function(path, sid) {
   if (file.exists(participants_file)) {
     part_df <- read.table(
       participants_file,
+      sep = "\t",
       header = TRUE,
       stringsAsFactors = FALSE,
       colClasses = c(participant_id = "character")
