@@ -106,6 +106,38 @@ proj
 
 The `bids_project` object provides a high-level interface to the dataset. We can see it contains 16 subjects with both anatomical and functional data.
 
+## Seeing the dataset at a glance
+
+Before querying anything, look at the whole dataset. `plot_bids()` draws an
+*acquisition matrix*: one row per subject, one column per acquisition, grouped
+by datatype and task. A present file is a pale cell. A missing file gets a
+heavy frame with a cross, and its BIDS name is listed under the plot. A file
+whose size is far from its column's median gets a heavy frame and its
+percentage, which is how truncated scans show up. Counts such as `15/16` appear
+only above columns and beside rows that are short.
+
+```{r overview-matrix, fig.width = 8, fig.height = 6.2}
+plot_bids(proj, interactive = FALSE)
+```
+
+ds001 is complete, so the matrix is uniformly pale and the subtitle says so.
+For a dataset with gaps, the problems are the only dark marks on the page.
+(The bids-examples copy of ds001 ships empty image files, so no sizes are
+shown here; on a real download the size check runs automatically.)
+
+`plot_bids_tree()` shows the same dataset as a file layout. Every subject is
+folded into one `sub-<label>` template, so the shape of the dataset fits in a
+few lines however many subjects it has. The right-hand column counts files per
+template and names any subject, session or run that lacks one.
+
+```{r overview-tree, fig.width = 8, fig.height = 3.6}
+plot_bids_tree(proj)
+```
+
+Both functions take `interactive = TRUE` (for `plot_bids()`) or return a
+regular ggplot, so you can restyle them with `theme_bidser()` or any ggplot2
+theme.
+
 ## Basic Dataset Queries
 
 ### Dataset Structure

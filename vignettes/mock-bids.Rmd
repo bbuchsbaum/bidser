@@ -134,10 +134,21 @@ mock_proj
 stopifnot(file.exists(file.path(mock_dir, "participants.tsv")))
 ```
 
-You can inspect the resulting layout immediately with `plot_bids()`.
+You can inspect the resulting layout immediately with `plot_bids()`. The
+fMRIPrep column is drawn as an outline to set derivatives apart from raw data.
+Because the inventory above gives `sub-02` no preprocessed run, the plot marks
+that cell as missing and names the file under the plot. Mock projects are a
+cheap way to check that your QC code catches such gaps before you run it on
+real data.
 
-```{r plot-project}
+```{r plot-project, fig.width = 6, fig.height = 2.8}
 plot_bids(mock_proj, interactive = FALSE)
+```
+
+`plot_bids_tree()` shows the file layout the mock project will write to disk:
+
+```{r plot-tree, fig.width = 8, fig.height = 3.2}
+plot_bids_tree(mock_proj)
 ```
 
 ## How do you query raw and derivative files?
