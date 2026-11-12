@@ -394,7 +394,10 @@ bids_matrix_plot <- function(cells, fill_by = c("datatype", "size"),
   ink <- bidser_ink()
   col_labels <- strip_colkey(levels(droplevels(cells$colkey)))
   if (is.null(rotate_labels)) {
-    rotate_labels <- length(col_labels) > 16 || max(nchar(col_labels)) > 10
+    # Labels sit under columns about one cell wide; tilt them once long
+    # labels and many columns make collisions likely.
+    rotate_labels <- length(col_labels) > 16 ||
+      (max(nchar(col_labels)) > 8 && length(col_labels) > 6)
   }
 
   cells$tooltip <- paste0(
@@ -479,7 +482,7 @@ bids_matrix_plot <- function(cells, fill_by = c("datatype", "size"),
     if (fill_by == "datatype") {
       p <- p + ggplot2::geom_text(
         data = flagged, ggplot2::aes(label = flag_short(flagged)),
-        size = 2.7, fontface = "bold", colour = ink[["text"]]
+        size = 2.3, fontface = "bold", colour = ink[["text"]]
       )
     }
   }
@@ -503,7 +506,7 @@ bids_matrix_plot <- function(cells, fill_by = c("datatype", "size"),
       panel.spacing.x = ggplot2::unit(10, "pt"),
       panel.spacing.y = ggplot2::unit(10, "pt"),
       axis.text.x = if (rotate_labels)
-        ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5, size = 8)
+        ggplot2::element_text(angle = 35, hjust = 1, vjust = 1, size = 8)
       else ggplot2::element_text(size = 8.5, margin = ggplot2::margin(t = 3)),
       axis.text.y = ggplot2::element_text(size = 8.5, family = "mono"),
       strip.text.x = if (show_strips)
@@ -712,7 +715,7 @@ bids_matrix_figure <- function(x, frame, cells, title = NULL, margins = TRUE,
     top, ggplot2::ggplot() + ggplot2::theme_void() +
       ggplot2::theme(plot.background = ggplot2::element_rect(fill = "white", colour = NA)),
     main, right,
-    ncol = 2, widths = c(1, 0.06), heights = c(0.45, max(n_rows, 2))
+    ncol = 2, widths = c(1, 0.09), heights = c(0.45, max(n_rows, 2))
   ) +
     patchwork::plot_annotation(
       title = title, subtitle = subtitle, caption = caption,
@@ -747,6 +750,13 @@ bids_matrix_caption <- function(cells) {
     }
   }
   lines <- c(lines, cur)
+  # Long BIDS names: break after the name so each line fits the figure
+  problems <- unlist(lapply(problems, function(pr) {
+    if (nchar(pr) <= 100) return(pr)
+    parts <- regmatches(pr, regexpr(": ", pr), invert = TRUE)[[1]]
+    if (length(parts) < 2) return(pr)
+    c(paste0(parts[1], ":"), paste0("    ", paste(parts[-1], collapse = ": ")))
+  }))
   paste(c(lines, if (length(problems)) c("", problems)), collapse = "\n")
 }
 
@@ -781,6 +791,8 @@ bids_display_name <- function(x) {
 #'   `run-<index>` row.
 #' @param include_sidecars Logical. Show `.json` sidecars.
 #' @param max_rows Maximum number of rows to draw before truncating.
+#' @param short_names Logical. Replace the `sub-<label>_ses-<label>_` prefix
+#'   that every file name repeats with an ellipsis, for a narrower figure.
 #' @return A ggplot object. Because the layout is monospace text, its natural
 #'   size is known: `attr(p, "bidser_size")` gives a suggested `width` and
 #'   `height` in inches for `ggsave()` or knitr's `fig.width`/`fig.height`.
@@ -797,7 +809,7 @@ bids_display_name <- function(x) {
 #'   plot_bids_tree(mock)
 #' }
 plot_bids_tree <- function(x, include_derivatives = TRUE, collapse_runs = TRUE,
-                           include_sidecars = TRUE, max_rows = 60) {
+                           include_sidecars = TRUE, max_rows = 60, short_names = FALSE) {
   if (!inherits(x, "bids_project") && !inherits(x, "mock_bids_project")) {
     stop("Input must be a bids_project or mock_bids_project object")
   }
@@ -813,6 +825,10 @@ plot_bids_tree <- function(x, include_derivatives = TRUE, collapse_runs = TRUE,
   if (!include_sidecars) frame <- frame[frame$role != "sidecar", ]
   rows <- bids_tree_rows(frame, collapse_runs = collapse_runs)
   absent <- attr(rows, "absent")
+  if (isTRUE(short_names)) {
+    is_leaf <- !rows$is_dir & grepl("^sub-<label>_", rows$label)
+    rows$label[is_leaf] <- paste0("\u2026_", sub("^sub-<label>_(ses-<label>_)?", "", rows$label[is_leaf]))
+  }
   truncated <- 0L
   if (nrow(rows) > max_rows) {
     truncated <- nrow(rows) - max_rows
@@ -979,7 +995,7 @@ bids_tree_plot <- function(nodes, title, truncated = 0L, n_sub = NA_integer_) {
 
   name <- ifelse(nodes$is_dir, paste0(nodes$label, "/"), nodes$label)
   prefix_len <- ifelse(nodes$is_dir, 0L,
-                       nchar(stringr::str_extract(nodes$label, "^(sub-<label>_)?(ses-<label>_)?")))
+                       nchar(stringr::str_extract(nodes$label, "^(\u2026_)?(sub-<label>_)?(ses-<label>_)?")))
   prefix_len[is.na(prefix_len)] <- 0L
 
   leaf <- !nodes$is_dir

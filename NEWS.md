@@ -21,9 +21,14 @@
   assignments" on datasets with real file sizes.
 * `n_volumes()` no longer requires RNifti: without it, NIfTI-1 headers are
   read directly in base R.
-* `print()` on a `bids_project` shows the dataset's `Name` from
-  `dataset_description.json` alongside the directory name, and omits the
-  empty "Modalities" line.
+* `print()` on a `bids_project` is now a short summary: the dataset's `Name`
+  from `dataset_description.json`, root, subjects (and where they came
+  from), sessions in chronological order, tasks, datatypes and derivative
+  pipelines. Internal details (index state, parser keys, "funcprep" types)
+  are no longer printed.
+* `plot_bids_tree()` gains `short_names` to abbreviate the repeated
+  `sub-<label>_ses-<label>_` prefix, and reports its natural size in
+  `attr(p, "bidser_size")`.
 * The README now opens with a real dataset workflow (overview plots, entity
   queries, metadata, derivatives, confounds) rather than mock projects.
 * New `theme_bidser()` and `bids_datatype_colors()` give all bidser figures

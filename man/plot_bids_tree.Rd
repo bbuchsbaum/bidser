@@ -9,7 +9,8 @@ plot_bids_tree(
   include_derivatives = TRUE,
   collapse_runs = TRUE,
   include_sidecars = TRUE,
-  max_rows = 60
+  max_rows = 60,
+  short_names = FALSE
 )
 }
 \arguments{
@@ -23,6 +24,9 @@ plot_bids_tree(
 \item{include_sidecars}{Logical. Show \code{.json} sidecars.}
 
 \item{max_rows}{Maximum number of rows to draw before truncating.}
+
+\item{short_names}{Logical. Replace the \verb{sub-<label>_ses-<label>_} prefix
+that every file name repeats with an ellipsis, for a narrower figure.}
 }
 \value{
 A ggplot object. Because the layout is monospace text, its natural

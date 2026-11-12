@@ -55,17 +55,13 @@ library(bidser)
 
 proj <- bids_project(path, derivatives = "auto")
 proj
-#> BIDS Project Summary 
-#> Project Name:  Working Memory Training (wm-training) 
-#> Participants (n):  10 
-#> Participants Source:  file 
-#> Tasks:  nback, rest 
-#> Sessions:  post, pre 
-#> fMRIPrep Derivatives:  derivatives/fmriprep 
-#> Derivative Pipelines:  fmriprep 
-#> Index:  enabled 
-#> Image Types:  func, fmap, dwi, anat, funcprep 
-#> Keys:  session, folder, kind, relative_path, run, subid, suffix, task, type, dir, desc, space
+#> <bids_project> Working Memory Training
+#>   root         /tmp/RtmpTshqMt/wm-training
+#>   subjects     10 (from participants.tsv)
+#>   sessions     pre, post
+#>   tasks        nback, rest
+#>   datatypes    anat, func, fmap, dwi
+#>   derivatives  fmriprep (derivatives/fmriprep)
 ```
 
 The examples on this page run on a small demonstration dataset: a
@@ -94,10 +90,13 @@ plot_bids(proj, interactive = FALSE)
 
 `plot_bids_tree()` shows the same dataset as a file layout. Every
 subject is folded into one `sub-<label>` template, and each file line
-gives its count and names whoever is missing.
+gives its count and names whoever is missing. Here it shows the raw data
+only, with the `sub-<label>_ses-<label>_` prefix that every file name
+repeats abbreviated; by default it also draws each pipeline under
+`derivatives/`.
 
 ``` r
-plot_bids_tree(proj)
+plot_bids_tree(proj, include_derivatives = FALSE, short_names = TRUE)
 ```
 
 <img src="man/figures/README-plot-tree-1.png" width="100%" />
@@ -134,12 +133,10 @@ applies to every run:
 
 ``` r
 bold <- func_scans(proj, subid = "01", task = "nback", session = "pre", run = "1")
-get_metadata(proj, bold)[c("TaskName", "RepetitionTime")]
-#> $TaskName
-#> [1] "nback"
-#> 
-#> $RepetitionTime
-#> [1] 2
+str(get_metadata(proj, bold)[c("TaskName", "RepetitionTime")])
+#> List of 2
+#>  $ TaskName      : chr "nback"
+#>  $ RepetitionTime: int 2
 ```
 
 `n_volumes()` reads volume counts from the image headers. Here it shows
@@ -155,17 +152,21 @@ n_volumes(proj, subid = "07", session = "post", task = "nback", as_tibble = TRUE
 #> 2 07    post        2   130
 ```
 
-`read_events()` returns each run’s `events.tsv` nested by subject,
-session, task and run:
+`read_events()` reads every matching `events.tsv`, one row per run with
+the events nested in `data`:
 
 ``` r
-read_events(proj, subid = "01", session = "pre", task = "nback")
-#> # A tibble: 2 × 9
-#> # Groups:   .task, .session, .run, .subid [2]
-#>   .task .session .run  .subid task  session run   participant_id data             
-#>   <chr> <chr>    <chr> <chr>  <chr> <chr>   <chr> <chr>          <list>           
-#> 1 nback pre      1     01     nback pre     1     01             <tibble [16 × 5]>
-#> 2 nback pre      2     01     nback pre     2     01             <tibble [16 × 5]>
+events <- read_events(proj, subid = "01", session = "pre", task = "nback")
+nrow(events)
+#> [1] 2
+head(events$data[[1]][, c("onset", "duration", "trial_type", "response_time")], 4)
+#> # A tibble: 4 × 4
+#>   onset duration trial_type response_time
+#>   <dbl>    <dbl> <chr>              <dbl>
+#> 1    10       20 0back              0.652
+#> 2    40       20 2back              0.808
+#> 3    70       20 0back              0.839
+#> 4   100       20 2back              0.819
 ```
 
 ## Derivatives
@@ -181,10 +182,11 @@ derivative_pipelines(proj)[, c("pipeline", "root")]
 #>   <chr>    <chr>               
 #> 1 fmriprep derivatives/fmriprep
 
-query_files(proj, regex = "desc-preproc_bold", scope = "derivatives",
-            pipeline = "fmriprep", subid = "09", session = "post")
-#> [1] "derivatives/fmriprep/sub-09/ses-post/func/sub-09_ses-post_task-nback_run-1_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz"
-#> [2] "derivatives/fmriprep/sub-09/ses-post/func/sub-09_ses-post_task-rest_run-1_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz"
+preproc <- query_files(proj, regex = "desc-preproc_bold", scope = "derivatives",
+                       pipeline = "fmriprep", subid = "09", session = "post")
+basename(preproc)
+#> [1] "sub-09_ses-post_task-nback_run-1_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz"
+#> [2] "sub-09_ses-post_task-rest_run-1_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz"
 ```
 
 Only two preprocessed runs are returned for sub-09 ses-post, where three
