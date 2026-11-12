@@ -56,7 +56,7 @@ library(bidser)
 proj <- bids_project(path, derivatives = "auto")
 proj
 #> <bids_project> Working Memory Training
-#>   root         /tmp/RtmpTshqMt/wm-training
+#>   root         /tmp/Rtmp7eD2dP/wm-training
 #>   subjects     10 (from participants.tsv)
 #>   sessions     pre, post
 #>   tasks        nback, rest

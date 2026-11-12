@@ -12,6 +12,31 @@
 #   - fMRIPrep produced nothing for sub-09 ses-post nback run-2
 #   - sub-04 moved a lot during ses-post rest
 
+# A minimal but valid single-file NIfTI-1 header (348 bytes + 4-byte
+# extension flag), int16 data, 2 mm voxels, TR 2 s.
+write_nifti1_header <- function(con, dims) {
+  dims <- as.integer(dims)
+  le <- function(x, size, type = "integer") writeBin(x, con, size = size, endian = "little")
+  le(348L, 4)                                   # sizeof_hdr
+  writeBin(raw(34), con); writeBin(as.raw(0x72), con); writeBin(raw(1), con)  # ..regular, dim_info
+  le(c(length(dims), dims, rep(1L, 7 - length(dims))), 2)  # dim[8]
+  le(c(0, 0, 0), 4, "double")                  # intent_p1..p3
+  le(c(0L, 4L, 16L, 0L), 2)                    # intent_code, datatype, bitpix, slice_start
+  le(c(1, 2, 2, 2, 2, 1, 1, 1), 4, "double")   # pixdim[8]
+  le(352, 4, "double")                         # vox_offset
+  le(c(1, 0), 4, "double")                     # scl_slope, scl_inter
+  le(0L, 2); writeBin(raw(2), con)             # slice_end, slice_code, xyzt_units
+  le(c(0, 0, 0, 0), 4, "double")               # cal_max, cal_min, slice_duration, toffset
+  le(c(0L, 0L), 4)                             # glmax, glmin
+  writeBin(raw(80 + 24), con)                  # descrip, aux_file
+  le(c(0L, 1L), 2)                             # qform_code, sform_code
+  le(rep(0, 6), 4, "double")                   # quatern_b..qoffset_z
+  le(c(2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0), 4, "double")  # srow_x/y/z
+  writeBin(raw(16), con)                       # intent_name
+  writeBin(c(charToRaw("n+1"), as.raw(0)), con) # magic
+  writeBin(raw(4), con)                        # extension flag
+}
+
 make_readme_dataset <- function(root = tempfile("bidser-readme-")) {
   set.seed(1)
   dir.create(root, recursive = TRUE, showWarnings = FALSE)
@@ -31,11 +56,7 @@ make_readme_dataset <- function(root = tempfile("bidser-readme-")) {
     f <- file.path(root, rel)
     dir.create(dirname(f), recursive = TRUE, showWarnings = FALSE)
     con <- gzfile(f, "wb")
-    writeBin(348L, con, size = 4, endian = "little")
-    writeBin(raw(36), con)
-    writeBin(as.integer(c(if (nvol > 1) 4 else 3, 64, 64, 36, nvol, 1, 1, 1)),
-             con, size = 2, endian = "little")
-    writeBin(raw(348 - 56), con)
+    write_nifti1_header(con, c(64, 64, 36, nvol))
     close(con)
     con <- file(f, "r+b")
     seek(con, round(bytes) - 1, rw = "write")

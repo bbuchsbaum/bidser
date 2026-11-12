@@ -448,7 +448,7 @@ bids_matrix_plot <- function(cells, fill_by = c("datatype", "size"),
       ggplot2::scale_fill_gradient2(
         low = "#B5562F", mid = ink[["empty"]], high = "#2F5D7C", midpoint = 0,
         limits = log2(c(lo, hi)), breaks = log2(c(0.4, 0.7, 1, 1.3, 1.6)),
-        labels = c("\u2264 40%", "70%", "median", "130%", "\u2265 160%"),
+        labels = function(b) bidser_safe(c("\u2264 40%", "70%", "median", "130%", "\u2265 160%")),
         na.value = ink[["empty"]],
         name = "Size as % of\ncolumn median",
         guide = ggplot2::guide_colourbar(barheight = ggplot2::unit(70, "pt"),
@@ -685,7 +685,7 @@ bids_matrix_problems <- function(cells, max_items = 8) {
   all <- do.call(rbind, rows)
   out <- all$txt[order(all$subject, all$ses)]
   if (length(out) > max_items) {
-    out <- c(out[seq_len(max_items - 1)], paste0("\u2026 and ", length(out) - max_items + 1, " more"))
+    out <- c(out[seq_len(max_items - 1)], paste0("and ", length(out) - max_items + 1, " more"))
   }
   out
 }
@@ -733,7 +733,7 @@ bids_matrix_caption <- function(cells) {
     key <- c(key, if (any(!is.na(cells$col_nvol[cells$state == "size"])))
       "n/N in frame: volumes vs. usual count" else "% in frame: size vs. column median")
   }
-  if (any(cells$companion_missing)) key <- c(key, "\u25cb: events/confounds file missing")
+  if (any(cells$companion_missing)) key <- c(key, "ring: events/confounds file missing")
   if (any(cells$scope == "derivatives")) key <- c(key, "outline: derivative")
   if (any(cells$state %in% c("upstream", "absent"))) key <- c(key, "faint dashes: not counted (no data for that subject-session, or raw input missing)")
   problems <- bids_matrix_problems(cells)
@@ -1065,7 +1065,7 @@ bids_tree_plot <- function(nodes, title, truncated = 0L, n_sub = NA_integer_) {
 
   fs <- 3.1
   mono <- function(data, colour, face = "plain") {
-    ggplot2::geom_text(data = data, ggplot2::aes(x = 0, y = .data$y, label = .data$txt),
+    ggplot2::geom_text(data = data, ggplot2::aes(x = 0, y = .data$y, label = bidser_safe(.data$txt)),
                        hjust = 0, family = "mono", size = fs, colour = colour, fontface = face)
   }
   df <- function(txt, keep = rep(TRUE, n)) data.frame(y = row_y[keep], txt = txt[keep])
@@ -1091,7 +1091,7 @@ bids_tree_plot <- function(nodes, title, truncated = 0L, n_sub = NA_integer_) {
         "of one file per subject", if (any(nodes$has_sessions, na.rm = TRUE)) " \u00d7 session",
         " \u00d7 run (the arrow names who is missing) or contain a file of unusual length."),
         width = 100), collapse = "\n"),
-      caption = if (truncated > 0) paste0("\u2026 ", truncated, " more rows not shown") else NULL
+      caption = if (truncated > 0) paste0(truncated, " more rows not shown") else NULL
     ) +
     theme_bidser() +
     ggplot2::theme(axis.text = ggplot2::element_blank(), axis.title = ggplot2::element_blank())
