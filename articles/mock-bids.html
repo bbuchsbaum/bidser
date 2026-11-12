@@ -141,14 +141,24 @@ later.</p>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Datatypes: </span> <span style="color: #00BB00;">func</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">Suffixes: </span> <span style="color: #00BB00;">nii.gz, tsv</span> </span></span>
 <span><span class="co">#&gt; <span style="font-weight: bold;">BIDS Keys: </span> <span style="color: #BBBB00;">(none)</span> </span></span>
-<span><span class="co">#&gt; Path:  /tmp/RtmpBnEAoJ/bidser-mock-6cbd7e9d5694</span></span>
+<span><span class="co">#&gt; Path:  /tmp/RtmpOjrn2d/bidser-mock-6f0d33a2af8e</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">mock_dir</span>, <span class="st">"participants.tsv"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>You can inspect the resulting layout immediately with
-<code><a href="../reference/plot_bids.html">plot_bids()</a></code>.</p>
+<code><a href="../reference/plot_bids.html">plot_bids()</a></code>. The fMRIPrep column is drawn as an outline to
+set derivatives apart from raw data. Because the inventory above gives
+<code>sub-02</code> no preprocessed run, the plot marks that cell as
+missing and names the file under the plot. Mock projects are a cheap way
+to check that your QC code catches such gaps before you run it on real
+data.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_bids.html">plot_bids</a></span><span class="op">(</span><span class="va">mock_proj</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="mock-bids_files/figure-html/plot-project-1.png" class="r-plt" alt="" width="700"></p>
+<p><img src="mock-bids_files/figure-html/plot-project-1.png" class="r-plt" alt="" width="576"></p>
+<p><code><a href="../reference/plot_bids_tree.html">plot_bids_tree()</a></code> shows the file layout the mock project
+will write to disk:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_bids_tree.html">plot_bids_tree</a></span><span class="op">(</span><span class="va">mock_proj</span><span class="op">)</span></span></code></pre></div>
+<p><img src="mock-bids_files/figure-html/plot-tree-1.png" class="r-plt" alt="" width="768"></p>
 </div>
 <div class="section level2">
 <h2 id="how-do-you-query-raw-and-derivative-files">How do you query raw and derivative files?<a class="anchor" aria-label="anchor" href="#how-do-you-query-raw-and-derivative-files"></a>
@@ -156,7 +166,7 @@ later.</p>
 <p>Because <code><a href="../reference/query_files.html">query_files()</a></code> works on mock projects too, you
 can test selection logic before you point the same code at a real
 dataset.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">raw_runs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span></span>
 <span>  <span class="va">mock_proj</span>,</span>
 <span>  regex <span class="op">=</span> <span class="st">"bold\\.nii\\.gz$"</span>,</span>
@@ -193,7 +203,7 @@ dataset.</p>
 </h2>
 <p>The mock project stores real tabular data, so the higher-level
 readers work the same way they do on a real project.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">subject_events</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_events.html">read_events</a></span><span class="op">(</span><span class="va">mock_proj</span>, subid <span class="op">=</span> <span class="st">"01"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="va">data</span><span class="op">)</span></span>
 <span></span>
@@ -210,7 +220,7 @@ readers work the same way they do on a real project.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">subject_events</span><span class="op">)</span> <span class="op">==</span> <span class="fl">2L</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">subject_events</span><span class="op">$</span><span class="va">duration</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mock_confounds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_confounds.html">read_confounds</a></span><span class="op">(</span></span>
 <span>  <span class="va">mock_proj</span>,</span>
 <span>  subid <span class="op">=</span> <span class="st">"01"</span>,</span>
@@ -241,7 +251,7 @@ downstream table checks.</p>
 <p><code><a href="../reference/pack_bids.html">pack_bids()</a></code> creates an archive while replacing imaging
 files with zero-byte stubs. That keeps the layout and tabular metadata
 intact without shipping full images.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">archive_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".tar.gz"</span><span class="op">)</span></span>
 <span><span class="va">packed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pack_bids.html">pack_bids</a></span><span class="op">(</span><span class="va">mock_proj</span>, output_file <span class="op">=</span> <span class="va">archive_file</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">archive_contents</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/list_pack_bids.html">list_pack_bids</a></span><span class="op">(</span><span class="va">packed</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>

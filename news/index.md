@@ -2,6 +2,44 @@
 
 ## bidser (development version)
 
+- [`plot_bids()`](https://bbuchsbaum.github.io/bidser/reference/plot_bids.md)
+  is redesigned as an acquisition matrix: one row per subject (grouped
+  by session), one column per acquisition (grouped by datatype, task and
+  derivative pipeline). Present files are drawn quietly; missing files,
+  runs with an unusual number of volumes (read from the NIfTI header in
+  base
+
+  18. or size, and missing `events.tsv`/confounds files are marked,
+      counted in the margins and listed by BIDS file name under the
+      plot. A derivative is only expected where its raw input exists,
+      and a subject-session with no files at all is reported once.
+
+- New
+  [`plot_bids_tree()`](https://bbuchsbaum.github.io/bidser/reference/plot_bids_tree.md)
+  draws the dataset layout with every subject folded into a
+  `sub-<label>` template, with per-file counts that name who is missing
+  and which files have an unusual length.
+
+- [`bids_heatmap()`](https://bbuchsbaum.github.io/bidser/reference/bids_heatmap.md)
+  now shades each file by its size relative to its column’s median.
+  Previously it showed a placeholder 1 MB per file on real projects.
+
+- [`plot()`](https://rdrr.io/r/graphics/plot.default.html) on confound
+  objects leads with head motion when `framewise_displacement` is kept
+  as a raw column (new `fd_threshold` argument), uses
+  one-row-per-component small multiples, and shows loadings as dot plots
+  in a consistent order.
+
+- [`plot_bids()`](https://bbuchsbaum.github.io/bidser/reference/plot_bids.md)
+  no longer fails with “NAs are not allowed in subscripted assignments”
+  on datasets with real file sizes.
+
+- New
+  [`theme_bidser()`](https://bbuchsbaum.github.io/bidser/reference/theme_bidser.md)
+  and
+  [`bids_datatype_colors()`](https://bbuchsbaum.github.io/bidser/reference/bids_datatype_colors.md)
+  give all bidser figures one theme and one datatype palette.
+
 - [`bids_summary()`](https://bbuchsbaum.github.io/bidser/reference/bids_summary.md)
   now counts runs correctly: `total_runs` is the number of raw BOLD runs
   in the dataset, and `tasks$n_runs` is the number of runs of each task
@@ -9,18 +47,21 @@
   labels per task and included non-BOLD files, so 4 subjects x 3 runs
   reported 3 instead of 12. Multi-echo files from one acquisition count
   once ([\#80](https://github.com/bbuchsbaum/bidser/issues/80)).
+
 - [`read_confounds()`](https://bbuchsbaum.github.io/bidser/reference/read_confounds.md)
   (and
   [`variables_table()`](https://bbuchsbaum.github.io/bidser/reference/variables_table.md),
   which calls it) no longer prints readr’s column-specification message
   for every confound file
   ([\#81](https://github.com/bbuchsbaum/bidser/issues/81)).
+
 - `create_mock_bids(create_stub = TRUE)` now writes a derivative
   `dataset_description.json` (`DatasetType = "derivative"`,
   `GeneratedBy`) under `prep_dir` when the file structure includes
   derivative files, so the stub opens with
   `bids_project(..., fmriprep = TRUE)` without warnings
   ([\#82](https://github.com/bbuchsbaum/bidser/issues/82)).
+
 - [`bids_check_compliance()`](https://bbuchsbaum.github.io/bidser/reference/bids_check_compliance.md)
   and
   [`bids_summary()`](https://bbuchsbaum.github.io/bidser/reference/bids_summary.md)

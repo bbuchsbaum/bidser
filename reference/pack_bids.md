@@ -210,7 +210,7 @@ tryCatch({
 #> Archive size: 0.07 MB
 #> 
 #> Timing:
-#>   Archive creation: 0.1 seconds
+#>   Archive creation: 0.0 seconds
 #>   Total time: 0.1 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 1.00 MB
@@ -246,7 +246,7 @@ tryCatch({
 #> 
 #> Timing:
 #>   Archive creation: 0.0 seconds
-#>   Total time: 0.1 seconds
+#>   Total time: 0.0 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 10.00 MB
 #> 
@@ -284,7 +284,7 @@ tryCatch({
 #> Downsampling complete:
 #>   Successfully downsampled: 0 files
 #>   Created stubs for 80 files (downsampling failed)
-#>   Time taken: 4.1 seconds
+#>   Time taken: 2.5 seconds
 #> 
 #> Creating archive...
 #> 
@@ -294,8 +294,8 @@ tryCatch({
 #> Expected size reduction: ~64.0x for 3D, ~64.0x for 4D
 #> 
 #> Timing:
-#>   Archive creation: 0.1 seconds
-#>   Total time: 4.2 seconds
+#>   Archive creation: 0.0 seconds
+#>   Total time: 2.5 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 10.00 MB
 #> Using parallel processing with 2 cores for downsampling
@@ -328,7 +328,7 @@ tryCatch({
 #> Downsampling complete:
 #>   Successfully downsampled: 0 files
 #>   Created stubs for 80 files (downsampling failed)
-#>   Time taken: 6.0 seconds
+#>   Time taken: 4.0 seconds
 #> 
 #> Creating archive...
 #> 
@@ -339,7 +339,7 @@ tryCatch({
 #> 
 #> Timing:
 #>   Archive creation: 0.0 seconds
-#>   Total time: 6.4 seconds
+#>   Total time: 4.4 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 10.00 MB
 #> 
@@ -373,7 +373,7 @@ tryCatch({
 #> 
 #> Timing:
 #>   Archive creation: 0.0 seconds
-#>   Total time: 0.1 seconds
+#>   Total time: 0.0 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 10.00 MB
 #> 
@@ -407,7 +407,7 @@ tryCatch({
 #> 
 #> Timing:
 #>   Archive creation: 0.0 seconds
-#>   Total time: 0.1 seconds
+#>   Total time: 0.0 seconds
 #> Temporary files cleaned up
 #> Maximum file size for non-imaging files: 10.00 MB
 #> 
@@ -443,7 +443,7 @@ tryCatch({
 #> 
 #> Timing:
 #>   Archive creation: 0.0 seconds
-#>   Total time: 0.4 seconds
+#>   Total time: 0.2 seconds
 #> Temporary files cleaned up
 # }
 ```

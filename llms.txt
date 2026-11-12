@@ -118,6 +118,8 @@ vignette](https://bbuchsbaum.github.io/bidser/articles/confounds-and-variables.h
   : Coerce to a BIDS URI object
 - [`bids_check_compliance()`](https://bbuchsbaum.github.io/bidser/reference/bids_check_compliance.md)
   : Basic BIDS Compliance Checks
+- [`bids_datatype_colors()`](https://bbuchsbaum.github.io/bidser/reference/bids_datatype_colors.md)
+  : Colours for BIDS datatypes
 - [`bids_datatype_spec()`](https://bbuchsbaum.github.io/bidser/reference/bids_datatype_spec.md)
   : Build a custom BIDS datatype spec
 - [`bids_entities()`](https://bbuchsbaum.github.io/bidser/reference/bids_entities.md)
@@ -248,6 +250,8 @@ vignette](https://bbuchsbaum.github.io/bidser/articles/confounds-and-variables.h
   : Plot a BIDS project as a dendrogram
 - [`plot_bids()`](https://bbuchsbaum.github.io/bidser/reference/plot_bids.md)
   : Plot a comprehensive visual overview of a BIDS project
+- [`plot_bids_tree()`](https://bbuchsbaum.github.io/bidser/reference/plot_bids_tree.md)
+  : Plot the file layout of a BIDS project as a template tree
 - [`preproc_scans()`](https://bbuchsbaum.github.io/bidser/reference/preproc_scans-method.md)
   : Get preprocessed functional MRI scans
 - [`preproc_scans(`*`<bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/preproc_scans.bids_project.md)
@@ -300,6 +304,8 @@ vignette](https://bbuchsbaum.github.io/bidser/articles/confounds-and-variables.h
   : Get tasks from a BIDS project
 - [`tasks(`*`<mock_bids_project>`*`)`](https://bbuchsbaum.github.io/bidser/reference/tasks.mock_bids_project.md)
   : Get Tasks from Mock BIDS Project
+- [`theme_bidser()`](https://bbuchsbaum.github.io/bidser/reference/theme_bidser.md)
+  : A quiet ggplot2 theme for BIDS figures
 - [`transform_files()`](https://bbuchsbaum.github.io/bidser/reference/transform_files.md)
   : Query Transform Files from a BIDS Project
 - [`unregister_datatype()`](https://bbuchsbaum.github.io/bidser/reference/unregister_datatype.md)

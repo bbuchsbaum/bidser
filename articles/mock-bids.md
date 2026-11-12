@@ -83,13 +83,18 @@ mock_proj
 #> Datatypes:  func 
 #> Suffixes:  nii.gz, tsv 
 #> BIDS Keys:  (none) 
-#> Path:  /tmp/RtmpBnEAoJ/bidser-mock-6cbd7e9d5694
+#> Path:  /tmp/RtmpOjrn2d/bidser-mock-6f0d33a2af8e
 
 stopifnot(file.exists(file.path(mock_dir, "participants.tsv")))
 ```
 
 You can inspect the resulting layout immediately with
 [`plot_bids()`](https://bbuchsbaum.github.io/bidser/reference/plot_bids.md).
+The fMRIPrep column is drawn as an outline to set derivatives apart from
+raw data. Because the inventory above gives `sub-02` no preprocessed
+run, the plot marks that cell as missing and names the file under the
+plot. Mock projects are a cheap way to check that your QC code catches
+such gaps before you run it on real data.
 
 ``` r
 
@@ -97,6 +102,16 @@ plot_bids(mock_proj, interactive = FALSE)
 ```
 
 ![](mock-bids_files/figure-html/plot-project-1.png)
+
+[`plot_bids_tree()`](https://bbuchsbaum.github.io/bidser/reference/plot_bids_tree.md)
+shows the file layout the mock project will write to disk:
+
+``` r
+
+plot_bids_tree(mock_proj)
+```
+
+![](mock-bids_files/figure-html/plot-tree-1.png)
 
 ## How do you query raw and derivative files?
 

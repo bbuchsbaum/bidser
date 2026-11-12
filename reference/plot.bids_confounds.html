@@ -62,6 +62,7 @@ aggregates loadings across runs.</p>
 <span>  pcs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  top_n <span class="op">=</span> <span class="fl">8</span>,</span>
 <span>  max_panels <span class="op">=</span> <span class="fl">6</span>,</span>
+<span>  fd_threshold <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -92,6 +93,12 @@ absolute loading. Set to <code>NULL</code> to keep all variables.</p></dd>
 <dt id="arg-max-panels">max_panels<a class="anchor" aria-label="anchor" href="#arg-max-panels"></a></dt>
 <dd><p>Integer. In <code>view = "auto"</code>, facet score plots only
 when the number of runs is at most <code>max_panels</code>.</p></dd>
+
+
+<dt id="arg-fd-threshold">fd_threshold<a class="anchor" aria-label="anchor" href="#arg-fd-threshold"></a></dt>
+<dd><p>Numeric. Framewise-displacement threshold in mm drawn
+on the motion panel (shown when a <code>framewise_displacement</code> column was
+kept, e.g. via <code>confound_strategy(raw_vars = "framewise_displacement")</code>).</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

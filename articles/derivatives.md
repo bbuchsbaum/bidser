@@ -14,7 +14,10 @@ without downloading example data. For raw-project discovery, start with
 Use
 [`plot_bids()`](https://bbuchsbaum.github.io/bidser/reference/plot_bids.md)
 to get a fast overview of the raw project plus attached derivative
-folders.
+folders. Each pipeline gets its own column group, drawn in outline, and
+a derivative that is absent where raw data exist is flagged as missing.
+A derivative whose raw input is itself missing is not counted against
+the pipeline.
 
 ``` r
 
@@ -22,6 +25,16 @@ plot_bids(proj, interactive = FALSE)
 ```
 
 ![](derivatives_files/figure-html/overview-plot-1.png)
+
+[`plot_bids_tree()`](https://bbuchsbaum.github.io/bidser/reference/plot_bids_tree.md)
+shows where each pipeline wrote its files:
+
+``` r
+
+plot_bids_tree(proj)
+```
+
+![](derivatives_files/figure-html/overview-tree-1.png)
 
 For code,
 [`derivative_pipelines()`](https://bbuchsbaum.github.io/bidser/reference/derivative_pipelines.md)
@@ -118,7 +131,9 @@ stopifnot(
 ```
 
 If you want a compact diagnostic view, ask for principal components and
-plot them.
+plot them. Keep framewise displacement as a raw column and the plot adds
+a head-motion panel with a 0.5 mm threshold (`fd_threshold`) above the
+components.
 
 ``` r
 
@@ -126,10 +141,14 @@ confounds_pca <- read_confounds(
   proj,
   subid = "01",
   task = "rest",
-  npcs = 2
+  cvars = confound_strategy(
+    pca_vars = c("CSF", "WhiteMatter", "GlobalSignal"),
+    raw_vars = "FramewiseDisplacement",
+    npcs = 2
+  )
 )
 
-plot(confounds_pca, view = "aggregate")
+plot(confounds_pca)
 ```
 
 ![](derivatives_files/figure-html/plot-confounds-1.png)
@@ -183,7 +202,7 @@ report <- bids_report(
 
 report
 #> BIDS Report
-#> Project: bidser-deriv-6c20436e8cf1 
+#> Project: bidser-deriv-6e713ebad124 
 #> Participants source: file 
 #> Subjects: 1 
 #> Sessions: 0 

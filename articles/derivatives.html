@@ -80,13 +80,21 @@ start with <code><a href="../articles/quickstart.html">vignette("quickstart")</a
 <h2 id="where-are-the-derivatives">Where are the derivatives?<a class="anchor" aria-label="anchor" href="#where-are-the-derivatives"></a>
 </h2>
 <p>Use <code><a href="../reference/plot_bids.html">plot_bids()</a></code> to get a fast overview of the raw
-project plus attached derivative folders.</p>
+project plus attached derivative folders. Each pipeline gets its own
+column group, drawn in outline, and a derivative that is absent where
+raw data exist is flagged as missing. A derivative whose raw input is
+itself missing is not counted against the pipeline.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_bids.html">plot_bids</a></span><span class="op">(</span><span class="va">proj</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="derivatives_files/figure-html/overview-plot-1.png" class="r-plt" alt="" width="864"></p>
+<p><img src="derivatives_files/figure-html/overview-plot-1.png" class="r-plt" alt="" width="576"></p>
+<p><code><a href="../reference/plot_bids_tree.html">plot_bids_tree()</a></code> shows where each pipeline wrote its
+files:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_bids_tree.html">plot_bids_tree</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span></code></pre></div>
+<p><img src="derivatives_files/figure-html/overview-tree-1.png" class="r-plt" alt="" width="864"></p>
 <p>For code, <code><a href="../reference/derivative_pipelines.html">derivative_pipelines()</a></code> is the clearest
 inspection entry point.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pipes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/derivative_pipelines.html">derivative_pipelines</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span>
 <span><span class="va">pipes</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 4</span></span></span>
@@ -108,7 +116,7 @@ target in the next query.</p>
 </h2>
 <p>Use <code><a href="../reference/query_files.html">query_files()</a></code> when you want explicit scope and
 pipeline control.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prep_bold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span></span>
 <span>  <span class="va">proj</span>,</span>
 <span>  regex <span class="op">=</span> <span class="st">"bold\\.nii\\.gz$"</span>,</span>
@@ -141,7 +149,7 @@ vignette shows just enough to sanity-check a pipeline; for confound
 <em>sets</em>, PCA <em>strategies</em>, and the run-level
 <code><a href="../reference/variables_table.html">variables_table()</a></code> bridge into modeling, see
 <code><a href="../articles/confounds-and-variables.html">vignette("confounds-and-variables")</a></code>.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">confounds_flat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_confounds.html">read_confounds</a></span><span class="op">(</span></span>
 <span>  <span class="va">proj</span>,</span>
 <span>  subid <span class="op">=</span> <span class="st">"01"</span>,</span>
@@ -165,17 +173,23 @@ vignette shows just enough to sanity-check a pipeline; for confound
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">confounds_flat</span><span class="op">$</span><span class="va">FramewiseDisplacement</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.05</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>If you want a compact diagnostic view, ask for principal components
-and plot them.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+and plot them. Keep framewise displacement as a raw column and the plot
+adds a head-motion panel with a 0.5 mm threshold
+(<code>fd_threshold</code>) above the components.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">confounds_pca</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_confounds.html">read_confounds</a></span><span class="op">(</span></span>
 <span>  <span class="va">proj</span>,</span>
 <span>  subid <span class="op">=</span> <span class="st">"01"</span>,</span>
 <span>  task <span class="op">=</span> <span class="st">"rest"</span>,</span>
-<span>  npcs <span class="op">=</span> <span class="fl">2</span></span>
+<span>  cvars <span class="op">=</span> <span class="fu"><a href="../reference/confound_strategy.html">confound_strategy</a></span><span class="op">(</span></span>
+<span>    pca_vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CSF"</span>, <span class="st">"WhiteMatter"</span>, <span class="st">"GlobalSignal"</span><span class="op">)</span>,</span>
+<span>    raw_vars <span class="op">=</span> <span class="st">"FramewiseDisplacement"</span>,</span>
+<span>    npcs <span class="op">=</span> <span class="fl">2</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">confounds_pca</span>, view <span class="op">=</span> <span class="st">"aggregate"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="derivatives_files/figure-html/plot-confounds-1.png" class="r-plt" alt="" width="700"></p>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">confounds_pca</span><span class="op">)</span></span></code></pre></div>
+<p><img src="derivatives_files/figure-html/plot-confounds-1.png" class="r-plt" alt="" width="672"></p>
 <p>The plot is most useful as a quick failure check: if the confounds
 are missing, degenerate, or wildly scaled, the PCA summary becomes
 obviously suspicious.</p>
@@ -186,7 +200,7 @@ obviously suspicious.</p>
 <p><code><a href="../reference/variables_table.html">variables_table()</a></code> pulls scans, events, and confounds
 into one run-level tibble without forcing you to manage separate
 joins.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">run_variables</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/variables_table.html">variables_table</a></span><span class="op">(</span></span>
 <span>  <span class="va">proj</span>,</span>
 <span>  scope <span class="op">=</span> <span class="st">"all"</span>,</span>
@@ -212,7 +226,7 @@ shows whether each run has the pieces you expect.</p>
 </h2>
 <p><code><a href="../reference/bids_report.html">bids_report()</a></code> wraps the same run-level coverage into a
 compact text report.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_report.html">bids_report</a></span><span class="op">(</span></span>
 <span>  <span class="va">proj</span>,</span>
 <span>  scope <span class="op">=</span> <span class="st">"all"</span>,</span>
@@ -221,7 +235,7 @@ compact text report.</p>
 <span></span>
 <span><span class="va">report</span></span>
 <span><span class="co">#&gt; BIDS Report</span></span>
-<span><span class="co">#&gt; Project: bidser-deriv-6c20436e8cf1 </span></span>
+<span><span class="co">#&gt; Project: bidser-deriv-6e713ebad124 </span></span>
 <span><span class="co">#&gt; Participants source: file </span></span>
 <span><span class="co">#&gt; Subjects: 1 </span></span>
 <span><span class="co">#&gt; Sessions: 0 </span></span>

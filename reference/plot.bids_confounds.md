@@ -15,6 +15,7 @@ plot(
   pcs = NULL,
   top_n = 8,
   max_panels = 6,
+  fd_threshold = 0.5,
   ...
 )
 ```
@@ -44,6 +45,12 @@ plot(
 
   Integer. In `view = "auto"`, facet score plots only when the number of
   runs is at most `max_panels`.
+
+- fd_threshold:
+
+  Numeric. Framewise-displacement threshold in mm drawn on the motion
+  panel (shown when a `framewise_displacement` column was kept, e.g. via
+  `confound_strategy(raw_vars = "framewise_displacement")`).
 
 - ...:
 

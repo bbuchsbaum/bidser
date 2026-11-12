@@ -16,6 +16,7 @@
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/anat_parser.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/as_bids_uri.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_check_compliance.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_datatype_colors.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_datatype_spec.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_entities.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/bids_heatmap.html</loc></url>
@@ -94,6 +95,7 @@
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/plot_bids_file_sizes.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/plot_bids_heatmap.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/plot_bids_tasks.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/plot_bids_tree.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/prepare_bids_data_for_plot.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/preproc_scans-method.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/preproc_scans.bids_project.html</loc></url>
@@ -122,6 +124,7 @@
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/surface_files.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/tasks-method.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/tasks.mock_bids_project.html</loc></url>
+<url><loc>https://bbuchsbaum.github.io/bidser/reference/theme_bidser.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/transform_files.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/unregister_datatype.html</loc></url>
 <url><loc>https://bbuchsbaum.github.io/bidser/reference/variables_table.html</loc></url>

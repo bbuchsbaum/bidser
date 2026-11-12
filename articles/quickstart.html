@@ -143,13 +143,44 @@ to the dataset. We can see it contains 16 subjects with both anatomical
 and functional data.</p>
 </div>
 <div class="section level2">
+<h2 id="seeing-the-dataset-at-a-glance">Seeing the dataset at a glance<a class="anchor" aria-label="anchor" href="#seeing-the-dataset-at-a-glance"></a>
+</h2>
+<p>Before querying anything, look at the whole dataset.
+<code><a href="../reference/plot_bids.html">plot_bids()</a></code> draws an <em>acquisition matrix</em>: one row
+per subject, one column per acquisition, grouped by datatype and task. A
+present file is a pale cell. A missing file gets a heavy frame with a
+cross, and its BIDS name is listed under the plot. A file whose size is
+far from its column’s median gets a heavy frame and its percentage,
+which is how truncated scans show up. Counts such as <code>15/16</code>
+appear only above columns and beside rows that are short.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_bids.html">plot_bids</a></span><span class="op">(</span><span class="va">proj</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="quickstart_files/figure-html/overview-matrix-1.png" class="r-plt" alt="" width="768"></p>
+<p>ds001 is complete, so the matrix is uniformly pale and the subtitle
+says so. For a dataset with gaps, the problems are the only dark marks
+on the page. (The bids-examples copy of ds001 ships empty image files,
+so no sizes are shown here; on a real download the size check runs
+automatically.)</p>
+<p><code><a href="../reference/plot_bids_tree.html">plot_bids_tree()</a></code> shows the same dataset as a file
+layout. Every subject is folded into one <code>sub-&lt;label&gt;</code>
+template, so the shape of the dataset fits in a few lines however many
+subjects it has. The right-hand column counts files per template and
+names any subject, session or run that lacks one.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_bids_tree.html">plot_bids_tree</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span></code></pre></div>
+<p><img src="quickstart_files/figure-html/overview-tree-1.png" class="r-plt" alt="" width="768"></p>
+<p>Both functions take <code>interactive = TRUE</code> (for
+<code><a href="../reference/plot_bids.html">plot_bids()</a></code>) or return a regular ggplot, so you can restyle
+them with <code><a href="../reference/theme_bidser.html">theme_bidser()</a></code> or any ggplot2 theme.</p>
+</div>
+<div class="section level2">
 <h2 id="basic-dataset-queries">Basic Dataset Queries<a class="anchor" aria-label="anchor" href="#basic-dataset-queries"></a>
 </h2>
 <div class="section level3">
 <h3 id="dataset-structure">Dataset Structure<a class="anchor" aria-label="anchor" href="#dataset-structure"></a>
 </h3>
 <p>Let’s explore the basic structure of this dataset:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Check if the dataset has multiple sessions per subject</span></span>
 <span><span class="fu"><a href="../reference/sessions-method.html">sessions</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span>
 <span><span class="co">#&gt; NULL</span></span>
@@ -184,7 +215,7 @@ and functional data.</p>
 <h3 id="finding-files-by-type">Finding Files by Type<a class="anchor" aria-label="anchor" href="#finding-files-by-type"></a>
 </h3>
 <p>Let’s find the most common neuroimaging file types:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Find all anatomical T1-weighted images</span></span>
 <span><span class="va">t1w_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span><span class="va">proj</span>, regex <span class="op">=</span> <span class="st">"T1w\\.nii"</span>, full_path <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">t1w_files</span><span class="op">)</span></span>
@@ -206,7 +237,7 @@ and functional data.</p>
 <h3 id="filtering-by-subject-and-task">Filtering by Subject and Task<a class="anchor" aria-label="anchor" href="#filtering-by-subject-and-task"></a>
 </h3>
 <p>One of bidser’s key strengths is filtering data by BIDS metadata:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get functional scans for specific subjects</span></span>
 <span><span class="va">sub01_scans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">"01"</span><span class="op">)</span></span>
 <span><span class="va">sub02_scans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">"02"</span><span class="op">)</span></span>
@@ -231,7 +262,7 @@ and functional data.</p>
 </h3>
 <p>You can use regular expressions to select multiple subjects at
 once:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get scans for subjects 01, 02, and 03</span></span>
 <span><span class="va">first_three_scans</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">"0[123]"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"First 3 subjects:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">first_three_scans</span><span class="op">)</span>, <span class="st">"scans total\n"</span><span class="op">)</span></span>
@@ -249,7 +280,7 @@ once:</p>
 <p>Event files describe the experimental paradigm - when stimuli were
 presented, what responses occurred, etc. This is crucial for task-based
 fMRI analysis.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Find all event files</span></span>
 <span><span class="va">event_file_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/event_files-method.html">event_files</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Found"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">event_file_paths</span><span class="op">)</span>, <span class="st">"event files\n"</span><span class="op">)</span></span>
@@ -274,7 +305,7 @@ fMRI analysis.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> balloonana… <span style="color: #BB0000;">NA</span>       01    04     ball… <span style="color: #BB0000;">NA</span>      01    04             <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 38 more rows</span></span></span></code></pre></div>
 <p>Let’s explore the event data structure:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Unnest events for subject 01</span></span>
 <span><span class="va">first_subject_events</span> <span class="op">&lt;-</span> <span class="va">events_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">.subid</span> <span class="op">==</span> <span class="st">"01"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -305,7 +336,7 @@ fMRI analysis.</p>
 <h3 id="analyzing-event-data">Analyzing Event Data<a class="anchor" aria-label="anchor" href="#analyzing-event-data"></a>
 </h3>
 <p>Let’s do some basic exploration of the experimental design:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># How many trials per subject?</span></span>
 <span><span class="va">trial_counts</span> <span class="op">&lt;-</span> <span class="va">events_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -343,7 +374,7 @@ keeps its acquisition metadata in a single task-level sidecar
 shares, rather than one sidecar per BOLD file.
 <code><a href="../reference/read_sidecar.html">read_sidecar()</a></code> reads the sidecar files that actually
 exist:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Read the task-level sidecar directly</span></span>
 <span><span class="va">direct_sidecars</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_sidecar.html">read_sidecar</a></span><span class="op">(</span></span>
 <span>  <span class="va">proj</span>,</span>
@@ -363,7 +394,7 @@ exist:</p>
 and walks up from the file to task- and dataset-level sidecars, so even
 though <code>sub-01</code> has no file-level JSON of its own, the
 task-level <code>RepetitionTime</code> is resolved for its BOLD run:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Resolve effective metadata for a specific BOLD file</span></span>
 <span><span class="va">resolved_meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_metadata.html">get_metadata</a></span><span class="op">(</span><span class="va">proj</span>, <span class="va">bold_files</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, inherit <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -382,7 +413,7 @@ that applies to a particular scan after inheritance.</p>
 interface for working with data from a single subject. It returns a
 lightweight object with helper functions that automatically filter data
 for that subject.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a subject-specific interface for subject 01</span></span>
 <span><span class="va">subject_01</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_subject.html">bids_subject</a></span><span class="op">(</span><span class="va">proj</span>, <span class="st">"01"</span><span class="op">)</span></span>
 <span></span>
@@ -408,7 +439,7 @@ for that subject.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> balloonanal… <span style="color: #BB0000;">NA</span>       03    01     ball… <span style="color: #BB0000;">NA</span>      03    01             <span style="color: #949494;">&lt;tibble&gt;</span></span></span></code></pre></div>
 <p>This approach is particularly useful when you’re doing subject-level
 analyses:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">subjects_to_analyze</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"01"</span>, <span class="st">"02"</span>, <span class="st">"03"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">subj_id</span> <span class="kw">in</span> <span class="va">subjects_to_analyze</span><span class="op">)</span> <span class="op">{</span></span>
@@ -423,7 +454,7 @@ analyses:</p>
 <span><span class="co">#&gt; Subject 03: 3 scans, 9 event files</span></span></code></pre></div>
 <p>The subject interface makes it easy to write analysis pipelines that
 iterate over subjects without manually constructing filters:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">subject_trial_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="../reference/participants-method.html">participants</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span>, <span class="kw">function</span><span class="op">(</span><span class="va">subj_id</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">subj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_subject.html">bids_subject</a></span><span class="op">(</span><span class="va">proj</span>, <span class="va">subj_id</span><span class="op">)</span></span>
 <span>  <span class="va">event_data</span> <span class="op">&lt;-</span> <span class="va">subj</span><span class="op">$</span><span class="fu">events</span><span class="op">(</span><span class="op">)</span></span>
@@ -453,7 +484,7 @@ with parsed entities.</p>
 <div class="section level3">
 <h3 id="match-modes">Match Modes<a class="anchor" aria-label="anchor" href="#match-modes"></a>
 </h3>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Exact entity matching -- reproducible, no regex surprises</span></span>
 <span><span class="va">exact_bold</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span></span>
 <span>  <span class="va">proj</span>,</span>
@@ -489,7 +520,7 @@ with parsed entities.</p>
 <div class="section level3">
 <h3 id="entity-presence-extension-and-datatype-filters">Entity Presence, Extension, and Datatype Filters<a class="anchor" aria-label="anchor" href="#entity-presence-extension-and-datatype-filters"></a>
 </h3>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Require the queried entity to actually exist on returned files</span></span>
 <span><span class="va">task_annotated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span></span>
 <span>  <span class="va">proj</span>,</span>
@@ -513,7 +544,7 @@ with parsed entities.</p>
 <div class="section level3">
 <h3 id="tibble-output-with-parsed-entities">Tibble Output with Parsed Entities<a class="anchor" aria-label="anchor" href="#tibble-output-with-parsed-entities"></a>
 </h3>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Return a tibble instead of paths -- includes all parsed BIDS entities</span></span>
 <span><span class="va">bold_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/query_files.html">query_files</a></span><span class="op">(</span></span>
 <span>  <span class="va">proj</span>,</span>
@@ -543,7 +574,7 @@ run, and path.</p>
 <p>When derivatives are present, <code>scope</code> controls where to
 search and <code>pipeline</code> selects specific derivative
 pipelines:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">deriv_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_example_bids_dataset.html">get_example_bids_dataset</a></span><span class="op">(</span><span class="st">"ds000001-fmriprep"</span><span class="op">)</span></span>
 <span><span class="va">proj_deriv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">deriv_path</span><span class="op">)</span></span>
 <span></span>
@@ -575,7 +606,7 @@ pipelines:</p>
 <p><code><a href="../reference/bids_project.html">bids_project()</a></code> can handle real-world datasets missing
 <code>participants.tsv</code> – subjects are inferred from the directory
 tree:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">proj_relaxed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_project.html">bids_project</a></span><span class="op">(</span></span>
 <span>  <span class="st">"/path/to/bids"</span>,</span>
 <span>  strict_participants <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -593,7 +624,7 @@ tree:</p>
 <p><code><a href="../reference/variables_table.html">variables_table()</a></code> gives you a run-level tibble that
 nests scan inventory, events, and confounds – ready for downstream R
 workflows:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/variables_table.html">variables_table</a></span><span class="op">(</span></span>
 <span>  <span class="va">proj_deriv</span>,</span>
 <span>  scope <span class="op">=</span> <span class="st">"all"</span>,</span>
@@ -609,12 +640,12 @@ workflows:</p>
 <h3 id="full-file-paths">Full File Paths<a class="anchor" aria-label="anchor" href="#full-file-paths"></a>
 </h3>
 <p>When you need absolute paths for analysis tools:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">full_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">"01"</span>, full_path <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">full_paths</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmptuiQyg/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
-<span><span class="co">#&gt; [2] "/tmp/RtmptuiQyg/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
-<span><span class="co">#&gt; [3] "/tmp/RtmptuiQyg/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/Rtmpg3qsma/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [2] "/tmp/Rtmpg3qsma/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [3] "/tmp/Rtmpg3qsma/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">full_paths</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
@@ -626,7 +657,7 @@ workflows:</p>
 <p><code>bidser</code> automatically discovers derivative pipelines
 under <code>derivatives/</code>. You can query preprocessed scans,
 confounds, and masks through <code><a href="../reference/query_files.html">query_files()</a></code>:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">deriv_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_example_bids_dataset.html">get_example_bids_dataset</a></span><span class="op">(</span><span class="st">"ds000001-fmriprep"</span><span class="op">)</span></span>
 <span><span class="va">proj_deriv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">deriv_path</span><span class="op">)</span></span>
 <span></span>

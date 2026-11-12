@@ -26,7 +26,7 @@ vignette runs without network access.
 proj <- bids_project(temp_dir, fmriprep = TRUE)
 proj
 #> BIDS Project Summary 
-#> Project Name:  bids_confounds_vignette_57247ca0d03d 
+#> Project Name:  bids_confounds_vignette_559bac7bacc 
 #> Participants (n):  2 
 #> Participants Source:  file 
 #> Tasks:  nback, rest 
@@ -262,6 +262,34 @@ names(conf_custom$data[[1]])
 Five PCs from the motion + aCompCor space, plus FD and cosine regressors
 kept in their original form.
 
+### Plotting a confound object
+
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) on a
+PCA-reduced confound object shows what the components look like over
+time and which variables drive them. Because framewise displacement was
+kept as a raw column, the plot leads with head motion. Volumes above the
+threshold (`fd_threshold = 0.5` mm by default) are marked, and each run
+is summarised by its mean FD and the number of volumes over the line.
+
+``` r
+
+conf_both <- read_confounds(proj, subid = "01", cvars = my_strat)
+plot(conf_both, pcs = 1:3)
+```
+
+![](confounds-and-variables_files/figure-html/plot-custom-1.png)
+
+With many runs, `view = "aggregate"` swaps the time series for one dot
+per run, which makes a single high-motion run easy to find:
+
+``` r
+
+conf_all <- read_confounds(proj, cvars = my_strat)
+plot(conf_all, view = "aggregate", pcs = 1:3)
+```
+
+![](confounds-and-variables_files/figure-html/plot-aggregate-1.png)
+
 ## Reading event files
 
 Event files describe the experimental design – trial onsets, durations,
@@ -399,7 +427,7 @@ checks, pipeline discovery, and run-level coverage:
 report <- bids_report(proj)
 report
 #> BIDS Report
-#> Project: bids_confounds_vignette_57247ca0d03d 
+#> Project: bids_confounds_vignette_559bac7bacc 
 #> Participants source: file 
 #> Subjects: 2 
 #> Sessions: 0 
