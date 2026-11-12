@@ -394,7 +394,10 @@ bids_matrix_plot <- function(cells, fill_by = c("datatype", "size"),
   ink <- bidser_ink()
   col_labels <- strip_colkey(levels(droplevels(cells$colkey)))
   if (is.null(rotate_labels)) {
-    rotate_labels <- length(col_labels) > 16 || max(nchar(col_labels)) > 10
+    # Labels sit under columns about one cell wide; tilt them once long
+    # labels and many columns make collisions likely.
+    rotate_labels <- length(col_labels) > 16 ||
+      (max(nchar(col_labels)) > 8 && length(col_labels) > 6)
   }
 
   cells$tooltip <- paste0(
@@ -445,7 +448,7 @@ bids_matrix_plot <- function(cells, fill_by = c("datatype", "size"),
       ggplot2::scale_fill_gradient2(
         low = "#B5562F", mid = ink[["empty"]], high = "#2F5D7C", midpoint = 0,
         limits = log2(c(lo, hi)), breaks = log2(c(0.4, 0.7, 1, 1.3, 1.6)),
-        labels = c("\u2264 40%", "70%", "median", "130%", "\u2265 160%"),
+        labels = function(b) bidser_safe(c("\u2264 40%", "70%", "median", "130%", "\u2265 160%")),
         na.value = ink[["empty"]],
         name = "Size as % of\ncolumn median",
         guide = ggplot2::guide_colourbar(barheight = ggplot2::unit(70, "pt"),
@@ -503,9 +506,9 @@ bids_matrix_plot <- function(cells, fill_by = c("datatype", "size"),
       panel.spacing.x = ggplot2::unit(10, "pt"),
       panel.spacing.y = ggplot2::unit(10, "pt"),
       axis.text.x = if (rotate_labels)
-        ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5, size = 7)
-      else ggplot2::element_text(size = 7, margin = ggplot2::margin(t = 3)),
-      axis.text.y = ggplot2::element_text(size = 7.5, family = "mono"),
+        ggplot2::element_text(angle = 35, hjust = 1, vjust = 1, size = 8)
+      else ggplot2::element_text(size = 8.5, margin = ggplot2::margin(t = 3)),
+      axis.text.y = ggplot2::element_text(size = 8.5, family = "mono"),
       strip.text.x = if (show_strips)
         ggplot2::element_text(hjust = 0, vjust = 0, face = "bold", size = 8,
                               colour = ink[["text"]], lineheight = 1.05)
@@ -540,7 +543,7 @@ bids_matrix_top <- function(cells) {
   top$session_lab <- factor(levels(cells$session_lab)[1], levels = levels(cells$session_lab))
 
   ggplot2::ggplot(top, ggplot2::aes(x = .data$colkey, y = 0)) +
-    ggplot2::geom_text(ggplot2::aes(label = .data$label), size = 2.4, fontface = "bold",
+    ggplot2::geom_text(ggplot2::aes(label = .data$label), size = 2.8, fontface = "bold",
                        colour = ink[["text"]], vjust = 0) +
     ggplot2::scale_y_continuous(limits = c(-0.1, 1), expand = c(0, 0)) +
     ggplot2::scale_x_discrete(expand = ggplot2::expansion(add = 0.5)) +
@@ -574,7 +577,7 @@ bids_matrix_right <- function(cells) {
   right$label[is_abs] <- "no data"
 
   ggplot2::ggplot(right, ggplot2::aes(y = .data$subject, x = 0)) +
-    ggplot2::geom_text(ggplot2::aes(label = .data$label), hjust = 0, size = 2.4,
+    ggplot2::geom_text(ggplot2::aes(label = .data$label), hjust = 0, size = 2.8,
                        fontface = "bold", colour = ink[["text"]]) +
     ggplot2::scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
     ggplot2::scale_y_discrete(expand = ggplot2::expansion(add = 0.5)) +
@@ -682,7 +685,7 @@ bids_matrix_problems <- function(cells, max_items = 8) {
   all <- do.call(rbind, rows)
   out <- all$txt[order(all$subject, all$ses)]
   if (length(out) > max_items) {
-    out <- c(out[seq_len(max_items - 1)], paste0("\u2026 and ", length(out) - max_items + 1, " more"))
+    out <- c(out[seq_len(max_items - 1)], paste0("and ", length(out) - max_items + 1, " more"))
   }
   out
 }
@@ -707,13 +710,17 @@ bids_matrix_figure <- function(x, frame, cells, title = NULL, margins = TRUE,
   right <- bids_matrix_right(cells)
   n_rows <- nrow(dplyr::distinct(cells, .data$session_lab, .data$subject))
   patchwork::wrap_plots(
-    top, patchwork::plot_spacer(), main, right,
-    ncol = 2, widths = c(1, 0.06), heights = c(0.45, max(n_rows, 2))
+    # A truly empty corner: plot_spacer() would inherit the session theme's
+    # background (e.g. a tinted vignette theme) and show up as a box.
+    top, ggplot2::ggplot() + ggplot2::theme_void() +
+      ggplot2::theme(plot.background = ggplot2::element_rect(fill = "white", colour = NA)),
+    main, right,
+    ncol = 2, widths = c(1, 0.09), heights = c(0.45, max(n_rows, 2))
   ) +
     patchwork::plot_annotation(
       title = title, subtitle = subtitle, caption = caption,
       theme = theme_bidser() +
-        ggplot2::theme(plot.caption = ggplot2::element_text(family = "mono", size = 7,
+        ggplot2::theme(plot.caption = ggplot2::element_text(family = "mono", size = 8,
                                                             lineheight = 1.15))
     )
 }
@@ -726,12 +733,31 @@ bids_matrix_caption <- function(cells) {
     key <- c(key, if (any(!is.na(cells$col_nvol[cells$state == "size"])))
       "n/N in frame: volumes vs. usual count" else "% in frame: size vs. column median")
   }
-  if (any(cells$companion_missing)) key <- c(key, "\u25cb: events/confounds file missing")
+  if (any(cells$companion_missing)) key <- c(key, "ring: events/confounds file missing")
   if (any(cells$scope == "derivatives")) key <- c(key, "outline: derivative")
   if (any(cells$state %in% c("upstream", "absent"))) key <- c(key, "faint dashes: not counted (no data for that subject-session, or raw input missing)")
   problems <- bids_matrix_problems(cells)
-  paste(c(paste(key, collapse = "   "), if (length(problems)) c("", problems)),
-        collapse = "\n")
+  # Wrap the key at item boundaries so it never runs off the figure
+  lines <- character()
+  cur <- ""
+  for (k in key) {
+    cand <- if (nzchar(cur)) paste0(cur, "   ", k) else k
+    if (nchar(cand) > 100 && nzchar(cur)) {
+      lines <- c(lines, cur)
+      cur <- k
+    } else {
+      cur <- cand
+    }
+  }
+  lines <- c(lines, cur)
+  # Long BIDS names: break after the name so each line fits the figure
+  problems <- unlist(lapply(problems, function(pr) {
+    if (nchar(pr) <= 100) return(pr)
+    parts <- regmatches(pr, regexpr(": ", pr), invert = TRUE)[[1]]
+    if (length(parts) < 2) return(pr)
+    c(paste0(parts[1], ":"), paste0("    ", paste(parts[-1], collapse = ": ")))
+  }))
+  paste(c(lines, if (length(problems)) c("", problems)), collapse = "\n")
 }
 
 #' Display name for a project: the dataset_description.json Name when present,
@@ -765,7 +791,11 @@ bids_display_name <- function(x) {
 #'   `run-<index>` row.
 #' @param include_sidecars Logical. Show `.json` sidecars.
 #' @param max_rows Maximum number of rows to draw before truncating.
-#' @return A ggplot object.
+#' @param short_names Logical. Replace the `sub-<label>_ses-<label>_` prefix
+#'   that every file name repeats with an ellipsis, for a narrower figure.
+#' @return A ggplot object. Because the layout is monospace text, its natural
+#'   size is known: `attr(p, "bidser_size")` gives a suggested `width` and
+#'   `height` in inches for `ggsave()` or knitr's `fig.width`/`fig.height`.
 #' @export
 #' @examples
 #' fs <- tibble::tribble(
@@ -779,7 +809,7 @@ bids_display_name <- function(x) {
 #'   plot_bids_tree(mock)
 #' }
 plot_bids_tree <- function(x, include_derivatives = TRUE, collapse_runs = TRUE,
-                           include_sidecars = TRUE, max_rows = 60) {
+                           include_sidecars = TRUE, max_rows = 60, short_names = FALSE) {
   if (!inherits(x, "bids_project") && !inherits(x, "mock_bids_project")) {
     stop("Input must be a bids_project or mock_bids_project object")
   }
@@ -795,6 +825,10 @@ plot_bids_tree <- function(x, include_derivatives = TRUE, collapse_runs = TRUE,
   if (!include_sidecars) frame <- frame[frame$role != "sidecar", ]
   rows <- bids_tree_rows(frame, collapse_runs = collapse_runs)
   absent <- attr(rows, "absent")
+  if (isTRUE(short_names)) {
+    is_leaf <- !rows$is_dir & grepl("^sub-<label>_", rows$label)
+    rows$label[is_leaf] <- paste0("\u2026_", sub("^sub-<label>_(ses-<label>_)?", "", rows$label[is_leaf]))
+  }
   truncated <- 0L
   if (nrow(rows) > max_rows) {
     truncated <- nrow(rows) - max_rows
@@ -961,7 +995,7 @@ bids_tree_plot <- function(nodes, title, truncated = 0L, n_sub = NA_integer_) {
 
   name <- ifelse(nodes$is_dir, paste0(nodes$label, "/"), nodes$label)
   prefix_len <- ifelse(nodes$is_dir, 0L,
-                       nchar(stringr::str_extract(nodes$label, "^(sub-<label>_)?(ses-<label>_)?")))
+                       nchar(stringr::str_extract(nodes$label, "^(\u2026_)?(sub-<label>_)?(ses-<label>_)?")))
   prefix_len[is.na(prefix_len)] <- 0L
 
   leaf <- !nodes$is_dir
@@ -1029,9 +1063,9 @@ bids_tree_plot <- function(nodes, title, truncated = 0L, n_sub = NA_integer_) {
   )
   header <- paste0(strrep(" ", col_size), formatC("size", width = size_w), "  files")
 
-  fs <- 2.7
+  fs <- 3.1
   mono <- function(data, colour, face = "plain") {
-    ggplot2::geom_text(data = data, ggplot2::aes(x = 0, y = .data$y, label = .data$txt),
+    ggplot2::geom_text(data = data, ggplot2::aes(x = 0, y = .data$y, label = bidser_safe(.data$txt)),
                        hjust = 0, family = "mono", size = fs, colour = colour, fontface = face)
   }
   df <- function(txt, keep = rep(TRUE, n)) data.frame(y = row_y[keep], txt = txt[keep])
@@ -1057,7 +1091,7 @@ bids_tree_plot <- function(nodes, title, truncated = 0L, n_sub = NA_integer_) {
         "of one file per subject", if (any(nodes$has_sessions, na.rm = TRUE)) " \u00d7 session",
         " \u00d7 run (the arrow names who is missing) or contain a file of unusual length."),
         width = 100), collapse = "\n"),
-      caption = if (truncated > 0) paste0("\u2026 ", truncated, " more rows not shown") else NULL
+      caption = if (truncated > 0) paste0(truncated, " more rows not shown") else NULL
     ) +
     theme_bidser() +
     ggplot2::theme(axis.text = ggplot2::element_blank(), axis.title = ggplot2::element_blank())
@@ -1069,6 +1103,15 @@ bids_tree_plot <- function(nodes, title, truncated = 0L, n_sub = NA_integer_) {
   }
   # Width (in characters) of the widest line, for choosing a figure width:
   # about 0.075 inches per character at the default text size.
-  attr(p, "bidser_chars") <- max(nchar(L$count), nchar(extra_df$txt), col_size + size_w)
+  # Suggested figure size in inches. The layout is monospace, so its width is
+  # known: an em of `fs` mm text is fs * .pt points, and a monospace glyph
+  # advances about 0.6 em.
+  n_chars <- max(nchar(L$count), nchar(extra_df$txt), col_size + size_w + 7)
+  char_in <- fs * ggplot2::.pt * 0.62 / 72
+  n_lines <- n + nrow(extra_df)
+  sub_lines <- length(strsplit(p$labels$subtitle %||% "", "\n")[[1]])
+  attr(p, "bidser_size") <- c(width = round(n_chars * char_in + 0.9, 1),
+                              height = round(n_lines * fs * ggplot2::.pt * 1.55 / 72 +
+                                               0.5 + 0.2 * sub_lines, 1))
   p
 }

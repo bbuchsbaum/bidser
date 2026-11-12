@@ -17,7 +17,7 @@
 #'     ggplot2::geom_point() +
 #'     theme_bidser(grid = "y")
 #' }
-theme_bidser <- function(base_size = 10, base_family = "", grid = "none") {
+theme_bidser <- function(base_size = 11, base_family = "", grid = "none") {
   ink <- bidser_ink()
   grid_line <- ggplot2::element_line(colour = ink[["rule"]], linewidth = 0.3)
   ggplot2::theme_minimal(base_size = base_size, base_family = base_family) +
@@ -114,4 +114,34 @@ format_bytes <- function(x) {
   out[ok] <- paste(ifelse(digits == 1, sprintf("%.1f", val), sprintf("%.0f", val)), units[pow + 1])
   out[ok] <- sub("\\.0 ", " ", out[ok])
   out
+}
+
+#' Can the current graphics device draw non-Latin-1 glyphs?
+#'
+#' R's own pdf() and postscript() devices use single-byte encodings and fail
+#' on characters such as box-drawing lines; cairo-based and bitmap devices in
+#' a UTF-8 locale do not.
+#' @keywords internal
+#' @noRd
+bidser_device_unicode <- function() {
+  if (!isTRUE(l10n_info()[["UTF-8"]])) return(FALSE)
+  dev <- names(grDevices::dev.cur())
+  !dev %in% c("pdf", "postscript", "xfig", "pictex")
+}
+
+#' Make figure text safe for the current device
+#'
+#' Called while a plot is being drawn (inside aes() or a scale's labels
+#' function), so it sees the device actually in use. Each non-Latin-1 glyph is
+#' replaced by exactly one ASCII character, which keeps monospace layouts (the
+#' structure tree) aligned.
+#' @keywords internal
+#' @noRd
+bidser_safe <- function(x) {
+  if (bidser_device_unicode()) return(x)
+  map <- c("\u251c" = "|", "\u2500" = "-", "\u2514" = "`", "\u2502" = "|",
+           "\u2190" = "<", "\u2026" = "~", "\u2264" = "<", "\u2265" = ">",
+           "\u25cb" = "o")
+  for (g in names(map)) x <- gsub(g, map[[g]], x, fixed = TRUE)
+  x
 }

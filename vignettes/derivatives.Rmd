@@ -97,12 +97,20 @@ file.create(file.path(
   "sub-01", "func",
   "sub-01_task-rest_run-01_space-MNI_desc-preproc_bold.nii.gz"
 ))
+set.seed(11)
+n_vol <- 200
+drift <- cumsum(rnorm(n_vol, 0, 0.05))
+fd <- abs(rnorm(n_vol, 0.12, 0.05))
+fd[c(48, 131, 132)] <- c(0.71, 0.92, 0.64)
 readr::write_tsv(
   tibble::tibble(
-    CSF = c(0.10, 0.20, 0.30, 0.20),
-    WhiteMatter = c(0.40, 0.50, 0.60, 0.50),
-    GlobalSignal = c(1.00, 1.10, 1.20, 1.10),
-    FramewiseDisplacement = c(0.01, 0.02, 0.03, 0.02)
+    CSF = drift + rnorm(n_vol, 0, 0.3),
+    WhiteMatter = 0.6 * drift + rnorm(n_vol, 0, 0.3),
+    GlobalSignal = 100 + drift + rnorm(n_vol, 0, 0.2),
+    FramewiseDisplacement = fd,
+    trans_x = cumsum(rnorm(n_vol, 0, 0.02)),
+    trans_y = cumsum(rnorm(n_vol, 0, 0.02)),
+    trans_z = cumsum(rnorm(n_vol, 0, 0.03))
   ),
   file.path(
     fmriprep_root,
@@ -141,13 +149,17 @@ and a derivative that is absent where raw data exist is flagged as missing.
 A derivative whose raw input is itself missing is not counted against the
 pipeline.
 
-```{r overview-plot, fig.width = 6, fig.height = 2.6}
+```{r overview-plot, fig.width = 5.5, fig.height = 3.2}
 plot_bids(proj, interactive = FALSE)
 ```
 
 `plot_bids_tree()` shows where each pipeline wrote its files:
 
-```{r overview-tree, fig.width = 9, fig.height = 3.4}
+```{r overview-tree-size, include = FALSE}
+tree_size <- attr(plot_bids_tree(proj), "bidser_size")
+```
+
+```{r overview-tree, fig.width = tree_size[["width"]], fig.height = tree_size[["height"]]}
 plot_bids_tree(proj)
 ```
 
@@ -212,9 +224,9 @@ confounds_flat <- read_confounds(
 confounds_flat
 
 stopifnot(
-  nrow(confounds_flat) == 4L,
+  nrow(confounds_flat) == 200L,
   all(is.finite(confounds_flat$FramewiseDisplacement)),
-  max(confounds_flat$FramewiseDisplacement) < 0.05
+  mean(confounds_flat$FramewiseDisplacement) < 0.2
 )
 ```
 
@@ -223,15 +235,15 @@ them. Keep framewise displacement as a raw column and the plot adds a
 head-motion panel with a 0.5 mm threshold (`fd_threshold`) above the
 components.
 
-```{r plot-confounds, fig.width = 7, fig.height = 6}
+```{r plot-confounds, fig.width = 7, fig.height = 6.5}
 confounds_pca <- read_confounds(
   proj,
   subid = "01",
   task = "rest",
   cvars = confound_strategy(
-    pca_vars = c("CSF", "WhiteMatter", "GlobalSignal"),
+    pca_vars = c("CSF", "WhiteMatter", "GlobalSignal", "trans_*"),
     raw_vars = "FramewiseDisplacement",
-    npcs = 2
+    npcs = 3
   )
 )
 
@@ -258,7 +270,7 @@ run_variables[, c(".subid", ".task", ".run", "n_scans", "n_events", "n_confound_
 stopifnot(
   run_variables$n_scans[[1]] == 1L,
   run_variables$n_events[[1]] == 1L,
-  run_variables$n_confound_rows[[1]] == 4L
+  run_variables$n_confound_rows[[1]] == 200L
 )
 ```
 

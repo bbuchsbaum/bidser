@@ -394,7 +394,8 @@ plot.bids_confounds <- function(x, view = c("auto", "run", "aggregate"),
                                         paste0(as.character(fd_sum$panel), "\n")),
                                  fd_sum$label),
                           as.character(fd_sum$panel)))) +
-        ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.02, 0.08))) +
+        ggplot2::scale_y_continuous(breaks = scales::breaks_extended(3),
+                                    expand = ggplot2::expansion(mult = c(0.02, 0.08))) +
         ggplot2::labs(title = paste(c("Head motion", if (nzchar(context)) paste0("\u00b7 ", context)), collapse = " "),
                       subtitle = sprintf("Framewise displacement (mm); dashed line and dots: volumes above %.1f mm.", fd_threshold),
                       x = NULL, y = "FD (mm)") +
@@ -458,7 +459,10 @@ plot.bids_confounds <- function(x, view = c("auto", "run", "aggregate"),
       h <- c(fd = if (show_scores) 1.1 else max(1.2, length(unique(x_tbl[[intersect(c("participant_id", ".subid", "panel"), names(x_tbl))[1]]])) / 3.5),
              scores = length(pc_cols),
              loadings = max(2, length(levels(loadings_df$variable)) / 4))[names(plots)]
-      return(patchwork::wrap_plots(plots, ncol = 1, heights = h))
+      # White background for the whole assembly, whatever the session theme
+      return(patchwork::wrap_plots(plots, ncol = 1, heights = h) +
+               patchwork::plot_annotation(theme = ggplot2::theme(
+                 plot.background = ggplot2::element_rect(fill = "white", colour = NA))))
     }
     warning("Package patchwork is not installed; returning a list of plots.")
     return(plots)

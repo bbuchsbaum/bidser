@@ -130,13 +130,19 @@ folded into one `sub-<label>` template, so the shape of the dataset fits in a
 few lines however many subjects it has. The right-hand column counts files per
 template and names any subject, session or run that lacks one.
 
-```{r overview-tree, fig.width = 8, fig.height = 3.6}
+```{r overview-tree-size, include = FALSE}
+tree_size <- attr(plot_bids_tree(proj), "bidser_size")
+```
+
+```{r overview-tree, fig.width = tree_size[["width"]], fig.height = tree_size[["height"]]}
 plot_bids_tree(proj)
 ```
 
-Both functions take `interactive = TRUE` (for `plot_bids()`) or return a
-regular ggplot, so you can restyle them with `theme_bidser()` or any ggplot2
-theme.
+Both return regular ggplot objects (`plot_bids()` can also return an
+interactive plotly widget with `interactive = TRUE`), so you can restyle them
+with `theme_bidser()` or any ggplot2 theme. The tree is laid out as monospace
+text, so it knows its natural size: `attr(p, "bidser_size")` gives a width and
+height in inches for `ggsave()` or knitr's `fig.width` and `fig.height`.
 
 ## Basic Dataset Queries
 

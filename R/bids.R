@@ -910,85 +910,35 @@ flat_list.bids_project <- function(x, full_path=TRUE, ...) {
 
 #' @export
 print.bids_project <- function(x, ...) {
-  # Ensure crayon is available
-  if (!requireNamespace("crayon", quietly = TRUE)) {
-    warning("`crayon` is not installed. Please install `crayon` for colored output.")
-    # fallback to original print if crayon not available
-    cat("project: ", x$name, "\n")
-    cat("participants (n):", nrow(x$part_df), "\n")
-    cat("participants source:", x$participants_source, "\n")
-    cat("tasks: ", tasks(x), "\n")
-    if (x$has_sessions) {
-      cat("sessions: ", sessions(x), "\n")
-    }
-    if (x$has_fmriprep) {
-      cat("fmriprep: ", x$prep_dir, "\n")
-    }
-    if (isTRUE(x$has_derivatives)) {
-      cat("derivative pipelines:", paste(x$derivatives$pipeline, collapse = ", "), "\n")
-    }
-    cat("index:", if (isTRUE(x$has_index)) "enabled" else "disabled", "\n")
-    cat("image types: ", unique(x$tbl$type[!is.na(x$tbl$type)]), "\n")
-    cat("modalities: ", paste(unique(x$tbl$modality[!is.na(x$tbl$modality)]), collapse=", "), "\n")
-    cat("keys: ", paste(unique(x$bids_tree$attributesAll), collapse=", "), "\n")
-    return(invisible(x))
-  }
-  
-  # Using crayon for colored output
-  project_col <- crayon::bold(crayon::cyan(x$name))
-  participant_count_col <- crayon::bold(crayon::green(nrow(x$part_df)))
-  task_list <- tasks(x)
-  task_list_col <- if (length(task_list) > 0) {
-    crayon::yellow(paste(task_list, collapse=", "))
-  } else {
-    crayon::yellow("(none)")
-  }
-  
-  cat(crayon::bold("BIDS Project Summary"), "\n")
-  cat(crayon::bold("Project Name: "), project_col, "\n")
-  cat(crayon::bold("Participants (n): "), participant_count_col, "\n")
-  cat(crayon::bold("Participants Source: "), crayon::yellow(x$participants_source), "\n")
-  cat(crayon::bold("Tasks: "), task_list_col, "\n")
-  
-  if (x$has_sessions) {
-    sess <- sessions(x)
-    sess_col <- if (length(sess) > 0) crayon::yellow(paste(sess, collapse=", ")) else crayon::yellow("(none)")
-    cat(crayon::bold("Sessions: "), sess_col, "\n")
-  }
-  
-  if (x$has_fmriprep) {
-    cat(crayon::bold("fMRIPrep Derivatives: "), crayon::magenta(x$prep_dir), "\n")
+  has_crayon <- requireNamespace("crayon", quietly = TRUE)
+  bold <- if (has_crayon) crayon::bold else identity
+  dim <- if (has_crayon) crayon::silver else identity
+  field <- function(label, value) {
+    if (length(value) == 0 || all(is.na(value)) || !nzchar(paste(value, collapse = ""))) return(invisible())
+    cat("  ", formatC(label, width = -13), paste(value, collapse = ", "), "\n", sep = "")
   }
 
-  if (isTRUE(x$has_derivatives)) {
-    cat(
-      crayon::bold("Derivative Pipelines: "),
-      crayon::magenta(paste(x$derivatives$pipeline, collapse = ", ")),
-      "\n"
-    )
-  }
+  name <- bids_display_name(x)
+  cat(dim("<bids_project> "), bold(name), "\n", sep = "")
+  field("root", x$path)
 
-  cat(
-    crayon::bold("Index: "),
-    if (isTRUE(x$has_index)) crayon::green("enabled") else crayon::yellow("disabled"),
-    "\n"
-  )
-  
-  # Image types
-  img_types <- unique(x$tbl$type[!is.na(x$tbl$type)])
-  img_types_col <- if (length(img_types) > 0) crayon::green(paste(img_types, collapse=", ")) else crayon::green("(none)")
-  cat(crayon::bold("Image Types: "), img_types_col, "\n")
-  
-  # Modalities
-  mods <- unique(x$tbl$modality[!is.na(x$tbl$modality)])
-  mods_col <- if (length(mods) > 0) crayon::green(paste(mods, collapse=", ")) else crayon::green("(none)")
-  cat(crayon::bold("Modalities: "), mods_col, "\n")
-  
-  # Keys
-  keys <- unique(x$bids_tree$attributesAll)
-  keys_col <- if (length(keys) > 0) crayon::yellow(paste(keys, collapse=", ")) else crayon::yellow("(none)")
-  cat(crayon::bold("Keys: "), keys_col, "\n")
-  
+  n_sub <- nrow(x$part_df)
+  src <- x$participants_source
+  src_txt <- if (identical(src, "file")) "participants.tsv" else src
+  field("subjects", paste0(n_sub, if (!is.null(src_txt) && nzchar(src_txt)) dim(paste0(" (from ", src_txt, ")")) else ""))
+  if (isTRUE(x$has_sessions)) field("sessions", session_order(sessions(x)))
+  field("tasks", tasks(x))
+
+  types <- unique(stats::na.omit(x$tbl$type))
+  types <- bids_datatype_order(types[types %in% names(bids_datatype_colors())])
+  field("datatypes", types)
+
+  if (isTRUE(x$has_derivatives) && !is.null(x$derivatives) && nrow(x$derivatives) > 0) {
+    field("derivatives", paste0(x$derivatives$pipeline,
+                                dim(paste0(" (", x$derivatives$root, ")"))))
+  } else if (isTRUE(x$has_fmriprep)) {
+    field("derivatives", paste0("fmriprep", dim(paste0(" (", x$prep_dir, ")"))))
+  }
   invisible(x)
 }
 

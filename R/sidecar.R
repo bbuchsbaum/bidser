@@ -237,14 +237,25 @@ get_repetition_time <- function(x, subid, task, run=".*", session=".*", ...) {
   if (!file.exists(path)) {
     stop("File not found: ", path, call. = FALSE)
   }
-  rlang::check_installed("RNifti", reason = "to read NIfTI headers for n_volumes().")
-
-  hdr <- tryCatch(
-    RNifti::niftiHeader(path),
-    error = function(e) {
-      stop("Could not read NIfTI header for `", path, "`: ", e$message, call. = FALSE)
+  # Without RNifti, read the NIfTI-1 header directly (base R).
+  if (!requireNamespace("RNifti", quietly = TRUE)) {
+    nvol <- nifti_nvols(path)
+    if (is.na(nvol)) {
+      stop("Could not read a NIfTI-1 header from `", path,
+           "`; install RNifti to read other formats.", call. = FALSE)
     }
-  )
+    return(nvol)
+  }
+
+  hdr <- tryCatch(RNifti::niftiHeader(path), error = function(e) e)
+  if (inherits(hdr, "error")) {
+    # RNifti is strict about the header (magic string, offsets). Fall back to
+    # reading dim[] directly before giving up.
+    nvol <- nifti_nvols(path)
+    if (!is.na(nvol)) return(nvol)
+    stop("Could not read NIfTI header for `", path, "`: ", conditionMessage(hdr),
+         call. = FALSE)
+  }
   dims <- hdr$dim
   if (is.null(dims) || length(dims) < 5L || is.na(dims[[1]]) || dims[[1]] < 4L) {
     return(1L)

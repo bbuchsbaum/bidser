@@ -81,3 +81,24 @@ test_that("theme and palette helpers behave", {
   expect_equal(unname(cols["weird"]), unname(bids_datatype_colors()["other"]))
   expect_equal(bidser:::format_bytes(c(950, 1.2e6, NA)), c("950 B", "1.2 MB", NA))
 })
+
+test_that("figures draw on the single-byte pdf() device without glyph errors", {
+  proj <- make_qc_project()
+  f <- tempfile(fileext = ".pdf")
+  grDevices::pdf(f)
+  on.exit({ grDevices::dev.off(); unlink(f) }, add = TRUE)
+  expect_silent(print(plot_bids_tree(proj, short_names = TRUE)))
+  expect_silent(print(plot_bids(proj, interactive = FALSE)))
+  expect_silent(print(bids_heatmap(proj, interactive = FALSE)))
+})
+
+test_that("bidser_safe keeps character counts when it substitutes", {
+  x <- "├── …_bold ← sub-01"
+  # Force the ASCII path by drawing on a pdf device
+  f <- tempfile(fileext = ".pdf")
+  grDevices::pdf(f)
+  on.exit({ grDevices::dev.off(); unlink(f) }, add = TRUE)
+  y <- bidser:::bidser_safe(x)
+  expect_identical(y, "|-- ~_bold < sub-01")
+  expect_identical(nchar(y), nchar(x))
+})
