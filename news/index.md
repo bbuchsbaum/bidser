@@ -34,6 +34,26 @@
   no longer fails with “NAs are not allowed in subscripted assignments”
   on datasets with real file sizes.
 
+- [`n_volumes()`](https://bbuchsbaum.github.io/bidser/reference/n_volumes.md)
+  no longer requires RNifti: without it, NIfTI-1 headers are read
+  directly in base R.
+
+- [`print()`](https://rdrr.io/r/base/print.html) on a `bids_project` is
+  now a short summary: the dataset’s `Name` from
+  `dataset_description.json`, root, subjects (and where they came from),
+  sessions in chronological order, tasks, datatypes and derivative
+  pipelines. Internal details (index state, parser keys, “funcprep”
+  types) are no longer printed.
+
+- [`plot_bids_tree()`](https://bbuchsbaum.github.io/bidser/reference/plot_bids_tree.md)
+  gains `short_names` to abbreviate the repeated
+  `sub-<label>_ses-<label>_` prefix, and reports its natural size in
+  `attr(p, "bidser_size")`.
+
+- The README now opens with a real dataset workflow (overview plots,
+  entity queries, metadata, derivatives, confounds) rather than mock
+  projects.
+
 - New
   [`theme_bidser()`](https://bbuchsbaum.github.io/bidser/reference/theme_bidser.md)
   and

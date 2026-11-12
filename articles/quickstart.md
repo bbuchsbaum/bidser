@@ -41,15 +41,11 @@ data from a “Balloon Analog Risk Task” experiment with 16 subjects.
 ``` r
 
 proj
-#> BIDS Project Summary 
-#> Project Name:  bids_example_ds001 
-#> Participants (n):  16 
-#> Participants Source:  file 
-#> Tasks:  balloonanalogrisktask 
-#> Index:  enabled 
-#> Image Types:  func, anat 
-#> Modalities:  (none) 
-#> Keys:  folder, kind, relative_path, run, subid, suffix, task, type
+#> <bids_project> Balloon Analog Risk-taking Task
+#>   root         /tmp/Rtmp14Gt3s/bids_example_ds001
+#>   subjects     16 (from participants.tsv)
+#>   tasks        balloonanalogrisktask
+#>   datatypes    anat, func
 ```
 
 The `bids_project` object provides a high-level interface to the
@@ -94,11 +90,14 @@ plot_bids_tree(proj)
 
 ![](quickstart_files/figure-html/overview-tree-1.png)
 
-Both functions take `interactive = TRUE` (for
-[`plot_bids()`](https://bbuchsbaum.github.io/bidser/reference/plot_bids.md))
-or return a regular ggplot, so you can restyle them with
+Both return regular ggplot objects
+([`plot_bids()`](https://bbuchsbaum.github.io/bidser/reference/plot_bids.md)
+can also return an interactive plotly widget with `interactive = TRUE`),
+so you can restyle them with
 [`theme_bidser()`](https://bbuchsbaum.github.io/bidser/reference/theme_bidser.md)
-or any ggplot2 theme.
+or any ggplot2 theme. The tree is laid out as monospace text, so it
+knows its natural size: `attr(p, "bidser_size")` gives a width and
+height in inches for `ggsave()` or knitr’s `fig.width` and `fig.height`.
 
 ## Basic Dataset Queries
 
@@ -615,9 +614,9 @@ When you need absolute paths for analysis tools:
 
 full_paths <- func_scans(proj, subid = "01", full_path = TRUE)
 full_paths
-#> [1] "/tmp/Rtmpg3qsma/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
-#> [2] "/tmp/Rtmpg3qsma/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
-#> [3] "/tmp/Rtmpg3qsma/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
+#> [1] "/tmp/Rtmp14Gt3s/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"
+#> [2] "/tmp/Rtmp14Gt3s/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"
+#> [3] "/tmp/Rtmp14Gt3s/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"
 
 all(file.exists(full_paths))
 #> [1] TRUE

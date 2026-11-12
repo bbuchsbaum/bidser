@@ -25,17 +25,12 @@ vignette runs without network access.
 
 proj <- bids_project(temp_dir, fmriprep = TRUE)
 proj
-#> BIDS Project Summary 
-#> Project Name:  bids_confounds_vignette_559bac7bacc 
-#> Participants (n):  2 
-#> Participants Source:  file 
-#> Tasks:  nback, rest 
-#> fMRIPrep Derivatives:  derivatives/fmriprep 
-#> Derivative Pipelines:  fmriprep 
-#> Index:  enabled 
-#> Image Types:  func, funcprep 
-#> Modalities:  (none) 
-#> Keys:  folder, kind, relative_path, run, subid, suffix, task, type, desc, space
+#> <bids_project> ConfoundDemo
+#>   root         /tmp/RtmpL30L5P/bids_confounds_vignette_5580a512255
+#>   subjects     2 (from participants.tsv)
+#>   tasks        nback, rest
+#>   datatypes    func
+#>   derivatives  fmriprep (derivatives/fmriprep)
 ```
 
 Our demo has 2 subjects, each with a resting-state and an n-back task
@@ -427,7 +422,7 @@ checks, pipeline discovery, and run-level coverage:
 report <- bids_report(proj)
 report
 #> BIDS Report
-#> Project: bids_confounds_vignette_559bac7bacc 
+#> Project: bids_confounds_vignette_5580a512255 
 #> Participants source: file 
 #> Subjects: 2 
 #> Sessions: 0 

@@ -129,15 +129,11 @@ which contains data from a “Balloon Analog Risk Task” experiment with 16
 subjects.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">proj</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">BIDS Project Summary</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Project Name: </span> <span style="color: #00BBBB; font-weight: bold;">bids_example_ds001</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Participants (n): </span> <span style="color: #00BB00; font-weight: bold;">16</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Participants Source: </span> <span style="color: #BBBB00;">file</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Tasks: </span> <span style="color: #BBBB00;">balloonanalogrisktask</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Index: </span> <span style="color: #00BB00;">enabled</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Image Types: </span> <span style="color: #00BB00;">func, anat</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Modalities: </span> <span style="color: #00BB00;">(none)</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Keys: </span> <span style="color: #BBBB00;">folder, kind, relative_path, run, subid, suffix, task, type</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #555555;">&lt;bids_project&gt; </span><span style="font-weight: bold;">Balloon Analog Risk-taking Task</span></span></span>
+<span><span class="co">#&gt;   root         /tmp/Rtmp14Gt3s/bids_example_ds001</span></span>
+<span><span class="co">#&gt;   subjects     16<span style="color: #555555;"> (from participants.tsv)</span></span></span>
+<span><span class="co">#&gt;   tasks        balloonanalogrisktask</span></span>
+<span><span class="co">#&gt;   datatypes    anat, func</span></span></code></pre></div>
 <p>The <code>bids_project</code> object provides a high-level interface
 to the dataset. We can see it contains 16 subjects with both anatomical
 and functional data.</p>
@@ -168,10 +164,15 @@ subjects it has. The right-hand column counts files per template and
 names any subject, session or run that lacks one.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_bids_tree.html">plot_bids_tree</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span></code></pre></div>
-<p><img src="quickstart_files/figure-html/overview-tree-1.png" class="r-plt" alt="" width="768"></p>
-<p>Both functions take <code>interactive = TRUE</code> (for
-<code><a href="../reference/plot_bids.html">plot_bids()</a></code>) or return a regular ggplot, so you can restyle
-them with <code><a href="../reference/theme_bidser.html">theme_bidser()</a></code> or any ggplot2 theme.</p>
+<p><img src="quickstart_files/figure-html/overview-tree-1.png" class="r-plt" alt="" width="816"></p>
+<p>Both return regular ggplot objects (<code><a href="../reference/plot_bids.html">plot_bids()</a></code> can also
+return an interactive plotly widget with
+<code>interactive = TRUE</code>), so you can restyle them with
+<code><a href="../reference/theme_bidser.html">theme_bidser()</a></code> or any ggplot2 theme. The tree is laid out
+as monospace text, so it knows its natural size:
+<code>attr(p, "bidser_size")</code> gives a width and height in inches
+for <code>ggsave()</code> or knitr’s <code>fig.width</code> and
+<code>fig.height</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="basic-dataset-queries">Basic Dataset Queries<a class="anchor" aria-label="anchor" href="#basic-dataset-queries"></a>
@@ -643,9 +644,9 @@ workflows:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">full_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/func_scans.html">func_scans</a></span><span class="op">(</span><span class="va">proj</span>, subid <span class="op">=</span> <span class="st">"01"</span>, full_path <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">full_paths</span></span>
-<span><span class="co">#&gt; [1] "/tmp/Rtmpg3qsma/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
-<span><span class="co">#&gt; [2] "/tmp/Rtmpg3qsma/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
-<span><span class="co">#&gt; [3] "/tmp/Rtmpg3qsma/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [1] "/tmp/Rtmp14Gt3s/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-01_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [2] "/tmp/Rtmp14Gt3s/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-02_bold.nii.gz"</span></span>
+<span><span class="co">#&gt; [3] "/tmp/Rtmp14Gt3s/bids_example_ds001/sub-01/func/sub-01_task-balloonanalogrisktask_run-03_bold.nii.gz"</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">full_paths</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>

@@ -114,19 +114,27 @@ confounds_flat <- read_confounds(
 )
 
 confounds_flat
-#> # A tibble: 4 × 8
-#>     CSF WhiteMatter GlobalSignal FramewiseDisplacement participant_id task 
-#>   <dbl>       <dbl>        <dbl>                 <dbl> <chr>          <chr>
-#> 1   0.1         0.4          1                    0.01 01             rest 
-#> 2   0.2         0.5          1.1                  0.02 01             rest 
-#> 3   0.3         0.6          1.2                  0.03 01             rest 
-#> 4   0.2         0.5          1.1                  0.02 01             rest 
-#> # ℹ 2 more variables: run <chr>, session <chr>
+#> # A tibble: 200 × 11
+#>        CSF WhiteMatter GlobalSignal FramewiseDisplacement  trans_x trans_y
+#>      <dbl>       <dbl>        <dbl>                 <dbl>    <dbl>   <dbl>
+#>  1  0.373       0.0814        100.0                0.153  -0.00803 -0.0415
+#>  2 -0.340      -0.262         100.                 0.203  -0.0155  -0.0240
+#>  3  0.251       0.0425         99.7                0.0572 -0.0240   0.0268
+#>  4 -1.01       -0.377         100.                 0.164  -0.0151   0.0347
+#>  5  0.199      -0.738          99.9                0.157  -0.0286   0.0425
+#>  6 -0.0946     -0.0280        100.                 0.120  -0.0203   0.0364
+#>  7  0.0950      0.234          99.9                0.102  -0.0482   0.0348
+#>  8 -0.350       0.148          99.7                0.0935 -0.0651   0.0375
+#>  9 -0.561      -0.0191         99.9                0.0679 -0.0777   0.0598
+#> 10  0.506       0.238          99.8                0.0563 -0.0637   0.0297
+#> # ℹ 190 more rows
+#> # ℹ 5 more variables: trans_z <dbl>, participant_id <chr>, task <chr>,
+#> #   run <chr>, session <chr>
 
 stopifnot(
-  nrow(confounds_flat) == 4L,
+  nrow(confounds_flat) == 200L,
   all(is.finite(confounds_flat$FramewiseDisplacement)),
-  max(confounds_flat$FramewiseDisplacement) < 0.05
+  mean(confounds_flat$FramewiseDisplacement) < 0.2
 )
 ```
 
@@ -142,9 +150,9 @@ confounds_pca <- read_confounds(
   subid = "01",
   task = "rest",
   cvars = confound_strategy(
-    pca_vars = c("CSF", "WhiteMatter", "GlobalSignal"),
+    pca_vars = c("CSF", "WhiteMatter", "GlobalSignal", "trans_*"),
     raw_vars = "FramewiseDisplacement",
-    npcs = 2
+    npcs = 3
   )
 )
 
@@ -175,12 +183,12 @@ run_variables[, c(".subid", ".task", ".run", "n_scans", "n_events", "n_confound_
 #> # A tibble: 1 × 6
 #>   .subid .task .run  n_scans n_events n_confound_rows
 #>   <chr>  <chr> <chr>   <int>    <int>           <int>
-#> 1 01     rest  01          1        1               4
+#> 1 01     rest  01          1        1             200
 
 stopifnot(
   run_variables$n_scans[[1]] == 1L,
   run_variables$n_events[[1]] == 1L,
-  run_variables$n_confound_rows[[1]] == 4L
+  run_variables$n_confound_rows[[1]] == 200L
 )
 ```
 
@@ -202,7 +210,7 @@ report <- bids_report(
 
 report
 #> BIDS Report
-#> Project: bidser-deriv-6e713ebad124 
+#> Project: bidser-deriv-6e54156ede2d 
 #> Participants source: file 
 #> Subjects: 1 
 #> Sessions: 0 

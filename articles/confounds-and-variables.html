@@ -89,17 +89,12 @@ vignette runs without network access.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_project.html">bids_project</a></span><span class="op">(</span><span class="va">temp_dir</span>, fmriprep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">proj</span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">BIDS Project Summary</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Project Name: </span> <span style="color: #00BBBB; font-weight: bold;">bids_confounds_vignette_559bac7bacc</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Participants (n): </span> <span style="color: #00BB00; font-weight: bold;">2</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Participants Source: </span> <span style="color: #BBBB00;">file</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Tasks: </span> <span style="color: #BBBB00;">nback, rest</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">fMRIPrep Derivatives: </span> <span style="color: #BB00BB;">derivatives/fmriprep</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Derivative Pipelines: </span> <span style="color: #BB00BB;">fmriprep</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Index: </span> <span style="color: #00BB00;">enabled</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Image Types: </span> <span style="color: #00BB00;">func, funcprep</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Modalities: </span> <span style="color: #00BB00;">(none)</span> </span></span>
-<span><span class="co">#&gt; <span style="font-weight: bold;">Keys: </span> <span style="color: #BBBB00;">folder, kind, relative_path, run, subid, suffix, task, type, desc, space</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #555555;">&lt;bids_project&gt; </span><span style="font-weight: bold;">ConfoundDemo</span></span></span>
+<span><span class="co">#&gt;   root         /tmp/RtmpL30L5P/bids_confounds_vignette_5580a512255</span></span>
+<span><span class="co">#&gt;   subjects     2<span style="color: #555555;"> (from participants.tsv)</span></span></span>
+<span><span class="co">#&gt;   tasks        nback, rest</span></span>
+<span><span class="co">#&gt;   datatypes    func</span></span>
+<span><span class="co">#&gt;   derivatives  fmriprep<span style="color: #555555;"> (derivatives/fmriprep)</span></span></span></code></pre></div>
 <p>Our demo has 2 subjects, each with a resting-state and an n-back task
 run, plus fMRIPrep derivatives containing confound timeseries.</p>
 </div>
@@ -430,7 +425,7 @@ run-level coverage:</p>
 <code class="sourceCode R"><span><span class="va">report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bids_report.html">bids_report</a></span><span class="op">(</span><span class="va">proj</span><span class="op">)</span></span>
 <span><span class="va">report</span></span>
 <span><span class="co">#&gt; BIDS Report</span></span>
-<span><span class="co">#&gt; Project: bids_confounds_vignette_559bac7bacc </span></span>
+<span><span class="co">#&gt; Project: bids_confounds_vignette_5580a512255 </span></span>
 <span><span class="co">#&gt; Participants source: file </span></span>
 <span><span class="co">#&gt; Subjects: 2 </span></span>
 <span><span class="co">#&gt; Sessions: 0 </span></span>

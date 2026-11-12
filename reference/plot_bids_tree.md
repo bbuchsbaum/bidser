@@ -14,7 +14,8 @@ plot_bids_tree(
   include_derivatives = TRUE,
   collapse_runs = TRUE,
   include_sidecars = TRUE,
-  max_rows = 60
+  max_rows = 60,
+  short_names = FALSE
 )
 ```
 
@@ -40,9 +41,16 @@ plot_bids_tree(
 
   Maximum number of rows to draw before truncating.
 
+- short_names:
+
+  Logical. Replace the `sub-<label>_ses-<label>_` prefix that every file
+  name repeats with an ellipsis, for a narrower figure.
+
 ## Value
 
-A ggplot object.
+A ggplot object. Because the layout is monospace text, its natural size
+is known: `attr(p, "bidser_size")` gives a suggested `width` and
+`height` in inches for `ggsave()` or knitr's `fig.width`/`fig.height`.
 
 ## Examples
 

@@ -60,7 +60,8 @@ datatype colour; files that some subjects lack are flagged.</p>
 <span>  include_derivatives <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  collapse_runs <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  include_sidecars <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  max_rows <span class="op">=</span> <span class="fl">60</span></span>
+<span>  max_rows <span class="op">=</span> <span class="fl">60</span>,</span>
+<span>  short_names <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -88,10 +89,17 @@ datatype colour; files that some subjects lack are flagged.</p>
 <dt id="arg-max-rows">max_rows<a class="anchor" aria-label="anchor" href="#arg-max-rows"></a></dt>
 <dd><p>Maximum number of rows to draw before truncating.</p></dd>
 
+
+<dt id="arg-short-names">short_names<a class="anchor" aria-label="anchor" href="#arg-short-names"></a></dt>
+<dd><p>Logical. Replace the <code>sub-&lt;label&gt;_ses-&lt;label&gt;_</code> prefix
+that every file name repeats with an ellipsis, for a narrower figure.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A ggplot object.</p>
+    <p>A ggplot object. Because the layout is monospace text, its natural
+size is known: <code>attr(p, "bidser_size")</code> gives a suggested <code>width</code> and
+<code>height</code> in inches for <code>ggsave()</code> or knitr's <code>fig.width</code>/<code>fig.height</code>.</p>
     </div>
 
     <div class="section level2">

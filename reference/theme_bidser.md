@@ -12,7 +12,7 @@ the data marks carry the colour.
 ## Usage
 
 ``` r
-theme_bidser(base_size = 10, base_family = "", grid = "none")
+theme_bidser(base_size = 11, base_family = "", grid = "none")
 ```
 
 ## Arguments
