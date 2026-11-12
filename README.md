@@ -56,7 +56,7 @@ library(bidser)
 proj <- bids_project(path, derivatives = "auto")
 proj
 #> <bids_project> Working Memory Training
-#>   root         /tmp/Rtmp7eD2dP/wm-training
+#>   root         /tmp/RtmpSXxUoG/wm-training
 #>   subjects     10 (from participants.tsv)
 #>   sessions     pre, post
 #>   tasks        nback, rest
@@ -86,7 +86,7 @@ plot by BIDS file name.
 plot_bids(proj, interactive = FALSE)
 ```
 
-<img src="man/figures/README-plot-bids-1.png" width="100%" />
+<img src="man/figures/README-plot-bids-1.png" alt="" width="100%" />
 
 `plot_bids_tree()` shows the same dataset as a file layout. Every
 subject is folded into one `sub-<label>` template, and each file line
@@ -99,7 +99,7 @@ repeats abbreviated; by default it also draws each pipeline under
 plot_bids_tree(proj, include_derivatives = FALSE, short_names = TRUE)
 ```
 
-<img src="man/figures/README-plot-tree-1.png" width="100%" />
+<img src="man/figures/README-plot-tree-1.png" alt="" width="100%" />
 
 For the same checks as data rather than pictures, see `bids_report()`,
 `bids_summary()` and `bids_check_compliance()`.
@@ -223,7 +223,7 @@ strategy <- confound_strategy(
 plot(read_confounds(proj, cvars = strategy), view = "aggregate")
 ```
 
-<img src="man/figures/README-confound-plot-1.png" width="100%" />
+<img src="man/figures/README-confound-plot-1.png" alt="" width="100%" />
 
 `list_confound_sets()` and `list_confound_strategies()` list the
 built-in options. Code that used the unexported
