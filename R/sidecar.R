@@ -237,7 +237,15 @@ get_repetition_time <- function(x, subid, task, run=".*", session=".*", ...) {
   if (!file.exists(path)) {
     stop("File not found: ", path, call. = FALSE)
   }
-  rlang::check_installed("RNifti", reason = "to read NIfTI headers for n_volumes().")
+  # Without RNifti, read the NIfTI-1 header directly (base R).
+  if (!requireNamespace("RNifti", quietly = TRUE)) {
+    nvol <- nifti_nvols(path)
+    if (is.na(nvol)) {
+      stop("Could not read a NIfTI-1 header from `", path,
+           "`; install RNifti to read other formats.", call. = FALSE)
+    }
+    return(nvol)
+  }
 
   hdr <- tryCatch(
     RNifti::niftiHeader(path),

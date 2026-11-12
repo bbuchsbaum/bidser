@@ -19,6 +19,13 @@
   as dot plots in a consistent order.
 * `plot_bids()` no longer fails with "NAs are not allowed in subscripted
   assignments" on datasets with real file sizes.
+* `n_volumes()` no longer requires RNifti: without it, NIfTI-1 headers are
+  read directly in base R.
+* `print()` on a `bids_project` shows the dataset's `Name` from
+  `dataset_description.json` alongside the directory name, and omits the
+  empty "Modalities" line.
+* The README now opens with a real dataset workflow (overview plots, entity
+  queries, metadata, derivatives, confounds) rather than mock projects.
 * New `theme_bidser()` and `bids_datatype_colors()` give all bidser figures
   one theme and one datatype palette.
 

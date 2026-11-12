@@ -935,7 +935,10 @@ print.bids_project <- function(x, ...) {
   }
   
   # Using crayon for colored output
-  project_col <- crayon::bold(crayon::cyan(x$name))
+  disp <- bids_display_name(x)
+  project_col <- crayon::bold(crayon::cyan(
+    if (identical(disp, x$name)) x$name else paste0(disp, " (", x$name, ")")
+  ))
   participant_count_col <- crayon::bold(crayon::green(nrow(x$part_df)))
   task_list <- tasks(x)
   task_list_col <- if (length(task_list) > 0) {
@@ -981,8 +984,9 @@ print.bids_project <- function(x, ...) {
   
   # Modalities
   mods <- unique(x$tbl$modality[!is.na(x$tbl$modality)])
-  mods_col <- if (length(mods) > 0) crayon::green(paste(mods, collapse=", ")) else crayon::green("(none)")
-  cat(crayon::bold("Modalities: "), mods_col, "\n")
+  if (length(mods) > 0) {
+    cat(crayon::bold("Modalities: "), crayon::green(paste(mods, collapse=", ")), "\n")
+  }
   
   # Keys
   keys <- unique(x$bids_tree$attributesAll)

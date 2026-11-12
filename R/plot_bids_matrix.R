@@ -730,8 +730,20 @@ bids_matrix_caption <- function(cells) {
   if (any(cells$scope == "derivatives")) key <- c(key, "outline: derivative")
   if (any(cells$state %in% c("upstream", "absent"))) key <- c(key, "faint dashes: not counted (no data for that subject-session, or raw input missing)")
   problems <- bids_matrix_problems(cells)
-  paste(c(paste(key, collapse = "   "), if (length(problems)) c("", problems)),
-        collapse = "\n")
+  # Wrap the key at item boundaries so it never runs off the figure
+  lines <- character()
+  cur <- ""
+  for (k in key) {
+    cand <- if (nzchar(cur)) paste0(cur, "   ", k) else k
+    if (nchar(cand) > 100 && nzchar(cur)) {
+      lines <- c(lines, cur)
+      cur <- k
+    } else {
+      cur <- cand
+    }
+  }
+  lines <- c(lines, cur)
+  paste(c(lines, if (length(problems)) c("", problems)), collapse = "\n")
 }
 
 #' Display name for a project: the dataset_description.json Name when present,
