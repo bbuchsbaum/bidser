@@ -88,6 +88,29 @@ plot_bids <- function(x, interactive = TRUE, color_scheme = "viridis",
     return(p)
   }
   
+  # Standard mode: the acquisition matrix (subjects x acquisitions) with
+  # completeness margins. Falls through to the legacy panels if the project
+  # has no subject-level imaging files.
+  if (visualization_mode == "standard") {
+    frame <- bids_plot_frame(x, include_derivatives = include_derivatives)
+    cells <- if (nrow(frame) > 0) bids_matrix_data(frame) else NULL
+    if (!is.null(cells) && nrow(cells) > 0) {
+      if (interactive) {
+        p <- bids_matrix_plot(cells, show_strips = TRUE)
+        p <- p + ggplot2::aes(text = .data$tooltip)
+        out <- tryCatch(
+          plotly::layout(plotly::ggplotly(p, tooltip = "text"), hovermode = "closest"),
+          error = function(e) {
+            if (debug) cat("Error making plot interactive:", e$message, "\n")
+            NULL
+          }
+        )
+        if (!is.null(out)) return(out)
+      }
+      return(bids_matrix_figure(x, frame, cells, color_scheme = color_scheme))
+    }
+  }
+
   # Try to safely extract project data
   project_data <- tryCatch({
     # Extract metadata from the BIDS project
@@ -973,13 +996,11 @@ plot_bids_structure <- function(data, color_scheme = "viridis") {
 #' @export
 bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type="func",
                         highlight_missing=TRUE, text_size=2.5, rotate_labels=TRUE) {
-  
+
   # Check input - accept both bids_project and mock_bids_project
   if (!inherits(x, "bids_project") && !inherits(x, "mock_bids_project")) {
     stop("Input must be a bids_project or mock_bids_project object")
   }
-  
-  # Check required packages
   for (pkg in c("ggplot2", "viridis", "scales")) {
     if (!requireNamespace(pkg, quietly = TRUE)) {
       stop("Package ", pkg, " is required for plotting but not installed. Please install it with: install.packages('", pkg, "')")
@@ -989,361 +1010,42 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
     warning("Package plotly is required for interactive plots but not installed. Falling back to static plot.")
     interactive <- FALSE
   }
-  
-  # Prepare data
-  project_data <- prepare_bids_data_for_plot(x, include_derivatives = TRUE)
-  raw_data <- project_data$raw_data
 
-  if (!"type" %in% names(raw_data)) {
-    stop("missing 'type' column")
+  frame <- bids_plot_frame(x, include_derivatives = FALSE)
+  available <- unique(stats::na.omit(frame$datatype[frame$role == "primary"]))
+  if (!file_type %in% available) {
+    stop(paste0("File type '", file_type, "' not found in dataset. Available types: ",
+                paste(available, collapse = ", ")))
   }
-  
-  # Filter by file type
-  if (!file_type %in% unique(raw_data$type)) {
-    stop(paste0("File type '", file_type, "' not found in dataset. Available types: ", 
-                paste(unique(raw_data$type), collapse = ", ")))
-  }
-  
-  filtered_data <- raw_data %>%
-    dplyr::filter(type == file_type)
+  cells <- bids_matrix_data(frame, datatypes = file_type)
+  if (!highlight_missing) cells <- cells[cells$present, ]
+  has_sizes <- any(!is.na(cells$size) & cells$size > 0)
 
-  # Determine if we have sessions
-  has_sessions <- !is.null(project_data$project_info$sessions) &&
-                 length(project_data$project_info$sessions) > 0
+  p <- bids_matrix_plot(
+    cells,
+    fill_by = if (has_sizes) "size" else "datatype",
+    color_scheme = color_scheme,
+    text_size = if (has_sizes) text_size else 0,
+    rotate_labels = if (isTRUE(rotate_labels)) NULL else FALSE,
+    show_companions = !has_sizes
+  ) +
+    ggplot2::labs(
+      title = paste0(bids_display_name(x), ": ", file_type),
+      subtitle = if (has_sizes)
+        "Each cell is one file, shaded by its size relative to the column median.\nFiles more than 10% from the median are labelled; \u00d7 marks a missing file."
+      else "Each cell is one file; \u00d7 marks a missing file.",
+      caption = paste(bids_matrix_problems(cells), collapse = "\n")
+    ) +
+    ggplot2::theme(plot.caption = ggplot2::element_text(family = "mono", size = 7))
 
-  if (has_sessions && !"session" %in% names(raw_data)) {
-    stop("missing 'session' column")
-  }
-  
-  # Create different visualizations based on file type
-  if (file_type == "func") {
-    # For functional data, use task and run
-    if (!"task" %in% names(raw_data)) {
-      stop("missing 'task' column")
-    }
-    if (!"run" %in% names(raw_data)) {
-      stop("missing 'run' column")
-    }
-    
-    # Create a task-run combination for y-axis
-    if (has_sessions) {
-      # With sessions
-      heatmap_data <- filtered_data %>%
-        dplyr::filter(!is.na(subid), !is.na(task), !is.na(run)) %>%
-        dplyr::group_by(subid, session, task, run) %>%
-        dplyr::summarize(
-          file_size = sum(file_size, na.rm = TRUE),
-          file_count = dplyr::n(),
-          .groups = "drop"
-        ) %>%
-        # Create a combined task-run label for the y-axis
-        dplyr::mutate(task_run = paste0(task, "-run", run))
-      
-      # Create a complete grid to detect missing data
-      if (highlight_missing) {
-        all_subj <- unique(heatmap_data$subid)
-        all_sess <- unique(heatmap_data$session)
-        all_task_runs <- unique(heatmap_data$task_run)
-        
-        expected_grid <- expand.grid(
-          subid = all_subj,
-          session = all_sess,
-          task_run = all_task_runs,
-          stringsAsFactors = FALSE
-        )
-        
-        # Merge to find missing combinations
-        heatmap_data <- dplyr::left_join(expected_grid, heatmap_data, 
-                                by = c("subid", "session", "task_run")) %>%
-          dplyr::mutate(
-            file_size = ifelse(is.na(file_size), 0, file_size),
-            file_count = ifelse(is.na(file_count), 0, file_count),
-            missing = file_count == 0
-          )
-      }
-      
-      # Create the plot - THIS IS THE MAIN VISUALIZATION
-      # x-axis: subject, y-axis: task/run, facet by session, color by file size
-      p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = subid, y = task_run, fill = file_size)) +
-        ggplot2::geom_tile(color = "white", linewidth = 0.2, 
-                 ggplot2::aes(alpha = ifelse(file_count == 0, 0.3, 1))) +
-        ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
-                            trans = "log10", na.value = "grey90",
-                            labels = scales::label_bytes(units = "MB")) +
-        ggplot2::scale_alpha_identity() +
-        ggplot2::facet_wrap(~ session, scales = "free_x", ncol = 1) +
-        ggplot2::labs(
-          title = paste0("BIDS Functional Data: ", x$name),
-          subtitle = "Subject x Task-Run Heatmap",
-          x = "Subject ID",
-          y = "Task and Run"
-        )
-      
-      # Add file size labels
-      if (text_size > 0) {
-        p <- p + ggplot2::geom_text(
-          ggplot2::aes(label = ifelse(file_size > 0, 
-                            paste0(round(file_size / 1e6, 1), "MB"), 
-                            "")),
-          size = text_size, color = "white"
-        )
-      }
-    } else {
-      # No sessions
-      heatmap_data <- filtered_data %>%
-        dplyr::filter(!is.na(subid), !is.na(task), !is.na(run)) %>%
-        dplyr::group_by(subid, task, run) %>%
-        dplyr::summarize(
-          file_size = sum(file_size, na.rm = TRUE),
-          file_count = dplyr::n(),
-          .groups = "drop"
-        ) %>%
-        # Create a combined task-run label for the y-axis
-        dplyr::mutate(task_run = paste0(task, "-run", run))
-      
-      # Create a complete grid to detect missing data
-      if (highlight_missing) {
-        all_subj <- unique(heatmap_data$subid)
-        all_task_runs <- unique(heatmap_data$task_run)
-        
-        expected_grid <- expand.grid(
-          subid = all_subj,
-          task_run = all_task_runs,
-          stringsAsFactors = FALSE
-        )
-        
-        # Merge to find missing combinations
-        heatmap_data <- dplyr::left_join(expected_grid, heatmap_data, by = c("subid", "task_run")) %>%
-          dplyr::mutate(
-            file_size = ifelse(is.na(file_size), 0, file_size),
-            file_count = ifelse(is.na(file_count), 0, file_count),
-            missing = file_count == 0
-          )
-      }
-      
-      # Create the plot - THIS IS THE MAIN VISUALIZATION
-      # x-axis: subject, y-axis: task/run, color by file size
-      p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = subid, y = task_run, fill = file_size)) +
-        ggplot2::geom_tile(color = "white", linewidth = 0.2, 
-                 ggplot2::aes(alpha = ifelse(file_count == 0, 0.3, 1))) +
-        ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
-                            trans = "log10", na.value = "grey90",
-                            labels = scales::label_bytes(units = "MB")) +
-        ggplot2::scale_alpha_identity() +
-        ggplot2::labs(
-          title = paste0("BIDS Functional Data: ", x$name),
-          subtitle = "Subject x Task-Run Heatmap",
-          x = "Subject ID",
-          y = "Task and Run"
-        )
-      
-      # Add file size labels
-      if (text_size > 0) {
-        p <- p + ggplot2::geom_text(
-          ggplot2::aes(label = ifelse(file_size > 0, 
-                            paste0(round(file_size / 1e6, 1), "MB"), 
-                            "")),
-          size = text_size, color = "white"
-        )
-      }
-    }
-  } else if (file_type == "anat") {
-    # For anatomical data, use anatomical modality (T1w, T2w, etc.)
-    # x-axis: subject, y-axis: anatomical type, color by file size
-    
-    # Check if 'kind' column exists, if not use 'modality' or extract from filename
-    if (!"kind" %in% names(filtered_data)) {
-      if ("modality" %in% names(filtered_data) && !all(is.na(filtered_data$modality))) {
-        filtered_data$kind <- filtered_data$modality
-      } else {
-        # Extract anatomical type from filename
-        filtered_data$kind <- sapply(filtered_data$name, function(fname) {
-          if (grepl("_T1w\\.", fname)) return("T1w")
-          if (grepl("_T2w\\.", fname)) return("T2w")
-          if (grepl("_inplaneT2\\.", fname)) return("inplaneT2")
-          if (grepl("_FLAIR\\.", fname)) return("FLAIR")
-          if (grepl("_PD\\.", fname)) return("PD")
-          if (grepl("_PDT2\\.", fname)) return("PDT2")
-          return("anatomical")
-        })
-      }
-    }
-    
-    if (has_sessions) {
-      # With sessions
-      heatmap_data <- filtered_data %>%
-        dplyr::filter(!is.na(subid)) %>%
-        dplyr::group_by(subid, session, kind) %>%
-        dplyr::summarize(
-          file_size = sum(file_size, na.rm = TRUE),
-          file_count = dplyr::n(),
-          .groups = "drop"
-        )
-      
-      # Create a complete grid for missing data
-      if (highlight_missing) {
-        all_subj <- unique(heatmap_data$subid)
-        all_sess <- unique(heatmap_data$session)
-        all_kinds <- unique(heatmap_data$kind)
-        
-        expected_grid <- expand.grid(
-          subid = all_subj,
-          session = all_sess,
-          kind = all_kinds,
-          stringsAsFactors = FALSE
-        )
-        
-        # Merge to find missing combinations
-        heatmap_data <- dplyr::left_join(expected_grid, heatmap_data, 
-                                by = c("subid", "session", "kind")) %>%
-          dplyr::mutate(
-            file_size = ifelse(is.na(file_size), 1e3, file_size),  # Use small positive value for log safety
-            file_count = ifelse(is.na(file_count), 0, file_count),
-            missing = file_count == 0
-          )
-      }
-      
-      # Create the plot
-      p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = subid, y = kind, fill = file_size)) +
-        ggplot2::geom_tile(color = "white", linewidth = 0.2, 
-                 ggplot2::aes(alpha = ifelse(file_count == 0, 0.3, 1))) +
-        ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
-                            trans = "log10", na.value = "grey90",
-                            labels = scales::label_bytes(units = "MB")) +
-        ggplot2::scale_alpha_identity() +
-        ggplot2::facet_wrap(~ session, scales = "free_x", ncol = 1) +
-        ggplot2::labs(
-          title = paste0("BIDS Anatomical Data: ", x$name),
-          subtitle = "Subject x Image Type Heatmap",
-          x = "Subject ID",
-          y = "Anatomical Type"
-        )
-      
-      # Add file size labels
-      if (text_size > 0) {
-        p <- p + ggplot2::geom_text(
-          ggplot2::aes(label = ifelse(file_size > 0, 
-                            paste0(round(file_size / 1e6, 1), "MB"), 
-                            "")),
-          size = text_size, color = "white"
-        )
-      }
-    } else {
-      # No sessions
-      heatmap_data <- filtered_data %>%
-        dplyr::filter(!is.na(subid)) %>%
-        dplyr::group_by(subid, kind) %>%
-        dplyr::summarize(
-          file_size = sum(file_size, na.rm = TRUE),
-          file_count = dplyr::n(),
-          .groups = "drop"
-        )
-      
-      # Create a complete grid for missing data
-      if (highlight_missing) {
-        all_subj <- unique(heatmap_data$subid)
-        all_kinds <- unique(heatmap_data$kind)
-        
-        expected_grid <- expand.grid(
-          subid = all_subj,
-          kind = all_kinds,
-          stringsAsFactors = FALSE
-        )
-        
-        # Merge to find missing combinations
-        heatmap_data <- dplyr::left_join(expected_grid, heatmap_data, 
-                                by = c("subid", "kind")) %>%
-          dplyr::mutate(
-            file_size = ifelse(is.na(file_size), 1e3, file_size),  # Use small positive value for log safety
-            file_count = ifelse(is.na(file_count), 0, file_count),
-            missing = file_count == 0
-          )
-      }
-      
-      # Create the plot
-      p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = subid, y = kind, fill = file_size)) +
-        ggplot2::geom_tile(color = "white", linewidth = 0.2, 
-                 ggplot2::aes(alpha = ifelse(file_count == 0, 0.3, 1))) +
-        ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
-                            trans = "log10", na.value = "grey90",
-                            labels = scales::label_bytes(units = "MB")) +
-        ggplot2::scale_alpha_identity() +
-        ggplot2::labs(
-          title = paste0("BIDS Anatomical Data: ", x$name),
-          subtitle = "Subject x Image Type Heatmap",
-          x = "Subject ID",
-          y = "Anatomical Type"
-        )
-      
-      # Add file size labels
-      if (text_size > 0) {
-        p <- p + ggplot2::geom_text(
-          ggplot2::aes(label = ifelse(file_size > 0, 
-                            paste0(round(file_size / 1e6, 1), "MB"), 
-                            "")),
-          size = text_size, color = "white"
-        )
-      }
-    }
-  } else {
-    # For other file types, just use the file type as the y-axis
-    heatmap_data <- filtered_data %>%
-      dplyr::filter(!is.na(subid)) %>%
-      dplyr::group_by(subid) %>%
-      dplyr::summarize(
-        file_size = sum(file_size, na.rm = TRUE),
-        file_count = dplyr::n(),
-        .groups = "drop"
-      )
-    
-    # Create the plot
-    p <- ggplot2::ggplot(heatmap_data, ggplot2::aes(x = subid, y = 1, fill = file_size)) +
-      ggplot2::geom_tile(color = "white", linewidth = 0.2) +
-      ggplot2::scale_fill_viridis_c(option = color_scheme, name = "File Size",
-                          trans = "log10", na.value = "grey90",
-                          labels = scales::label_bytes(units = "MB")) +
-      ggplot2::labs(
-        title = paste0("BIDS ", file_type, " Data: ", x$name),
-        subtitle = "Subject Heatmap",
-        x = "Subject ID",
-        y = ""
-      ) +
-      ggplot2::scale_y_continuous(breaks = NULL)
-    
-    # Add file size labels
-    if (text_size > 0) {
-      p <- p + ggplot2::geom_text(
-        ggplot2::aes(label = paste0(round(file_size / 1e6, 1), "MB")),
-        size = text_size, color = "white"
-      )
-    }
-  }
-  
-  # Apply common theme settings
-  p <- p + ggplot2::theme_minimal() +
-    ggplot2::theme(
-      axis.text.x = ggplot2::element_text(angle = if(rotate_labels) 45 else 0, hjust = 1),
-      panel.grid.major = ggplot2::element_blank(),
-      panel.grid.minor = ggplot2::element_blank(),
-      legend.position = "right"
-    )
-  
-  # Convert to interactive if requested
   if (interactive) {
-    p <- plotly::ggplotly(p) %>%
-      plotly::layout(
-        hovermode = "closest",
-        hoverlabel = list(bgcolor = "white"),
-        title = list(
-          text = paste0("BIDS ", file_type, " Data: ", x$name,
-                       "<br><sup>Subject x ", 
-                       if(file_type == "func") "Task-Run" else "Image Type", 
-                       " Heatmap</sup>")
-        )
-      )
+    p <- p + ggplot2::aes(text = .data$tooltip)
+    p <- tryCatch(
+      plotly::layout(plotly::ggplotly(p, tooltip = "text"), hovermode = "closest"),
+      error = function(e) p
+    )
   }
-  
-  return(p)
+  p
 }
 
 #' Plot BIDS data as a heatmap

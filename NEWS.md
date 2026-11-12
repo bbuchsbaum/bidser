@@ -1,5 +1,27 @@
 # bidser (development version)
 
+* `plot_bids()` is redesigned as an acquisition matrix: one row per subject
+  (grouped by session), one column per acquisition (grouped by datatype, task
+  and derivative pipeline). Present files are drawn quietly; missing files,
+  runs with an unusual number of volumes (read from the NIfTI header in base
+  R) or size, and missing `events.tsv`/confounds files are marked, counted in
+  the margins and listed by BIDS file name under the plot. A derivative is
+  only expected where its raw input exists, and a subject-session with no
+  files at all is reported once.
+* New `plot_bids_tree()` draws the dataset layout with every subject folded
+  into a `sub-<label>` template, with per-file counts that name who is
+  missing and which files have an unusual length.
+* `bids_heatmap()` now shades each file by its size relative to its column's
+  median. Previously it showed a placeholder 1 MB per file on real projects.
+* `plot()` on confound objects leads with head motion when
+  `framewise_displacement` is kept as a raw column (new `fd_threshold`
+  argument), uses one-row-per-component small multiples, and shows loadings
+  as dot plots in a consistent order.
+* `plot_bids()` no longer fails with "NAs are not allowed in subscripted
+  assignments" on datasets with real file sizes.
+* New `theme_bidser()` and `bids_datatype_colors()` give all bidser figures
+  one theme and one datatype palette.
+
 * `bids_summary()` now counts runs correctly: `total_runs` is the number of
   raw BOLD runs in the dataset, and `tasks$n_runs` is the number of runs of
   each task across all subjects and sessions. Previously both counted distinct

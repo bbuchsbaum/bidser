@@ -136,10 +136,19 @@ without downloading example data. For raw-project discovery, start with
 ## Where are the derivatives?
 
 Use `plot_bids()` to get a fast overview of the raw project plus attached
-derivative folders.
+derivative folders. Each pipeline gets its own column group, drawn in outline,
+and a derivative that is absent where raw data exist is flagged as missing.
+A derivative whose raw input is itself missing is not counted against the
+pipeline.
 
-```{r overview-plot, fig.width=9, fig.height=7}
+```{r overview-plot, fig.width = 6, fig.height = 2.6}
 plot_bids(proj, interactive = FALSE)
+```
+
+`plot_bids_tree()` shows where each pipeline wrote its files:
+
+```{r overview-tree, fig.width = 9, fig.height = 3.4}
+plot_bids_tree(proj)
 ```
 
 For code, `derivative_pipelines()` is the clearest inspection entry point.
@@ -210,17 +219,23 @@ stopifnot(
 ```
 
 If you want a compact diagnostic view, ask for principal components and plot
-them.
+them. Keep framewise displacement as a raw column and the plot adds a
+head-motion panel with a 0.5 mm threshold (`fd_threshold`) above the
+components.
 
-```{r plot-confounds}
+```{r plot-confounds, fig.width = 7, fig.height = 6}
 confounds_pca <- read_confounds(
   proj,
   subid = "01",
   task = "rest",
-  npcs = 2
+  cvars = confound_strategy(
+    pca_vars = c("CSF", "WhiteMatter", "GlobalSignal"),
+    raw_vars = "FramewiseDisplacement",
+    npcs = 2
+  )
 )
 
-plot(confounds_pca, view = "aggregate")
+plot(confounds_pca)
 ```
 
 The plot is most useful as a quick failure check: if the confounds are missing,

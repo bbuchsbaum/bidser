@@ -10,6 +10,7 @@
   pcs = NULL,
   top_n = 8,
   max_panels = 6,
+  fd_threshold = 0.5,
   ...
 )
 }
@@ -27,6 +28,10 @@ absolute loading. Set to \code{NULL} to keep all variables.}
 
 \item{max_panels}{Integer. In \code{view = "auto"}, facet score plots only
 when the number of runs is at most \code{max_panels}.}
+
+\item{fd_threshold}{Numeric. Framewise-displacement threshold in mm drawn
+on the motion panel (shown when a \code{framewise_displacement} column was
+kept, e.g. via \code{confound_strategy(raw_vars = "framewise_displacement")}).}
 
 \item{...}{Unused.}
 }

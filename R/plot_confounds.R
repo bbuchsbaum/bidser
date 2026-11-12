@@ -14,6 +14,9 @@
 #'   absolute loading. Set to \code{NULL} to keep all variables.
 #' @param max_panels Integer. In \code{view = "auto"}, facet score plots only
 #'   when the number of runs is at most \code{max_panels}.
+#' @param fd_threshold Numeric. Framewise-displacement threshold in mm drawn
+#'   on the motion panel (shown when a `framewise_displacement` column was
+#'   kept, e.g. via `confound_strategy(raw_vars = "framewise_displacement")`).
 #' @param ... Unused.
 #' @return A ggplot object, or a list of ggplot objects when patchwork is not
 #'   available.
@@ -45,7 +48,8 @@
 #' }
 #' @export
 plot.bids_confounds <- function(x, view = c("auto", "run", "aggregate"),
-                                pcs = NULL, top_n = 8, max_panels = 6, ...) {
+                                pcs = NULL, top_n = 8, max_panels = 6,
+                                fd_threshold = 0.5, ...) {
   if (!inherits(x, "bids_confounds")) {
     stop("x must be a 'bids_confounds' object returned by read_confounds().")
   }
@@ -93,22 +97,51 @@ plot.bids_confounds <- function(x, view = c("auto", "run", "aggregate"),
     desc = "desc", .desc = "desc"
   )
 
-  make_panel_label <- function(df, cols) {
-    if (length(cols) == 0) {
-      return(rep("all", nrow(df)))
-    }
-    parts <- lapply(cols, function(col) {
-      prefix <- label_key[[col]]
-      val <- as.character(df[[col]])
-      val[is.na(val) | val == ""] <- "unknown"
-      if (prefix == "sub") {
-        paste0("sub-", val)
-      } else {
-        paste0(prefix, "-", val)
-      }
-    })
-    do.call(paste, c(parts, sep = " | "))
+  varying <- id_cols[vapply(id_cols, function(col) {
+    length(unique(as.character(x_tbl[[col]]))) > 1
+  }, logical(1))]
+  constant <- setdiff(id_cols, varying)
+  # read_confounds() fills session = "1" for datasets without sessions; do not
+  # print an entity that is not in the file names.
+  constant <- constant[!(constant %in% c("session", ".session") &
+                           vapply(constant, function(col) all(as.character(x_tbl[[col]]) %in% c("1", NA)), logical(1)))]
+  ent_lab <- function(col, val) {
+    prefix <- label_key[[col]]
+    val <- as.character(val)
+    val[is.na(val) | val == ""] <- "unknown"
+    paste0(prefix, "-", val)
   }
+  # Labels follow BIDS entity order (sub, ses, task, run, desc); the run goes
+  # on its own line so narrow strips stay readable.
+  bids_rank <- c(participant_id = 1, .subid = 1, session = 2, .session = 2,
+                 task = 3, .task = 3, run = 4, .run = 4, desc = 5, .desc = 5)
+  make_panel_label <- function(df, cols) {
+    cols <- intersect(varying, cols)
+    if (length(cols) == 0) {
+      return(rep("all runs", nrow(df)))
+    }
+    cols <- cols[order(bids_rank[cols])]
+    run_cols <- intersect(cols, c("run", ".run"))
+    rest <- setdiff(cols, run_cols)
+    lab <- function(cs) if (length(cs)) do.call(paste, c(lapply(cs, function(col) ent_lab(col, df[[col]])), sep = " ")) else NULL
+    first <- lab(rest)
+    second <- lab(run_cols)
+    if (!is.null(first) && !is.null(second)) paste0(first, "\n", second) else if (!is.null(first)) first else second
+  }
+  context <- if (length(constant)) {
+    paste(vapply(constant, function(col) ent_lab(col, x_tbl[[col]][1]), ""), collapse = " ")
+  } else ""
+  # Panels in a stable order: subject, task, session (chronological), run
+  id_ord <- id_cols[order(bids_rank[id_cols])]
+  ord_df <- unique(x_tbl[, id_ord, drop = FALSE])
+  ses_col <- intersect(id_cols, c("session", ".session"))
+  ord_keys <- lapply(id_ord, function(col) {
+    v <- as.character(ord_df[[col]])
+    if (col %in% ses_col) match(v, sub("^ses-", "", session_order(v))) else
+      suppressWarnings(if (all(!is.na(as.numeric(v)))) as.numeric(v) else v)
+  })
+  ord_df <- ord_df[do.call(order, ord_keys), , drop = FALSE]
+  panel_order <- unique(make_panel_label(ord_df, id_cols))
 
   x_tbl$panel <- make_panel_label(x_tbl, id_cols)
   x_tbl <- x_tbl %>%
@@ -124,7 +157,8 @@ plot.bids_confounds <- function(x, view = c("auto", "run", "aggregate"),
   ) %>%
     dplyr::filter(!is.na(.data$score))
 
-  panel_levels <- unique(scores_long$panel)
+  panel_levels <- intersect(panel_order, unique(scores_long$panel))
+  scores_long$panel <- factor(scores_long$panel, levels = panel_levels)
   n_panels <- length(panel_levels)
 
   pca_id_cols <- intersect(id_cols, names(pca_meta))
@@ -188,29 +222,45 @@ plot.bids_confounds <- function(x, view = c("auto", "run", "aggregate"),
     aggregate_loadings <- TRUE
   }
 
+  ink <- bidser_ink()
   p_scores <- NULL
   if (show_scores) {
+    # One row per component, one column per run: small multiples that share a
+    # y-axis within each component, so spikes and drifts compare directly.
     p_scores <- ggplot2::ggplot(
       scores_long,
-      ggplot2::aes(x = .data$timepoint, y = .data$score, color = .data$pc_label)
+      ggplot2::aes(x = .data$timepoint, y = .data$score)
     ) +
-      ggplot2::geom_line(linewidth = 0.35, alpha = 0.85) +
+      ggplot2::geom_hline(yintercept = 0, colour = ink[["rule"]], linewidth = 0.3) +
+      ggplot2::geom_line(linewidth = 0.3, colour = ink[["text"]]) +
+      ggplot2::scale_y_continuous(breaks = function(lims) {
+        if (!all(is.finite(lims)) || diff(lims) < 1e-8) return(0)
+        scales::breaks_extended(3)(lims)
+      }, labels = function(b) {
+        b[abs(b) < 1e-8] <- 0
+        format(signif(b, 2), trim = TRUE, drop0trailing = TRUE, scientific = FALSE)
+      }) +
       ggplot2::labs(
-        title = "Confound PC scores",
-        x = "Timepoint",
-        y = "Score",
-        color = "PC"
+        title = paste(c("Confound principal components over time", if (nzchar(context)) paste0("\u00b7 ", context)), collapse = " "),
+        subtitle = "Rows: components, with their share of confound variance. Columns: runs.",
+        x = "Volume",
+        y = NULL
       ) +
-      ggplot2::theme_minimal(base_size = 11) +
+      theme_bidser(grid = "") +
       ggplot2::theme(
-        panel.grid.minor = ggplot2::element_blank(),
-        legend.position = "bottom",
-        plot.title.position = "plot"
+        strip.text.y = ggplot2::element_text(angle = 0, hjust = 0, face = "bold",
+                                             size = 8, colour = ink[["text"]]),
+        strip.text.x = ggplot2::element_text(hjust = 0, size = 8, colour = ink[["muted"]]),
+        panel.spacing = ggplot2::unit(6, "pt"),
+        axis.text.y = ggplot2::element_text(size = 6.5, colour = ink[["faint"]])
       )
 
     if (facet_scores) {
-      ncol_scores <- if (n_panels <= 2) 1 else if (n_panels <= 6) 2 else 3
-      p_scores <- p_scores + ggplot2::facet_wrap(~ panel, ncol = ncol_scores, scales = "free_x")
+      p_scores <- p_scores +
+        ggplot2::facet_grid(pc_label ~ panel, scales = "free_y",
+                            labeller = ggplot2::labeller(panel = ggplot2::label_wrap_gen(28)))
+    } else {
+      p_scores <- p_scores + ggplot2::facet_grid(pc_label ~ ., scales = "free_y")
     }
   }
 
@@ -243,24 +293,27 @@ plot.bids_confounds <- function(x, view = c("auto", "run", "aggregate"),
       dplyr::summarize(loading = mean(abs(.data$loading), na.rm = TRUE), .groups = "drop")
   }
 
+  # Keep the top_n variables overall (by their largest |loading| on any
+  # shown PC) and show every PC for them, so an absent dot never means
+  # "filtered out". Rows are sorted by |loading| on the first PC, the same
+  # way in every view.
+  strength <- loadings_df %>%
+    dplyr::group_by(.data$variable) %>%
+    dplyr::summarize(score = max(abs(.data$loading), na.rm = TRUE), .groups = "drop")
   if (!is.null(top_n)) {
-    if (aggregate_loadings) {
-      loadings_df <- loadings_df %>%
-        dplyr::group_by(.data$pc) %>%
-        dplyr::slice_max(abs(.data$loading), n = top_n, with_ties = FALSE) %>%
-        dplyr::ungroup()
-    } else {
-      loadings_df <- loadings_df %>%
-        dplyr::group_by(.data$panel, .data$pc) %>%
-        dplyr::slice_max(abs(.data$loading), n = top_n, with_ties = FALSE) %>%
-        dplyr::ungroup()
-    }
+    keep_vars <- strength %>%
+      dplyr::slice_max(.data$score, n = top_n, with_ties = FALSE) %>%
+      dplyr::pull(.data$variable)
+    loadings_df <- loadings_df[loadings_df$variable %in% keep_vars, ]
   }
-
+  first_pc <- pc_cols[1]
   var_order <- loadings_df %>%
     dplyr::group_by(.data$variable) %>%
-    dplyr::summarize(score = max(abs(.data$loading), na.rm = TRUE), .groups = "drop") %>%
-    dplyr::arrange(.data$score) %>%
+    dplyr::summarize(
+      score = mean(abs(.data$loading[.data$pc == first_pc]), na.rm = TRUE),
+      .groups = "drop"
+    ) %>%
+    dplyr::arrange(.data$score, dplyr::desc(.data$variable)) %>%
     dplyr::pull(.data$variable)
   loadings_df$variable <- factor(loadings_df$variable, levels = var_order)
 
@@ -272,50 +325,143 @@ plot.bids_confounds <- function(x, view = c("auto", "run", "aggregate"),
   loadings_df$pc_label <- factor(loadings_df$pc_label, levels = pc_label_levels)
 
   loadings_title <- if (aggregate_loadings) {
-    "PC loadings (mean absolute across runs)"
+    "What drives each component (mean |loading| across runs)"
   } else {
-    "PC loadings"
+    "What drives each component (signed loadings)"
   }
 
+  loadings_df$sign <- ifelse(loadings_df$loading >= 0, "positive", "negative")
   p_loadings <- ggplot2::ggplot(
     loadings_df,
-    ggplot2::aes(x = .data$pc_label, y = .data$variable, fill = .data$loading)
+    ggplot2::aes(x = .data$loading, y = .data$variable)
   ) +
-    ggplot2::geom_tile(color = "white", linewidth = 0.2) +
+    ggplot2::geom_vline(xintercept = 0, colour = ink[["rule"]], linewidth = 0.4) +
+    ggplot2::geom_segment(ggplot2::aes(x = 0, xend = .data$loading, yend = .data$variable),
+                          colour = ink[["faint"]], linewidth = 0.35) +
+    ggplot2::geom_point(ggplot2::aes(colour = .data$sign), size = 1.6) +
+    ggplot2::scale_colour_manual(values = c(positive = ink[["text"]], negative = "#C2502E"),
+                                 guide = "none") +
+    ggplot2::scale_x_continuous(
+      limits = if (aggregate_loadings) c(0, max(loadings_df$loading, na.rm = TRUE) * 1.05)
+               else c(-1, 1) * max(abs(loadings_df$loading), na.rm = TRUE) * 1.05,
+      breaks = scales::breaks_pretty(n = 3)
+    ) +
     ggplot2::labs(
       title = loadings_title,
-      x = "PC",
-      y = NULL,
-      fill = "Loading"
-    ) +
-    ggplot2::theme_minimal(base_size = 11) +
+      subtitle = sprintf("%s of %d confounds, by largest |loading|; rows sorted by %s.",
+                         if (length(levels(loadings_df$variable)) < nrow(strength))
+                           paste("Top", length(levels(loadings_df$variable))) else "All",
+                         nrow(strength), first_pc),
+      x = NULL, y = NULL) +
+    theme_bidser(grid = "y") +
     ggplot2::theme(
-      panel.grid = ggplot2::element_blank(),
-      legend.position = "bottom",
-      plot.title.position = "plot"
+      strip.text = ggplot2::element_text(hjust = 0, face = "bold", size = 8),
+      panel.spacing.x = ggplot2::unit(12, "pt"),
+      axis.text.y = ggplot2::element_text(size = 7.5, colour = ink[["text"]])
     )
 
-  if (aggregate_loadings) {
-    p_loadings <- p_loadings +
-      ggplot2::scale_fill_gradient(low = "#F1F5F9", high = "#1F77B4")
-  } else {
-    p_loadings <- p_loadings +
-      ggplot2::scale_fill_gradient2(low = "#2C7FB8", mid = "#F7F7F7", high = "#D95F0E")
-  }
-
   if (facet_loadings) {
-    ncol_loadings <- if (n_panels <= 2) 1 else if (n_panels <= 6) 2 else 3
-    p_loadings <- p_loadings + ggplot2::facet_wrap(~ panel, ncol = ncol_loadings)
+    p_loadings <- p_loadings + ggplot2::facet_grid(panel ~ pc_label)
+  } else {
+    p_loadings <- p_loadings + ggplot2::facet_grid(. ~ pc_label)
   }
 
-  if (!is.null(p_scores) && !is.null(p_loadings)) {
+  # Motion: framewise displacement, when it was kept as a raw column
+  fd_col <- intersect(c("framewise_displacement", "FramewiseDisplacement"), names(x_tbl))
+  p_fd <- NULL
+  if (length(fd_col) > 0) {
+    fd_df <- tibble::tibble(panel = factor(x_tbl$panel, levels = panel_levels),
+                            timepoint = x_tbl$timepoint,
+                            fd = suppressWarnings(as.numeric(x_tbl[[fd_col[1]]])))
+    fd_df <- fd_df[!is.na(fd_df$panel), ]
+    fd_sum <- fd_df %>%
+      dplyr::group_by(.data$panel) %>%
+      dplyr::summarize(mean_fd = mean(.data$fd, na.rm = TRUE),
+                       pct = 100 * mean(.data$fd > fd_threshold, na.rm = TRUE),
+                       n_over = sum(.data$fd > fd_threshold, na.rm = TRUE),
+                       .groups = "drop")
+    fd_sum$label <- sprintf("mean %.2f mm\n%d vols (%.0f%%) > %.1f mm", fd_sum$mean_fd,
+                            fd_sum$n_over, fd_sum$pct, fd_threshold)
+    if (show_scores) {
+      over <- fd_df[!is.na(fd_df$fd) & fd_df$fd > fd_threshold, ]
+      p_fd <- ggplot2::ggplot(fd_df, ggplot2::aes(x = .data$timepoint, y = .data$fd)) +
+        ggplot2::geom_hline(yintercept = fd_threshold, colour = "#C2502E",
+                            linewidth = 0.35, linetype = "22") +
+        ggplot2::geom_line(linewidth = 0.3, colour = ink[["text"]], na.rm = TRUE) +
+        ggplot2::geom_point(data = over, colour = "#C2502E", size = 0.9) +
+        ggplot2::facet_grid(. ~ panel, labeller = ggplot2::as_labeller(
+          stats::setNames(paste0(ifelse(as.character(fd_sum$panel) == "all runs", "",
+                                        paste0(as.character(fd_sum$panel), "\n")),
+                                 fd_sum$label),
+                          as.character(fd_sum$panel)))) +
+        ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.02, 0.08))) +
+        ggplot2::labs(title = paste(c("Head motion", if (nzchar(context)) paste0("\u00b7 ", context)), collapse = " "),
+                      subtitle = sprintf("Framewise displacement (mm); dashed line and dots: volumes above %.1f mm.", fd_threshold),
+                      x = NULL, y = "FD (mm)") +
+        theme_bidser(grid = "") +
+        ggplot2::theme(strip.text.x = ggplot2::element_text(hjust = 0, size = 7.5, colour = ink[["muted"]],
+                                                            lineheight = 1.1),
+                       axis.text.x = ggplot2::element_blank(),
+                       axis.text.y = ggplot2::element_text(size = 6.5, colour = ink[["faint"]]),
+                       panel.spacing = ggplot2::unit(6, "pt"))
+      if (!is.null(p_scores)) {
+        p_scores <- p_scores + ggplot2::theme(strip.text.x = ggplot2::element_blank()) +
+          ggplot2::labs(title = "Confound principal components")
+      }
+    } else {
+      # One row per subject, one dot per run: the run-level distribution
+      # is the QC question, and individual bad runs are labelled.
+      sub_col <- intersect(c("participant_id", ".subid"), names(x_tbl))
+      run_ids <- unique(x_tbl[, c("panel", sub_col), drop = FALSE])
+      fd_sum <- dplyr::left_join(fd_sum, dplyr::mutate(run_ids, panel = factor(.data$panel, levels = panel_levels)),
+                                 by = "panel")
+      fd_sum$subject <- if (length(sub_col)) paste0("sub-", fd_sum[[sub_col[1]]]) else "all runs"
+      fd_sum$subject <- factor(fd_sum$subject, levels = rev(sort(unique(fd_sum$subject))))
+      fd_sum$bad <- fd_sum$pct > 20
+      bad <- fd_sum[fd_sum$bad, ]
+      bad_pct <- 20
+      fd_sum$bad <- fd_sum$pct > bad_pct
+      bad <- fd_sum[fd_sum$bad, ]
+      p_fd <- ggplot2::ggplot(fd_sum, ggplot2::aes(x = .data$pct, y = .data$subject)) +
+        ggplot2::geom_vline(xintercept = bad_pct, colour = "#C2502E", linewidth = 0.35,
+                            linetype = "22") +
+        ggplot2::geom_point(ggplot2::aes(colour = .data$bad), size = 1.4, alpha = 0.7,
+                            shape = 16,
+                            position = ggplot2::position_jitter(width = 0, height = 0.22, seed = 1)) +
+        ggplot2::scale_colour_manual(values = c(`FALSE` = ink[["muted"]], `TRUE` = "#C2502E"),
+                                     guide = "none") +
+        ggplot2::scale_x_continuous(limits = c(0, max(c(fd_sum$pct, bad_pct), na.rm = TRUE) * 1.15),
+                                    expand = c(0, 0), labels = function(v) paste0(v, "%")) +
+        ggplot2::labs(
+          title = "Head motion per run",
+          subtitle = sprintf(paste0("Share of volumes with framewise displacement above %.1f mm, ",
+                                    "one dot per run (%d runs).\nRuns right of the dashed line ",
+                                    "(%d%%) are named."), fd_threshold, nrow(fd_sum), bad_pct),
+          x = NULL, y = NULL) +
+        theme_bidser(grid = "y") +
+        ggplot2::theme(axis.text.y = ggplot2::element_text(size = 7.5, family = "mono",
+                                                           colour = ink[["text"]]))
+      if (nrow(bad) > 0) {
+        bad$lab <- sprintf("%s: %.0f%%, mean %.2f mm",
+                           trimws(gsub("\\s+", " ", gsub("sub-[^ \n]+|\n", " ", bad$panel))),
+                           bad$pct, bad$mean_fd)
+        p_fd <- p_fd + ggplot2::geom_text(
+          data = bad, ggplot2::aes(label = .data$lab),
+          hjust = 1.04, size = 2.3, colour = "#C2502E")
+      }
+    }
+  }
+
+  plots <- Filter(Negate(is.null), list(fd = p_fd, scores = p_scores, loadings = p_loadings))
+  if (length(plots) > 1) {
     if (requireNamespace("patchwork", quietly = TRUE)) {
-      return(patchwork::wrap_plots(list(p_scores, p_loadings), ncol = 1, heights = c(2, 1)))
+      h <- c(fd = if (show_scores) 1.1 else max(1.2, length(unique(x_tbl[[intersect(c("participant_id", ".subid", "panel"), names(x_tbl))[1]]])) / 3.5),
+             scores = length(pc_cols),
+             loadings = max(2, length(levels(loadings_df$variable)) / 4))[names(plots)]
+      return(patchwork::wrap_plots(plots, ncol = 1, heights = h))
     }
     warning("Package patchwork is not installed; returning a list of plots.")
-    return(list(scores = p_scores, loadings = p_loadings))
+    return(plots)
   }
-
-  if (!is.null(p_scores)) return(p_scores)
-  p_loadings
+  plots[[1]]
 }
