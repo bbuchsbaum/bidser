@@ -96,7 +96,11 @@ plot_bids(proj, interactive = FALSE)
 folded into one `sub-<label>` template, and each file line gives its count and
 names whoever is missing.
 
-```{r plot-tree, fig.width = 12.5, fig.height = 7}
+```{r plot-tree-size, include = FALSE}
+tree_size <- attr(plot_bids_tree(proj), "bidser_size")
+```
+
+```{r plot-tree, fig.width = tree_size[["width"]], fig.height = tree_size[["height"]]}
 plot_bids_tree(proj)
 ```
 

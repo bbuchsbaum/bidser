@@ -25,7 +25,9 @@ plot_bids_tree(
 \item{max_rows}{Maximum number of rows to draw before truncating.}
 }
 \value{
-A ggplot object.
+A ggplot object. Because the layout is monospace text, its natural
+size is known: \code{attr(p, "bidser_size")} gives a suggested \code{width} and
+\code{height} in inches for \code{ggsave()} or knitr's \code{fig.width}/\code{fig.height}.
 }
 \description{
 Collapses every subject (and session) into a single \verb{sub-<label>} template

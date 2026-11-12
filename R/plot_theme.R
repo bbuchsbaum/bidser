@@ -17,7 +17,7 @@
 #'     ggplot2::geom_point() +
 #'     theme_bidser(grid = "y")
 #' }
-theme_bidser <- function(base_size = 10, base_family = "", grid = "none") {
+theme_bidser <- function(base_size = 11, base_family = "", grid = "none") {
   ink <- bidser_ink()
   grid_line <- ggplot2::element_line(colour = ink[["rule"]], linewidth = 0.3)
   ggplot2::theme_minimal(base_size = base_size, base_family = base_family) +

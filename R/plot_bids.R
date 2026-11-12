@@ -1036,7 +1036,7 @@ bids_heatmap <- function(x, interactive=TRUE, color_scheme="viridis", file_type=
       else "Each cell is one file; \u00d7 marks a missing file.",
       caption = paste(bids_matrix_problems(cells), collapse = "\n")
     ) +
-    ggplot2::theme(plot.caption = ggplot2::element_text(family = "mono", size = 7))
+    ggplot2::theme(plot.caption = ggplot2::element_text(family = "mono", size = 8))
 
   if (interactive) {
     p <- p + ggplot2::aes(text = .data$tooltip)

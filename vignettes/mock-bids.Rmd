@@ -141,13 +141,17 @@ that cell as missing and names the file under the plot. Mock projects are a
 cheap way to check that your QC code catches such gaps before you run it on
 real data.
 
-```{r plot-project, fig.width = 6, fig.height = 2.8}
+```{r plot-project, fig.width = 5, fig.height = 3.2}
 plot_bids(mock_proj, interactive = FALSE)
 ```
 
 `plot_bids_tree()` shows the file layout the mock project will write to disk:
 
-```{r plot-tree, fig.width = 8, fig.height = 3.2}
+```{r plot-tree-size, include = FALSE}
+tree_size <- attr(plot_bids_tree(mock_proj), "bidser_size")
+```
+
+```{r plot-tree, fig.width = tree_size[["width"]], fig.height = tree_size[["height"]]}
 plot_bids_tree(mock_proj)
 ```
 

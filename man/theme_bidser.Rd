@@ -4,7 +4,7 @@
 \alias{theme_bidser}
 \title{A quiet ggplot2 theme for BIDS figures}
 \usage{
-theme_bidser(base_size = 10, base_family = "", grid = "none")
+theme_bidser(base_size = 11, base_family = "", grid = "none")
 }
 \arguments{
 \item{base_size}{Base font size in points.}

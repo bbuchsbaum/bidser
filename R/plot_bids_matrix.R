@@ -479,7 +479,7 @@ bids_matrix_plot <- function(cells, fill_by = c("datatype", "size"),
     if (fill_by == "datatype") {
       p <- p + ggplot2::geom_text(
         data = flagged, ggplot2::aes(label = flag_short(flagged)),
-        size = 2.3, fontface = "bold", colour = ink[["text"]]
+        size = 2.7, fontface = "bold", colour = ink[["text"]]
       )
     }
   }
@@ -503,9 +503,9 @@ bids_matrix_plot <- function(cells, fill_by = c("datatype", "size"),
       panel.spacing.x = ggplot2::unit(10, "pt"),
       panel.spacing.y = ggplot2::unit(10, "pt"),
       axis.text.x = if (rotate_labels)
-        ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5, size = 7)
-      else ggplot2::element_text(size = 7, margin = ggplot2::margin(t = 3)),
-      axis.text.y = ggplot2::element_text(size = 7.5, family = "mono"),
+        ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5, size = 8)
+      else ggplot2::element_text(size = 8.5, margin = ggplot2::margin(t = 3)),
+      axis.text.y = ggplot2::element_text(size = 8.5, family = "mono"),
       strip.text.x = if (show_strips)
         ggplot2::element_text(hjust = 0, vjust = 0, face = "bold", size = 8,
                               colour = ink[["text"]], lineheight = 1.05)
@@ -540,7 +540,7 @@ bids_matrix_top <- function(cells) {
   top$session_lab <- factor(levels(cells$session_lab)[1], levels = levels(cells$session_lab))
 
   ggplot2::ggplot(top, ggplot2::aes(x = .data$colkey, y = 0)) +
-    ggplot2::geom_text(ggplot2::aes(label = .data$label), size = 2.4, fontface = "bold",
+    ggplot2::geom_text(ggplot2::aes(label = .data$label), size = 2.8, fontface = "bold",
                        colour = ink[["text"]], vjust = 0) +
     ggplot2::scale_y_continuous(limits = c(-0.1, 1), expand = c(0, 0)) +
     ggplot2::scale_x_discrete(expand = ggplot2::expansion(add = 0.5)) +
@@ -574,7 +574,7 @@ bids_matrix_right <- function(cells) {
   right$label[is_abs] <- "no data"
 
   ggplot2::ggplot(right, ggplot2::aes(y = .data$subject, x = 0)) +
-    ggplot2::geom_text(ggplot2::aes(label = .data$label), hjust = 0, size = 2.4,
+    ggplot2::geom_text(ggplot2::aes(label = .data$label), hjust = 0, size = 2.8,
                        fontface = "bold", colour = ink[["text"]]) +
     ggplot2::scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
     ggplot2::scale_y_discrete(expand = ggplot2::expansion(add = 0.5)) +
@@ -707,13 +707,17 @@ bids_matrix_figure <- function(x, frame, cells, title = NULL, margins = TRUE,
   right <- bids_matrix_right(cells)
   n_rows <- nrow(dplyr::distinct(cells, .data$session_lab, .data$subject))
   patchwork::wrap_plots(
-    top, patchwork::plot_spacer(), main, right,
+    # A truly empty corner: plot_spacer() would inherit the session theme's
+    # background (e.g. a tinted vignette theme) and show up as a box.
+    top, ggplot2::ggplot() + ggplot2::theme_void() +
+      ggplot2::theme(plot.background = ggplot2::element_rect(fill = "white", colour = NA)),
+    main, right,
     ncol = 2, widths = c(1, 0.06), heights = c(0.45, max(n_rows, 2))
   ) +
     patchwork::plot_annotation(
       title = title, subtitle = subtitle, caption = caption,
       theme = theme_bidser() +
-        ggplot2::theme(plot.caption = ggplot2::element_text(family = "mono", size = 7,
+        ggplot2::theme(plot.caption = ggplot2::element_text(family = "mono", size = 8,
                                                             lineheight = 1.15))
     )
 }
@@ -777,7 +781,9 @@ bids_display_name <- function(x) {
 #'   `run-<index>` row.
 #' @param include_sidecars Logical. Show `.json` sidecars.
 #' @param max_rows Maximum number of rows to draw before truncating.
-#' @return A ggplot object.
+#' @return A ggplot object. Because the layout is monospace text, its natural
+#'   size is known: `attr(p, "bidser_size")` gives a suggested `width` and
+#'   `height` in inches for `ggsave()` or knitr's `fig.width`/`fig.height`.
 #' @export
 #' @examples
 #' fs <- tibble::tribble(
@@ -1041,7 +1047,7 @@ bids_tree_plot <- function(nodes, title, truncated = 0L, n_sub = NA_integer_) {
   )
   header <- paste0(strrep(" ", col_size), formatC("size", width = size_w), "  files")
 
-  fs <- 2.7
+  fs <- 3.1
   mono <- function(data, colour, face = "plain") {
     ggplot2::geom_text(data = data, ggplot2::aes(x = 0, y = .data$y, label = .data$txt),
                        hjust = 0, family = "mono", size = fs, colour = colour, fontface = face)
@@ -1081,6 +1087,15 @@ bids_tree_plot <- function(nodes, title, truncated = 0L, n_sub = NA_integer_) {
   }
   # Width (in characters) of the widest line, for choosing a figure width:
   # about 0.075 inches per character at the default text size.
-  attr(p, "bidser_chars") <- max(nchar(L$count), nchar(extra_df$txt), col_size + size_w)
+  # Suggested figure size in inches. The layout is monospace, so its width is
+  # known: an em of `fs` mm text is fs * .pt points, and a monospace glyph
+  # advances about 0.6 em.
+  n_chars <- max(nchar(L$count), nchar(extra_df$txt), col_size + size_w + 7)
+  char_in <- fs * ggplot2::.pt * 0.62 / 72
+  n_lines <- n + nrow(extra_df)
+  sub_lines <- length(strsplit(p$labels$subtitle %||% "", "\n")[[1]])
+  attr(p, "bidser_size") <- c(width = round(n_chars * char_in + 0.9, 1),
+                              height = round(n_lines * fs * ggplot2::.pt * 1.55 / 72 +
+                                               0.5 + 0.2 * sub_lines, 1))
   p
 }
